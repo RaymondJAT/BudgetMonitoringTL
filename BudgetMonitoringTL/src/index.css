@@ -52,6 +52,15 @@ tfoot strong {
   font-size: 13px;
 }
 
+.custom-col strong {
+  font-size: 13px;
+}
+
+.custom-table th,
+.custom-table td {
+  font-size: 13px;
+}
+
 /* Responsive spacing */
 @media (max-width: 768px) {
   .custom-btn {

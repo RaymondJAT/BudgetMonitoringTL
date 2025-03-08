@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Button, Table } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import DataTable from "./DataTable";
+import PrintModal from "./PrintModal";
 
 const ApprovalForm = ({ data }) => {
   const fields = [
@@ -16,48 +18,35 @@ const ApprovalForm = ({ data }) => {
     { label: "Team Lead", key: "teamLead" },
   ];
 
-  const [tableData, setTableData] = useState([
-    { label: "Ticket", quantity: 1, price: 250, amount: 250 },
-    { label: "Food", quantity: 2, price: 100, amount: 200 },
-    { label: "Others", quantity: 1, price: 50, amount: 50 },
-  ]);
-
-  // calculate total amount
-  const calculateTotal = () => {
-    return tableData.reduce((sum, row) => sum + row.amount, 0);
-  };
-
-  // add new row
-  //   const addRow = () => {
-  //     setTableData([
-  //       ...tableData,
-  //       { label: "New Item", quantity: 1, price: 0.0, amount: 0.0 },
-  //     ]);
-  //   };
+  const [modalShow, setModalShow] = useState(false);
 
   return (
     <>
-      <div className="custom-wrapper">
+      <Container className="custom-wrapper pb-5">
         {/* Buttons */}
-        <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-4">
+        <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2">
           <Button variant="success" className="btn-responsive">
             Approve
           </Button>
           <Button variant="danger" className="btn-responsive">
             Refuse
           </Button>
-          <Button variant="secondary" className="btn-responsive">
+          <Button
+            variant="secondary"
+            onClick={() => setModalShow(true)}
+            className="btn-responsive"
+          >
             Print
           </Button>
         </div>
 
         {/* Main container */}
-        <Container className="custom-container border border-black p-3 bg-white">
-          <Row>
-            <Col xs={12} className="d-flex align-items-center mb-2">
-              <strong className="title">Description:</strong>
-              <p className="ms-2 mb-0">
-                {data?.description || "________________________"}
+        <div className="custom-container border border-black p-3 bg-white">
+          <Row className="mb-2">
+            <Col xs={12} className="d-flex flex-column flex-md-row">
+              <strong className="title text-start">Description:</strong>
+              <p className="ms-md-2 mb-0 text-start">
+                {data?.description || " "}
               </p>
             </Col>
           </Row>
@@ -72,9 +61,7 @@ const ApprovalForm = ({ data }) => {
                 className="d-flex align-items-center mb-2"
               >
                 <strong className="title">{field.label}:</strong>
-                <p className="ms-2 mb-0">
-                  {data?.[field.key] || "________________"}
-                </p>
+                <p className="ms-2 mb-0">{data?.[field.key] || " "}</p>
               </Col>
             ))}
           </Row>
@@ -84,73 +71,25 @@ const ApprovalForm = ({ data }) => {
             <Row key={index}>
               <Col xs={12} className="d-flex align-items-center mb-2">
                 <strong className="title">{field.label}:</strong>
-                <p className="ms-2 mb-0">
-                  {data?.[field.key] || "________________"}
-                </p>
+                <p className="ms-2 mb-0">{data?.[field.key] || " "}</p>
               </Col>
             </Row>
           ))}
 
-          <Row>
-            <Col xs={12} className="d-flex align-items-center mb-2">
-              <strong className="title">Amount in Words:</strong>
-              <p className="ms-2 mb-0">
-                {data?.amountInWords || "________________________"}
+          <Row className="mb-2">
+            <Col xs={12} className="d-flex flex-column flex-md-row">
+              <strong className="title text-start">Amount in Words:</strong>
+              <p className="ms-md-2 mb-0 text-start">
+                {data?.amountInWords || " "}
               </p>
             </Col>
           </Row>
-        </Container>
-
-        {/* Table Section */}
-        <div className="table-wrapper border border-black p-3">
-          <Table responsive>
-            <thead className="tableHead">
-              <tr>
-                <th>Label</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody className="tableBody">
-              {tableData.map((row, index) => (
-                <tr key={index}>
-                  <td>{row.label}</td>
-                  <td>{row.quantity}</td>
-                  <td>{row.price.toFixed(2)}</td>
-                  <td>{row.amount.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-            {/* Total and Amount Due */}
-            <tfoot>
-              <tr>
-                <td colSpan="3" className="custom-col text-end">
-                  <strong>Total:</strong>
-                </td>
-                <td>
-                  <strong>{calculateTotal().toFixed(2)}</strong>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="3" className="custom-col text-end">
-                  <strong>Amount Due:</strong>
-                </td>
-                <td>
-                  <strong>{calculateTotal().toFixed(2)}</strong>
-                </td>
-              </tr>
-            </tfoot>
-          </Table>
         </div>
-
-        {/* Add Button */}
-        {/* <div className="d-flex justify-content-end mt-2">
-          <Button variant="primary" onClick={addRow}>
-            Add Row
-          </Button>
-        </div> */}
-      </div>
+        {/* Table Section */}
+        <DataTable />
+      </Container>
+      {/* Modal */}
+      <PrintModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 };
