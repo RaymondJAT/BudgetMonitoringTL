@@ -14,7 +14,7 @@
 
 .custom-btn Button {
   font-size: small;
-  max-width: 1200px; /* Ensures buttons align with container */
+  max-width: 1200px;
 }
 
 .title {
@@ -58,6 +58,10 @@ tfoot strong {
 
 .custom-table th,
 .custom-table td {
+  font-size: 13px;
+}
+
+.signature strong {
   font-size: 13px;
 }
 

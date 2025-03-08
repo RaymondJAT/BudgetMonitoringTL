@@ -19,6 +19,11 @@ const ApprovalForm = ({ data }) => {
   ];
 
   const [modalShow, setModalShow] = useState(false);
+  const [tableData, setTableData] = useState([
+    { label: "Ticket", quantity: 1, price: 250, amount: 250 },
+    { label: "Food", quantity: 2, price: 100, amount: 200 },
+    { label: "Others", quantity: 1, price: 50, amount: 50 },
+  ]);
 
   return (
     <>
@@ -86,10 +91,15 @@ const ApprovalForm = ({ data }) => {
           </Row>
         </div>
         {/* Table Section */}
-        <DataTable />
+        <DataTable tableData={tableData} />
       </Container>
-      {/* Modal */}
-      <PrintModal show={modalShow} onHide={() => setModalShow(false)} />
+      {/* Modal with tableData passed */}
+      <PrintModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        data={data}
+        tableData={tableData}
+      />
     </>
   );
 };
