@@ -47,6 +47,7 @@ p {
   padding: 0 10px;
 }
 
+/* modal */
 .custom-col,
 tfoot strong {
   font-size: 13px;
@@ -61,7 +62,14 @@ tfoot strong {
   font-size: 13px;
 }
 
-.signature strong {
+.custom-table tbody tr:nth-last-child(2) td:first-child {
+  border-right: none;
+}
+
+.custom-table tbody tr:nth-last-child(2) td:last-child {
+  border-left: none;
+}
+.custom .signature strong {
   font-size: 13px;
 }
 

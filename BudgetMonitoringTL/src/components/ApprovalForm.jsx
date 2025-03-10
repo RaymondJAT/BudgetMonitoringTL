@@ -19,16 +19,12 @@ const ApprovalForm = ({ data }) => {
   ];
 
   const [modalShow, setModalShow] = useState(false);
-  const [tableData, setTableData] = useState([
-    { label: "Ticket", quantity: 1, price: 250, amount: 250 },
-    { label: "Food", quantity: 2, price: 100, amount: 200 },
-    { label: "Others", quantity: 1, price: 50, amount: 50 },
-  ]);
+  const [amountInWords, setAmountInWords] = useState("");
 
   return (
     <>
       <Container className="custom-wrapper pb-5">
-        {/* Buttons */}
+        {/* buttons */}
         <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2">
           <Button variant="success" className="btn-responsive">
             Approve
@@ -41,11 +37,11 @@ const ApprovalForm = ({ data }) => {
             onClick={() => setModalShow(true)}
             className="btn-responsive"
           >
-            Print
+            View
           </Button>
         </div>
 
-        {/* Main container */}
+        {/* main container */}
         <div className="custom-container border border-black p-3 bg-white">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -56,7 +52,7 @@ const ApprovalForm = ({ data }) => {
             </Col>
           </Row>
 
-          {/* Partner Fields */}
+          {/* partner fields */}
           <Row>
             {partnerFields.map((field, index) => (
               <Col
@@ -71,7 +67,7 @@ const ApprovalForm = ({ data }) => {
             ))}
           </Row>
 
-          {/* Fields */}
+          {/* fields */}
           {fields.map((field, index) => (
             <Row key={index}>
               <Col xs={12} className="d-flex align-items-center mb-2">
@@ -84,21 +80,20 @@ const ApprovalForm = ({ data }) => {
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Amount in Words:</strong>
-              <p className="ms-md-2 mb-0 text-start">
-                {data?.amountInWords || " "}
-              </p>
+              <p className="ms-md-2 mb-0 text-start">{amountInWords}</p>
             </Col>
           </Row>
         </div>
+
         {/* Table Section */}
-        <DataTable tableData={tableData} />
+        <DataTable setAmountInWords={setAmountInWords} />
       </Container>
-      {/* Modal with tableData passed */}
+
       <PrintModal
         show={modalShow}
         onHide={() => setModalShow(false)}
         data={data}
-        tableData={tableData}
+        tableData={data?.items || []} // Ensure particulars are passed
       />
     </>
   );

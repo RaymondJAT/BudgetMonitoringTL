@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Modal, Container, Table } from "react-bootstrap";
+import { numberToWords } from "../js/numberToWords";
 
-const PrintModal = ({ show, onHide, data, tableData }) => {
+const PrintModal = ({ show, onHide, data, tableData = [] }) => {
   const [dateFiled, setDateFiled] = useState("");
 
   useEffect(() => {
@@ -9,7 +10,10 @@ const PrintModal = ({ show, onHide, data, tableData }) => {
   }, [show]);
 
   // Calculate total amount
-  const totalAmount = tableData.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount =
+    tableData && tableData.length > 0
+      ? tableData.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0)
+      : 0;
 
   return (
     <Modal
@@ -21,7 +25,7 @@ const PrintModal = ({ show, onHide, data, tableData }) => {
       <Modal.Header closeButton>
         <Modal.Title
           id="contained-modal-title-vcenter"
-          className="text-center w-100"
+          className="text-center w-100 fw-bold"
         >
           CASH REQUEST FORM
         </Modal.Title>
@@ -58,23 +62,33 @@ const PrintModal = ({ show, onHide, data, tableData }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.map((item, index) => (
+                  {(tableData ?? []).map((item, index) => (
                     <tr key={index}>
-                      <td className="text-start">
-                        {`${item.label} - ${
-                          item.quantity
-                        } x ${item.price.toFixed(2)}`}
+                      <td className="text-center">
+                        {`${item.label} - ${item.quantity} x ${(
+                          item.price ?? 0
+                        ).toFixed(2)}`}
                       </td>
-                      <td className="text-center">{item.amount.toFixed(2)}</td>
+                      <td className="text-center">
+                        {item.amount
+                          ? parseFloat(item.amount).toFixed(2)
+                          : "0.00"}
+                      </td>
                     </tr>
                   ))}
-                  {/* total */}
-                  <tr>
-                    <td className="text-end">
+                  <tr className="no-border">
+                    <td className="text-end pe-3">
                       <strong>Total:</strong>
                     </td>
                     <td className="text-center">
                       <strong>{totalAmount.toFixed(2)}</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan="2" className="text-start">
+                      <strong>Amount in Words:</strong>{" "}
+                      {totalAmount > 0 ? numberToWords(totalAmount) : "Zero"}{" "}
+                      Pesos Only
                     </td>
                   </tr>
                 </tbody>

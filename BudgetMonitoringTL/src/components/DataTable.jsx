@@ -1,77 +1,58 @@
-import React, { useState } from "react";
-import { Table, Container, Button } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Table, Container } from "react-bootstrap";
+import { numberToWords } from "../js/numberToWords";
 
-const DataTable = () => {
-  const [tableData, setTableData] = useState([
-    { label: "Ticket", quantity: 1, price: 250, amount: 250 },
-    { label: "Food", quantity: 2, price: 100, amount: 200 },
-    { label: "Others", quantity: 1, price: 50, amount: 50 },
+const DataTable = ({ setAmountInWords }) => {
+  const [tableData] = useState([
+    { label: "Ticket", quantity: 3, price: 250 },
+    { label: "Food", quantity: 2, price: 100 },
+    { label: "Others", quantity: 1, price: 50.87 },
   ]);
 
-  // calculate total amount
-  const calculateTotal = () => {
-    return tableData.reduce((sum, row) => sum + row.amount, 0);
-  };
+  // computing total dynamically
+  const total = tableData.reduce(
+    (sum, row) => sum + row.quantity * row.price,
+    0
+  );
 
-  // add new row
-  const addRow = () => {
-    setTableData([
-      ...tableData,
-      { label: "New Item", quantity: 1, price: 0.0, amount: 0.0 },
-    ]);
-  };
+  // amount in words
+  useEffect(() => {
+    setAmountInWords(numberToWords(total));
+  }, [total, setAmountInWords]);
 
   return (
-    <div>
-      <Container className="table-wrapper border border-black p-3">
-        <Table responsive>
-          <thead className="tableHead">
-            <tr>
-              <th>Label</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Amount</th>
+    <Container className="table-wrapper border border-black p-3">
+      <Table responsive>
+        <thead className="tableHead">
+          <tr>
+            <th>Label</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody className="tableBody">
+          {tableData.map((row, index) => (
+            <tr key={index}>
+              <td>{row.label || "N/A"}</td>
+              <td>{row.quantity ?? 0}</td>
+              <td>{row.price ? row.price.toFixed(2) : "0.00"}</td>
+              <td>{(row.quantity * row.price).toFixed(2)}</td>
             </tr>
-          </thead>
-          <tbody className="tableBody">
-            {tableData.map((row, index) => (
-              <tr key={index}>
-                <td>{row.label}</td>
-                <td>{row.quantity}</td>
-                <td>{row.price.toFixed(2)}</td>
-                <td>{row.amount.toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-          {/* Total and Amount Due */}
-          <tfoot>
-            <tr>
-              <td colSpan="3" className="custom-col text-end">
-                <strong>Total:</strong>
-              </td>
-              <td>
-                <strong>{calculateTotal().toFixed(2)}</strong>
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="3" className="custom-col text-end">
-                <strong>Amount Due:</strong>
-              </td>
-              <td>
-                <strong>{calculateTotal().toFixed(2)}</strong>
-              </td>
-            </tr>
-          </tfoot>
-        </Table>
-      </Container>
-
-      {/* Add Button */}
-      {/* <div className="d-flex justify-content-end mt-2">
-        <Button variant="primary" onClick={addRow}>
-          Add Row
-        </Button>
-      </div> */}
-    </div>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan="3" className="custom-col text-end">
+              <strong>Total:</strong>
+            </td>
+            <td>
+              <strong>₱{total.toFixed(2)}</strong>
+            </td>
+          </tr>
+        </tfoot>
+      </Table>
+    </Container>
   );
 };
 
