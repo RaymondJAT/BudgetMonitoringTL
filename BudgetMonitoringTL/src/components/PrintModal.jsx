@@ -82,7 +82,7 @@ const PrintModal = ({ show, onHide, data, amountInWords }) => {
                       <strong>Total:</strong>
                     </td>
                     <td className="text-center">
-                      <strong>{totalAmount.toFixed(2)}</strong>
+                      <strong>₱{totalAmount.toFixed(2)}</strong>
                     </td>
                   </tr>
                   <tr>

@@ -2,6 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import ApprovalForm from "./components/ApprovalForm";
+import TeamLead from "./pages/TeamLead";
 
 function App() {
   const requestData = {
@@ -19,7 +20,8 @@ function App() {
 
   return (
     <>
-      <ApprovalForm data={requestData} />
+      {/* <ApprovalForm data={requestData} /> */}
+      <TeamLead />
     </>
   );
 }

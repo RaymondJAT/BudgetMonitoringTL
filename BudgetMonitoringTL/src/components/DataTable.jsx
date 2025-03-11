@@ -4,13 +4,13 @@ import { numberToWords } from "../js/numberToWords";
 
 const DataTable = ({ setAmountInWords, setParticulars }) => {
   const [tableData] = useState([
-    { label: "Ticket", quantity: 3, price: 250 },
+    { label: "Ticket", quantity: 4, price: 250 },
     { label: "Food", quantity: 2, price: 100 },
     { label: "Others", quantity: 1, price: 50.87 },
     { label: "Food", quantity: 2, price: 100 },
-    { label: "Ticket", quantity: 3, price: 250 },
-    { label: "Ticket", quantity: 3, price: 250 },
-    { label: "Ticket", quantity: 3, price: 250 },
+    { label: "Ticket", quantity: 3, price: 250.99 },
+    { label: "Ticket", quantity: 1, price: 250 },
+    { label: "Ticket", quantity: 2, price: 250 },
   ]);
 
   useEffect(() => {
