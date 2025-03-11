@@ -2,36 +2,29 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Modal, Container, Table } from "react-bootstrap";
 import { numberToWords } from "../js/numberToWords";
 
-const PrintModal = ({ show, onHide, data, tableData = [] }) => {
+const PrintModal = ({ show, onHide, data, amountInWords }) => {
   const [dateFiled, setDateFiled] = useState("");
 
   useEffect(() => {
     setDateFiled(new Date().toLocaleDateString());
   }, [show]);
 
-  // Calculate total amount
-  const totalAmount =
-    tableData && tableData.length > 0
-      ? tableData.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0)
-      : 0;
+  const particulars = data?.items || [];
+  const totalAmount = particulars.reduce(
+    (sum, item) => sum + (parseFloat(item.amount) || 0),
+    0
+  );
 
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      aria-labelledby="contained-modal-title-vcenter"
-      size="lg"
-    >
+    <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title
-          id="contained-modal-title-vcenter"
-          className="text-center w-100 fw-bold"
-        >
+        <Modal.Title className="text-center w-100 fw-bold">
           CASH REQUEST FORM
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Container>
+          {/* Employee Details */}
           <Row className="custom-col">
             <Col xs={12} md={6} className="d-flex align-items-center mb-2">
               <strong className="title">Name:</strong>
@@ -51,7 +44,7 @@ const PrintModal = ({ show, onHide, data, tableData = [] }) => {
             </Col>
           </Row>
 
-          {/* particulars */}
+          {/* Particulars Table */}
           <Row>
             <Col xs={12}>
               <Table bordered className="custom-table">
@@ -62,20 +55,28 @@ const PrintModal = ({ show, onHide, data, tableData = [] }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(tableData ?? []).map((item, index) => (
-                    <tr key={index}>
-                      <td className="text-center">
-                        {`${item.label} - ${item.quantity} x ${(
-                          item.price ?? 0
-                        ).toFixed(2)}`}
-                      </td>
-                      <td className="text-center">
-                        {item.amount
-                          ? parseFloat(item.amount).toFixed(2)
-                          : "0.00"}
+                  {particulars.length > 0 ? (
+                    particulars.map((item, index) => (
+                      <tr key={index}>
+                        <td className="text-center">
+                          {`${item.label} - ${item.quantity} x ${(
+                            item.price ?? 0
+                          ).toFixed(2)}`}
+                        </td>
+                        <td className="text-center">
+                          {item.amount
+                            ? parseFloat(item.amount).toFixed(2)
+                            : "0.00"}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="2" className="text-center">
+                        No particulars added.
                       </td>
                     </tr>
-                  ))}
+                  )}
                   <tr className="no-border">
                     <td className="text-end pe-3">
                       <strong>Total:</strong>
@@ -87,8 +88,7 @@ const PrintModal = ({ show, onHide, data, tableData = [] }) => {
                   <tr>
                     <td colSpan="2" className="text-start">
                       <strong>Amount in Words:</strong>{" "}
-                      {totalAmount > 0 ? numberToWords(totalAmount) : "Zero"}{" "}
-                      Pesos Only
+                      {amountInWords || "Zero"}
                     </td>
                   </tr>
                 </tbody>
@@ -96,7 +96,7 @@ const PrintModal = ({ show, onHide, data, tableData = [] }) => {
             </Col>
           </Row>
 
-          {/* signatures */}
+          {/* Signatures */}
           <Row className="signature mt-4">
             <Col xs={12} md={4} className="text-center">
               <p className="mb-0">

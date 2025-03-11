@@ -20,6 +20,7 @@ const ApprovalForm = ({ data }) => {
 
   const [modalShow, setModalShow] = useState(false);
   const [amountInWords, setAmountInWords] = useState("");
+  const [particulars, setParticulars] = useState([]);
 
   return (
     <>
@@ -86,14 +87,17 @@ const ApprovalForm = ({ data }) => {
         </div>
 
         {/* Table Section */}
-        <DataTable setAmountInWords={setAmountInWords} />
+        <DataTable
+          setAmountInWords={setAmountInWords}
+          setParticulars={setParticulars}
+        />
       </Container>
 
       <PrintModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        data={data}
-        tableData={data?.items || []} // Ensure particulars are passed
+        data={{ ...data, items: particulars }} // Ensure items are passed
+        amountInWords={amountInWords}
       />
     </>
   );

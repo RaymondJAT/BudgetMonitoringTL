@@ -2,12 +2,28 @@ import React, { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
 import { numberToWords } from "../js/numberToWords";
 
-const DataTable = ({ setAmountInWords }) => {
+const DataTable = ({ setAmountInWords, setParticulars }) => {
   const [tableData] = useState([
     { label: "Ticket", quantity: 3, price: 250 },
     { label: "Food", quantity: 2, price: 100 },
     { label: "Others", quantity: 1, price: 50.87 },
+    { label: "Food", quantity: 2, price: 100 },
+    { label: "Ticket", quantity: 3, price: 250 },
+    { label: "Ticket", quantity: 3, price: 250 },
+    { label: "Ticket", quantity: 3, price: 250 },
   ]);
+
+  useEffect(() => {
+    // Update particulars in ApprovalForm
+    setParticulars(
+      tableData.map((item) => ({
+        label: item.label,
+        quantity: item.quantity,
+        price: item.price,
+        amount: item.quantity * item.price,
+      }))
+    );
+  }, [setParticulars, tableData]);
 
   // computing total dynamically
   const total = tableData.reduce(

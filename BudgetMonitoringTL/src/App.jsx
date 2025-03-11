@@ -10,7 +10,7 @@ function App() {
     department: "IT",
     paidBy: "Employee (To reimburse)",
     category: "Business trip",
-    expenseDate: "2025-03-07",
+    expenseDate: "03/07/2025",
     total: "500.00",
     teamLead: "Jane Smith",
     description: "Trip to Hong Kong to meet Mickey Mouse.",
