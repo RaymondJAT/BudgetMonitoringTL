@@ -1,0 +1,26 @@
+export const mockData = [
+  {
+    employee: "John Doe",
+    position: "Research and Development",
+    teamLead: "John Wick",
+    department: "IT",
+    description: "Laptop Purchase",
+    expenseDate: "03/07/2025",
+    category: "Equipment",
+    paidBy: "Employee",
+    total: "2000.00",
+    status: "Pending",
+  },
+  {
+    employee: "Jane Smith",
+    position: "IT Field Associate",
+    department: "IT",
+    description: "Training Expense",
+    expenseDate: "03/10/2025",
+    teamLead: "Jane Doe",
+    category: "Education",
+    paidBy: "Employee",
+    total: "3500.00",
+    status: "Approved",
+  },
+];

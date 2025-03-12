@@ -1,27 +1,19 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import ApprovalForm from "./components/ApprovalForm";
 import TeamLead from "./pages/TeamLead";
 
 function App() {
-  const requestData = {
-    employee: "John Doe",
-    position: "IT Field Associate",
-    department: "IT",
-    paidBy: "Employee (To reimburse)",
-    category: "Business trip",
-    expenseDate: "03/07/2025",
-    total: "500.00",
-    teamLead: "Jane Smith",
-    description: "Trip to Hong Kong to meet Mickey Mouse.",
-    amountInWords: "Five Hundred Pesos Only",
-  };
-
   return (
     <>
-      {/* <ApprovalForm data={requestData} /> */}
-      <TeamLead />
+      <Router>
+        <Routes>
+          <Route path="/" element={<TeamLead />} />
+          <Route path="/approval" element={<ApprovalForm />} />
+        </Routes>
+      </Router>
     </>
   );
 }

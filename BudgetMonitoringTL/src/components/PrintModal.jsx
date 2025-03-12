@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Modal, Container, Table } from "react-bootstrap";
-import { numberToWords } from "../js/numberToWords";
 
 const PrintModal = ({ show, onHide, data, amountInWords }) => {
   const [dateFiled, setDateFiled] = useState("");

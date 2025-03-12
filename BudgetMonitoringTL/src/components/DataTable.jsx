@@ -1,37 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
 import { numberToWords } from "../js/numberToWords";
+import { tableData } from "../mock-data/tableData";
 
-const DataTable = ({ setAmountInWords, setParticulars }) => {
-  const [tableData] = useState([
-    { label: "Ticket", quantity: 4, price: 250 },
-    { label: "Food", quantity: 2, price: 100 },
-    { label: "Others", quantity: 1, price: 50.87 },
-    { label: "Food", quantity: 2, price: 100 },
-    { label: "Ticket", quantity: 3, price: 250.99 },
-    { label: "Ticket", quantity: 1, price: 250 },
-    { label: "Ticket", quantity: 2, price: 250 },
-  ]);
+const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
+  // Find transactions for the selected employee
+  const employeeData = tableData.find((e) => e.employee === employeeName);
+  const [data] = useState(employeeData ? employeeData.transactions : []);
 
   useEffect(() => {
-    // Update particulars in ApprovalForm
     setParticulars(
-      tableData.map((item) => ({
+      data.map((item) => ({
         label: item.label,
         quantity: item.quantity,
         price: item.price,
         amount: item.quantity * item.price,
       }))
     );
-  }, [setParticulars, tableData]);
+  }, [setParticulars, data]);
 
-  // computing total dynamically
-  const total = tableData.reduce(
-    (sum, row) => sum + row.quantity * row.price,
-    0
-  );
+  // Compute total dynamically
+  const total = data.reduce((sum, row) => sum + row.quantity * row.price, 0);
 
-  // amount in words
+  // Convert total amount to words
   useEffect(() => {
     setAmountInWords(numberToWords(total));
   }, [total, setAmountInWords]);
@@ -39,7 +30,7 @@ const DataTable = ({ setAmountInWords, setParticulars }) => {
   return (
     <Container className="table-wrapper border border-black p-3">
       <Table responsive>
-        <thead className="tableHead">
+        <thead className="tableHead text-center">
           <tr>
             <th>Label</th>
             <th>Quantity</th>
@@ -47,8 +38,8 @@ const DataTable = ({ setAmountInWords, setParticulars }) => {
             <th>Amount</th>
           </tr>
         </thead>
-        <tbody className="tableBody">
-          {tableData.map((row, index) => (
+        <tbody className="tableBody text-center">
+          {data.map((row, index) => (
             <tr key={index}>
               <td>{row.label || "N/A"}</td>
               <td>{row.quantity ?? 0}</td>
@@ -62,7 +53,7 @@ const DataTable = ({ setAmountInWords, setParticulars }) => {
             <td colSpan="3" className="custom-col text-end">
               <strong>Total:</strong>
             </td>
-            <td>
+            <td className="text-center">
               <strong>₱{total.toFixed(2)}</strong>
             </td>
           </tr>

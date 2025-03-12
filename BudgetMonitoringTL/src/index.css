@@ -73,9 +73,14 @@ tfoot strong {
   font-size: 13px;
 }
 
-.admin-table th {
+/* team leader */
+.team-table th {
   font-size: 13px;
   font-weight: 700;
+}
+
+.team-table td {
+  font-size: 13px;
 }
 
 /* Responsive spacing */

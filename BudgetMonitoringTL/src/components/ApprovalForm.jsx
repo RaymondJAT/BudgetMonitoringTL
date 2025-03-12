@@ -1,9 +1,13 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import DataTable from "./DataTable";
 import PrintModal from "./PrintModal";
 
-const ApprovalForm = ({ data }) => {
+const ApprovalForm = () => {
+  const { state: data } = useLocation();
+  const navigate = useNavigate();
+
   const fields = [
     { label: "Employee", key: "employee" },
     { label: "Position", key: "position" },
@@ -25,8 +29,15 @@ const ApprovalForm = ({ data }) => {
   return (
     <>
       <Container className="custom-wrapper pb-5">
-        {/* buttons */}
+        {/* Buttons */}
         <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2">
+          <Button
+            variant="secondary"
+            onClick={() => navigate(-1)}
+            className="btn-responsive"
+          >
+            Back
+          </Button>
           <Button variant="success" className="btn-responsive">
             Approve
           </Button>
@@ -42,18 +53,18 @@ const ApprovalForm = ({ data }) => {
           </Button>
         </div>
 
-        {/* main container */}
+        {/* Main container */}
         <div className="custom-container border border-black p-3 bg-white">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Description:</strong>
               <p className="ms-md-2 mb-0 text-start">
-                {data?.description || " "}
+                {data?.description || "N/A"}
               </p>
             </Col>
           </Row>
 
-          {/* partner fields */}
+          {/* Partner fields */}
           <Row>
             {partnerFields.map((field, index) => (
               <Col
@@ -63,17 +74,17 @@ const ApprovalForm = ({ data }) => {
                 className="d-flex align-items-center mb-2"
               >
                 <strong className="title">{field.label}:</strong>
-                <p className="ms-2 mb-0">{data?.[field.key] || " "}</p>
+                <p className="ms-2 mb-0">{data?.[field.key] || "N/A"}</p>
               </Col>
             ))}
           </Row>
 
-          {/* fields */}
+          {/* Fields */}
           {fields.map((field, index) => (
             <Row key={index}>
               <Col xs={12} className="d-flex align-items-center mb-2">
                 <strong className="title">{field.label}:</strong>
-                <p className="ms-2 mb-0">{data?.[field.key] || " "}</p>
+                <p className="ms-2 mb-0">{data?.[field.key] || "N/A"}</p>
               </Col>
             </Row>
           ))}
@@ -86,8 +97,8 @@ const ApprovalForm = ({ data }) => {
           </Row>
         </div>
 
-        {/* Table Section */}
         <DataTable
+          employeeName={data?.employee || ""}
           setAmountInWords={setAmountInWords}
           setParticulars={setParticulars}
         />
@@ -96,7 +107,7 @@ const ApprovalForm = ({ data }) => {
       <PrintModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        data={{ ...data, items: particulars }} // Ensure items are passed
+        data={{ ...data, items: particulars }}
         amountInWords={amountInWords}
       />
     </>
