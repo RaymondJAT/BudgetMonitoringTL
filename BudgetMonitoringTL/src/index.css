@@ -2,7 +2,7 @@
   padding: 0;
   margin: 0;
   box-shadow: none;
-  /* text-align: center; */
+  text-align: center;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -99,9 +99,9 @@ tfoot strong {
 
 /* react-to-print */
 @media print {
-  body * {
+  /* body * {
     visibility: hidden;
-  }
+  } */
 
   .print-container,
   .print-container * {

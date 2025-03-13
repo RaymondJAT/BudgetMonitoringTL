@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import { useReactToPrint } from "react-to-print";
 import DataTable from "./DataTable";
 import PrintModal from "./PrintModal";
+import PrintableCashRequest from "./PrintableCashRequest";
 
 const ApprovalForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
+
+  const contentRef = useRef(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
 
   const fields = [
     { label: "Employee", key: "employee" },
@@ -50,6 +55,14 @@ const ApprovalForm = () => {
             className="btn-responsive"
           >
             View
+          </Button>
+          {/* print */}
+          <Button
+            variant="secondary"
+            className="btn-responsive"
+            onClick={() => reactToPrintFn()}
+          >
+            Print
           </Button>
         </div>
 
@@ -110,6 +123,13 @@ const ApprovalForm = () => {
         data={{ ...data, items: particulars }}
         amountInWords={amountInWords}
       />
+      <div style={{ display: "none" }}>
+        <PrintableCashRequest
+          data={{ ...data, items: particulars }}
+          amountInWords={amountInWords}
+          contentRef={contentRef}
+        />
+      </div>
     </>
   );
 };
