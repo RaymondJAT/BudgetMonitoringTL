@@ -18,7 +18,7 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
     <div ref={contentRef}>
       <Container>
         <h4 className="text-center w-100 fw-bold">CASH REQUEST FORM</h4>
-        <hr className="mb-1" style={{ borderTop: "3px solid black" }} />
+        <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
         {/* Employee Details */}
         <Row className="custom-col">
           <Col xs={12} md={6} className="d-flex align-items-center mb-2">

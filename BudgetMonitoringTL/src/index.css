@@ -99,48 +99,35 @@ tfoot strong {
 
 /* react-to-print */
 @media print {
-  /* body * {
-    visibility: hidden;
-  } */
+  @page {
+    size: 150mm 95mm landscape;
+    margin: 5mm;
+  }
 
-  .print-container,
-  .print-container * {
-    visibility: visible;
+  body {
+    font-size: 8px;
   }
 
   .print-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 20px;
+    width: 150mm;
+    height: 95mm;
+    padding: 10mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
-  .print-container .border {
-    border: 2px solid black !important;
-    padding: 20px;
-  }
-
-  .print-container .custom-table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  .print-container .custom-table th,
-  .print-container .custom-table td {
-    border: 1px solid black;
-    padding: 8px;
+  .data-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
 
   .signature-box {
     width: 100%;
-    height: 40px;
+    height: 30px;
     border-bottom: 1px solid black;
-    margin-top: 20px;
-  }
-
-  .custom-btn {
-    display: none !important;
+    margin-top: 5px;
   }
 }
 

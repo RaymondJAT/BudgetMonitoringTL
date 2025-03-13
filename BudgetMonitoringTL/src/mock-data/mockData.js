@@ -23,4 +23,16 @@ export const mockData = [
     total: "3500.00",
     status: "Approved",
   },
+  {
+    employee: "Mickey Mouse",
+    position: "Finance",
+    department: "Admin",
+    description: "Food Expense",
+    expenseDate: "03/01/2025",
+    teamLead: "Jane Doe",
+    category: "Meal Allowance",
+    paidBy: "Employee",
+    total: "5000.00",
+    status: "Pending",
+  },
 ];

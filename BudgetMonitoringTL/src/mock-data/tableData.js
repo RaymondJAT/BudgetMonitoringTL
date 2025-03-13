@@ -14,4 +14,10 @@ export const tableData = [
       { label: "Conference Ticket", quantity: 2, price: 200 },
     ],
   },
+  {
+    employee: "Mickey Mouse",
+    transactions: [
+      { label: "Jollibee Mix and Match", quantity: 10, price: 500 },
+    ],
+  },
 ];
