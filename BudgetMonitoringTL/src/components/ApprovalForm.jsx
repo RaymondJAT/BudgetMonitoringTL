@@ -37,11 +37,11 @@ const ApprovalForm = () => {
         {/* Buttons */}
         <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2">
           <Button
-            variant="secondary"
+            variant="dark"
             onClick={() => navigate(-1)}
             className="btn-responsive"
           >
-            Back
+            ⇦
           </Button>
           <Button variant="success" className="btn-responsive">
             Approve
@@ -50,7 +50,7 @@ const ApprovalForm = () => {
             Refuse
           </Button>
           <Button
-            variant="secondary"
+            variant="dark"
             onClick={() => setModalShow(true)}
             className="btn-responsive"
           >

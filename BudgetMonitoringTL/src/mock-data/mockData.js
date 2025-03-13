@@ -33,6 +33,6 @@ export const mockData = [
     category: "Meal Allowance",
     paidBy: "Employee",
     total: "5000.00",
-    status: "Pending",
+    status: "Refused",
   },
 ];

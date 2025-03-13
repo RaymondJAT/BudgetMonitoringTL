@@ -26,7 +26,13 @@ const TeamLead = () => {
       {/* Main Table Content */}
       <Card className="w-auto">
         <Card.Header as="h5" className="text-center">
-          TEAM LEADER
+          <div className="approval-steps">
+            <span className="step">To Approve</span>
+            <span className="separator"> &gt; </span>
+            <span className="step">Waiting Reimbursement</span>
+            <span className="separator"> &gt; </span>
+            <span className="step">In Payment</span>
+          </div>
         </Card.Header>
         <Card.Body className="p-0">
           <Table hover className="team-table m-0">
@@ -57,7 +63,13 @@ const TeamLead = () => {
                   <td>{row.category}</td>
                   <td>{row.paidBy}</td>
                   <td>₱{row.total}</td>
-                  <td>{row.status}</td>
+                  <td>
+                    <span
+                      className={`status-badge ${row.status.toLowerCase()}`}
+                    >
+                      {row.status}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
