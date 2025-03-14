@@ -20,4 +20,11 @@ export const tableData = [
       { label: "Jollibee Mix and Match", quantity: 10, price: 500 },
     ],
   },
+  {
+    employee: "Michael Jackson",
+    transactions: [
+      { label: "Voice Lesson", quantity: 1, price: 6500 },
+      { label: "Meal", quantity: 2, price: 1500 },
+    ],
+  },
 ];

@@ -12,6 +12,18 @@ export const mockData = [
     status: "Pending",
   },
   {
+    employee: "Michael Jackson",
+    position: "IT Field Associate",
+    department: "IT",
+    description: "Training Expense",
+    expenseDate: "03/10/2025",
+    teamLead: "Jane Doe",
+    category: "Education",
+    paidBy: "Employee",
+    total: "9500.00",
+    status: "Pending",
+  },
+  {
     employee: "Jane Smith",
     position: "IT Field Associate",
     department: "IT",
