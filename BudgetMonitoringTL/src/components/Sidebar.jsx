@@ -7,10 +7,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         {isSidebarOpen ? "<<" : ">>"}
       </button>
       {isSidebarOpen && (
-        <div className="sidebar-content">
-          <h5>Sidebar Content</h5>
-          <p>Additional options can go here.</p>
-        </div>
+        <div className="sidebar-content">{/* side bar content */}</div>
       )}
     </div>
   );

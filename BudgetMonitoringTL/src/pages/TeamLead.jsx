@@ -5,6 +5,7 @@ import { mockData } from "../mock-data/mockData";
 import Header from "../components/Header";
 import loader from "../assets/5Lloading.gif";
 import Sidebar from "../components/Sidebar";
+import HeaderCount from "../components/HeaderCount";
 
 const TeamLead = () => {
   const navigate = useNavigate();
@@ -73,24 +74,15 @@ const TeamLead = () => {
         handlePrint={handlePrint}
       />
       <div>
+        <div className="card-header text-center">
+          <HeaderCount
+            pendingCount={pendingCount}
+            approvedCount={approvedCount}
+            postCount={postCount}
+          />
+        </div>
         {/* table */}
         <Card className="w-auto">
-          <Card.Header as="h5" className="text-center">
-            <div className="approval-steps">
-              <div className="step">
-                <div className="count">{pendingCount}</div>
-                <span>To Approve</span>
-              </div>
-              <div className="step">
-                <div className="count">{approvedCount}</div>
-                <span>Waiting Reimbursement</span>
-              </div>
-              <div className="step">
-                <div className="count">{postCount}</div>
-                <span>In Payment</span>
-              </div>
-            </div>
-          </Card.Header>
           <Card.Body className="p-0">
             <div className="content-container">
               {/* Sidebar */}
