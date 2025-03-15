@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
 import Header from "../components/Header";
 import loader from "../assets/5Lloading.gif";
+import Sidebar from "../components/Sidebar";
 
 const TeamLead = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // header count
   const pendingCount = mockData.filter(
@@ -70,85 +72,95 @@ const TeamLead = () => {
         setSearchTerm={setSearchTerm}
         handlePrint={handlePrint}
       />
+      <div>
+        {/* table */}
+        <Card className="w-auto">
+          <Card.Header as="h5" className="text-center">
+            <div className="approval-steps">
+              <div className="step">
+                <div className="count">{pendingCount}</div>
+                <span>To Approve</span>
+              </div>
+              <div className="step">
+                <div className="count">{approvedCount}</div>
+                <span>Waiting Reimbursement</span>
+              </div>
+              <div className="step">
+                <div className="count">{postCount}</div>
+                <span>In Payment</span>
+              </div>
+            </div>
+          </Card.Header>
+          <Card.Body className="p-0">
+            <div className="content-container">
+              {/* Sidebar */}
+              <Sidebar
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+              />
 
-      {/* table */}
-      <Card className="w-auto">
-        <Card.Header as="h5" className="text-center">
-          <div className="approval-steps">
-            <div className="step">
-              <div className="count">{pendingCount}</div>
-              <span>To Approve</span>
-            </div>
-            <div className="step">
-              <div className="count">{approvedCount}</div>
-              <span>Waiting Reimbursement</span>
-            </div>
-            <div className="step">
-              <div className="count">{postCount}</div>
-              <span>In Payment</span>
-            </div>
-          </div>
-        </Card.Header>
-        <Card.Body className="p-0">
-          <div className="table-container">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={handleSelectAll}
-                      checked={selectedRows.length === mockData.length}
-                    />
-                  </th>
-                  <th>Employee</th>
-                  <th>Department</th>
-                  <th>Description</th>
-                  <th>Expense Date</th>
-                  <th>Category</th>
-                  <th>Paid By</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((row, index) => (
-                  <tr
-                    key={index}
-                    onClick={() => handleRowClick(row)}
-                    className={`text-center ${
-                      selectedRows.includes(row) ? "highlighted-row" : ""
-                    }`}
-                  >
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(row)}
-                        onChange={() => handleCheckBoxChange(row)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </td>
-                    <td>{row.employee}</td>
-                    <td>{row.department}</td>
-                    <td>{row.description}</td>
-                    <td>{row.expenseDate}</td>
-                    <td>{row.category}</td>
-                    <td>{row.paidBy}</td>
-                    <td>₱{row.total}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${row.status.toLowerCase()}`}
+              {/* Table */}
+              <div className="table-container">
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <input
+                          type="checkbox"
+                          onChange={handleSelectAll}
+                          checked={selectedRows.length === mockData.length}
+                        />
+                      </th>
+                      <th>Employee</th>
+                      <th>Department</th>
+                      <th>Description</th>
+                      <th>Expense Date</th>
+                      <th>Category</th>
+                      <th>Paid By</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredData.map((row, index) => (
+                      <tr
+                        key={index}
+                        onClick={() => handleRowClick(row)}
+                        className={`text-center ${
+                          selectedRows.includes(row) ? "highlighted-row" : ""
+                        }`}
                       >
-                        {row.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card.Body>
-      </Card>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.includes(row)}
+                            onChange={() => handleCheckBoxChange(row)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </td>
+                        <td>{row.employee}</td>
+                        <td>{row.department}</td>
+                        <td>{row.description}</td>
+                        <td>{row.expenseDate}</td>
+                        <td>{row.category}</td>
+                        <td>{row.paidBy}</td>
+                        <td>₱{row.total}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${row.status.toLowerCase()}`}
+                          >
+                            {row.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </Card.Body>
+        </Card>
+      </div>
     </>
   );
 };

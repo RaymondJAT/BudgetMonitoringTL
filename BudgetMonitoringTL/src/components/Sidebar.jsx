@@ -1,18 +1,19 @@
 import React from "react";
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   return (
-    <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
-      <button className="close-btn" onClick={toggleSidebar}>
-        ✖
+    <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+      <button className="toggle-btn" onClick={toggleSidebar}>
+        {isSidebarOpen ? "<<" : ">>"}
       </button>
-      <ul>
-        <li>Dashboard</li>
-        <li>Approvals</li>
-        <li>Reports</li>
-        <li>Settings</li>
-      </ul>
+      {isSidebarOpen && (
+        <div className="sidebar-content">
+          <h5>Sidebar Content</h5>
+          <p>Additional options can go here.</p>
+        </div>
+      )}
     </div>
   );
 };
+
 export default Sidebar;
