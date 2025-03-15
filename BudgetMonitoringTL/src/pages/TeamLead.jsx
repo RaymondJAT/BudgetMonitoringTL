@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Card, Spinner } from "react-bootstrap";
+import { Card, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
 import Header from "../components/Header";
@@ -22,7 +22,6 @@ const TeamLead = () => {
 
   const handleRowClick = (rowData) => {
     setLoading(true);
-
     setTimeout(() => {
       navigate("/approval", { state: rowData });
     }, 1000);
@@ -60,7 +59,7 @@ const TeamLead = () => {
     <>
       {loading && (
         <div className="loading">
-          {/* <Spinner animation="border" variant="danger" /> */}
+          {/* <Spinner animation = "border" variant = "danger" /> */}
           <img src={loader} alt="Loading GIF" className="custom-loader" />
         </div>
       )}
@@ -72,7 +71,7 @@ const TeamLead = () => {
         handlePrint={handlePrint}
       />
 
-      {/* Main Table Content */}
+      {/* table */}
       <Card className="w-auto">
         <Card.Header as="h5" className="text-center">
           <div className="approval-steps">
@@ -91,10 +90,10 @@ const TeamLead = () => {
           </div>
         </Card.Header>
         <Card.Body className="p-0">
-          <div className="table-responsive">
-            <Table hover className="team-table m-0">
+          <div className="table-container">
+            <table className="custom-table">
               <thead>
-                <tr className="text-center">
+                <tr>
                   <th>
                     <input
                       type="checkbox"
@@ -117,7 +116,6 @@ const TeamLead = () => {
                   <tr
                     key={index}
                     onClick={() => handleRowClick(row)}
-                    style={{ cursor: "pointer" }}
                     className={`text-center ${
                       selectedRows.includes(row) ? "highlighted-row" : ""
                     }`}
@@ -147,7 +145,7 @@ const TeamLead = () => {
                   </tr>
                 ))}
               </tbody>
-            </Table>
+            </table>
           </div>
         </Card.Body>
       </Card>

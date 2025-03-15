@@ -73,23 +73,7 @@ tfoot strong {
   font-size: 13px;
 }
 
-/* team leader */
-.team-table {
-  table-layout: fixed;
-  width: 100%;
-}
-
-.team-table th {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
-  min-width: 100px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.team-table td {
+.table-container td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -98,151 +82,7 @@ tfoot strong {
   font-size: 13px;
 }
 
-.team-table th:first-child,
-.team-table td:first-child {
-  width: 3%;
-  min-width: 40px;
-  text-align: center;
-}
-
-.team-table th:nth-child(4),
-.team-table td:nth-child(4) {
-  width: 20%;
-}
-
-.team-table th:nth-child(8),
-.team-table td:nth-child(8),
-.team-table th:nth-child(9),
-.team-table td:nth-child(9) {
-  width: 8%;
-}
-
-.table-responsive {
-  overflow-x: auto;
-  max-width: 100%;
-  display: block;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 50px;
-  font-size: 11px;
-  font-weight: 500;
-  color: white;
-  text-transform: capitalize;
-  min-width: 75px;
-  text-align: center;
-}
-
-.status-badge.pending {
-  background-color: rgb(221, 132, 15);
-  /* color: black; */
-}
-
-.status-badge.approved {
-  background-color: rgb(1, 119, 1);
-}
-
-.status-badge.refused {
-  background-color: red;
-}
-
-/* team leader header */
-.approval-steps {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  gap: 150px;
-}
-
-.step {
-  color: black;
-  font-size: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-weight: bold;
-  white-space: nowrap;
-  padding: 5px;
-}
-
-/* loading spinner */
-/* .loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: white;
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} */
-
-/* loading GIF */
-.loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgb(255, 255, 255);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.custom-loader {
-  width: 50%;
-  height: auto;
-}
-
-/* breadcrumb */
-.approval-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  font-size: 16px;
-  padding: 10px 0;
-}
-
-/* checkbox */
-input[type="checkbox"] {
-  accent-color: rgb(235, 0, 0);
-}
-
-/* status badge */
-.status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: bold;
-  color: white;
-  text-transform: capitalize;
-  min-width: 75px;
-  text-align: center;
-}
-
-.status-badge.pending {
-  background-color: rgb(189, 113, 15);
-}
-
-.status-badge.approved {
-  background-color: rgb(7, 128, 7);
-}
-
-.status-badge.refused {
-  background-color: rgb(204, 3, 3);
-}
-
-/* header */
+/* main header */
 .teamlead-header {
   display: flex;
   align-items: center;
@@ -293,7 +133,7 @@ input[type="checkbox"] {
 .custom-search-bar {
   position: absolute;
   right: 20px;
-  width: 280px;
+  width: 350px;
   height: 20px;
   padding: 13px 12px;
   font-size: 12px;
@@ -307,9 +147,156 @@ input[type="checkbox"] {
   box-shadow: 0 0 3px rgba(6, 9, 14, 0.5);
 }
 
-/* count for header status */
+/* breadcrumb */
+.approval-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  font-size: 16px;
+  padding: 10px 0;
+}
+
+.step {
+  color: black;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+  white-space: nowrap;
+  padding: 5px;
+}
+
+/* count header status breadcrumb */
 .count {
   padding-bottom: 5px;
+}
+
+/* table styles */
+.table-container {
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 6px;
+  font-size: 13px;
+}
+
+.custom-table th {
+  background-color: #f4f4f4;
+}
+
+.custom-table td {
+  cursor: pointer;
+}
+
+.custom-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.highlighted-row {
+  background-color: rgb(252, 207, 207) !important;
+}
+
+.table-container th:first-child,
+.table-container td:first-child {
+  width: 3%;
+  min-width: 40px;
+  text-align: center;
+}
+
+.table-container th:nth-child(4),
+.table-container td:nth-child(4) {
+  width: 20%;
+}
+
+.table-container th:nth-child(8),
+.table-container td:nth-child(8),
+.table-container th:nth-child(9),
+.table-container td:nth-child(9) {
+  width: 7%;
+}
+
+/* status */
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 30px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: white;
+  text-transform: capitalize;
+  width: 73px;
+  text-align: center;
+  border: 2px solid;
+}
+
+.status-badge.pending {
+  background-color: rgb(223, 151, 57);
+  border-color: rgb(196, 107, 6);
+}
+
+.status-badge.approved {
+  background-color: rgb(46, 173, 46);
+  border-color: rgb(27, 99, 27);
+}
+
+.status-badge.refused {
+  background-color: rgb(247, 57, 57);
+  border-color: rgb(153, 1, 1);
+}
+
+/* checkbox */
+input[type="checkbox"] {
+  accent-color: rgb(235, 0, 0);
+  cursor: pointer;
+}
+
+/* loading spinner */
+/* .loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+
+/* loading GIF */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(255, 255, 255);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.custom-loader {
+  width: 50%;
+  height: auto;
 }
 
 /* react-to-print */
@@ -367,3 +354,17 @@ input[type="checkbox"] {
     text-align: center;
   }
 }
+
+/* responsiveness */
+/* @media (max-width: 1700px) {
+}
+@media (max-width: 1200px) {
+}
+@media (max-width: 1050px) {
+}
+@media (max-width: 800px) {
+}
+@media (max-width: 600px) {
+}
+@media (max-width: 450px) {
+} */
