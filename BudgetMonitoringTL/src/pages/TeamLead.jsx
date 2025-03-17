@@ -13,7 +13,7 @@ const TeamLead = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedStatuses, setSelectedStatuses] = useState([]); // Status filter state
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
 
   const pendingCount = mockData.filter(
     (row) => row.status === "Pending"
@@ -48,7 +48,6 @@ const TeamLead = () => {
     window.print();
   };
 
-  // Handle filter changes from Sidebar
   const handleStatusFilterChange = (status) => {
     setSelectedStatuses((prevStatuses) =>
       prevStatuses.includes(status)
@@ -57,7 +56,7 @@ const TeamLead = () => {
     );
   };
 
-  // Filter data based on search and status filters
+  // filter data based on search and status
   const filteredData = mockData
     .filter((row) =>
       Object.values(row).some((value) =>
@@ -67,7 +66,7 @@ const TeamLead = () => {
     .filter(
       (row) =>
         selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
-    ); // Apply status filtering
+    ); // status filtering
 
   return (
     <>
@@ -94,68 +93,70 @@ const TeamLead = () => {
 
         <Card className="w-auto">
           <Card.Body className="p-0">
-            <div className="content-container">
-              <Sidebar
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-                onStatusChange={handleStatusFilterChange}
-              />
-              <div className="table-container">
-                <table className="custom-table">
-                  <thead>
-                    <tr>
-                      <th>
-                        <input
-                          type="checkbox"
-                          onChange={handleSelectAll}
-                          checked={selectedRows.length === mockData.length}
-                        />
-                      </th>
-                      <th>Employee</th>
-                      <th>Department</th>
-                      <th>Description</th>
-                      <th>Expense Date</th>
-                      <th>Category</th>
-                      <th>Paid By</th>
-                      <th>Total</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredData.map((row, index) => (
-                      <tr
-                        key={index}
-                        onClick={() => handleRowClick(row)}
-                        className={`text-center ${
-                          selectedRows.includes(row) ? "highlighted-row" : ""
-                        }`}
-                      >
-                        <td>
+            <div className="content-containers">
+              <div className="content-container">
+                <Sidebar
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                  onStatusChange={handleStatusFilterChange}
+                />
+                <div className="table-container">
+                  <table className="custom-table">
+                    <thead>
+                      <tr>
+                        <th>
                           <input
                             type="checkbox"
-                            checked={selectedRows.includes(row)}
-                            onChange={() => handleCheckBoxChange(row)}
-                            onClick={(e) => e.stopPropagation()}
+                            onChange={handleSelectAll}
+                            checked={selectedRows.length === mockData.length}
                           />
-                        </td>
-                        <td>{row.employee}</td>
-                        <td>{row.department}</td>
-                        <td>{row.description}</td>
-                        <td>{row.expenseDate}</td>
-                        <td>{row.category}</td>
-                        <td>{row.paidBy}</td>
-                        <td>₱{row.total}</td>
-                        <td>
-                          <span
-                            className={`status-badge ${row.status.toLowerCase()}`}
-                          >
-                            {row.status}
-                          </span>
-                        </td>
+                        </th>
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Description</th>
+                        <th>Expense Date</th>
+                        <th>Category</th>
+                        <th>Paid By</th>
+                        <th>Total</th>
+                        <th>Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {filteredData.map((row, index) => (
+                        <tr
+                          key={index}
+                          onClick={() => handleRowClick(row)}
+                          className={`text-center ${
+                            selectedRows.includes(row) ? "highlighted-row" : ""
+                          }`}
+                        >
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.includes(row)}
+                              onChange={() => handleCheckBoxChange(row)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </td>
+                          <td>{row.employee}</td>
+                          <td>{row.department}</td>
+                          <td>{row.description}</td>
+                          <td>{row.expenseDate}</td>
+                          <td>{row.category}</td>
+                          <td>{row.paidBy}</td>
+                          <td>₱{row.total}</td>
+                          <td>
+                            <span
+                              className={`status-badge ${row.status.toLowerCase()}`}
+                            >
+                              {row.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </Card.Body>

@@ -91,7 +91,7 @@ tfoot strong {
   padding: 0 10px;
   background-color: #a11b1b;
   border-bottom: 1px solid #ddd;
-  height: 50px;
+  height: 65px;
 }
 
 .logo-text {
@@ -174,33 +174,22 @@ tfoot strong {
   padding-bottom: 5px;
 }
 
-/* table styles */
-.table-container {
-  overflow-x: auto;
-}
-
-.custom-table {
+/* .custom-table {
   width: 100%;
   border-collapse: collapse;
-}
+} */
 
 .custom-table th {
   border-bottom: 1px solid #ddd;
   padding: 8px;
   text-align: center;
+  background-color: #f4f4f4;
 }
 
 .custom-table td {
   border-bottom: 1px solid #ddd;
   padding: 6px;
   font-size: 13px;
-}
-
-.custom-table th {
-  background-color: #f4f4f4;
-}
-
-.custom-table td {
   cursor: pointer;
 }
 
@@ -299,22 +288,43 @@ input[type="checkbox"] {
   height: auto;
 }
 
-/* sidebar */
+/* card container */
 .content-container {
   display: flex;
-  align-items: stretch;
+  height: 74vh;
+  overflow: hidden;
 }
 
+/* sidebar */
 .sidebar {
   width: 250px;
-  height: calc(100vh - 60px);
+  height: 100vh;
   position: sticky;
-  top: 60px;
+  top: 0;
   border-right: 1px solid #ddd;
-  background-color: #f4f4f4;
-  padding: 0;
-  overflow: hidden;
-  transition: width 0.3s ease-in-out;
+  background: #f8f9fa;
+  overflow-y: hidden;
+  transition: width 0.2s ease-in-out;
+}
+
+.table-container {
+  flex: 1;
+  /* height: calc(100vh - 120px);  */
+  height: 74vh;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table thead {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
 }
 
 .sidebar.closed {
@@ -377,14 +387,9 @@ input[type="checkbox"] {
   /* transition-delay: 0s; */
 }
 
-.table-container {
-  flex: 1;
-  overflow-x: auto;
-}
-
 .sidebar-header {
   font-size: 13.5px;
-  /* margin-bottom: 15px; */
+  margin-bottom: 15px;
 }
 
 .status-filters label {
@@ -392,10 +397,20 @@ input[type="checkbox"] {
   margin: 12px 0;
   cursor: pointer;
   font-size: 13.5px;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .status-filters input[type="checkbox"] {
-  margin-right: 8px;
+  margin-right: 10px;
+}
+
+.status-filters label.checked {
+  background-color: rgba(255, 0, 0, 0.2); /* Light red background */
+  border-radius: 5px;
+  padding: 4px;
 }
 
 /* react-to-print */
