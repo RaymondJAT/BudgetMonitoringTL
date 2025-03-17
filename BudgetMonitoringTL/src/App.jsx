@@ -5,6 +5,7 @@ import "./index.css";
 import ApprovalForm from "./components/ApprovalForm";
 import TeamLead from "./pages/TeamLead";
 import Sample from "./components/Sample";
+import Example from "./components/SampleSidebar";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       </Router>
 
       {/* <Sample /> */}
+      {/* <Example /> */}
     </>
   );
 }

@@ -341,11 +341,11 @@ input[type="checkbox"] {
 
 .sidebar-content {
   opacity: 0;
-  transform: translateX(-20px);
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  max-height: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease-in-out 0.3s, transform 0.3s ease-in-out;
+  /* max-height: 0;
   overflow: hidden;
-  padding: 0 10px;
+  padding: 0 10px; */
 }
 
 .sidebar.open .sidebar-content {
@@ -366,9 +366,36 @@ input[type="checkbox"] {
   max-height: 500px;
 }
 
+.sidebar-content.fade-in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebar-content.fade-out {
+  opacity: 0;
+  transform: translateX(-10px);
+  /* transition-delay: 0s; */
+}
+
 .table-container {
   flex: 1;
   overflow-x: auto;
+}
+
+.sidebar-header {
+  font-size: 13.5px;
+  /* margin-bottom: 15px; */
+}
+
+.status-filters label {
+  display: block;
+  margin: 12px 0;
+  cursor: pointer;
+  font-size: 13.5px;
+}
+
+.status-filters input[type="checkbox"] {
+  margin-right: 8px;
 }
 
 /* react-to-print */

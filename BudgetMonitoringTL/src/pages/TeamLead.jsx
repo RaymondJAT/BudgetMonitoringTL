@@ -13,8 +13,8 @@ const TeamLead = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedStatuses, setSelectedStatuses] = useState([]); // Status filter state
 
-  // header count
   const pendingCount = mockData.filter(
     (row) => row.status === "Pending"
   ).length;
@@ -30,7 +30,6 @@ const TeamLead = () => {
     }, 1000);
   };
 
-  // individual row
   const handleCheckBoxChange = (row) => {
     setSelectedRows((prevSelected) =>
       prevSelected.includes(row)
@@ -39,30 +38,41 @@ const TeamLead = () => {
     );
   };
 
-  // all rows
   const handleSelectAll = () => {
-    if (selectedRows.length === mockData.length) {
-      setSelectedRows([]);
-    } else {
-      setSelectedRows([...mockData]);
-    }
+    setSelectedRows(
+      selectedRows.length === mockData.length ? [] : [...mockData]
+    );
   };
 
   const handlePrint = () => {
     window.print();
   };
 
-  const filteredData = mockData.filter((row) =>
-    Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  // Handle filter changes from Sidebar
+  const handleStatusFilterChange = (status) => {
+    setSelectedStatuses((prevStatuses) =>
+      prevStatuses.includes(status)
+        ? prevStatuses.filter((s) => s !== status)
+        : [...prevStatuses, status]
+    );
+  };
+
+  // Filter data based on search and status filters
+  const filteredData = mockData
+    .filter((row) =>
+      Object.values(row).some((value) =>
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
     )
-  );
+    .filter(
+      (row) =>
+        selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
+    ); // Apply status filtering
 
   return (
     <>
       {loading && (
         <div className="loading">
-          {/* <Spinner animation = "border" variant = "danger" /> */}
           <img src={loader} alt="Loading GIF" className="custom-loader" />
         </div>
       )}
@@ -81,17 +91,15 @@ const TeamLead = () => {
             postCount={postCount}
           />
         </div>
-        {/* table */}
+
         <Card className="w-auto">
           <Card.Body className="p-0">
             <div className="content-container">
-              {/* Sidebar */}
               <Sidebar
                 isSidebarOpen={isSidebarOpen}
                 toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                onStatusChange={handleStatusFilterChange}
               />
-
-              {/* Table */}
               <div className="table-container">
                 <table className="custom-table">
                   <thead>
