@@ -10,15 +10,15 @@ import PrintableCashRequest from "./components/PrintableCashRequest";
 function App() {
   return (
     <>
-      {/* <Router>
+      <Router>
         <Routes>
           <Route path="/" element={<TeamLead />} />
           <Route path="/approval" element={<ApprovalForm />} />
         </Routes>
-      </Router> */}
+      </Router>
 
-      <PrintableCashRequest />
-      <Sample />
+      {/* <PrintableCashRequest /> */}
+      {/* <Sample /> */}
     </>
   );
 }

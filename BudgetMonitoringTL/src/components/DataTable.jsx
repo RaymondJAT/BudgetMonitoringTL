@@ -44,16 +44,18 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
               <td>{row.label || "N/A"}</td>
               <td>{row.quantity ?? 0}</td>
               <td>{row.price ? row.price.toFixed(2) : "0.00"}</td>
-              <td>{(row.quantity * row.price).toFixed(2)}</td>
+              <td className="border">
+                {(row.quantity * row.price).toFixed(2)}
+              </td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan="3" className="custom-col text-end">
+            <td colSpan="3" className="custom-col text-end border-end">
               <strong>Total:</strong>
             </td>
-            <td className="text-center">
+            <td className="text-center border-end">
               <strong>₱{total.toFixed(2)}</strong>
             </td>
           </tr>

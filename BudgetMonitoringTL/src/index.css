@@ -418,6 +418,16 @@ input[type="checkbox"] {
   padding: 4px;
 }
 
+/* print-table */
+.print-table {
+  font-size: 13px;
+}
+
+/* expense */
+.expense-table {
+  font-size: 13px;
+}
+
 /* react-to-print */
 @media print {
   @page {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
 const ExpenseReport = ({ data, reportRef }) => {
@@ -9,9 +9,9 @@ const ExpenseReport = ({ data, reportRef }) => {
   );
 
   return (
-    <div ref={reportRef} className="expense-report">
+    <div ref={reportRef} className="expense-report border p-3 bg-white">
       <Container>
-        {/* details */}
+        {/* Employee Details */}
         <Row className="mb-4 reference-section">
           <Col xs={6} className="mb-2">
             <p>
@@ -20,12 +20,12 @@ const ExpenseReport = ({ data, reportRef }) => {
           </Col>
           <Col xs={6} className="mb-2">
             <p>
-              <strong>Team Leader:</strong> {data?.teamLeader || " "}
+              <strong>Team Leader:</strong> {data?.teamLead || " "}
             </p>
           </Col>
           <Col xs={6} className="mb-2">
             <p>
-              <strong>Date:</strong> {data?.date || " "}
+              <strong>Date:</strong> {data?.expenseDate || " "}
             </p>
           </Col>
           <Col xs={6} className="mb-2">
@@ -35,23 +35,23 @@ const ExpenseReport = ({ data, reportRef }) => {
           </Col>
         </Row>
 
-        {/* description */}
+        {/* Description */}
         <Row className="mb-4">
           <Col>
             <p>
-              <strong>Reference:</strong> {data?.reference || " "}
+              <strong>Reference:</strong> {data?.description || " "}
             </p>
           </Col>
         </Row>
 
-        {/* expense table */}
-        <Table bordered className="expense-table">
-          <thead>
+        {/* Expense Table */}
+        <Table className="expense-table">
+          <thead className="border-top">
             <tr>
               <th className="text-center">Label</th>
               <th className="text-center">Unit Price</th>
               <th className="text-center">Quantity</th>
-              <th className="text-center border-end">Subtotal</th>
+              <th className="text-center">Subtotal</th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +63,7 @@ const ExpenseReport = ({ data, reportRef }) => {
                     ₱{(item.price ?? 0).toFixed(2)}
                   </td>
                   <td className="text-center">{item.quantity}</td>
-                  <td className="text-center border-end">
+                  <td className="text-center border">
                     ₱{item.amount ? parseFloat(item.amount).toFixed(2) : "0.00"}
                   </td>
                 </tr>
@@ -75,8 +75,8 @@ const ExpenseReport = ({ data, reportRef }) => {
                 </td>
               </tr>
             )}
-            <tr>
-              <td colSpan="3" className="text-end pe-3">
+            <tr className="no-border">
+              <td colSpan="3" className="custom-col text-end border-end">
                 <strong>Total:</strong>
               </td>
               <td className="text-center border-end">

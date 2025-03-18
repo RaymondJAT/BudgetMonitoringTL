@@ -5,12 +5,15 @@ import { useReactToPrint } from "react-to-print";
 import DataTable from "./DataTable";
 import PrintModal from "./PrintModal";
 import PrintableCashRequest from "./PrintableCashRequest";
+import Sample from "../components/Sample";
+import ExpenseReport from "../components/Sample";
 
 const ApprovalForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
 
   const contentRef = useRef(null);
+  const reportRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const fields = [
@@ -115,6 +118,14 @@ const ApprovalForm = () => {
           setAmountInWords={setAmountInWords}
           setParticulars={setParticulars}
         />
+
+        {/* expense report */}
+        <div className="mt-4">
+          <ExpenseReport
+            data={{ ...data, items: particulars }}
+            reportRef={reportRef}
+          />
+        </div>
       </Container>
 
       <PrintModal
