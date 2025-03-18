@@ -123,6 +123,7 @@ const ApprovalForm = () => {
         data={{ ...data, items: particulars }}
         amountInWords={amountInWords}
       />
+
       <div style={{ display: "none" }}>
         <PrintableCashRequest
           data={{ ...data, items: particulars }}

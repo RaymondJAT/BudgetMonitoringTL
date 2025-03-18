@@ -42,7 +42,7 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
         {/* Particulars Table */}
         <Row>
           <Col xs={12}>
-            <Table bordered className="custom-table">
+            <Table bordered className="print-table">
               <thead>
                 <tr>
                   <th className="text-center">Particulars</th>

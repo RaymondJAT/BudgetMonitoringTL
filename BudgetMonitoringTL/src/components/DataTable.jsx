@@ -19,10 +19,10 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
     );
   }, [setParticulars, data]);
 
-  // Compute total dynamically
+  // total dynamically
   const total = data.reduce((sum, row) => sum + row.quantity * row.price, 0);
 
-  // Convert total amount to words
+  // total amount to words
   useEffect(() => {
     setAmountInWords(numberToWords(total));
   }, [total, setAmountInWords]);
@@ -35,7 +35,7 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
             <th>Label</th>
             <th>Quantity</th>
             <th>Price</th>
-            <th>Amount</th>
+            <th>Subtotal</th>
           </tr>
         </thead>
         <tbody className="tableBody text-center">
