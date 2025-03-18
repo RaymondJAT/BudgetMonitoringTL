@@ -2,7 +2,15 @@ import React from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
 const ExpenseReport = ({ data, reportRef }) => {
-  const particulars = data?.items || [];
+  const particulars = data?.items || [
+    {
+      label: data?.description || " ",
+      price: data?.unitPrice || 0,
+      quantity: data?.quantity || 0,
+      amount: data?.total || 0,
+    },
+  ];
+
   const totalAmount = particulars.reduce(
     (sum, item) => sum + (parseFloat(item.amount) || 0),
     0

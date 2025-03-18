@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
@@ -6,9 +6,11 @@ import Header from "../components/Header";
 import loader from "../assets/5Lloading.gif";
 import Sidebar from "../components/Sidebar";
 import HeaderCount from "../components/HeaderCount";
+import ExpenseReport from "../components/Sample";
 
 const TeamLead = () => {
   const navigate = useNavigate();
+  const reportRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,6 +39,15 @@ const TeamLead = () => {
         : [...prevSelected, row]
     );
   };
+
+  // const handleCheckBoxChange = (row) => {
+  //   setSelectedRows(
+  //     (prevSelected) =>
+  //       prevSelected.includes(row)
+  //         ? prevSelected.filter((item) => item !== row)
+  //         : [row] // Allow only one selected row at a time
+  //   );
+  // };
 
   const handleSelectAll = () => {
     setSelectedRows(
@@ -117,6 +128,8 @@ const TeamLead = () => {
                         <th>Expense Date</th>
                         <th>Category</th>
                         <th>Paid By</th>
+                        <th className="hidden-column">Unit Price</th>
+                        <th className="hidden-column">Quantity</th>
                         <th>Total</th>
                         <th>Status</th>
                       </tr>
@@ -144,6 +157,8 @@ const TeamLead = () => {
                           <td>{row.expenseDate}</td>
                           <td>{row.category}</td>
                           <td>{row.paidBy}</td>
+                          <td className="hidden-column">{row.price}</td>
+                          <td className="hidden-column">{row.quantity}</td>
                           <td>₱{row.total}</td>
                           <td>
                             <span
@@ -162,6 +177,8 @@ const TeamLead = () => {
           </Card.Body>
         </Card>
       </div>
+
+      <ExpenseReport data={selectedRows[0] || {}} reportRef={reportRef} />
     </>
   );
 };
