@@ -1,15 +1,26 @@
 import React from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
-const ExpenseReport = ({ data, reportRef }) => {
-  const particulars = data?.items || [
-    {
-      label: data?.description || " ",
-      price: data?.unitPrice || 0,
-      quantity: data?.quantity || 0,
-      amount: data?.total || 0,
-    },
-  ];
+const ExpenseReport = ({ data }) => {
+  const particulars =
+    data?.items?.length > 0
+      ? data.items.map((item) => ({
+          label: item.label || data.description || " ",
+          price: parseFloat(item.price) || 0,
+          quantity: parseFloat(item.quantity) || 0,
+          amount:
+            (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
+        }))
+      : [
+          {
+            label: data?.description || " ",
+            price: parseFloat(data?.unitPrice) || 0,
+            quantity: parseFloat(data?.quantity) || 0,
+            amount:
+              (parseFloat(data?.unitPrice) || 0) *
+              (parseFloat(data?.quantity) || 0),
+          },
+        ];
 
   const totalAmount = particulars.reduce(
     (sum, item) => sum + (parseFloat(item.amount) || 0),
@@ -17,7 +28,7 @@ const ExpenseReport = ({ data, reportRef }) => {
   );
 
   return (
-    <div ref={reportRef} className="expense-report border p-3 bg-white">
+    <div className="expense-report border p-3 bg-white">
       <Container>
         {/* Employee Details */}
         <Row className="mb-4 reference-section">

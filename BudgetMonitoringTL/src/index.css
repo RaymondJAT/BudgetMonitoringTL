@@ -413,7 +413,7 @@ input[type="checkbox"] {
 }
 
 .status-filters label.checked {
-  background-color: rgba(255, 0, 0, 0.2); /* Light red background */
+  background-color: rgba(255, 0, 0, 0.2);
   border-radius: 5px;
   padding: 4px;
 }
@@ -429,9 +429,15 @@ input[type="checkbox"] {
 }
 
 /* thead */
-/* .hidden-column {
+.hidden-column {
   display: none;
-} */
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: center;
+}
 
 /* react-to-print */
 @media print {
