@@ -205,7 +205,9 @@ const ExpenseRow = ({
   return (
     <tr
       onClick={() => handleRowClick(row)}
-      className={`text-center ${isSelected ? "highlighted-row" : ""}`}
+      className={`custom-table-row text-center ${
+        isSelected ? "highlighted-row" : ""
+      }`}
     >
       <td>
         <input

@@ -7,9 +7,11 @@ const Header = ({ selectedRows, searchTerm, setSearchTerm, handlePrint }) => {
       <div
         className={`button-group ${selectedRows.length > 0 ? "visible" : ""}`}
       >
-        <button className="small-btn" onClick={handlePrint}>
-          Print
-        </button>
+        {selectedRows.length === 1 && (
+          <button className="small-btn" onClick={handlePrint}>
+            Print
+          </button>
+        )}
         <button className="small-btn">Actions</button>
       </div>
 
