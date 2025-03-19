@@ -1,8 +1,9 @@
 import React, { useState, useRef, useMemo } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
 import { tableData } from "../mock-data/tableData";
+import { useReactToPrint } from "react-to-print";
 import Header from "../components/Header";
 import loader from "../assets/5Lloading.gif";
 import Sidebar from "../components/Sidebar";
@@ -11,7 +12,9 @@ import ExpenseReport from "../components/Sample";
 
 const TeamLead = () => {
   const navigate = useNavigate();
-  const reportRef = useRef(null);
+  const contentRef = useRef(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
+
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +45,10 @@ const TeamLead = () => {
     );
   };
 
-  const handlePrint = () => window.print();
+  // react-to-print
+  const handlePrint = () => {
+    reactToPrintFn();
+  };
 
   const handleStatusFilterChange = (status) => {
     setSelectedStatuses((prev) =>
@@ -117,18 +123,19 @@ const TeamLead = () => {
           </Card.Body>
         </Card>
       </div>
-
-      <ExpenseReport
-        data={
-          selectedRows.length > 0
-            ? {
-                ...selectedRows[0],
-                items: getEmployeeTransactions(selectedRows[0]?.employee),
-              }
-            : {}
-        }
-        reportRef={reportRef}
-      />
+      <div style={{ display: "none" }}>
+        <ExpenseReport
+          data={
+            selectedRows.length > 0
+              ? {
+                  ...selectedRows[0],
+                  items: getEmployeeTransactions(selectedRows[0]?.employee),
+                }
+              : {}
+          }
+          contentRef={contentRef}
+        />
+      </div>
     </>
   );
 };

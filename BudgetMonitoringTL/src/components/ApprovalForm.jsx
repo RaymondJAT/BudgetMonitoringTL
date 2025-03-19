@@ -9,10 +9,12 @@ import PrintableCashRequest from "./PrintableCashRequest";
 const ApprovalForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
-
   const contentRef = useRef(null);
-  const reportRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
+
+  const [modalShow, setModalShow] = useState(false);
+  const [amountInWords, setAmountInWords] = useState("");
+  const [particulars, setParticulars] = useState([]);
 
   const fields = [
     { label: "Employee", key: "employee" },
@@ -27,10 +29,6 @@ const ApprovalForm = () => {
     { label: "Total", key: "total" },
     { label: "Team Lead", key: "teamLead" },
   ];
-
-  const [modalShow, setModalShow] = useState(false);
-  const [amountInWords, setAmountInWords] = useState("");
-  const [particulars, setParticulars] = useState([]);
 
   return (
     <>

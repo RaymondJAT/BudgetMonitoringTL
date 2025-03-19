@@ -1,7 +1,7 @@
 import React from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
-const ExpenseReport = ({ data }) => {
+const ExpenseReport = ({ data, contentRef }) => {
   const particulars =
     data?.items?.length > 0
       ? data.items.map((item) => ({
@@ -28,7 +28,7 @@ const ExpenseReport = ({ data }) => {
   );
 
   return (
-    <div className="expense-report border p-3 bg-white">
+    <div ref={contentRef} className="expense-report border p-3 bg-white">
       <Container>
         {/* Employee Details */}
         <Row className="mb-4 reference-section">
@@ -82,7 +82,7 @@ const ExpenseReport = ({ data }) => {
                     ₱{(item.price ?? 0).toFixed(2)}
                   </td>
                   <td className="text-center">{item.quantity}</td>
-                  <td className="text-center border">
+                  <td className="text-center border-start">
                     ₱{item.amount ? parseFloat(item.amount).toFixed(2) : "0.00"}
                   </td>
                 </tr>
@@ -98,7 +98,7 @@ const ExpenseReport = ({ data }) => {
               <td colSpan="3" className="custom-col text-end border-end">
                 <strong>Total:</strong>
               </td>
-              <td className="text-center border-end">
+              <td className="text-center">
                 <strong>₱{totalAmount.toFixed(2)}</strong>
               </td>
             </tr>
