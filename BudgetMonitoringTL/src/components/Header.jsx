@@ -1,4 +1,5 @@
 import React from "react";
+import { Dropdown } from "react-bootstrap";
 
 const Header = ({ selectedRows, searchTerm, setSearchTerm, handlePrint }) => {
   return (
@@ -12,10 +13,29 @@ const Header = ({ selectedRows, searchTerm, setSearchTerm, handlePrint }) => {
             Print
           </button>
         )}
-        <button className="small-btn">Actions</button>
+
+        {selectedRows.length > 0 && (
+          <Dropdown>
+            <Dropdown.Toggle as="button" className="small-btn">
+              Actions
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu className="custom-dropdown-menu">
+              <Dropdown.Item onClick={() => console.log("Delete")}>
+                Delete
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log("Archive")}>
+                Archive
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log("Mark as Important")}>
+                Mark as Important
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
       </div>
 
-      {/* search bar */}
+      {/* Search bar */}
       <input
         type="text"
         placeholder="Search..."
