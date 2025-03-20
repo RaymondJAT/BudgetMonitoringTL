@@ -8,7 +8,7 @@ import Header from "../components/Header";
 import loader from "../assets/5Lloading.gif";
 import Sidebar from "../components/Sidebar";
 import HeaderCount from "../components/HeaderCount";
-import ExpenseReport from "../components/Sample";
+import ExpenseReport from "../components/ExpenseReport";
 
 const TeamLead = () => {
   const navigate = useNavigate();

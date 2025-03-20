@@ -1,5 +1,6 @@
 import React from "react";
-import { Row, Col, Container, Table } from "react-bootstrap";
+import { Row, Col, Container, Table, Image } from "react-bootstrap";
+import logo from "../assets/logo5L.png";
 
 const ExpenseReport = ({ data, contentRef }) => {
   const particulars =
@@ -28,10 +29,20 @@ const ExpenseReport = ({ data, contentRef }) => {
   );
 
   return (
-    <div ref={contentRef} className="expense-report border p-3 bg-white">
-      <Container>
+    <div ref={contentRef} className="expense-report">
+      <Container fluid className="px-0" style={{ maxWidth: "90%" }}>
+        {/* Header */}
+        <Row className="border-bottom pb-3 mb-4 align-items-center">
+          <Col xs={6}>
+            <h4 className="m-0">Expense Report</h4>
+          </Col>
+          <Col xs={6} className="text-end">
+            <Image src={logo} alt="Company Logo" width={100} height="auto" />
+          </Col>
+        </Row>
+
         {/* Employee Details */}
-        <Row className="mb-4 reference-section">
+        <Row className="mb-4">
           <Col xs={6} className="mb-2">
             <p>
               <strong>Employee:</strong> {data?.employee || " "}
@@ -54,8 +65,8 @@ const ExpenseReport = ({ data, contentRef }) => {
           </Col>
         </Row>
 
-        {/* Description */}
-        <Row className="mb-4">
+        {/* Reference */}
+        <Row className="reference-section mb-4">
           <Col>
             <p>
               <strong>Reference:</strong> {data?.description || " "}
@@ -94,8 +105,8 @@ const ExpenseReport = ({ data, contentRef }) => {
                 </td>
               </tr>
             )}
-            <tr className="no-border">
-              <td colSpan="3" className="custom-col text-end border-end">
+            <tr>
+              <td colSpan="3" className="text-end border-end">
                 <strong>Total:</strong>
               </td>
               <td className="text-center">
