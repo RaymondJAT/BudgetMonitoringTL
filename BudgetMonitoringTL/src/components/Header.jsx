@@ -1,7 +1,13 @@
 import React from "react";
 import { Dropdown } from "react-bootstrap";
 
-const Header = ({ selectedRows, searchTerm, setSearchTerm, handlePrint }) => {
+const Header = ({
+  selectedRows,
+  searchTerm,
+  setSearchTerm,
+  handlePrint,
+  handleDelete,
+}) => {
   return (
     <div className="teamlead-header">
       <div className="logo-text">ExpenseFlow</div>
@@ -21,15 +27,9 @@ const Header = ({ selectedRows, searchTerm, setSearchTerm, handlePrint }) => {
             </Dropdown.Toggle>
 
             <Dropdown.Menu className="custom-dropdown-menu">
-              <Dropdown.Item onClick={() => console.log("Delete")}>
-                Delete
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => console.log("Archive")}>
-                Archive
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => console.log("Mark as Important")}>
-                Mark as Important
-              </Dropdown.Item>
+              <Dropdown.Item onClick={handleDelete}>Delete</Dropdown.Item>
+              <Dropdown.Item>Archive</Dropdown.Item>
+              <Dropdown.Item>Mark as Important</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         )}
@@ -38,7 +38,7 @@ const Header = ({ selectedRows, searchTerm, setSearchTerm, handlePrint }) => {
       {/* Search bar */}
       <input
         type="text"
-        placeholder="Search..."
+        placeholder="Search"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="custom-search-bar"

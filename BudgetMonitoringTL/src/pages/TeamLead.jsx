@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from "react";
-import { Card, Spinner } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
 import { tableData } from "../mock-data/tableData";
@@ -9,17 +9,51 @@ import loader from "../assets/5Lloading.gif";
 import Sidebar from "../components/Sidebar";
 import HeaderCount from "../components/HeaderCount";
 import ExpenseReport from "../components/ExpenseReport";
+import Swal from "sweetalert2";
 
 const TeamLead = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
-
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [data, setData] = useState(mockData);
+
+  // delete button function
+  const handleDelete = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setData((prevData) => {
+          const rowsToDelete = filteredData.filter((row) =>
+            selectedRows.includes(row)
+          );
+          const updatedData = prevData.filter(
+            (row) => !rowsToDelete.includes(row)
+          );
+          setSelectedRows([]);
+          return updatedData;
+        });
+
+        Swal.fire({
+          title: "Deleted!",
+          text: "Selected items have been deleted.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        });
+      }
+    });
+  };
 
   // Helper function to find transactions of an employee
   const getEmployeeTransactions = (employeeName) => {
@@ -59,7 +93,7 @@ const TeamLead = () => {
   };
 
   const filteredData = useMemo(() => {
-    return mockData
+    return data
       .filter((row) =>
         Object.values(row).some((value) =>
           value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -69,7 +103,7 @@ const TeamLead = () => {
         (row) =>
           selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
       );
-  }, [searchTerm, selectedStatuses]);
+  }, [searchTerm, selectedStatuses, data]);
 
   return (
     <>
@@ -84,18 +118,17 @@ const TeamLead = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handlePrint={handlePrint}
+        handleDelete={handleDelete}
       />
 
       <div>
         <div className="card-header text-center">
           <HeaderCount
-            pendingCount={
-              mockData.filter((row) => row.status === "Pending").length
-            }
+            pendingCount={data.filter((row) => row.status === "Pending").length}
             approvedCount={
-              mockData.filter((row) => row.status === "Approved").length
+              data.filter((row) => row.status === "Approved").length
             }
-            postCount={mockData.filter((row) => row.status === "Post").length}
+            postCount={data.filter((row) => row.status === "Post").length}
           />
         </div>
 
