@@ -90,11 +90,19 @@ const ExpenseReport = ({ data, contentRef }) => {
                 <tr key={index}>
                   <td className="text-center">{item.label}</td>
                   <td className="text-center">
-                    ₱{(item.price ?? 0).toFixed(2)}
+                    ₱
+                    {(item.price ?? 0).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}
                   </td>
                   <td className="text-center">{item.quantity}</td>
                   <td className="text-center border-start">
-                    ₱{item.amount ? parseFloat(item.amount).toFixed(2) : "0.00"}
+                    ₱
+                    {item.amount
+                      ? parseFloat(item.amount).toLocaleString("es-US", {
+                          minimumFractionDigits: 2,
+                        })
+                      : "0.00"}
                   </td>
                 </tr>
               ))
@@ -110,7 +118,12 @@ const ExpenseReport = ({ data, contentRef }) => {
                 <strong>Total:</strong>
               </td>
               <td className="text-center">
-                <strong>₱{totalAmount.toFixed(2)}</strong>
+                <strong>
+                  ₱
+                  {totalAmount.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </strong>
               </td>
             </tr>
           </tbody>

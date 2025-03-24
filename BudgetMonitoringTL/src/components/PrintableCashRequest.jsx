@@ -54,13 +54,18 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
                   particulars.map((item, index) => (
                     <tr key={index}>
                       <td className="text-center">
-                        {`${item.label} - ${item.quantity} x ${(
+                        {`${item.label} - ${item.quantity} x ₱${(
                           item.price ?? 0
-                        ).toFixed(2)}`}
+                        ).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                        })}`}
                       </td>
                       <td className="text-center">
+                        ₱
                         {item.amount
-                          ? parseFloat(item.amount).toFixed(2)
+                          ? parseFloat(item.amount).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })
                           : "0.00"}
                       </td>
                     </tr>
@@ -77,7 +82,12 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
                     <strong>Total:</strong>
                   </td>
                   <td className="text-center">
-                    <strong>₱{totalAmount.toFixed(2)}</strong>
+                    <strong>
+                      ₱
+                      {totalAmount.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </strong>
                   </td>
                 </tr>
                 <tr>

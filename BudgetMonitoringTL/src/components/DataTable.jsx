@@ -43,9 +43,17 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
             <tr key={index}>
               <td>{row.label || "N/A"}</td>
               <td>{row.quantity ?? 0}</td>
-              <td>{row.price ? row.price.toFixed(2) : "0.00"}</td>
+              <td>
+                {row.price
+                  ? `₱${row.price.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}`
+                  : "₱0.00"}
+              </td>
               <td className="border">
-                {(row.quantity * row.price).toFixed(2)}
+                {`₱${(row.quantity * row.price).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })}`}
               </td>
             </tr>
           ))}
@@ -56,7 +64,9 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
               <strong>Total:</strong>
             </td>
             <td className="text-center border-end">
-              <strong>₱{total.toFixed(2)}</strong>
+              <strong>
+                ₱{total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </strong>
             </td>
           </tr>
         </tfoot>

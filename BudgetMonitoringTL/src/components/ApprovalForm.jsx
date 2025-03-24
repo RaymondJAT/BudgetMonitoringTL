@@ -86,7 +86,14 @@ const ApprovalForm = () => {
                 className="d-flex align-items-center mb-2"
               >
                 <strong className="title">{field.label}:</strong>
-                <p className="ms-2 mb-0">{data?.[field.key] || "N/A"}</p>
+                <p className="ms-2 mb-0">
+                  {field.key === "total"
+                    ? `₱${parseFloat(data?.[field.key] || 0).toLocaleString(
+                        "en-US",
+                        { minimumFractionDigits: 2 }
+                      )}`
+                    : data?.[field.key] || "N/A"}
+                </p>
               </Col>
             ))}
           </Row>

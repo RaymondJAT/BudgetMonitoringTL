@@ -104,6 +104,19 @@ const TeamLead = () => {
           selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
       );
   }, [searchTerm, selectedStatuses, data]);
+  // compute total of each status
+  const getTotalAmountByStatus = (status) => {
+    return data
+      .filter((row) => row.status === status)
+      .reduce((sum, row) => {
+        const transactions = getEmployeeTransactions(row.employee);
+        const grandTotal = transactions.reduce(
+          (total, item) => total + item.quantity * item.price,
+          0
+        );
+        return sum + grandTotal;
+      }, 0);
+  };
 
   return (
     <>
@@ -124,11 +137,9 @@ const TeamLead = () => {
       <div>
         <div className="card-header text-center">
           <HeaderCount
-            pendingCount={data.filter((row) => row.status === "Pending").length}
-            approvedCount={
-              data.filter((row) => row.status === "Approved").length
-            }
-            postCount={data.filter((row) => row.status === "Post").length}
+            pendingTotal={getTotalAmountByStatus("Pending")}
+            approvedTotal={getTotalAmountByStatus("Approved")}
+            postTotal={getTotalAmountByStatus("Post")}
           />
         </div>
 
@@ -228,7 +239,11 @@ const ExpenseRow = ({
   getEmployeeTransactions,
 }) => {
   const transactions = getEmployeeTransactions(row.employee);
-  const prices = transactions.map((t) => `₱${t.price.toFixed(2)}`).join("\n");
+  const prices = transactions
+    .map(
+      (t) => `₱${t.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+    )
+    .join("\n");
   const quantities = transactions.map((t) => t.quantity).join("\n");
   const grandTotal = transactions.reduce(
     (sum, item) => sum + item.quantity * item.price,
@@ -262,7 +277,9 @@ const ExpenseRow = ({
       <td className="hidden-column">
         <pre>{quantities}</pre>
       </td>
-      <td>₱{grandTotal.toFixed(2)}</td>
+      <td>
+        ₱{grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+      </td>
       <td>
         <span className={`status-badge ${row.status.toLowerCase()}`}>
           {row.status}
