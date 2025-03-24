@@ -10,7 +10,22 @@ const Header = ({
 }) => {
   return (
     <div className="teamlead-header">
-      <div className="logo-text">ExpenseFlow</div>
+      <div className="d-flex align-items-center gap-2">
+        <div className="logo-text me-4">ExpenseFlow</div>
+
+        <button className="small-btn">Dashboard</button>
+
+        <Dropdown>
+          <Dropdown.Toggle as="button" className="small-btn">
+            Expense
+          </Dropdown.Toggle>
+          <Dropdown.Menu className="custom-dropdown-menu">
+            <Dropdown.Item>Expenses</Dropdown.Item>
+            <Dropdown.Item>Expense Report</Dropdown.Item>
+            <Dropdown.Item>My Approvals</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
       <div
         className={`button-group ${selectedRows.length > 0 ? "visible" : ""}`}
       >
