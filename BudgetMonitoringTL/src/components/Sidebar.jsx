@@ -26,13 +26,13 @@ const Sidebar = ({
         className={`sidebar-content ${isSidebarOpen ? "fade-in" : "fade-out"}`}
       >
         {/* Navigation Section */}
-        <div className="sidebar-header fw-bold mt-2">NAVIGATION</div>
+        {/* <div className="sidebar-header fw-bold mt-2">NAVIGATION</div> */}
         <div className="navigation-links">
           <button className="nav-btn" onClick={() => onNavigate("important")}>
             ⭐ Important
           </button>
           <button className="nav-btn" onClick={() => onNavigate("archive")}>
-            📁 Archive
+            📦 Archive
           </button>
           <button className="nav-btn" onClick={() => onNavigate("important")}>
             🗑️ Trash

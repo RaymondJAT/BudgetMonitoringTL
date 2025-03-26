@@ -11,7 +11,7 @@ import HeaderCount from "../components/HeaderCount";
 import ExpenseReport from "../components/ExpenseReport";
 import Swal from "sweetalert2";
 
-const TeamLead = () => {
+const Expenses = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
@@ -231,6 +231,7 @@ const ExpenseTable = ({
   );
 };
 
+// data
 const ExpenseRow = ({
   row,
   isSelected,
@@ -289,4 +290,4 @@ const ExpenseRow = ({
   );
 };
 
-export default TeamLead;
+export default Expenses;

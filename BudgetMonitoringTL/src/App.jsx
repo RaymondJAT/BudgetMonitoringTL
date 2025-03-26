@@ -3,23 +3,18 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import ApprovalForm from "./components/ApprovalForm";
-import TeamLead from "./pages/TeamLead";
-import ExpenseReport from "./components/ExpenseReport";
-import PrintableCashRequest from "./components/PrintableCashRequest";
+import Expenses from "./pages/Expenses";
+import Approval from "./pages/Approval";
 
 function App() {
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<TeamLead />} />
-          <Route path="/approval" element={<ApprovalForm />} />
-        </Routes>
-      </Router>
-
-      {/* <PrintableCashRequest /> */}
-      {/* <ExpenseReport /> */}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Expenses />} />
+        <Route path="/approval" element={<ApprovalForm />} />
+        <Route path="/my-approvals" element={<Approval />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { Dropdown } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({
   selectedRows,
@@ -8,24 +9,28 @@ const Header = ({
   handlePrint,
   handleDelete,
 }) => {
+  const navigate = useNavigate(); // Navigation hook
+
   return (
     <div className="teamlead-header">
       <div className="d-flex align-items-center gap-2">
         <div className="logo-text me-4">ExpenseFlow</div>
-
-        <button className="small-btn">Dashboard</button>
 
         <Dropdown>
           <Dropdown.Toggle as="button" className="small-btn">
             Expense
           </Dropdown.Toggle>
           <Dropdown.Menu className="custom-dropdown-menu">
-            <Dropdown.Item>Expenses</Dropdown.Item>
-            <Dropdown.Item>Expense Report</Dropdown.Item>
-            <Dropdown.Item>My Approvals</Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/")}>
+              Expenses
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/my-approvals")}>
+              My Approvals
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
+
       <div
         className={`button-group ${selectedRows.length > 0 ? "visible" : ""}`}
       >
@@ -50,7 +55,6 @@ const Header = ({
         )}
       </div>
 
-      {/* Search bar */}
       <input
         type="text"
         placeholder="Search"
