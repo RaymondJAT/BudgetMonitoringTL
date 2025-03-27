@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -11,14 +11,22 @@ const Header = ({
 }) => {
   const navigate = useNavigate(); // Navigation hook
 
+  const [selected, setSelected] = useState(() =>
+    location.pathname === "/my-approvals" ? "My Approvals" : "Expenses"
+  );
+
   return (
     <div className="teamlead-header">
       <div className="d-flex align-items-center gap-2">
         <div className="logo-text me-4">ExpenseFlow</div>
 
         <Dropdown>
-          <Dropdown.Toggle as="button" className="small-btn">
-            Expense
+          <Dropdown.Toggle
+            as="button"
+            className="small-btn"
+            style={{ width: "111px" }}
+          >
+            {selected}
           </Dropdown.Toggle>
           <Dropdown.Menu className="custom-dropdown-menu">
             <Dropdown.Item onClick={() => navigate("/")}>

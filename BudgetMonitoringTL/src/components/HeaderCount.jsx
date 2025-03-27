@@ -1,6 +1,10 @@
 import React from "react";
 
-const HeaderCount = ({ pendingTotal, approvedTotal, postTotal }) => {
+const HeaderCount = ({
+  pendingTotal = 0,
+  approvedTotal = 0,
+  postTotal = 0,
+}) => {
   return (
     <div className="text-center bg-white border-bottom p-3">
       <div className="approval-steps">

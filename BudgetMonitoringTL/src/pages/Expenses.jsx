@@ -94,6 +94,7 @@ const Expenses = () => {
 
   const filteredData = useMemo(() => {
     return data
+      .filter((row) => row.status !== "Approved") // ✅ Hide "Approved" rows from table
       .filter((row) =>
         Object.values(row).some((value) =>
           value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -104,6 +105,7 @@ const Expenses = () => {
           selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
       );
   }, [searchTerm, selectedStatuses, data]);
+
   // compute total of each status
   const getTotalAmountByStatus = (status) => {
     return data
