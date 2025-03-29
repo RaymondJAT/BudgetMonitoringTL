@@ -22,11 +22,6 @@ const Approval = () => {
   const [loading, setLoading] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
 
-  // Filter only approved data
-  const approvedData = useMemo(() => {
-    return data.filter((row) => row.status === "Approved");
-  }, [data]);
-
   // Delete function
   const handleDelete = () => {
     Swal.fire({
@@ -39,10 +34,16 @@ const Approval = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         setData((prevData) =>
-          prevData.filter((row) => !selectedRows.includes(row))
+          prevData.filter(
+            (row) => row.status !== "Approved" || !selectedRows.includes(row)
+          )
         );
         setSelectedRows([]);
-        Swal.fire("Deleted!", "Selected items have been deleted.", "success");
+        Swal.fire(
+          "Deleted!",
+          "Selected approved items have been deleted.",
+          "success"
+        );
       }
     });
   };
@@ -67,15 +68,13 @@ const Approval = () => {
 
   const handleCheckBoxChange = (row) => {
     setSelectedRows((prev) =>
-      prev.includes.apply(row)
-        ? prev.filter((item) => item !== row)
-        : [...prev, row]
+      prev.includes(row) ? prev.filter((item) => item !== row) : [...prev, row]
     );
   };
 
   const handleSelectAll = () => {
     setSelectedRows(
-      selectedRows.length === mockData.length ? [] : [...mockData]
+      selectedRows.length === filteredData.length ? [] : [...filteredData]
     );
   };
 
@@ -190,7 +189,9 @@ const ApprovalTable = ({
             <input
               type="checkbox"
               onChange={handleSelectAll}
-              checked={selectedRows.length === data.length}
+              checked={
+                selectedRows.length > 0 && selectedRows.length === data.length
+              }
             />
           </th>
           <th>Employee</th>

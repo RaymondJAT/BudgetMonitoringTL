@@ -22,6 +22,20 @@ const Expenses = () => {
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [data, setData] = useState(mockData);
 
+  const filteredData = useMemo(() => {
+    return data
+      .filter((row) => row.status !== "Approved")
+      .filter((row) =>
+        Object.values(row).some((value) =>
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      )
+      .filter(
+        (row) =>
+          selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
+      );
+  }, [searchTerm, selectedStatuses, data]);
+
   // delete button function
   const handleDelete = () => {
     Swal.fire({
@@ -75,7 +89,7 @@ const Expenses = () => {
 
   const handleSelectAll = () => {
     setSelectedRows(
-      selectedRows.length === mockData.length ? [] : [...mockData]
+      selectedRows.length === filteredData.length ? [] : [...filteredData]
     );
   };
 
@@ -90,23 +104,11 @@ const Expenses = () => {
         ? prev.filter((s) => s !== status)
         : [...prev, status]
     );
+
+    setSelectedRows([]);
   };
 
-  const filteredData = useMemo(() => {
-    return data
-      .filter((row) => row.status !== "Approved") // ✅ Hide "Approved" rows from table
-      .filter((row) =>
-        Object.values(row).some((value) =>
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      )
-      .filter(
-        (row) =>
-          selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
-      );
-  }, [searchTerm, selectedStatuses, data]);
-
-  // compute total of each status
+  // compute total of each status for HeaderCount
   const getTotalAmountByStatus = (status) => {
     return data
       .filter((row) => row.status === status)
@@ -202,7 +204,7 @@ const ExpenseTable = ({
             <input
               type="checkbox"
               onChange={handleSelectAll}
-              checked={selectedRows.length === data.length}
+              checked={selectedRows.length === data.length && data.length > 0}
             />
           </th>
           <th>Employee</th>
@@ -218,16 +220,21 @@ const ExpenseTable = ({
         </tr>
       </thead>
       <tbody>
-        {data.map((row, index) => (
-          <ExpenseRow
-            key={index}
-            row={row}
-            isSelected={selectedRows.includes(row)}
-            handleRowClick={handleRowClick}
-            handleCheckBoxChange={handleCheckBoxChange}
-            getEmployeeTransactions={getEmployeeTransactions}
-          />
-        ))}
+        {data.map(
+          (
+            row,
+            index // Update this to use 'data'
+          ) => (
+            <ExpenseRow
+              key={index}
+              row={row}
+              isSelected={selectedRows.includes(row)}
+              handleRowClick={handleRowClick}
+              handleCheckBoxChange={handleCheckBoxChange}
+              getEmployeeTransactions={getEmployeeTransactions}
+            />
+          )
+        )}
       </tbody>
     </table>
   );
