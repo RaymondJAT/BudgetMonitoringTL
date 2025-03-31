@@ -1,11 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Sidebar = ({
-  isSidebarOpen,
-  toggleSidebar,
-  onStatusChange,
-  onNavigate,
-}) => {
+const Sidebar = ({ isSidebarOpen, toggleSidebar, onStatusChange }) => {
+  const navigate = useNavigate();
   const [checkedStatuses, setCheckedStatuses] = useState([]);
 
   const handleCheckboxChange = (status) => {
@@ -27,13 +24,9 @@ const Sidebar = ({
       >
         {/* Navigation Section */}
         <div className="navigation-links">
-          <button className="nav-btn" onClick={() => onNavigate("important")}>
-            ⭐ Important
-          </button>
-          <button className="nav-btn" onClick={() => onNavigate("archive")}>
-            📦 Archive
-          </button>
-          <button className="nav-btn" onClick={() => onNavigate("important")}>
+          <button className="nav-btn">⭐ Important</button>
+          <button className="nav-btn">📦 Archive</button>
+          <button className="nav-btn" onClick={() => navigate("/trash")}>
             🗑️ Trash
           </button>
         </div>
@@ -41,21 +34,19 @@ const Sidebar = ({
         {/* Status Filters */}
         <div className="sidebar-header fw-bold">STATUS</div>
         <div className="status-filters">
-          {["Pending", "Approved", "Refused", "In Payment", "Paid"].map(
-            (status) => (
-              <label
-                key={status}
-                className={checkedStatuses.includes(status) ? "checked" : ""}
-              >
-                <input
-                  type="checkbox"
-                  checked={checkedStatuses.includes(status)}
-                  onChange={() => handleCheckboxChange(status)}
-                />
-                {status}
-              </label>
-            )
-          )}
+          {["Pending", "Refused"].map((status) => (
+            <label
+              key={status}
+              className={checkedStatuses.includes(status) ? "checked" : ""}
+            >
+              <input
+                type="checkbox"
+                checked={checkedStatuses.includes(status)}
+                onChange={() => handleCheckboxChange(status)}
+              />
+              {status}
+            </label>
+          ))}
         </div>
       </div>
     </div>

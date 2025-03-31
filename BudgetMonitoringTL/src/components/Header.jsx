@@ -40,15 +40,15 @@ const Header = ({
       </div>
 
       <div
-        className={`button-group ${selectedRows.length > 0 ? "visible" : ""}`}
+        className={`button-group ${selectedRows?.length > 0 ? "visible" : ""}`}
       >
-        {selectedRows.length === 1 && (
+        {selectedRows?.length === 1 && (
           <button className="small-btn" onClick={handlePrint}>
             Print
           </button>
         )}
 
-        {selectedRows.length > 0 && (
+        {selectedRows?.length > 0 && (
           <Dropdown>
             <Dropdown.Toggle as="button" className="small-btn">
               Actions

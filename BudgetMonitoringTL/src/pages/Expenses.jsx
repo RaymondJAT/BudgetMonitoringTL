@@ -39,7 +39,7 @@ const Expenses = () => {
   // delete button function
   const handleDelete = () => {
     Swal.fire({
-      title: "Are you sure?",
+      title: "Move to Trash?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
