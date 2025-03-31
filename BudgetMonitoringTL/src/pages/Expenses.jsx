@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
@@ -21,6 +21,7 @@ const Expenses = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [data, setData] = useState(mockData);
+  const [trashData, setTrashData] = useState([]);
 
   const filteredData = useMemo(() => {
     return data
@@ -36,6 +37,21 @@ const Expenses = () => {
       );
   }, [searchTerm, selectedStatuses, data]);
 
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("expensesData"));
+    setData(storedData || mockData);
+  }, []);
+
+  // useEffect(() => {
+  //   // Clear localStorage on every page refresh
+  //   localStorage.removeItem("expensesData");
+  //   localStorage.removeItem("trashData");
+
+  //   // Load fresh data from mockData
+  //   setData(mockData);
+  //   setTrashData([]);
+  // }, []);
+
   // delete button function
   const handleDelete = () => {
     Swal.fire({
@@ -48,19 +64,35 @@ const Expenses = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         setData((prevData) => {
-          const rowsToDelete = filteredData.filter((row) =>
+          const rowsToDelete = prevData.filter((row) =>
             selectedRows.includes(row)
           );
+
+          const existingTrash =
+            JSON.parse(localStorage.getItem("trashData")) || [];
+
+          const updatedTrash = existingTrash.concat(
+            rowsToDelete.filter(
+              (row) => !existingTrash.some((trashRow) => trashRow.id === row.id)
+            )
+          );
+
+          localStorage.setItem("trashData", JSON.stringify(updatedTrash));
+
           const updatedData = prevData.filter(
             (row) => !rowsToDelete.includes(row)
           );
+
+          localStorage.setItem("expensesData", JSON.stringify(updatedData));
+
           setSelectedRows([]);
+
           return updatedData;
         });
 
         Swal.fire({
           title: "Deleted!",
-          text: "Selected items have been deleted.",
+          text: "Selected items have been moved to Trash.",
           icon: "success",
           confirmButtonColor: "#3085d6",
           confirmButtonText: "OK",
@@ -69,7 +101,7 @@ const Expenses = () => {
     });
   };
 
-  // Helper function to find transactions of an employee
+  // function to find transactions of an employee
   const getEmployeeTransactions = (employeeName) => {
     return (
       tableData.find((emp) => emp.employee === employeeName)?.transactions || []
@@ -108,7 +140,7 @@ const Expenses = () => {
     setSelectedRows([]);
   };
 
-  // compute total of each status for HeaderCount
+  // total status HeaderCount
   const getTotalAmountByStatus = (status) => {
     return data
       .filter((row) => row.status === status)
@@ -220,21 +252,16 @@ const ExpenseTable = ({
         </tr>
       </thead>
       <tbody>
-        {data.map(
-          (
-            row,
-            index // Update this to use 'data'
-          ) => (
-            <ExpenseRow
-              key={index}
-              row={row}
-              isSelected={selectedRows.includes(row)}
-              handleRowClick={handleRowClick}
-              handleCheckBoxChange={handleCheckBoxChange}
-              getEmployeeTransactions={getEmployeeTransactions}
-            />
-          )
-        )}
+        {data.map((row, index) => (
+          <ExpenseRow
+            key={index}
+            row={row}
+            isSelected={selectedRows.includes(row)}
+            handleRowClick={handleRowClick}
+            handleCheckBoxChange={handleCheckBoxChange}
+            getEmployeeTransactions={getEmployeeTransactions}
+          />
+        ))}
       </tbody>
     </table>
   );
