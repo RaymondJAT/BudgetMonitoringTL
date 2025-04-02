@@ -4,6 +4,7 @@ import { useReactToPrint } from "react-to-print";
 import { Card } from "react-bootstrap";
 import Sidebar from "../components/Sidebar";
 import TrashTable from "../components/TrashTable";
+import HeaderCount from "../components/HeaderCount";
 
 const Trash = () => {
   const contentRef = useRef(null);
@@ -20,36 +21,53 @@ const Trash = () => {
     setTrashData(storedTrash);
   }, []);
 
-  const handleDelete = () => {
-    Swal.fire({
-      title: "Permanently delete selected items?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Delete",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const updatedTrash = trashData.filter(
-          (row) => !selectedRows.includes(row)
-        );
+  //   delete button with SWAL
+  //   const handleDelete = () => {
+  //     Swal.fire({
+  //       title: "Permanently delete selected items?",
+  //       icon: "warning",
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#3085d6",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Delete",
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+  //         const updatedTrash = trashData.filter(
+  //           (row) => !selectedRows.includes(row)
+  //         );
 
-        localStorage.setItem("trashData", JSON.stringify(updatedTrash));
-        setTrashData(updatedTrash);
-        setSelectedRows([]);
+  //         localStorage.setItem("trashData", JSON.stringify(updatedTrash));
+  //         setTrashData(updatedTrash);
+  //         setSelectedRows([]);
 
-        Swal.fire(
-          "Deleted!",
-          "Selected items have been permanently removed.",
-          "success"
-        );
-      }
-    });
-  };
+  //         Swal.fire(
+  //           "Deleted!",
+  //           "Selected items have been permanently removed.",
+  //           "success"
+  //         );
+  //       }
+  //     });
+  //   };
 
   // react-to-print
   const handlePrint = () => {
     reactToPrintFn();
+  };
+
+  const handleCheckBoxChange = (id) => {
+    setSelectedRows((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((selectedId) => selectedId !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    setSelectedRows((prevSelected) =>
+      prevSelected.length === trashData.length
+        ? []
+        : trashData.map((row) => row.id)
+    );
   };
 
   const handleStatusFilterChange = (status) => {
@@ -67,8 +85,16 @@ const Trash = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handlePrint={handlePrint}
-        handleDelete={handleDelete}
+        // handleDelete={handleDelete}
       />
+
+      {/* <HeaderCount
+        selectedRows={selectedRows}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        handlePrint={handlePrint}
+        handleDelete={handleDelete}
+      /> */}
 
       <Card className="w-auto">
         <Card.Body className="p-0">
@@ -80,11 +106,12 @@ const Trash = () => {
                 onStatusChange={handleStatusFilterChange}
               />
               <div className="table-container">
-                <h2>Trash</h2>
+                {/* <h2>Trash</h2> */}
                 <TrashTable
                   data={trashData}
                   selectedRows={selectedRows}
-                  setSelectedRows={setSelectedRows}
+                  handleCheckBoxChange={handleCheckBoxChange}
+                  handleSelectAll={handleSelectAll}
                 />
               </div>
             </div>

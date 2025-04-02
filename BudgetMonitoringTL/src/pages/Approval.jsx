@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 import { mockData } from "../mock-data/mockData";
-import { tableData } from "../mock-data/tableData";
 import Header from "../components/Header";
 import Swal from "sweetalert2";
 import HeaderCount from "../components/HeaderCount";
@@ -91,7 +90,7 @@ const Approval = () => {
   // Helper function to find transactions of an employee
   const getEmployeeTransactions = (employeeName) => {
     return (
-      tableData.find((emp) => emp.employee === employeeName)?.transactions || []
+      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
     );
   };
 

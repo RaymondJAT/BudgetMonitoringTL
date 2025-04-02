@@ -1,30 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
 import { numberToWords } from "../js/numberToWords";
-import { tableData } from "../mock-data/tableData";
+import { mockData } from "../mock-data/mockData";
 
 const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
-  // Find transactions for the selected employee
-  const employeeData = tableData.find((e) => e.employee === employeeName);
-  const [data] = useState(employeeData ? employeeData.transactions : []);
+  // Find transactions for the selected employee, default to empty array if not found
+  const employeeData = mockData.find((e) => e.employee === employeeName) || {
+    transactions: [],
+  };
+  const [data] = useState(employeeData.transactions);
 
   useEffect(() => {
-    setParticulars(
-      data.map((item) => ({
-        label: item.label,
-        quantity: item.quantity,
-        price: item.price,
-        amount: item.quantity * item.price,
-      }))
-    );
+    if (data.length > 0) {
+      setParticulars(
+        data.map((item) => ({
+          label: item.label ?? "N/A",
+          quantity: item.quantity ?? 0,
+          price: item.price ?? 0,
+          amount: (item.quantity ?? 0) * (item.price ?? 0),
+        }))
+      );
+    } else {
+      setParticulars([]);
+    }
   }, [setParticulars, data]);
 
-  // total dynamically
-  const total = data.reduce((sum, row) => sum + row.quantity * row.price, 0);
+  // Ensure total calculation handles undefined values
+  const total = data.reduce(
+    (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
+    0
+  );
 
-  // total amount to words
+  // Convert total to words if it's a valid number
   useEffect(() => {
-    setAmountInWords(numberToWords(total));
+    if (!isNaN(total)) {
+      setAmountInWords(numberToWords(total));
+    }
   }, [total, setAmountInWords]);
 
   return (
@@ -51,9 +62,12 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
                   : "₱0.00"}
               </td>
               <td className="border">
-                {`₱${(row.quantity * row.price).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}`}
+                {`₱${((row.quantity ?? 0) * (row.price ?? 0)).toLocaleString(
+                  "en-US",
+                  {
+                    minimumFractionDigits: 2,
+                  }
+                )}`}
               </td>
             </tr>
           ))}

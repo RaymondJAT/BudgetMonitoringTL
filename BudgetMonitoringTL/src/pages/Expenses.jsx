@@ -2,7 +2,6 @@ import React, { useState, useRef, useMemo, useEffect } from "react";
 import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { mockData } from "../mock-data/mockData";
-import { tableData } from "../mock-data/tableData";
 import { useReactToPrint } from "react-to-print";
 import Header from "../components/Header";
 import loader from "../assets/5Lloading.gif";
@@ -63,32 +62,28 @@ const Expenses = () => {
       confirmButtonText: "Delete",
     }).then((result) => {
       if (result.isConfirmed) {
-        setData((prevData) => {
-          const rowsToDelete = prevData.filter((row) =>
-            selectedRows.includes(row)
-          );
+        const rowsToDelete = data.filter((row) => selectedRows.includes(row));
 
-          const existingTrash =
-            JSON.parse(localStorage.getItem("trashData")) || [];
+        const existingTrash =
+          JSON.parse(localStorage.getItem("trashData")) || [];
 
-          const updatedTrash = existingTrash.concat(
-            rowsToDelete.filter(
-              (row) => !existingTrash.some((trashRow) => trashRow.id === row.id)
-            )
-          );
+        const updatedTrash = [
+          ...existingTrash,
+          ...rowsToDelete.filter(
+            (row) => !existingTrash.some((trashRow) => trashRow.id === row.id)
+          ),
+        ];
 
-          localStorage.setItem("trashData", JSON.stringify(updatedTrash));
+        localStorage.setItem("trashData", JSON.stringify(updatedTrash));
+        setTrashData(updatedTrash);
 
-          const updatedData = prevData.filter(
-            (row) => !rowsToDelete.includes(row)
-          );
+        const updatedData = data.filter((row) => !rowsToDelete.includes(row));
 
-          localStorage.setItem("expensesData", JSON.stringify(updatedData));
+        localStorage.setItem("expensesData", JSON.stringify(updatedData));
+        setData(updatedData);
 
-          setSelectedRows([]);
-
-          return updatedData;
-        });
+        // Clear selection
+        setSelectedRows([]);
 
         Swal.fire({
           title: "Deleted!",
@@ -104,13 +99,19 @@ const Expenses = () => {
   // function to find transactions of an employee
   const getEmployeeTransactions = (employeeName) => {
     return (
-      tableData.find((emp) => emp.employee === employeeName)?.transactions || []
+      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
     );
   };
 
   const handleRowClick = (rowData) => {
-    setLoading(true);
-    setTimeout(() => navigate("/approval", { state: rowData }), 1000);
+    const rowDataById = data.find((row) => row.id === rowData.id);
+
+    if (rowDataById) {
+      setLoading(true);
+      setTimeout(() => {
+        navigate("/approval", { state: rowDataById });
+      }, 1000);
+    }
   };
 
   const handleCheckBoxChange = (row) => {
