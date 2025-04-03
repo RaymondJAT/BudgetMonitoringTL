@@ -69,9 +69,11 @@ const Expenses = () => {
 
         const updatedTrash = [
           ...existingTrash,
-          ...rowsToDelete.filter(
-            (row) => !existingTrash.some((trashRow) => trashRow.id === row.id)
-          ),
+          ...rowsToDelete.map((row) => ({
+            ...row,
+            transactions: getEmployeeTransactions(row.employee), // Store transactions
+            deletedAt: new Date().toISOString(), // Add deletion timestamp
+          })),
         ];
 
         localStorage.setItem("trashData", JSON.stringify(updatedTrash));
@@ -82,7 +84,6 @@ const Expenses = () => {
         localStorage.setItem("expensesData", JSON.stringify(updatedData));
         setData(updatedData);
 
-        // Clear selection
         setSelectedRows([]);
 
         Swal.fire({

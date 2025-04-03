@@ -5,6 +5,7 @@ import { Card } from "react-bootstrap";
 import Sidebar from "../components/Sidebar";
 import TrashTable from "../components/TrashTable";
 import HeaderCount from "../components/HeaderCount";
+import { mockData } from "../mock-data/mockData";
 
 const Trash = () => {
   const contentRef = useRef(null);
@@ -14,6 +15,7 @@ const Trash = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [trashData, setTrashData] = useState([]);
+  const [data, setData] = useState(mockData);
 
   // load trash from local storage
   useEffect(() => {
@@ -50,6 +52,12 @@ const Trash = () => {
   //   };
 
   // react-to-print
+  const getEmployeeTransactions = (employeeName) => {
+    return (
+      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
+    );
+  };
+
   const handlePrint = () => {
     reactToPrintFn();
   };
@@ -78,6 +86,19 @@ const Trash = () => {
     );
   };
 
+  const getTotalAmountByStatus = (status) => {
+    return data
+      .filter((row) => row.status === status)
+      .reduce((sum, row) => {
+        const transactions = getEmployeeTransactions(row.employee);
+        const grandTotal = transactions.reduce(
+          (total, item) => total + item.quantity * item.price,
+          0
+        );
+        return sum + grandTotal;
+      }, 0);
+  };
+
   return (
     <>
       <Header
@@ -88,13 +109,12 @@ const Trash = () => {
         // handleDelete={handleDelete}
       />
 
-      {/* <HeaderCount
-        selectedRows={selectedRows}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        handlePrint={handlePrint}
-        handleDelete={handleDelete}
-      /> */}
+      <div className="card-header text-center">
+        <HeaderCount
+          pendingTotal={getTotalAmountByStatus("Pending")}
+          approvedTotal={getTotalAmountByStatus("Approved")}
+        />
+      </div>
 
       <Card className="w-auto">
         <Card.Body className="p-0">

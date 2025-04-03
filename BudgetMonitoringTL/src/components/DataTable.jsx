@@ -25,13 +25,12 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
     }
   }, [setParticulars, data]);
 
-  // Ensure total calculation handles undefined values
   const total = data.reduce(
     (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
     0
   );
 
-  // Convert total to words if it's a valid number
+  // Convert total to words if valid
   useEffect(() => {
     if (!isNaN(total)) {
       setAmountInWords(numberToWords(total));

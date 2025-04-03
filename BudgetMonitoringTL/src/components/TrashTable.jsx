@@ -1,5 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Card } from "react-bootstrap";
+
+const StatusBadge = ({ status }) => (
+  <span className={`status-badge ${status.toLowerCase()}`}>{status}</span>
+);
 
 const TrashTable = ({
   data,
@@ -7,6 +11,42 @@ const TrashTable = ({
   handleCheckBoxChange,
   handleSelectAll,
 }) => {
+  // trash data from localStorage
+  const trashData = useMemo(() => {
+    return JSON.parse(localStorage.getItem("trashData")) || [];
+  }, []);
+
+  const getEmployeeTransactions = useMemo(() => {
+    return (employeeName) =>
+      trashData.find((emp) => emp.employee === employeeName)?.transactions ||
+      [];
+  }, [trashData]);
+
+  // format data for display
+  const formattedData = useMemo(() => {
+    return data
+      .map((row) => {
+        const transactions = getEmployeeTransactions(row.employee);
+        return {
+          ...row,
+          prices: transactions
+            .map(
+              (t) =>
+                `₱${t.price.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })}`
+            )
+            .join("\n"),
+          quantities: transactions.map((t) => t.quantity).join("\n"),
+          grandTotal: transactions.reduce(
+            (sum, item) => sum + item.quantity * item.price,
+            0
+          ),
+        };
+      })
+      .sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt));
+  }, [data, getEmployeeTransactions]);
+
   return (
     <Card className="w-auto">
       <Card.Body className="p-0">
@@ -17,7 +57,6 @@ const TrashTable = ({
                 <thead>
                   <tr>
                     <th>
-                      {/* Select All Checkbox */}
                       <input
                         type="checkbox"
                         onChange={handleSelectAll}
@@ -32,11 +71,14 @@ const TrashTable = ({
                     <th>Expense Date</th>
                     <th>Category</th>
                     <th>Paid By</th>
+                    <th className="hidden-column">Unit Price</th>
+                    <th className="hidden-column">Quantity</th>
+                    <th>Total</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((row) => {
+                  {formattedData.map((row) => {
                     const isSelected = selectedRows.includes(row.id);
                     return (
                       <tr
@@ -48,9 +90,8 @@ const TrashTable = ({
                         <td>
                           <input
                             type="checkbox"
-                            checked={selectedRows.includes(row.id)}
+                            checked={isSelected}
                             onChange={() => handleCheckBoxChange(row.id)}
-                            onClick={(e) => e.stopPropagation()}
                           />
                         </td>
                         <td>{row.employee}</td>
@@ -59,7 +100,21 @@ const TrashTable = ({
                         <td>{row.expenseDate}</td>
                         <td>{row.category}</td>
                         <td>{row.paidBy}</td>
-                        <td>{row.status}</td>
+                        <td className="hidden-column">
+                          <pre>{row.prices}</pre>
+                        </td>
+                        <td className="hidden-column">
+                          <pre>{row.quantities}</pre>
+                        </td>
+                        <td>
+                          ₱
+                          {row.grandTotal.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </td>
+                        <td>
+                          <StatusBadge status={row.status} />
+                        </td>
                       </tr>
                     );
                   })}
