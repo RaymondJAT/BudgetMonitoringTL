@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import HeaderCount from "../components/HeaderCount";
-import { Card } from "react-bootstrap";
 import Sidebar from "../components/Sidebar";
-import ArchiveTable from "../components/ArchiveTable";
+import ImportantTable from "../components/ImportantTable";
+import { Card } from "react-bootstrap";
 
-const Archive = () => {
+const Important = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleStatusFilterChange = (status) => {
@@ -34,7 +34,7 @@ const Archive = () => {
               />
 
               <div className="table-container">
-                <ArchiveTable />
+                <ImportantTable />
               </div>
             </div>
           </div>
@@ -44,4 +44,4 @@ const Archive = () => {
   );
 };
 
-export default Archive;
+export default Important;

@@ -6,6 +6,7 @@ import Sidebar from "../components/Sidebar";
 import TrashTable from "../components/TrashTable";
 import HeaderCount from "../components/HeaderCount";
 import { mockData } from "../mock-data/mockData";
+import loader from "../assets/5Lloading.gif";
 
 const Trash = () => {
   const contentRef = useRef(null);
@@ -15,6 +16,7 @@ const Trash = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [trashData, setTrashData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState(mockData);
 
   // load trash from local storage
@@ -62,6 +64,17 @@ const Trash = () => {
     reactToPrintFn();
   };
 
+  const handleRowClick = (rowData) => {
+    const rowDataById = data.find((row) => row.id === rowData.id);
+
+    if (rowDataById) {
+      setLoading(true);
+      setTimeout(() => {
+        Navigate("/approval", { state: rowDataById });
+      }, 1000);
+    }
+  };
+
   const handleCheckBoxChange = (id) => {
     setSelectedRows((prevSelected) =>
       prevSelected.includes(id)
@@ -101,6 +114,11 @@ const Trash = () => {
 
   return (
     <>
+      {loading && (
+        <div className="loading">
+          <img src={loader} alt="Loading GIF" className="custom-loader" />
+        </div>
+      )}
       <Header
         selectedRows={selectedRows}
         searchTerm={searchTerm}
@@ -126,10 +144,10 @@ const Trash = () => {
                 onStatusChange={handleStatusFilterChange}
               />
               <div className="table-container">
-                {/* <h2>Trash</h2> */}
                 <TrashTable
                   data={trashData}
                   selectedRows={selectedRows}
+                  handleRowClick={handleRowClick}
                   handleCheckBoxChange={handleCheckBoxChange}
                   handleSelectAll={handleSelectAll}
                 />

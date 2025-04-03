@@ -24,8 +24,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, onStatusChange }) => {
       >
         {/* Navigation Section */}
         <div className="navigation-links">
-          <button className="nav-btn">⭐ Important</button>
-          <button className="nav-btn">📦 Archive</button>
+          <button className="nav-btn" onClick={() => navigate("/important")}>
+            ⭐ Important
+          </button>
+          <button className="nav-btn" onClick={() => navigate("/archive")}>
+            📦 Archive
+          </button>
           <button className="nav-btn" onClick={() => navigate("/trash")}>
             🗑️ Trash
           </button>

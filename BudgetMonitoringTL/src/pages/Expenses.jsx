@@ -36,11 +36,13 @@ const Expenses = () => {
       );
   }, [searchTerm, selectedStatuses, data]);
 
+  // localstorage
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("expensesData"));
     setData(storedData || mockData);
   }, []);
 
+  // reset
   // useEffect(() => {
   //   // Clear localStorage on every page refresh
   //   localStorage.removeItem("expensesData");
