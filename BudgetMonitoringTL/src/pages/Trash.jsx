@@ -18,20 +18,13 @@ const Trash = () => {
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [trashData, setTrashData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(mockData);
+  const [expensesData, setExpensesData] = useState([]);
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("trashData"));
-    setData(storedData || mockData);
+    const storedExpenses =
+      JSON.parse(localStorage.getItem("expensesData")) || [];
+    setExpensesData(storedExpenses);
   }, []);
-
-  // reset localstorage
-  // useEffect(() => {
-  //   localStorage.removeItem("expensesData");
-  //   localStorage.removeItem("trashData");
-  //   setData(mockData);
-  //   setTrashData([]);
-  // }, []);
 
   // load trash from local storage
   useEffect(() => {
@@ -103,12 +96,18 @@ const Trash = () => {
     );
   };
 
+  const getEmployeeTransactions = (employeeName) => {
+    return (
+      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
+    );
+  };
+
   // HeaderCount status
   const getTotalAmountByStatus = (status) => {
-    return trashData
+    return expensesData
       .filter((row) => row.status === status)
       .reduce((sum, row) => {
-        const transactions = row.transactions || [];
+        const transactions = getEmployeeTransactions(row.employee);
         const grandTotal = transactions.reduce(
           (total, item) => total + item.quantity * item.price,
           0
@@ -136,6 +135,7 @@ const Trash = () => {
         <HeaderCount
           pendingTotal={getTotalAmountByStatus("Pending")}
           approvedTotal={getTotalAmountByStatus("Approved")}
+          postTotal={getTotalAmountByStatus("Post")}
         />
       </div>
 
