@@ -7,6 +7,7 @@ import TrashTable from "../components/TrashTable";
 import HeaderCount from "../components/HeaderCount";
 import { mockData } from "../mock-data/mockData";
 import loader from "../assets/5Lloading.gif";
+import Swal from "sweetalert2";
 
 const Trash = () => {
   const contentRef = useRef(null);
@@ -19,60 +20,63 @@ const Trash = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(mockData);
 
-  // load trash from local storage
   useEffect(() => {
-    const storedTrash = JSON.parse(localStorage.getItem("trashData")) || [];
-    setTrashData(storedTrash);
+    const storedData = JSON.parse(localStorage.getItem("trashData"));
+    setData(storedData || mockData);
   }, []);
 
-  //   delete button with SWAL
-  //   const handleDelete = () => {
-  //     Swal.fire({
-  //       title: "Permanently delete selected items?",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Delete",
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         const updatedTrash = trashData.filter(
-  //           (row) => !selectedRows.includes(row)
-  //         );
+  // reset localstorage
+  // useEffect(() => {
+  //   localStorage.removeItem("expensesData");
+  //   localStorage.removeItem("trashData");
+  //   setData(mockData);
+  //   setTrashData([]);
+  // }, []);
 
-  //         localStorage.setItem("trashData", JSON.stringify(updatedTrash));
-  //         setTrashData(updatedTrash);
-  //         setSelectedRows([]);
+  // load trash from local storage
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("trashData"));
+    setTrashData(storedData || []);
+  }, []);
 
-  //         Swal.fire(
-  //           "Deleted!",
-  //           "Selected items have been permanently removed.",
-  //           "success"
-  //         );
-  //       }
-  //     });
-  //   };
+  //   delete button
+  const handleDelete = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedTrash = trashData.filter(
+          (row) => !selectedRows.includes(row.id)
+        );
 
-  // react-to-print
-  const getEmployeeTransactions = (employeeName) => {
-    return (
-      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
-    );
+        localStorage.setItem("trashData", JSON.stringify(updatedTrash));
+        setTrashData(updatedTrash);
+
+        setSelectedRows([]);
+
+        Swal.fire({
+          title: "Deleted!",
+          text: "Selected items have been permanently removed.",
+          icon: "success",
+        });
+      }
+    });
   };
 
+  // react-to-print
   const handlePrint = () => {
     reactToPrintFn();
   };
 
   const handleRowClick = (rowData) => {
-    const rowDataById = data.find((row) => row.id === rowData.id);
-
-    if (rowDataById) {
-      setLoading(true);
-      setTimeout(() => {
-        Navigate("/approval", { state: rowDataById });
-      }, 1000);
-    }
+    setLoading(true);
+    setTimeout(() => Navigate("/approval", { state: rowData }), 1000);
   };
 
   const handleCheckBoxChange = (id) => {
@@ -99,11 +103,12 @@ const Trash = () => {
     );
   };
 
+  // HeaderCount status
   const getTotalAmountByStatus = (status) => {
-    return data
+    return trashData
       .filter((row) => row.status === status)
       .reduce((sum, row) => {
-        const transactions = getEmployeeTransactions(row.employee);
+        const transactions = row.transactions || [];
         const grandTotal = transactions.reduce(
           (total, item) => total + item.quantity * item.price,
           0
@@ -124,7 +129,7 @@ const Trash = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handlePrint={handlePrint}
-        // handleDelete={handleDelete}
+        handleDelete={handleDelete}
       />
 
       <div className="card-header text-center">

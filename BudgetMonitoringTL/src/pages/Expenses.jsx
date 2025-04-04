@@ -44,16 +44,13 @@ const Expenses = () => {
 
   // reset
   // useEffect(() => {
-  //   // Clear localStorage on every page refresh
   //   localStorage.removeItem("expensesData");
   //   localStorage.removeItem("trashData");
-
-  //   // Load fresh data from mockData
   //   setData(mockData);
   //   setTrashData([]);
   // }, []);
 
-  // delete button function
+  // delete button
   const handleDelete = () => {
     Swal.fire({
       title: "Move to Trash?",
@@ -73,8 +70,8 @@ const Expenses = () => {
           ...existingTrash,
           ...rowsToDelete.map((row) => ({
             ...row,
-            transactions: getEmployeeTransactions(row.employee), // Store transactions
-            deletedAt: new Date().toISOString(), // Add deletion timestamp
+            transactions: getEmployeeTransactions(row.employee),
+            deletedAt: new Date().toISOString(),
           })),
         ];
 
