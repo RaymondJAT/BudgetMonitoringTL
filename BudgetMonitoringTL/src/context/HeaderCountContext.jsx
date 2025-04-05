@@ -1,52 +1,43 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { mockData } from "../mock-data/mockData";
 
-const HeaderCountContext = createContext();
+export const ExpensesContext = createContext();
 
-export const HeaderCountProvider = ({ children }) => {
-  const [data, setData] = useState([]);
+export const ExpensesProvider = ({ children }) => {
+  const [expensesData, setExpensesData] = useState([]);
+  const [totals, setTotals] = useState({ pending: 0, approved: 0, post: 0 });
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("expensesData"));
-    setData(storedData || mockData);
+    const storedData = JSON.parse(localStorage.getItem("expensesData")) || [];
+    setExpensesData(storedData);
+
+    const getTotalAmountByStatus = (status) => {
+      return storedData
+        .filter((row) => row.status === status)
+        .reduce((sum, row) => {
+          const transaction =
+            mockData.find((emp) => emp.employee === row.employee)
+              ?.transactions || [];
+          return (
+            sum +
+            transaction.reduce(
+              (total, item) => total + item.quantity * item.price,
+              0
+            )
+          );
+        }, 0);
+    };
+
+    setTotals({
+      pending: getTotalAmountByStatus("Pending"),
+      approved: getTotalAmountByStatus("Approved"),
+      post: getTotalAmountByStatus("Post"),
+    });
   }, []);
 
-  const getEmployeeTransactions = (employeeName) => {
-    return (
-      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
-    );
-  };
-
-  const getTotalAmountByStatus = (status) => {
-    return data
-      .filter((row) => row.status === status)
-      .reduce((sum, row) => {
-        const transactions = getEmployeeTransactions(row.employee);
-        return (
-          sum +
-          transactions.reduce(
-            (total, item) => total + item.quantity * item.price,
-            0
-          )
-        );
-      }, 0);
-  };
-
   return (
-    <HeaderCountContext.Provider
-      value={{
-        pendingTotal: getTotalAmountByStatus("Pending"),
-        approvedTotal: getTotalAmountByStatus("Approved"),
-        postTotal: getTotalAmountByStatus("Post"),
-        refreshData: () => {
-          const storedData = JSON.parse(localStorage.getItem("expensesData"));
-          setData(storedData || mockData);
-        },
-      }}
-    >
+    <ExpensesContext.Provider value={{ expensesData, totals }}>
       {children}
-    </HeaderCountContext.Provider>
+    </ExpensesContext.Provider>
   );
 };
-
-export const useHeaderCount = () => useContext(HeaderCountContext);

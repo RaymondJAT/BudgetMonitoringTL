@@ -9,12 +9,12 @@ import Trash from "./pages/Trash";
 import { FileProvider } from "./context/FileContext";
 import Archive from "./pages/Archive";
 import Important from "./pages/Important";
-import { HeaderCountProvider } from "./context/HeaderCountContext";
+import { ExpensesProvider } from "./context/HeaderCountContext";
 
 function App() {
   return (
     <FileProvider>
-      <HeaderCountProvider>
+      <ExpensesProvider>
         <Router>
           <Routes>
             <Route path="/" element={<Expenses />} />
@@ -25,7 +25,7 @@ function App() {
             <Route path="/important" element={<Important />} />
           </Routes>
         </Router>
-      </HeaderCountProvider>
+      </ExpensesProvider>
     </FileProvider>
   );
 }

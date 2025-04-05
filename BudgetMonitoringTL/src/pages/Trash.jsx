@@ -102,12 +102,14 @@ const Trash = () => {
     );
   };
 
-  // HeaderCount status
+  // headercount
   const getTotalAmountByStatus = (status) => {
     return expensesData
       .filter((row) => row.status === status)
       .reduce((sum, row) => {
-        const transactions = getEmployeeTransactions(row.employee);
+        const transactions =
+          mockData.find((emp) => emp.employee === row.employee)?.transactions ||
+          [];
         const grandTotal = transactions.reduce(
           (total, item) => total + item.quantity * item.price,
           0

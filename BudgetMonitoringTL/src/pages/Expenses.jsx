@@ -42,6 +42,10 @@ const Expenses = () => {
     setData(storedData || mockData);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("expensesData", JSON.stringify(data));
+  }, [data]);
+
   // reset
   // useEffect(() => {
   //   localStorage.removeItem("expensesData");
