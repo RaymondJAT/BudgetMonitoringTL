@@ -22,8 +22,25 @@ const Expenses = () => {
   const [data, setData] = useState(mockData);
   const [trashData, setTrashData] = useState([]);
 
+  // const filteredData = useMemo(() => {
+  //   return data
+  //     .filter((row) => row.status !== "Approved")
+  //     .filter((row) =>
+  //       Object.values(row).some((value) =>
+  //         value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  //       )
+  //     )
+  //     .filter(
+  //       (row) =>
+  //         selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
+  //     );
+  // }, [searchTerm, selectedStatuses, data]);
+
   const filteredData = useMemo(() => {
+    const trashIds = trashData.map((item) => item.id);
+
     return data
+      .filter((row) => !trashIds.includes(row.id))
       .filter((row) => row.status !== "Approved")
       .filter((row) =>
         Object.values(row).some((value) =>
@@ -34,17 +51,39 @@ const Expenses = () => {
         (row) =>
           selectedStatuses.length === 0 || selectedStatuses.includes(row.status)
       );
-  }, [searchTerm, selectedStatuses, data]);
+  }, [searchTerm, selectedStatuses, data, trashData]);
 
   // localstorage
-  useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("expensesData"));
-    setData(storedData || mockData);
-  }, []);
+  // useEffect(() => {
+  //   const storedData = JSON.parse(localStorage.getItem("expensesData"));
+  //   setData(storedData || mockData);
+  // }, []);
 
   useEffect(() => {
-    localStorage.setItem("expensesData", JSON.stringify(data));
-  }, [data]);
+    const storedExpenses = JSON.parse(localStorage.getItem("expensesData"));
+    const storedTrash = JSON.parse(localStorage.getItem("trashData"));
+    const storedSelectedRows = JSON.parse(localStorage.getItem("selectedRows"));
+
+    setData(storedExpenses || mockData); // Default to mockData if not found
+    setTrashData(storedTrash || []);
+    setSelectedRows(storedSelectedRows || []); // Default to empty array if not found
+  }, []);
+
+  // useEffect(() => {
+  //   const storedExpenses = JSON.parse(localStorage.getItem("expensesData"));
+  //   const storedTrash = JSON.parse(localStorage.getItem("trashData"));
+
+  //   setData(storedExpenses || mockData);
+  //   setTrashData(storedTrash || []);
+  // }, []);
+
+  // useEffect(() => {
+  //   localStorage.setItem("trashData", JSON.stringify(trashData));
+  // }, [trashData]);
+
+  // useEffect(() => {
+  //   localStorage.setItem("expensesData", JSON.stringify(data));
+  // }, [data]);
 
   // reset
   // useEffect(() => {
@@ -103,7 +142,7 @@ const Expenses = () => {
   // function to find transactions of an employee
   const getEmployeeTransactions = (employeeName) => {
     return (
-      mockData.find((emp) => emp.employee === employeeName)?.transactions || []
+      data.find((emp) => emp.employee === employeeName)?.transactions || []
     );
   };
 
