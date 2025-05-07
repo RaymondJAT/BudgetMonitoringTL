@@ -1,76 +1,44 @@
-import React, { useState } from "react";
-import { Dropdown } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { FaBars } from "react-icons/fa";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
-const Header = ({
-  selectedRows,
-  searchTerm,
-  setSearchTerm,
-  handlePrint,
-  handleDelete,
-}) => {
-  const navigate = useNavigate(); // Navigation hook
-
-  const [selected, setSelected] = useState(() =>
-    location.pathname === "/my-approvals" ? "My Approvals" : "Expenses"
-  );
-
+const Header = ({ toggleSidebar, isSidebarOpen }) => {
   return (
-    <div className="teamlead-header">
-      <div className="d-flex align-items-center gap-2">
-        <div className="logo-text me-4">ExpenseFlow</div>
-
-        <Dropdown>
-          <Dropdown.Toggle
-            as="button"
-            className="small-btn"
-            style={{ width: "111px" }}
-          >
-            {selected}
-          </Dropdown.Toggle>
-          <Dropdown.Menu className="custom-dropdown-menu">
-            <Dropdown.Item onClick={() => navigate("/")}>
-              Expenses
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => navigate("/my-approvals")}>
-              My Approvals
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
-
-      <div
-        className={`button-group ${selectedRows?.length > 0 ? "visible" : ""}`}
-      >
-        {selectedRows?.length === 1 && (
-          <button className="small-btn" onClick={handlePrint}>
-            Print
-          </button>
-        )}
-
-        {selectedRows?.length > 0 && (
-          <Dropdown>
-            <Dropdown.Toggle as="button" className="small-btn">
-              Actions
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu className="custom-dropdown-menu">
-              <Dropdown.Item onClick={handleDelete}>Delete</Dropdown.Item>
-              <Dropdown.Item>Archive</Dropdown.Item>
-              <Dropdown.Item>Mark as Important</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
-      </div>
-
-      <input
-        type="text"
-        placeholder="Search"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="custom-search-bar"
-      />
-    </div>
+    <header
+      className="main-header shadow-sm"
+      style={{
+        marginLeft: isSidebarOpen ? "200px" : "60px",
+        transition: "margin-left 0.3s ease",
+        height: "60px",
+        backgroundColor: "#fff",
+        borderBottom: "1px solid #ddd",
+        position: "sticky",
+        top: 0,
+        zIndex: 1100,
+      }}
+    >
+      <Container fluid>
+        <Row className="align-items-center h-100">
+          <Col xs="auto">
+            <Button
+              onClick={toggleSidebar}
+              className="toggle-btn-header p-0"
+              style={{
+                fontSize: "1.5rem",
+                color: "black",
+                background: "none",
+                border: "none",
+              }}
+            >
+              <FaBars />
+            </Button>
+          </Col>
+          <Col>
+            <h5 className="mb-0">5L Solutions</h5>
+          </Col>
+        </Row>
+      </Container>
+    </header>
   );
 };
 

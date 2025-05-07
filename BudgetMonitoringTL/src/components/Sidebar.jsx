@@ -1,57 +1,42 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo5L.png";
+import {
+  FaMoneyBillWave,
+  FaCheckCircle,
+  FaArchive,
+  FaStar,
+  FaTrash,
+} from "react-icons/fa";
 
-const Sidebar = ({ isSidebarOpen, toggleSidebar, onStatusChange }) => {
+const Sidebar = ({ isSidebarOpen }) => {
   const navigate = useNavigate();
-  const [checkedStatuses, setCheckedStatuses] = useState([]);
 
-  const handleCheckboxChange = (status) => {
-    const updatedStatuses = checkedStatuses.includes(status)
-      ? checkedStatuses.filter((s) => s !== status)
-      : [...checkedStatuses, status];
-
-    setCheckedStatuses(updatedStatuses);
-    onStatusChange(status);
-  };
+  const navItems = [
+    { label: "Expenses", icon: <FaMoneyBillWave />, path: "#" },
+    { label: "My Approval", icon: <FaCheckCircle />, path: "#" },
+    { label: "Archive", icon: <FaArchive />, path: "#" },
+    { label: "Important", icon: <FaStar />, path: "#" },
+    { label: "Trash", icon: <FaTrash />, path: "#" },
+  ];
 
   return (
-    <div className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
-      <button className="toggle-btn" onClick={toggleSidebar}>
-        {isSidebarOpen ? "<<" : ">>"}
-      </button>
-      <div
-        className={`sidebar-content ${isSidebarOpen ? "fade-in" : "fade-out"}`}
-      >
-        {/* Navigation Section */}
-        <div className="navigation-links">
-          <button className="nav-btn" onClick={() => navigate("/important")}>
-            ⭐ Important
-          </button>
-          <button className="nav-btn" onClick={() => navigate("/archive")}>
-            📦 Archive
-          </button>
-          <button className="nav-btn" onClick={() => navigate("/trash")}>
-            🗑️ Trash
-          </button>
-        </div>
+    <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
+      <div className="sidebar-header px-3 py-2 text-center">
+        <img src={logo} alt="Logo" className="sidebar-logo" />
+      </div>
 
-        {/* Status Filters */}
-        <div className="sidebar-header fw-bold">STATUS</div>
-        <div className="status-filters">
-          {["Pending", "Refused"].map((status) => (
-            <label
-              key={status}
-              className={checkedStatuses.includes(status) ? "checked" : ""}
-            >
-              <input
-                type="checkbox"
-                checked={checkedStatuses.includes(status)}
-                onChange={() => handleCheckboxChange(status)}
-              />
-              {status}
-            </label>
-          ))}
-        </div>
+      <div className="nav-links">
+        {navItems.map((item) => (
+          <div
+            key={item.label}
+            className="nav-item"
+            onClick={() => navigate(item.path)}
+          >
+            <span className="nav-icon">{item.icon}</span>
+            {isSidebarOpen && <span className="nav-label">{item.label}</span>}
+          </div>
+        ))}
       </div>
     </div>
   );

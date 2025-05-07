@@ -1,33 +1,32 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
-import ApprovalForm from "./components/ApprovalForm";
-import Expenses from "./pages/Expenses";
-import Approval from "./pages/Approval";
-import Trash from "./pages/Trash";
-import { FileProvider } from "./context/FileContext";
-import Archive from "./pages/Archive";
-import Important from "./pages/Important";
-import { ExpensesProvider } from "./context/HeaderCountContext";
+import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
 
-function App() {
+const App = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   return (
-    <FileProvider>
-      <ExpensesProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Expenses />} />
-            <Route path="/approval" element={<ApprovalForm />} />
-            <Route path="/my-approvals" element={<Approval />} />
-            <Route path="/trash" element={<Trash />} />
-            <Route path="/archive" element={<Archive />} />
-            <Route path="/important" element={<Important />} />
-          </Routes>
-        </Router>
-      </ExpensesProvider>
-    </FileProvider>
+    <Router>
+      <Header
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        isSidebarOpen={isSidebarOpen}
+      />
+
+      <Sidebar isSidebarOpen={isSidebarOpen} />
+
+      <main
+        style={{
+          marginLeft: isSidebarOpen ? "200px" : "60px",
+          transition: "margin-left 0.3s ease",
+        }}
+      >
+        {/* Your main content goes here */}
+      </main>
+    </Router>
   );
-}
+};
 
 export default App;
