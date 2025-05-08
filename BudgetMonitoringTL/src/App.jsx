@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
+import Expenses from "./pages/Expenses";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -14,16 +15,15 @@ const App = () => {
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
       />
-
       <Sidebar isSidebarOpen={isSidebarOpen} />
-
       <main
         style={{
           marginLeft: isSidebarOpen ? "200px" : "60px",
           transition: "margin-left 0.3s ease",
         }}
       >
-        {/* Your main content goes here */}
+        {/* main content */}
+        <Expenses />
       </main>
     </Router>
   );

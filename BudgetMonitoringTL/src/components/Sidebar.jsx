@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo5L.png";
+import logo from "../assets/lcb.png";
 import {
   FaMoneyBillWave,
   FaCheckCircle,
@@ -23,7 +23,8 @@ const Sidebar = ({ isSidebarOpen }) => {
   return (
     <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
       <div className="sidebar-header px-3 py-2 text-center">
-        <img src={logo} alt="Logo" className="sidebar-logo" />
+        {/* <img src={logo} alt="Logo" className="sidebar-logo" /> */}
+        <h1>LOGO</h1>
       </div>
 
       <div className="nav-links">
