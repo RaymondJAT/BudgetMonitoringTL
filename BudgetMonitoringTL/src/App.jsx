@@ -5,6 +5,7 @@ import "./index.css";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Expenses from "./pages/Expenses";
+import ExpenseReport from "./components/ExpenseReport";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -23,6 +24,7 @@ const App = () => {
         }}
       >
         {/* main content */}
+        {/* <ExpenseReport /> */}
         <Expenses />
       </main>
     </Router>
