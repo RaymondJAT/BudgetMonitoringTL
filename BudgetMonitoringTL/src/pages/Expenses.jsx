@@ -1,6 +1,8 @@
 import React from "react";
 import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
+import Total from "../components/Total";
+import ToolBar from "../components/ToolBar";
 
 const columns = [
   { header: "Employee", accessor: "employee" },
@@ -19,6 +21,9 @@ const Expenses = () => {
 
   return (
     <div className="expense-container">
+      <ToolBar />
+      <Total />
+      {/* <ExpenseReport /> */}
       <DataTable
         data={mockData}
         columns={columns}
