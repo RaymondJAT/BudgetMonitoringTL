@@ -59,7 +59,9 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                     width="30"
                     style={{ objectFit: "cover" }}
                   />
-                  <span style={{ fontWeight: 500 }}>Username</span>
+                  <span style={{ fontWeight: 400, fontSize: "13px" }}>
+                    Username
+                  </span>
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>

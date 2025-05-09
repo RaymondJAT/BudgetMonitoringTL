@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Expenses from "./pages/Expenses";
 import ExpenseReport from "./components/ExpenseReport";
+import Total from "./components/Total";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -21,9 +22,11 @@ const App = () => {
         style={{
           marginLeft: isSidebarOpen ? "200px" : "60px",
           transition: "margin-left 0.3s ease",
+          minHeight: "100vh",
         }}
       >
         {/* main content */}
+        <Total />
         {/* <ExpenseReport /> */}
         <Expenses />
       </main>

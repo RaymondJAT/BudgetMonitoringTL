@@ -1,89 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { Table, Container } from "react-bootstrap";
-import { numberToWords } from "../js/numberToWords";
-import { mockData } from "../mock-data/mockData";
+import React from "react";
+import { Table, Form, Container } from "react-bootstrap";
 
-const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
-  // Find transactions for the selected employee, default to empty array if not found
-  const employeeData = mockData.find((e) => e.employee === employeeName) || {
-    transactions: [],
-  };
-  const [data] = useState(employeeData.transactions);
-
-  useEffect(() => {
-    if (data.length > 0) {
-      setParticulars(
-        data.map((item) => ({
-          label: item.label ?? "N/A",
-          quantity: item.quantity ?? 0,
-          price: item.price ?? 0,
-          amount: (item.quantity ?? 0) * (item.price ?? 0),
-        }))
-      );
-    } else {
-      setParticulars([]);
-    }
-  }, [setParticulars, data]);
-
-  const total = data.reduce(
-    (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
-    0
-  );
-
-  // Convert total to words if valid
-  useEffect(() => {
-    if (!isNaN(total)) {
-      setAmountInWords(numberToWords(total));
-    }
-  }, [total, setAmountInWords]);
-
+const DataTable = ({ data, columns, onRowClick }) => {
   return (
-    <Container className="table-wrapper border border-black p-3">
-      <Table responsive>
-        <thead className="tableHead text-center">
-          <tr>
-            <th>Label</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody className="tableBody text-center">
-          {data.map((row, index) => (
-            <tr key={index}>
-              <td>{row.label || "N/A"}</td>
-              <td>{row.quantity ?? 0}</td>
-              <td>
-                {row.price
-                  ? `₱${row.price.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : "₱0.00"}
-              </td>
-              <td className="border">
-                {`₱${((row.quantity ?? 0) * (row.price ?? 0)).toLocaleString(
-                  "en-US",
-                  {
-                    minimumFractionDigits: 2,
-                  }
-                )}`}
-              </td>
+    <Container fluid>
+      <div className="table-wrapper">
+        <Table hover className="expense-table mb-0">
+          <thead>
+            <tr>
+              <th className="sticky-header">
+                <Form.Check type="checkbox" />
+              </th>
+              {columns.map((col, index) => (
+                <th key={index} className="sticky-header">
+                  {col.header}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colSpan="3" className="custom-col text-end border-end">
-              <strong>Total:</strong>
-            </td>
-            <td className="text-center border-end">
-              <strong>
-                ₱{total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </strong>
-            </td>
-          </tr>
-        </tfoot>
-      </Table>
+          </thead>
+          <tbody>
+            {data && data.length > 0 ? (
+              data.map((entry, index) => (
+                <tr
+                  key={index}
+                  onClick={() => onRowClick(entry)}
+                  className="clickable-row"
+                >
+                  <td>
+                    <Form.Check type="checkbox" />
+                  </td>
+                  {columns.map((col, colIndex) => (
+                    <td key={colIndex}>{entry[col.accessor]}</td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length + 1} className="text-center">
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </div>
     </Container>
   );
 };

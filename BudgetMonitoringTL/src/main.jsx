@@ -5,7 +5,7 @@ import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <div style={{ backgroundColor: "#F5F5DC" }}>
+    <div style={{ backgroundColor: "#800000" }}>
       <App />
     </div>
   </StrictMode>

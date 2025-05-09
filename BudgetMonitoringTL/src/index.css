@@ -81,11 +81,11 @@ body {
   font-size: 13px;
 }
 
-/* table styling */
+/* TABLE STYLING */
 .table-wrapper {
   position: relative;
-  margin-top: 50px;
-  max-height: 450px;
+  margin-top: 15px;
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -95,8 +95,15 @@ body {
 
 .expense-table {
   width: 100%;
-  border-collapse: collapse;
-  background-color: #fff;
+  margin-bottom: 0;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #fafaf8;
+  z-index: 10;
+  border-bottom: 2px solid #dee2e6;
 }
 
 .expense-table thead {
@@ -111,7 +118,7 @@ body {
 .expense-table td {
   padding: 12px 16px;
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .expense-table th {
@@ -134,6 +141,36 @@ body {
 
 .text-center {
   text-align: center;
+}
+
+/* TOTAL BOX */
+.total-container {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.total-box {
+  flex: 1;
+  min-width: 200px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.total-box h5 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.total-box p {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: bold;
 }
 
 /* checkbox style */

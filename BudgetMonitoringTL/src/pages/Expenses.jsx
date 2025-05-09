@@ -1,7 +1,6 @@
 import React from "react";
-import ExpenseTable from "../components/ExpenseTable";
+import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
-import ExpenseReport from "../components/ExpenseReport";
 
 const columns = [
   { header: "Employee", accessor: "employee" },
@@ -19,14 +18,13 @@ const Expenses = () => {
   };
 
   return (
-    <>
-      {/* <ExpenseReport /> */}
-      <ExpenseTable
+    <div className="expense-container">
+      <DataTable
         data={mockData}
         columns={columns}
         onRowClick={handleRowClick}
       />
-    </>
+    </div>
   );
 };
 
