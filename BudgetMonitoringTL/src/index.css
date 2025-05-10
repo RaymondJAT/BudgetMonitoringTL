@@ -1,6 +1,6 @@
 @font-face {
   font-family: customFont;
-  src: url(./assets/fonts/SourceCodePro-Regular.ttf);
+  src: url(./assets/fonts/Manrope-VariableFont_wght.ttfs);
 }
 
 html,
@@ -225,6 +225,17 @@ input[type="checkbox"]:checked {
   width: 250px;
 }
 
+.custom-app-button,
+.custom-app-button.btn,
+.custom-app-button.dropdown-toggle {
+  padding: 0.1rem 0.6rem !important;
+  font-size: 0.85rem !important;
+  background-color: #f8f9fa !important;
+  color: black !important;
+  border: none !important;
+  border-radius: 4px !important;
+}
+
 /* react-to-print */
 /* @media print {
   @page {
@@ -257,7 +268,7 @@ input[type="checkbox"]:checked {
 
 /* Styling the table's scrollbar */
 .table-wrapper::-webkit-scrollbar {
-  width: 8px;
+  width: 1px;
 }
 
 /* Scrollbar Track */
@@ -269,7 +280,7 @@ input[type="checkbox"]:checked {
 
 /* Scrollbar Handle (Thumb) */
 .table-wrapper::-webkit-scrollbar-thumb {
-  background-color: #ccc;
+  background-color: #800000;
   border-radius: 10px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 }

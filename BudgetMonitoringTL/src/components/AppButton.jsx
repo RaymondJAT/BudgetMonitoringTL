@@ -8,12 +8,18 @@ const AppButton = ({
   isDropdown,
   dropdownItems = [],
   onClick,
+  className = "",
   style = {},
 }) => {
   if (isDropdown) {
     return (
       <Dropdown>
-        <Dropdown.Toggle variant={variant} size={size} style={style}>
+        <Dropdown.Toggle
+          variant={variant}
+          size={size}
+          className={className}
+          style={style}
+        >
           {label}
         </Dropdown.Toggle>
         <Dropdown.Menu>
@@ -28,7 +34,13 @@ const AppButton = ({
   }
 
   return (
-    <Button variant={variant} size={size} onClick={onClick} style={style}>
+    <Button
+      variant={variant}
+      size={size}
+      onClick={onClick}
+      className={className}
+      style={style}
+    >
       {label}
     </Button>
   );

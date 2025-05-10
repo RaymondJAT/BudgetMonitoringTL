@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import Reaact, { useState } from "react";
 import { Container } from "react-bootstrap";
 import SearchBar from "./SearchBar";
 import AppButton from "./AppButton";
+import { FiFilter } from "react-icons/fi";
 
 const ToolBar = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -38,20 +39,40 @@ const ToolBar = () => {
         label="Action"
         variant="secondary"
         size="sm"
+        className="custom-app-button"
         dropdownItems={[
           { label: "Print", onClick: handlePrint },
           { label: "Delete", onClick: handleDelete },
           { label: "Mark as important", onClick: handleMarkImportant },
         ]}
-        style={{
-          padding: "0.3rem 0.5rem",
-        }}
       />
+
+      <AppButton
+        isDropdown
+        label={
+          <>
+            <FiFilter style={{ marginRight: "5px" }} />
+            Filter
+          </>
+        }
+        variant="info"
+        size="sm"
+        className="custom-app-button"
+        dropdownItems={[
+          { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
+          { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
+          { label: "A - Z", onClick: () => handleFilter("az") },
+          { label: "Z - A", onClick: () => handleFilter("za") },
+          { label: "Category A", onClick: () => handleFilter("categoryA") },
+          { label: "Category B", onClick: () => handleFilter("categoryB") },
+        ]}
+      />
+
       <SearchBar
         value={searchValue}
         onChange={onSearchChange}
         size="sm"
-        width="250px"
+        width="425px"
         style={{
           padding: "0.3rem 0.6rem",
         }}
