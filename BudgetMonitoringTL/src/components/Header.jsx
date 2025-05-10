@@ -2,6 +2,7 @@ import React from "react";
 import { FaBars, FaBell } from "react-icons/fa";
 import { Container, Row, Col, Button, Image, Dropdown } from "react-bootstrap";
 import avatarImg from "../assets/lcb.png";
+import { FaUserCircle } from "react-icons/fa";
 
 const Header = ({ toggleSidebar, isSidebarOpen }) => {
   return (
@@ -52,12 +53,12 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                   className="d-flex align-items-center gap-2 p-0 border-0 bg-transparent"
                   id="dropdown-user"
                 >
-                  <Image
-                    src={avatarImg}
-                    roundedCircle
-                    height="30"
-                    width="30"
-                    style={{ objectFit: "cover" }}
+                  <FaUserCircle
+                    size={30}
+                    style={{
+                      borderRadius: "100%",
+                      backgroundColor: "transparent",
+                    }}
                   />
                   <span style={{ fontWeight: 400, fontSize: "13px" }}>
                     Username

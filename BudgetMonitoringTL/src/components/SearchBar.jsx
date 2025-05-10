@@ -6,6 +6,8 @@ const SearchBar = ({
   size = "md",
   width = "250px",
   style = {},
+  className = "",
+  placeholder = "Search...",
 }) => {
   const sizeClass =
     size === "sm"
@@ -17,9 +19,9 @@ const SearchBar = ({
   return (
     <input
       type="text"
-      className={sizeClass}
+      className={`${sizeClass} ${className}`}
       style={{ width, ...style }}
-      placeholder="Search..."
+      placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />

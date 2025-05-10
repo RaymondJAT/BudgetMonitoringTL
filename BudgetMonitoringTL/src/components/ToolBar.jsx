@@ -2,7 +2,7 @@ import Reaact, { useState } from "react";
 import { Container } from "react-bootstrap";
 import SearchBar from "./SearchBar";
 import AppButton from "./AppButton";
-import { FiFilter } from "react-icons/fi";
+import { FaFilter } from "react-icons/fa";
 
 const ToolBar = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -51,7 +51,7 @@ const ToolBar = () => {
         isDropdown
         label={
           <>
-            <FiFilter style={{ marginRight: "5px" }} />
+            <FaFilter style={{ marginRight: "5px" }} />
             Filter
           </>
         }
@@ -73,8 +73,10 @@ const ToolBar = () => {
         onChange={onSearchChange}
         size="sm"
         width="425px"
+        className="custom-search-bar"
         style={{
           padding: "0.3rem 0.6rem",
+          fontSize: "0.75rem",
         }}
       />
     </Container>
