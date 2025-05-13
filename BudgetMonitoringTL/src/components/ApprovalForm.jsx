@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 import DataTable from "./DataTable";
-import PrintModal from "./PrintModal";
 import PrintableCashRequest from "./PrintableCashRequest";
 
 const ApprovalForm = () => {
@@ -12,7 +11,6 @@ const ApprovalForm = () => {
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const [modalShow, setModalShow] = useState(false);
   const [amountInWords, setAmountInWords] = useState("");
   const [particulars, setParticulars] = useState([]);
 
@@ -48,13 +46,7 @@ const ApprovalForm = () => {
           <Button variant="danger" className="btn-responsive">
             Refuse
           </Button>
-          <Button
-            variant="dark"
-            onClick={() => setModalShow(true)}
-            className="btn-responsive"
-          >
-            View
-          </Button>
+
           {/* print */}
           <Button
             variant="secondary"
@@ -122,13 +114,6 @@ const ApprovalForm = () => {
           setParticulars={setParticulars}
         />
       </Container>
-
-      <PrintModal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        data={{ ...data, items: particulars }}
-        amountInWords={amountInWords}
-      />
 
       <div style={{ display: "none" }}>
         <PrintableCashRequest

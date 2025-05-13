@@ -62,7 +62,7 @@ export const mockData = [
     category: "Meal Allowance",
     paidBy: "Employee",
     total: "5000.00",
-    status: "Refused",
+    status: "Rejected",
     transactions: [
       { label: "Jollibee Mix and Match", quantity: 10, price: 500 },
     ],
@@ -146,7 +146,7 @@ export const mockData = [
     category: "Design",
     paidBy: "Employee",
     total: "4500.00",
-    status: "Refused",
+    status: "Rejected",
     transactions: [
       { label: "Adobe Photoshop License", quantity: 1, price: 1200 },
       { label: "Illustrator Subscription", quantity: 1, price: 1000 },
@@ -197,7 +197,7 @@ export const mockData = [
     category: "Incentives",
     paidBy: "Employee",
     total: "7000.00",
-    status: "Refused",
+    status: "Rejected",
     transactions: [
       { label: "Team Incentive", quantity: 5, price: 1000 },
       { label: "Top Performer Bonus", quantity: 2, price: 1500 },

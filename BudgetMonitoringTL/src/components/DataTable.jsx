@@ -59,7 +59,9 @@ const DataTable = ({ data, columns, onRowClick }) => {
                 <tr
                   key={index}
                   onClick={() => onRowClick(entry)}
-                  className="clickable-row"
+                  className={`clickable-row ${
+                    selectedRows[index] ? "highlighted-row" : ""
+                  }`}
                 >
                   <td onClick={(e) => e.stopPropagation()}>
                     <Form.Check
@@ -69,7 +71,24 @@ const DataTable = ({ data, columns, onRowClick }) => {
                     />
                   </td>
                   {columns.map((col, colIndex) => (
-                    <td key={colIndex}>{entry[col.accessor]}</td>
+                    <td key={colIndex}>
+                      {col.accessor === "status" ? (
+                        <span
+                          className={`status-badge ${entry[
+                            col.accessor
+                          ].toLowerCase()}`}
+                        >
+                          {entry[col.accessor]}
+                        </span>
+                      ) : col.accessor === "total" ? (
+                        `₱ ${parseFloat(entry[col.accessor]).toLocaleString(
+                          "en-PH",
+                          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                        )}`
+                      ) : (
+                        entry[col.accessor]
+                      )}
+                    </td>
                   ))}
                 </tr>
               ))

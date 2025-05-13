@@ -18,7 +18,7 @@ const App = () => {
       <Sidebar isSidebarOpen={isSidebarOpen} />
       <main
         style={{
-          marginLeft: isSidebarOpen ? "200px" : "60px",
+          marginLeft: isSidebarOpen ? "230px" : "60px",
           transition: "margin-left 0.3s ease",
         }}
       >

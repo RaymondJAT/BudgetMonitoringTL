@@ -37,7 +37,7 @@ body {
 }
 
 .sidebar.open {
-  width: 200px;
+  width: 230px;
 }
 
 .sidebar.collapsed {
@@ -164,12 +164,49 @@ body {
   cursor: pointer;
 }
 
-.clickable-row:hover {
-  background-color: #f1f1f1;
+.table-hover tbody tr.clickable-row:hover td {
+  background-color: #f8d7da;
+}
+
+.highlighted-row td {
+  background-color: #ffe5e5 !important;
 }
 
 .text-center {
   text-align: center;
+}
+
+/* status badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 18px;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: capitalize;
+  padding: 0;
+}
+
+.status-badge.pending {
+  background-color: rgb(255, 132, 0);
+  color: white;
+  border: 1px solid rgb(208, 119, 9);
+}
+
+.status-badge.approved {
+  background-color: green;
+  color: white;
+  border: 1px solid darkgreen;
+}
+
+.status-badge.rejected {
+  background-color: red;
+  color: white;
+  border: 1px solid darkred;
 }
 
 /* TOTAL BOX */
@@ -192,12 +229,12 @@ body {
 
 .total-box h5 {
   margin-bottom: 0.5rem;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.075rem;
+  font-weight: bold;
 }
 
 .total-box p {
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 0;
   font-weight: bold;
 }

@@ -9,7 +9,7 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     <header
       className="main-header shadow-sm d-flex align-items-center"
       style={{
-        marginLeft: isSidebarOpen ? "200px" : "60px",
+        marginLeft: isSidebarOpen ? "230px" : "60px",
         transition: "margin-left 0.3s ease",
         backgroundColor: "#fff",
         borderBottom: "1px solid #ddd",

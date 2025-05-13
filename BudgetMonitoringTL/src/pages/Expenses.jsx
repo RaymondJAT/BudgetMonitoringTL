@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
 import Total from "../components/Total";
@@ -15,17 +15,29 @@ const columns = [
 ];
 
 const Expenses = () => {
+  const [searchValue, setSearchValue] = useState("");
+
   const handleRowClick = (entry) => {
     console.log("Clicked row:", entry);
   };
 
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .trim();
+
+  const filteredData = mockData.filter((item) =>
+    columns.some((col) =>
+      normalize(item[col.accessor]).includes(normalize(searchValue))
+    )
+  );
+
   return (
-    <div className="expense-container">
-      <ToolBar />
+    <div>
       <Total />
-      {/* <ExpenseReport /> */}
+      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
       <DataTable
-        data={mockData}
+        data={filteredData}
         columns={columns}
         onRowClick={handleRowClick}
       />

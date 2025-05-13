@@ -1,28 +1,15 @@
-import Reaact, { useState } from "react";
+import React from "react";
 import { Container } from "react-bootstrap";
 import SearchBar from "./SearchBar";
 import AppButton from "./AppButton";
 import { FaFilter } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 
-const ToolBar = () => {
-  const [searchValue, setSearchValue] = useState("");
-
-  const onSearchChange = (value) => {
-    setSearchValue(value);
-  };
-
-  const handlePrint = () => {
-    console.log("Print clicked");
-  };
-
-  const handleDelete = () => {
-    console.log("Delete clicked");
-  };
-
-  const handleMarkImportant = () => {
-    console.log("Marked as Important");
-  };
+const ToolBar = ({ searchValue, onSearchChange }) => {
+  const handlePrint = () => console.log("Print clicked");
+  const handleDelete = () => console.log("Delete clicked");
+  const handleMarkImportant = () => console.log("Marked as Important");
+  const handleFilter = (type) => console.log("Filter by:", type);
 
   return (
     <Container
@@ -50,6 +37,7 @@ const ToolBar = () => {
           { label: "Print", onClick: handlePrint },
           { label: "Delete", onClick: handleDelete },
           { label: "Mark as important", onClick: handleMarkImportant },
+          { label: "Export" },
         ]}
       />
 
@@ -65,12 +53,10 @@ const ToolBar = () => {
         size="sm"
         className="custom-app-button"
         dropdownItems={[
-          { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
-          { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
           { label: "A - Z", onClick: () => handleFilter("az") },
           { label: "Z - A", onClick: () => handleFilter("za") },
-          { label: "Category A", onClick: () => handleFilter("categoryA") },
-          { label: "Category B", onClick: () => handleFilter("categoryB") },
+          { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
+          { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
         ]}
       />
 
