@@ -3,6 +3,7 @@ import { Container } from "react-bootstrap";
 import SearchBar from "./SearchBar";
 import AppButton from "./AppButton";
 import { FaFilter } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
 
 const ToolBar = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -36,7 +37,12 @@ const ToolBar = () => {
     >
       <AppButton
         isDropdown
-        label="Action"
+        label={
+          <>
+            <IoMdSettings style={{ marginRight: "5px" }} />
+            Actions
+          </>
+        }
         variant="secondary"
         size="sm"
         className="custom-app-button"

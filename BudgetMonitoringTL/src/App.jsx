@@ -20,7 +20,6 @@ const App = () => {
         style={{
           marginLeft: isSidebarOpen ? "200px" : "60px",
           transition: "margin-left 0.3s ease",
-          minHeight: "100vh",
         }}
       >
         {/* main content */}
