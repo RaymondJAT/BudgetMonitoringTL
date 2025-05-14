@@ -25,8 +25,17 @@ const Total = () => {
   // total per status
   mockData.forEach((item) => {
     const key = mapStatusesToKeys[item.status];
-    if (key && !isNaN(item.total)) {
-      totals[key] += Number(item.total);
+
+    if (key === "pending") {
+      if (item.paidBy === "Employee" && !isNaN(item.total)) {
+        totals.pending += Number(item.total);
+      }
+    } else if (key === "approved") {
+      if (item.paidBy === "Employee" && !isNaN(item.total)) {
+        totals.approved += Number(item.total);
+      }
+    } else if (key === "inPayment" && !isNaN(item.total)) {
+      totals.inPayment += Number(item.total);
     }
   });
 

@@ -22,7 +22,7 @@ const AppButton = ({
         >
           {label}
         </Dropdown.Toggle>
-        <Dropdown.Menu>
+        <Dropdown.Menu className="custom-dropdown-menu">
           {dropdownItems.map((item, index) => (
             <Dropdown.Item key={index} onClick={item.onClick}>
               {item.label}
