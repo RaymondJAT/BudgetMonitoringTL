@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
-import DataTable from "./DataTable";
+import DataTables from "./DataTables";
 import PrintableCashRequest from "./PrintableCashRequest";
 
 const ApprovalForm = () => {
@@ -30,7 +30,7 @@ const ApprovalForm = () => {
 
   return (
     <>
-      <Container className="custom-wrapper pb-5">
+      <Container fluid className="custom-wrapper pb-5">
         {/* Buttons */}
         <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2">
           <Button
@@ -108,7 +108,7 @@ const ApprovalForm = () => {
           </Row>
         </div>
 
-        <DataTable
+        <DataTables
           employeeName={data?.employee || ""}
           setAmountInWords={setAmountInWords}
           setParticulars={setParticulars}

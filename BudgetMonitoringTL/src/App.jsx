@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Expenses from "./pages/Expenses";
+import ApprovalForm from "./components/ApprovalForm";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -22,8 +23,10 @@ const App = () => {
           transition: "margin-left 0.3s ease",
         }}
       >
-        {/* main content */}
-        <Expenses />
+        <Routes>
+          <Route path="/" element={<Expenses />} />
+          <Route path="/approval-form" element={<ApprovalForm />} />
+        </Routes>
       </main>
     </Router>
   );

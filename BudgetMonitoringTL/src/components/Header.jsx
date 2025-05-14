@@ -66,9 +66,9 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                  <Dropdown.Item href="#/settings">Settings</Dropdown.Item>
+                  <Dropdown.Item href="#">Settings</Dropdown.Item>
                   <Dropdown.Divider />
-                  <Dropdown.Item href="#/logout">Logout</Dropdown.Item>
+                  <Dropdown.Item href="#">Logout</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>

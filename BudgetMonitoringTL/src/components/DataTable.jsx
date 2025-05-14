@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Form, Container, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
+import { meatballActions } from "../mock-data/meatballActions";
 
 const DataTable = ({ data, columns, onRowClick }) => {
   const [selectedRows, setSelectedRows] = useState({});
@@ -32,21 +33,6 @@ const DataTable = ({ data, columns, onRowClick }) => {
     setAllSelected(Object.values(updated).every((val) => val));
   };
 
-  const meatballActions = [
-    { label: "Delete", onClick: (entry) => console.log("Delete", entry) },
-    { label: "Duplicate", onClick: (entry) => console.log("Duplicate", entry) },
-    { label: "Download", onClick: (entry) => console.log("Download", entry) },
-    {
-      label: "Mark as Important",
-      onClick: (entry) => console.log("Mark", entry),
-    },
-    {
-      label: "Change Status",
-      onClick: (entry) => console.log("Change Status", entry),
-    },
-    { label: "Print", onClick: (entry) => console.log("Print", entry) },
-  ];
-
   return (
     <Container fluid>
       <div className="table-wrapper">
@@ -61,7 +47,11 @@ const DataTable = ({ data, columns, onRowClick }) => {
                 />
               </th>
               {columns.map((col, index) => (
-                <th key={index} className="sticky-header">
+                <th
+                  key={index}
+                  className="sticky-header"
+                  style={{ width: col.width || "auto" }}
+                >
                   {col.header}
                 </th>
               ))}
@@ -86,7 +76,19 @@ const DataTable = ({ data, columns, onRowClick }) => {
                     />
                   </td>
                   {columns.map((col, colIndex) => (
-                    <td key={colIndex}>
+                    <td
+                      key={colIndex}
+                      style={
+                        col.accessor === "description"
+                          ? {
+                              maxWidth: "200px",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }
+                          : {}
+                      }
+                    >
                       {col.accessor === "status" ? (
                         <span
                           className={`status-badge ${entry[
@@ -140,6 +142,7 @@ const DataTable = ({ data, columns, onRowClick }) => {
                           <Dropdown.Item
                             key={i}
                             onClick={() => action.onClick(entry)}
+                            className="meat-dropdown"
                           >
                             {action.label}
                           </Dropdown.Item>

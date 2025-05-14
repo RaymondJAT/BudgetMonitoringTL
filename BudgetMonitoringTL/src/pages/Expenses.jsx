@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
 import Total from "../components/Total";
@@ -16,9 +17,10 @@ const columns = [
 
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
 
   const handleRowClick = (entry) => {
-    console.log("Clicked row:", entry);
+    navigate("/approval-form", { state: entry });
   };
 
   const normalize = (value) =>

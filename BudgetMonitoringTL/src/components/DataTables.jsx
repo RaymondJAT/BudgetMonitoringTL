@@ -3,7 +3,7 @@ import { Table, Container } from "react-bootstrap";
 import { numberToWords } from "../js/numberToWords";
 import { mockData } from "../mock-data/mockData";
 
-const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
+const DataTables = ({ employeeName, setAmountInWords, setParticulars }) => {
   // Find transactions for the selected employee, default to empty array if not found
   const employeeData = mockData.find((e) => e.employee === employeeName) || {
     transactions: [],
@@ -38,7 +38,7 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
   }, [total, setAmountInWords]);
 
   return (
-    <Container className="table-wrapper border border-black p-3">
+    <Container fluid className="table-wrapper border border-black p-3">
       <Table responsive>
         <thead className="tableHead text-center">
           <tr>
@@ -88,4 +88,4 @@ const DataTable = ({ employeeName, setAmountInWords, setParticulars }) => {
   );
 };
 
-export default DataTable;
+export default DataTables;

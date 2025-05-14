@@ -12,7 +12,7 @@ const Sidebar = ({ isSidebarOpen }) => {
   const navigate = useNavigate();
 
   const navItems = [
-    { label: "Expenses", icon: <FaMoneyBillWave />, path: "#" },
+    { label: "Expenses", icon: <FaMoneyBillWave />, path: "/" },
     { label: "My Approval", icon: <FaCheckCircle />, path: "#" },
     { label: "Archive", icon: <FaArchive />, path: "#" },
     { label: "Important", icon: <FaStar />, path: "#" },

@@ -9,7 +9,7 @@ export const mockData = [
     expenseDate: "03/07/2025",
     category: "Equipment",
     paidBy: "Employee",
-    total: "2000",
+    total: "1350.85",
     status: "Pending",
     transactions: [
       { label: "Laptop", quantity: 1, price: 1200 },
@@ -27,7 +27,7 @@ export const mockData = [
     teamLead: "Jane Doe",
     category: "Education",
     paidBy: "Employee",
-    total: "9500.00",
+    total: "2400",
     status: "Pending",
     transactions: [
       { label: "Training Course", quantity: 4, price: 500 },
@@ -44,7 +44,7 @@ export const mockData = [
     teamLead: "Jane Doe",
     category: "Education",
     paidBy: "Employee",
-    total: "3500.00",
+    total: "3300.00",
     status: "Approved",
     transactions: [
       { label: "Training Course", quantity: 2, price: 1500 },
@@ -77,7 +77,7 @@ export const mockData = [
     teamLead: "Bob Marley",
     category: "Supplies",
     paidBy: "Company",
-    total: "1500.00",
+    total: "550.00",
     status: "Approved",
     transactions: [
       { label: "Printer Paper", quantity: 10, price: 50 },
@@ -145,7 +145,7 @@ export const mockData = [
     teamLead: "Emma Stone",
     category: "Design",
     paidBy: "Employee",
-    total: "4500.00",
+    total: "2200.00",
     status: "Rejected",
     transactions: [
       { label: "Adobe Photoshop License", quantity: 1, price: 1200 },
@@ -179,7 +179,7 @@ export const mockData = [
     teamLead: "Judi Dench",
     category: "Supplies",
     paidBy: "Company",
-    total: "2000.00",
+    total: "650.00",
     status: "Pending",
     transactions: [
       { label: "Whiteboards", quantity: 3, price: 200 },
@@ -196,7 +196,7 @@ export const mockData = [
     teamLead: "Kevin Hart",
     category: "Incentives",
     paidBy: "Employee",
-    total: "7000.00",
+    total: "8000.00",
     status: "Rejected",
     transactions: [
       { label: "Team Incentive", quantity: 5, price: 1000 },
@@ -230,7 +230,7 @@ export const mockData = [
     teamLead: "Robert Downey Jr.",
     category: "Legal",
     paidBy: "Employee",
-    total: "10000.00",
+    total: "21000.00",
     status: "Pending",
     transactions: [
       { label: "Court Filing Fee", quantity: 1, price: 14000 },
@@ -282,7 +282,7 @@ export const mockData = [
     teamLead: "Mark Ruffalo",
     category: "Entertainment",
     paidBy: "Employee",
-    total: "12000",
+    total: "10400",
     status: "Pending",
     transactions: [
       { label: "On-Set Catering", quantity: 3, price: 800 },
@@ -300,7 +300,7 @@ export const mockData = [
     teamLead: "Scarlett Johansson",
     category: "Entertainment",
     paidBy: "Employee",
-    total: "11000.00",
+    total: "12000.00",
     status: "Pending",
     transactions: [
       { label: "Travel Expenses", quantity: 1, price: 3000 },
@@ -361,7 +361,7 @@ export const mockData = [
   },
   {
     id: 22,
-    employee: "Tom Hiddleston",
+    employee: "Tom Bradley",
     position: "DevOps Engineer",
     department: "Operations",
     description: "Server Maintenance",
