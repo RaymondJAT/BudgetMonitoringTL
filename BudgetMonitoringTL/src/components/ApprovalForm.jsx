@@ -1,20 +1,21 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Table } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
-import DataTables from "./DataTables";
+import { numberToWords } from "../js/numberToWords";
+import { mockData } from "../mock-data/mockData";
 import PrintableCashRequest from "./PrintableCashRequest";
 
 const ApprovalForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
 
   const [amountInWords, setAmountInWords] = useState("");
   const [particulars, setParticulars] = useState([]);
 
-  const fields = [
+  const infoFields = [
     { label: "Employee", key: "employee" },
     { label: "Position", key: "position" },
     { label: "Department", key: "department" },
@@ -28,11 +29,44 @@ const ApprovalForm = () => {
     { label: "Team Lead", key: "teamLead" },
   ];
 
+  const employeeData = mockData.find((e) => e.employee === data?.employee) || {
+    transactions: [],
+  };
+  const transactions = employeeData.transactions;
+
+  useEffect(() => {
+    const items = transactions.map(
+      ({ label = "N/A", quantity = 0, price = 0 }) => ({
+        label,
+        quantity,
+        price,
+        amount: quantity * price,
+      })
+    );
+    setParticulars(items);
+  }, [transactions]);
+
+  const total = transactions.reduce(
+    (sum, { quantity = 0, price = 0 }) => sum + quantity * price,
+    0
+  );
+
+  useEffect(() => {
+    if (!isNaN(total)) {
+      setAmountInWords(numberToWords(total));
+    }
+  }, [total]);
+
+  const formatCurrency = (value) =>
+    `₱${parseFloat(value || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+    })}`;
+
   return (
     <>
       <Container fluid className="custom-wrapper pb-5">
-        {/* Buttons */}
-        <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2">
+        {/* Action Buttons */}
+        <div className="custom-btn d-flex flex-column flex-md-row gap-1 pt-2 pb-2">
           <Button
             variant="dark"
             onClick={() => navigate(-1)}
@@ -46,18 +80,16 @@ const ApprovalForm = () => {
           <Button variant="danger" className="btn-responsive">
             Refuse
           </Button>
-
-          {/* print */}
           <Button
             variant="secondary"
             className="btn-responsive"
-            onClick={() => reactToPrintFn()}
+            onClick={reactToPrintFn}
           >
             Print
           </Button>
         </div>
 
-        {/* Main container */}
+        {/* Information Fields */}
         <div className="custom-container border border-black p-3 bg-white">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -68,34 +100,29 @@ const ApprovalForm = () => {
             </Col>
           </Row>
 
-          {/* Partner fields */}
           <Row>
-            {partnerFields.map((field, index) => (
+            {partnerFields.map(({ label, key }, idx) => (
               <Col
-                key={index}
+                key={idx}
                 xs={12}
                 md={6}
                 className="d-flex align-items-center mb-2"
               >
-                <strong className="title">{field.label}:</strong>
+                <strong className="title">{label}:</strong>
                 <p className="ms-2 mb-0">
-                  {field.key === "total"
-                    ? `₱${parseFloat(data?.[field.key] || 0).toLocaleString(
-                        "en-US",
-                        { minimumFractionDigits: 2 }
-                      )}`
-                    : data?.[field.key] || "N/A"}
+                  {key === "total"
+                    ? formatCurrency(data?.[key])
+                    : data?.[key] || "N/A"}
                 </p>
               </Col>
             ))}
           </Row>
 
-          {/* Fields */}
-          {fields.map((field, index) => (
-            <Row key={index}>
+          {infoFields.map(({ label, key }, idx) => (
+            <Row key={idx}>
               <Col xs={12} className="d-flex align-items-center mb-2">
-                <strong className="title">{field.label}:</strong>
-                <p className="ms-2 mb-0">{data?.[field.key] || "N/A"}</p>
+                <strong className="title">{label}:</strong>
+                <p className="ms-2 mb-0">{data?.[key] || "N/A"}</p>
               </Col>
             </Row>
           ))}
@@ -108,13 +135,42 @@ const ApprovalForm = () => {
           </Row>
         </div>
 
-        <DataTables
-          employeeName={data?.employee || ""}
-          setAmountInWords={setAmountInWords}
-          setParticulars={setParticulars}
-        />
+        {/* Transactions Table */}
+        <Table responsive>
+          <thead className="tableHead text-center">
+            <tr>
+              <th>Label</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody className="tableBody text-center">
+            {transactions.map((item, idx) => (
+              <tr key={idx}>
+                <td>{item.label || "N/A"}</td>
+                <td>{item.quantity ?? 0}</td>
+                <td>{formatCurrency(item.price)}</td>
+                <td>
+                  {formatCurrency((item.quantity ?? 0) * (item.price ?? 0))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan="3" className="custom-col text-end border-end">
+                <strong>Total:</strong>
+              </td>
+              <td className="text-center border-end">
+                <strong>{formatCurrency(total)}</strong>
+              </td>
+            </tr>
+          </tfoot>
+        </Table>
       </Container>
 
+      {/* Hidden Printable Component */}
       <div style={{ display: "none" }}>
         <PrintableCashRequest
           data={{ ...data, items: particulars }}

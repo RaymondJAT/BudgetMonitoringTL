@@ -4,16 +4,7 @@ import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
 import Total from "../components/Total";
 import ToolBar from "../components/ToolBar";
-
-const columns = [
-  { header: "Employee", accessor: "employee" },
-  { header: "Department", accessor: "department" },
-  { header: "Description", accessor: "description" },
-  { header: "Category", accessor: "category" },
-  { header: "Paid By", accessor: "paidBy" },
-  { header: "Total", accessor: "total" },
-  { header: "Status", accessor: "status" },
-];
+import { columns } from "../mock-data/tableHeader";
 
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
