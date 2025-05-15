@@ -10,6 +10,7 @@ const AppButton = ({
   onClick,
   className = "",
   style = {},
+  children,
 }) => {
   if (isDropdown) {
     return (
@@ -20,7 +21,7 @@ const AppButton = ({
           className={className}
           style={style}
         >
-          {label}
+          {label || children}
         </Dropdown.Toggle>
         <Dropdown.Menu className="custom-dropdown-menu">
           {dropdownItems.map((item, index) => (
@@ -41,7 +42,7 @@ const AppButton = ({
       className={className}
       style={style}
     >
-      {label}
+      {children || label}
     </Button>
   );
 };

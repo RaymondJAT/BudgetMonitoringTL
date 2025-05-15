@@ -279,6 +279,11 @@ input[type="checkbox"]:checked {
   background-color: #f8d7da;
 }
 
+.custom-button.btn {
+  /* approval form button */
+  font-size: 0.75rem;
+}
+
 /* MEATBALL MENU DataTable */
 .meat-dropdown {
   font-size: 0.75rem;
@@ -286,6 +291,12 @@ input[type="checkbox"]:checked {
 
 .black-dropdown .meat-dropdown:hover {
   background-color: #f8d7da;
+}
+
+/* APPROVAL FORM */
+.custom-container,
+.custom-table {
+  font-size: 0.8rem;
 }
 
 /* REACT-TO-PRINT */
