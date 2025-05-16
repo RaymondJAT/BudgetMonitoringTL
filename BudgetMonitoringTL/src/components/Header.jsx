@@ -1,10 +1,32 @@
-import React from "react";
+import { useLocation } from "react-router-dom";
 import { FaBars, FaBell } from "react-icons/fa";
 import { Container, Row, Col, Button, Image, Dropdown } from "react-bootstrap";
-import avatarImg from "../assets/lcb.png";
 import { FaUserCircle } from "react-icons/fa";
 
 const Header = ({ toggleSidebar, isSidebarOpen }) => {
+  const location = useLocation();
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+
+    if (
+      path.includes("/approval-requests") ||
+      path.includes("/my-approvals") ||
+      path.includes("/rejected")
+    ) {
+      return "Expenses";
+    } else if (path.includes("/archive")) {
+      return "Archive";
+    } else if (path.includes("/important")) {
+      return "Importants";
+    } else if (path.includes("/trash")) {
+      return "Trash";
+    } else {
+      return "";
+    }
+  };
+
+  const pageTitle = getPageTitle();
   return (
     <header
       className="main-header shadow-sm d-flex align-items-center"
@@ -21,7 +43,7 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     >
       <Container fluid>
         <Row className="align-items-center">
-          <Col xs="auto">
+          <Col xs="auto" className="d-flex align-items-center">
             <Button
               onClick={toggleSidebar}
               className="toggle-btn-header p-0"
@@ -34,8 +56,18 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
             >
               <FaBars />
             </Button>
+            <span
+              className="page-title ms-2 fw-semibold"
+              style={{
+                fontSize: "1rem",
+                whiteSpace: "nowrap",
+                position: "relative",
+                top: "3px",
+              }}
+            >
+              {pageTitle}
+            </span>
           </Col>
-          {/* Middle Spacer */}
           <Col />
 
           <Col xs="auto">

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DataTable from "../components/DataTable";
-import { mockData } from "../mock-data/mockData";
 import Total from "../components/Total";
 import ToolBar from "../components/ToolBar";
+import DataTable from "../components/DataTable";
+import { mockData } from "../mock-data/mockData";
 import { columns } from "../mock-data/tableHeader";
 
-const Expenses = () => {
+const Reject = () => {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
 
@@ -19,11 +19,9 @@ const Expenses = () => {
       .toLowerCase()
       .trim();
 
-  const pendingData = mockData.filter(
-    (item) => item.status !== "Approved" && item.status !== "Rejected"
-  );
+  const rejectedData = mockData.filter((item) => item.status === "Rejected");
 
-  const filteredData = pendingData.filter((item) =>
+  const filteredData = rejectedData.filter((item) =>
     columns.some((col) =>
       normalize(item[col.accessor]).includes(normalize(searchValue))
     )
@@ -42,4 +40,5 @@ const Expenses = () => {
   );
 };
 
-export default Expenses;
+
+export default Reject;
