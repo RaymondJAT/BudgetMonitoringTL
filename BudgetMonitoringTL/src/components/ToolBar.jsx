@@ -1,4 +1,3 @@
-import React from "react";
 import { Container } from "react-bootstrap";
 import SearchBar from "./SearchBar";
 import AppButton from "./AppButton";

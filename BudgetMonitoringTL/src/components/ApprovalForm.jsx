@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Table } from "react-bootstrap";
-import { FaStar, FaTrash } from "react-icons/fa";
+import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../js/numberToWords";
 import { mockData } from "../mock-data/mockData";
@@ -9,12 +9,12 @@ import PrintableCashRequest from "./PrintableCashRequest";
 import AppButton from "./AppButton";
 
 const ApprovalForm = () => {
+  const [amountInWords, setAmountInWords] = useState("");
+  const [particulars, setParticulars] = useState([]);
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
-  const [amountInWords, setAmountInWords] = useState("");
-  const [particulars, setParticulars] = useState([]);
 
   const fields = [
     { label: "Employee", key: "employee" },
@@ -30,7 +30,7 @@ const ApprovalForm = () => {
     { label: "Team Lead", key: "teamLead" },
   ];
 
-  // DataTables logic (merged here)
+  // DataTables logic
   const employeeData = mockData.find((e) => e.employee === data?.employee) || {
     transactions: [],
   };
@@ -63,17 +63,18 @@ const ApprovalForm = () => {
 
   return (
     <>
-      <Container fluid className="custom-wrapper pb-5">
-        <div className="custom-btn d-flex flex-column flex-md-row justify-content-between align-items-start pt-2 pb-2">
+      <Container fluid>
+        <div className="custom-btn d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-3">
           <div className="d-flex gap-1">
             {/* left buttons */}
             <AppButton
-              label="⇦"
               variant="dark"
               size="sm"
               onClick={() => navigate(-1)}
               className="custom-button btn-responsive"
-            />
+            >
+              <FaArrowLeft />
+            </AppButton>
             <AppButton
               label="Approve"
               variant="success"
@@ -105,27 +106,29 @@ const ApprovalForm = () => {
           <div className="d-flex gap-2 ms-md-auto mt-2 mt-md-0">
             <AppButton
               variant="warning"
+              size="sm"
               className="custom-button btn-responsive d-flex align-items-center justify-content-center"
               onClick={() => {
                 // mark as important logic
               }}
             >
-              <FaStar size={"0.8rem"} />
+              <FaStar size={"0.75rem"} />
             </AppButton>
             <AppButton
-              variant="danger"
+              variant="dark"
+              size="sm"
               className="custom-button btn-responsive d-flex align-items-center justify-content-center"
               onClick={() => {
                 // delete logic
               }}
             >
-              <FaTrash size={"0.8rem"} />
+              <FaTrash size={"0.75rem"} />
             </AppButton>
           </div>
         </div>
 
         {/* Info Fields */}
-        <div className="custom-container border border-black p-3 bg-white">
+        <div className="custom-container border p-3 bg-white">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Description:</strong>
@@ -174,7 +177,7 @@ const ApprovalForm = () => {
         </div>
 
         {/* Table (was DataTables) */}
-        <Table responsive className="custom-table border border-black">
+        <Table responsive className="custom-table ">
           <thead className="tableHead text-center">
             <tr>
               <th>Label</th>
@@ -195,7 +198,7 @@ const ApprovalForm = () => {
                       })}`
                     : "₱0.00"}
                 </td>
-                <td className="border border-black">
+                <td className="">
                   {`₱${((row.quantity ?? 0) * (row.price ?? 0)).toLocaleString(
                     "en-US",
                     {
@@ -208,13 +211,10 @@ const ApprovalForm = () => {
           </tbody>
           <tfoot>
             <tr>
-              <td
-                colSpan="3"
-                className="custom-col text-end border-end border-black"
-              >
+              <td colSpan="3" className="custom-col text-end border-end ">
                 <strong>Total:</strong>
               </td>
-              <td className="text-center border-end border-black">
+              <td className="text-center border-end ">
                 <strong>
                   ₱
                   {total.toLocaleString("en-US", {

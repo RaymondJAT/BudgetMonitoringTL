@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table, Form, Container, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
 import { meatballActions } from "../mock-data/meatballActions";
@@ -36,7 +36,7 @@ const DataTable = ({ data, columns, onRowClick }) => {
   return (
     <Container fluid>
       <div className="table-wrapper">
-        <Table hover className="expense-table mb-0">
+        <Table responsive hover className="expense-table mb-0">
           <thead>
             <tr>
               <th className="sticky-header">

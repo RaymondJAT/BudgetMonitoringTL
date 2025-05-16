@@ -1,6 +1,6 @@
 @font-face {
   font-family: customFont;
-  src: url(./assets/fonts/Manrope-VariableFont_wght.ttfs);
+  src: url(./assets/fonts/Manrope-VariableFont_wght.ttf);
 }
 
 html,
@@ -279,11 +279,6 @@ input[type="checkbox"]:checked {
   background-color: #f8d7da;
 }
 
-.custom-button.btn {
-  /* approval form button */
-  font-size: 0.75rem;
-}
-
 /* MEATBALL MENU DataTable */
 .meat-dropdown {
   font-size: 0.75rem;
@@ -296,7 +291,26 @@ input[type="checkbox"]:checked {
 /* APPROVAL FORM */
 .custom-container,
 .custom-table {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+}
+
+.custom-button.btn-responsive {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.custom-container {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.custom-table {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  overflow: hidden;
 }
 
 /* REACT-TO-PRINT */
