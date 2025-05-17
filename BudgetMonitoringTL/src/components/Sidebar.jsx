@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { navItems } from "../mock-data/navLinks";
 
@@ -9,6 +9,13 @@ const Sidebar = ({ isSidebarOpen }) => {
   const toggleDropdown = (label) => {
     setOpenDropdown(openDropdown === label ? null : label);
   };
+
+  // Close dropdowns when sidebar is collapsed
+  useEffect(() => {
+    if (!isSidebarOpen) {
+      setOpenDropdown(null);
+    }
+  }, [isSidebarOpen]);
 
   const HeaderIcon = navItems[0].icon;
 
@@ -52,7 +59,7 @@ const Sidebar = ({ isSidebarOpen }) => {
               </div>
             </div>
 
-            {item.children && (
+            {item.children && isSidebarOpen && (
               <div
                 className={`dropdown-links ps-5 transition-container ${
                   openDropdown === item.label ? "open" : ""

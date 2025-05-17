@@ -36,10 +36,10 @@ const DataTable = ({ data, columns, onRowClick }) => {
   return (
     <Container fluid>
       <div className="table-wrapper">
-        <Table responsive hover className="expense-table mb-0">
+        <Table hover className="expense-table mb-0">
           <thead>
             <tr>
-              <th className="sticky-header">
+              <th>
                 <Form.Check
                   type="checkbox"
                   checked={allSelected}
@@ -47,15 +47,11 @@ const DataTable = ({ data, columns, onRowClick }) => {
                 />
               </th>
               {columns.map((col, index) => (
-                <th
-                  key={index}
-                  className="sticky-header"
-                  style={{ width: col.width || "auto" }}
-                >
+                <th key={index} style={{ width: col.width || "auto" }}>
                   {col.header}
                 </th>
               ))}
-              <th className="sticky-header" style={{ width: "30px" }}></th>
+              <th style={{ width: "30px" }}></th>
             </tr>
           </thead>
           <tbody>
