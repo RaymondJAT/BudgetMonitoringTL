@@ -145,7 +145,7 @@ body {
 }
 
 .expense-table thead {
-  position: static;
+  position: sticky;
   top: unset;
   z-index: unset;
   background-color: transparent;

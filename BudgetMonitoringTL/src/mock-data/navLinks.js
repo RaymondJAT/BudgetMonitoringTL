@@ -11,7 +11,7 @@ export const navItems = [
     label: "Expenses",
     icon: FaMoneyBillWave,
     children: [
-      { label: "Approval Requests", path: "/approval-requests" },
+      { label: "Approval Requests", path: "/" },
       { label: "My Approvals", path: "/my-approvals" },
       { label: "Rejected Requests", path: "/rejected-requests" },
     ],

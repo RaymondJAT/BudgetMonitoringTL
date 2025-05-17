@@ -10,16 +10,16 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     const path = location.pathname;
 
     if (
-      path.includes("/approval-requests") ||
-      path.includes("/my-approvals") ||
-      path.includes("/rejected")
+      path === "/" ||
+      path === "/my-approvals" ||
+      path === "/rejected-requests"
     ) {
       return "Expenses";
-    } else if (path.includes("/archive")) {
+    } else if (path === "/archive") {
       return "Archive";
-    } else if (path.includes("/important")) {
+    } else if (path === "/important") {
       return "Importants";
-    } else if (path.includes("/trash")) {
+    } else if (path === "/trash") {
       return "Trash";
     } else {
       return "";
@@ -63,6 +63,7 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                 whiteSpace: "nowrap",
                 position: "relative",
                 top: "3px",
+                textTransform: "uppercase",
               }}
             >
               {pageTitle}
