@@ -317,6 +317,32 @@ input[type="checkbox"]:checked {
   overflow: hidden;
 }
 
+/* TRASH TABLE */
+.trash-button {
+  font-size: 10.5px !important;
+  font-weight: bold !important;
+  width: auto;
+  transition: background-color 0.3s ease;
+}
+
+.trash-button.btn-success {
+  background-color: #0e872a;
+  border: none;
+}
+
+.trash-button.btn-danger {
+  background-color: #dc3545;
+  border: none;
+}
+
+.trash-button:hover {
+  opacity: 0.9;
+}
+
+.btn-reponsive {
+  white-space: nowrap;
+}
+
 /* REACT-TO-PRINT */
 @media print {
   @page {
