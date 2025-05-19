@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
 import { numberToWords } from "../js/numberToWords";
 import { mockData } from "../mock-data/mockData";

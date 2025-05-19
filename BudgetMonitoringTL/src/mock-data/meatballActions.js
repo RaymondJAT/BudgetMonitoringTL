@@ -1,5 +1,12 @@
-export const meatballActions = [
-  { label: "Delete", onClick: (entry) => console.log("Delete", entry) },
+export const meatballActions = ({ onDelete }) => [
+  {
+    label: "Delete",
+    onClick: (entry) => {
+      if (window.confirm("Are you sure you want to delete this?")) {
+        onDelete(entry);
+      }
+    },
+  },
   { label: "Duplicate", onClick: (entry) => console.log("Duplicate", entry) },
   { label: "Download", onClick: (entry) => console.log("Download", entry) },
   {

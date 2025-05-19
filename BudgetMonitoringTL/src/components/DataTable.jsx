@@ -3,7 +3,7 @@ import { Table, Form, Container, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
 import { meatballActions } from "../mock-data/meatballActions";
 
-const DataTable = ({ data, columns, onRowClick }) => {
+const DataTable = ({ data, columns, onRowClick, onDelete }) => {
   const [selectedRows, setSelectedRows] = useState({});
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(false);
@@ -32,6 +32,14 @@ const DataTable = ({ data, columns, onRowClick }) => {
     setSelectedRows(updated);
     setAllSelected(Object.values(updated).every((val) => val));
   };
+
+  const handleDelete = (entryToDelete) => {
+    if (typeof onDelete === "function") {
+      onDelete(entryToDelete);
+    }
+  };
+
+  const meatballItems = meatballActions({ onDelete: handleDelete });
 
   return (
     <Container fluid>
@@ -134,7 +142,7 @@ const DataTable = ({ data, columns, onRowClick }) => {
                         />
                       </Dropdown.Toggle>
                       <Dropdown.Menu className="black-dropdown">
-                        {meatballActions.map((action, i) => (
+                        {meatballItems.map((action, i) => (
                           <Dropdown.Item
                             key={i}
                             onClick={() => action.onClick(entry)}
