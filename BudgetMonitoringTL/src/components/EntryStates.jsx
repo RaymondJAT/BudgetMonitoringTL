@@ -5,7 +5,7 @@ import AppButton from "../components/AppButton";
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
 
-const EntryStates = ({ trashItems, setTrashItems }) => {
+const EntryStates = ({ columns, trashItems, setTrashItems, onRowClick }) => {
   const [selectedRows, setSelectedRows] = useState({});
   const [allSelected, setAllSelected] = useState(false);
 
@@ -56,14 +56,13 @@ const EntryStates = ({ trashItems, setTrashItems }) => {
     { header: "Department", accessor: "department" },
     { header: "Description", accessor: "description" },
     { header: "Category", accessor: "category" },
-    // { header: "Paid By", accessor: "paidBy" },
     { header: "Total", accessor: "total" },
     { header: "Status", accessor: "status" },
   ];
 
   return (
     <Container fluid>
-      <div className="table-wrapper">
+      <div className="trash-wrapper">
         <Table hover className="expense-table mb-0">
           <thead>
             <tr>
@@ -83,7 +82,13 @@ const EntryStates = ({ trashItems, setTrashItems }) => {
           <tbody>
             {trashItems.length > 0 ? (
               trashItems.map((entry) => (
-                <tr key={entry.id}>
+                <tr
+                  key={entry.id}
+                  onClick={() => onRowClick(entry)}
+                  className={`clickable-row ${
+                    selectedRows[entry.id] ? "highlighted-row" : ""
+                  }`}
+                >
                   <td
                     style={{ width: "40px", paddingLeft: "0.5rem" }}
                     onClick={(e) => e.stopPropagation()}
@@ -136,14 +141,20 @@ const EntryStates = ({ trashItems, setTrashItems }) => {
                         variant="success"
                         size="sm"
                         className="trash-button btn-responsive"
-                        onClick={() => handleRestore(entry)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRestore(entry);
+                        }}
                       />
                       <AppButton
                         label="Delete"
                         variant="danger"
                         size="sm"
                         className="trash-button btn-responsive"
-                        onClick={() => handlePermanentDelete(entry)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePermanentDelete(entry);
+                        }}
                       />
                     </div>
                   </td>
