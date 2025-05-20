@@ -19,19 +19,48 @@ const Trash = () => {
     navigate("/approval-form", { state: entry });
   };
 
-  const filteredItems = trashItems.filter((item) =>
-    Object.values(item).some((value) =>
-      String(value).toLowerCase().includes(searchValue.toLowerCase())
-    )
-  );
+  const handleRestore = (entry) => {
+    // restore logic
+    const updatedTrash = trashItems.filter((item) => item.id !== entry.id);
+    setTrashItems(updatedTrash);
+    localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
+  };
+
+  const handlePermanentDelete = (entry) => {
+    const updatedTrash = trashItems.filter((item) => item.id !== entry.id);
+    setTrashItems(updatedTrash);
+    localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
+  };
+
+  const filteredItems = Array.isArray(trashItems)
+    ? trashItems.filter((item) =>
+        Object.values(item).some((value) =>
+          String(value).toLowerCase().includes(searchValue.toLowerCase())
+        )
+      )
+    : [];
+
+  const trashColumns = [
+    { header: "Employee", accessor: "employee" },
+    { header: "Department", accessor: "department" },
+    { header: "Description", accessor: "description" },
+    { header: "Category", accessor: "category" },
+    { header: "Total", accessor: "total" },
+    { header: "Status", accessor: "status" },
+  ];
 
   return (
     <div>
       <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
       <EntryStates
-        trashItems={filteredItems}
-        setTrashItems={setTrashItems}
+        columns={trashColumns}
+        items={filteredItems}
+        setItems={setTrashItems}
         onRowClick={handleRowClick}
+        showRestore={true}
+        showDelete={true}
+        onRestore={handleRestore}
+        onDelete={handlePermanentDelete}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-export const meatballActions = ({ onDelete }) => [
+export const meatballActions = ({ onDelete, onArchive }) => [
   {
     label: "Delete",
     onClick: (entry) => {
@@ -7,7 +7,14 @@ export const meatballActions = ({ onDelete }) => [
       }
     },
   },
-  { label: "Duplicate", onClick: (entry) => console.log("Duplicate", entry) },
+  {
+    label: "Archive",
+    onClick: (entry) => {
+      if (window.confirm("Are you sure you want to archive this?")) {
+        onArchive(entry);
+      }
+    },
+  },
   { label: "Download", onClick: (entry) => console.log("Download", entry) },
   {
     label: "Mark as Important",

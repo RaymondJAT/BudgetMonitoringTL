@@ -8,13 +8,14 @@ import { columns } from "../mock-data/tableHeader";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
+const LOCAL_KEY_ARCHIVE = "archiveData";
 
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
   const navigate = useNavigate();
 
-  // Load from localStorage
+  // load from localstorage
   useEffect(() => {
     const storedData = localStorage.getItem(LOCAL_KEY_ACTIVE);
     let parsedData;
@@ -33,7 +34,7 @@ const Expenses = () => {
     }
   }, []);
 
-  // Sync active data to localStorage
+  // sync active data to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
@@ -71,6 +72,21 @@ const Expenses = () => {
     }
   };
 
+  const handleArchive = async (entryToArchive) => {
+    try {
+      // remove from active list
+      const updatedData = tableData.filter((e) => e.id !== entryToArchive.id);
+      setTableData(updatedData);
+      // archive logic
+      const currentArchive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
+      const newArchive = [...currentArchive, entryToArchive];
+      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(newArchive));
+    } catch (error) {
+      console.error("Failed to archive entry:", error);
+    }
+  };
+
   return (
     <div>
       <Total />
@@ -80,6 +96,7 @@ const Expenses = () => {
         columns={columns}
         onRowClick={handleRowClick}
         onDelete={handleDelete}
+        onArchive={handleArchive}
       />
     </div>
   );
