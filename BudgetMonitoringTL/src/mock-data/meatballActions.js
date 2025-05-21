@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-export const meatballActions = ({ onDelete, onArchive }) => [
+export const meatballActions = ({ onDelete, onArchive, onToggleImportant }) => [
   {
     label: "Delete",
     onClick: (entry) => {
@@ -45,7 +45,18 @@ export const meatballActions = ({ onDelete, onArchive }) => [
   },
   {
     label: "Mark as Important",
-    onClick: (entry) => console.log("Mark", entry),
+    onClick: (entry) => {
+      const isNowImportant = !entry.important;
+      onToggleImportant({ ...entry, important: isNowImportant });
+
+      Swal.fire({
+        icon: "success",
+        title: isNowImportant ? "Marked as Important" : "Unmarked as Important",
+        text: `This entry has been ${
+          isNowImportant ? "marked" : "unmarked"
+        } as important.`,
+      });
+    },
   },
   {
     label: "Change Status",

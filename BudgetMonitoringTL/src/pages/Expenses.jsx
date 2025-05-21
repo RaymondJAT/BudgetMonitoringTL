@@ -10,6 +10,7 @@ import ExpenseReport from "../components/ExpenseReport";
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
 const LOCAL_KEY_ARCHIVE = "archiveData";
+const LOCAL_KEY_IMPORTANT = "importantData";
 
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -47,10 +48,20 @@ const Expenses = () => {
         archiveData = [];
       }
 
+      const storedImportant = localStorage.getItem(LOCAL_KEY_IMPORTANT);
+      let importantData = [];
+
+      try {
+        importantData = JSON.parse(storedImportant) || [];
+      } catch {
+        importantData = [];
+      }
+
       const filteredMockData = mockData.filter(
         (item) =>
           !trashData.find((trash) => trash.id === item.id) &&
-          !archiveData.find((archived) => archived.id === item.id)
+          !archiveData.find((archived) => archived.id === item.id) &&
+          !importantData.find((important) => important.id === item.id)
       );
 
       setTableData(filteredMockData);
@@ -111,6 +122,22 @@ const Expenses = () => {
       console.error("Failed to archive entry:", error);
     }
   };
+  // important logic
+  const handleToggleImportant = async (entryToImportant) => {
+    const updatedData = tableData.filter((e) => e.id !== entryToImportant.id);
+    setTableData(updatedData);
+
+    const currentImportant =
+      JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
+
+    const newImportant = currentImportant.some(
+      (item) => item.id === entryToImportant.id
+    )
+      ? currentImportant
+      : [...currentImportant, entryToImportant];
+
+    localStorage.setItem(LOCAL_KEY_IMPORTANT, JSON.stringify(newImportant));
+  };
 
   return (
     <div>
@@ -122,6 +149,7 @@ const Expenses = () => {
         onRowClick={handleRowClick}
         onDelete={handleDelete}
         onArchive={handleArchive}
+        onToggleImportant={handleToggleImportant}
       />
       <div style={{ display: "none" }}>
         <ExpenseReport />

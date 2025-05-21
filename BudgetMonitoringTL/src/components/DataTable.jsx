@@ -3,7 +3,14 @@ import { Table, Form, Container, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
 import { meatballActions } from "../mock-data/meatballActions";
 
-const DataTable = ({ data, columns, onRowClick, onDelete, onArchive }) => {
+const DataTable = ({
+  data,
+  columns,
+  onRowClick,
+  onDelete,
+  onArchive,
+  onToggleImportant,
+}) => {
   const [selectedRows, setSelectedRows] = useState({});
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(false);
@@ -39,7 +46,11 @@ const DataTable = ({ data, columns, onRowClick, onDelete, onArchive }) => {
     }
   };
 
-  const meatballItems = meatballActions({ onDelete: handleDelete, onArchive });
+  const meatballItems = meatballActions({
+    onDelete: handleDelete,
+    onArchive,
+    onToggleImportant,
+  });
 
   return (
     <Container fluid>
