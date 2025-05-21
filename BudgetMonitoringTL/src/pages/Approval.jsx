@@ -7,6 +7,7 @@ import { mockData } from "../mock-data/mockData";
 import { columns } from "../mock-data/tableHeader";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
+const LOCAL_KEY_ARCHIVE = "archiveData";
 const LOCAL_KEY_TRASH = "trashData";
 
 const Approval = () => {
@@ -16,19 +17,42 @@ const Approval = () => {
 
   useEffect(() => {
     const storedData = localStorage.getItem(LOCAL_KEY_ACTIVE);
-    let parsedData;
+    const storedTrash = localStorage.getItem(LOCAL_KEY_TRASH);
+    let parsedData = [];
+    let trashData = [];
 
     try {
-      parsedData = JSON.parse(storedData);
+      parsedData = JSON.parse(storedData) || [];
     } catch {
-      parsedData = null;
+      parsedData = [];
     }
 
-    if (Array.isArray(parsedData) && parsedData.length > 0) {
+    try {
+      trashData = JSON.parse(storedTrash) || [];
+    } catch {
+      trashData = [];
+    }
+
+    if (parsedData.length > 0) {
       setTableData(parsedData);
     } else {
-      setTableData(mockData);
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(mockData));
+      const storedArchive = localStorage.getItem(LOCAL_KEY_ARCHIVE);
+      let archiveData = [];
+
+      try {
+        archiveData = JSON.parse(storedArchive) || [];
+      } catch {
+        archiveData = [];
+      }
+
+      const filteredMockData = mockData.filter(
+        (item) =>
+          !trashData.find((trash) => trash.id === item.id) &&
+          !archiveData.find((archived) => archived.id === item.id)
+      );
+
+      setTableData(filteredMockData);
+      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(filteredMockData));
     }
   }, []);
 
@@ -54,6 +78,20 @@ const Approval = () => {
     }
   };
 
+  const handleArchive = async (entryToArchive) => {
+    try {
+      const updatedData = tableData.filter((e) => e.id !== entryToArchive.id);
+      setTableData(updatedData);
+
+      const currentArchive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
+      const newArchive = [...currentArchive, entryToArchive];
+      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(newArchive));
+    } catch (error) {
+      console.error("Failed to archive entry:", error);
+    }
+  };
+
   const normalize = (value) =>
     String(value || "")
       .toLowerCase()
@@ -76,6 +114,7 @@ const Approval = () => {
         columns={columns}
         onRowClick={handleRowClick}
         onDelete={handleDelete}
+        onArchive={handleArchive}
       />
     </div>
   );

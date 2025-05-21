@@ -4,6 +4,7 @@ import ToolBar from "../components/ToolBar";
 import { useNavigate } from "react-router-dom";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
+const LOCAL_KEY_TRASH = "trashData";
 const LOCAL_KEY_ARCHIVE = "archiveData";
 
 const Archive = () => {
@@ -14,7 +15,13 @@ const Archive = () => {
   useEffect(() => {
     const storedArchive =
       JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
-    setArchiveItems(storedArchive);
+    const trashData = JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
+
+    const filteredArchive = storedArchive.filter(
+      (item) => !trashData.find((trash) => trash.id === item.id)
+    );
+
+    setArchiveItems(filteredArchive);
   }, []);
 
   const handleRestore = (entryToRestore) => {
@@ -33,11 +40,18 @@ const Archive = () => {
   };
 
   const handleDelete = (entryToDelete) => {
+    // Remove from archive list
     const updatedArchive = archiveItems.filter(
       (item) => item.id !== entryToDelete.id
     );
     setArchiveItems(updatedArchive);
     localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
+
+    // Add to trash
+    const currentTrash =
+      JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
+    const newTrash = [...currentTrash, entryToDelete];
+    localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(newTrash));
   };
 
   const handleRowClick = (entry) => {

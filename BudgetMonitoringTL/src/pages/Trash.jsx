@@ -45,6 +45,7 @@ const Trash = () => {
     { header: "Department", accessor: "department" },
     { header: "Description", accessor: "description" },
     { header: "Category", accessor: "category" },
+    { header: "Paid By", accessor: "paidBy" },
     { header: "Total", accessor: "total" },
     { header: "Status", accessor: "status" },
   ];

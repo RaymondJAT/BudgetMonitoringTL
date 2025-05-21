@@ -10,6 +10,7 @@ import Approval from "./pages/Approval";
 import Reject from "./pages/Reject";
 import Archive from "./pages/Archive";
 import Trash from "./pages/Trash";
+import Important from "./pages/Important";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/my-approvals" element={<Approval />} />
           <Route path="/rejected-requests" element={<Reject />} />
           <Route path="/archive" element={<Archive />} />
+          <Route path="/important" element={<Important />} />
           <Route path="/trash" element={<Trash />} />
           <Route path="/approval-form" element={<ApprovalForm />} />
         </Routes>
