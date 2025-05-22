@@ -7,6 +7,7 @@ import ToolBar from "../components/ToolBar";
 import { columns } from "../mock-data/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 import ExpenseReport from "../components/ExpenseReport";
+import { useTotalData } from "../hooks/useTotalData";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -15,10 +16,10 @@ const LOCAL_KEY_IMPORTANT = "importantData";
 
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [tableData, setTableData] = useState([]);
+  const { data: tableData, setData: setTableData } = useTotalData(); // <-- use context
   const navigate = useNavigate();
 
-  // custom hook load from localStorage
+  // load from localStorage using custom hook
   useExpenseDataLoader({
     setTableData,
     LOCAL_KEY_ACTIVE,
@@ -28,7 +29,7 @@ const Expenses = () => {
     mockData,
   });
 
-  // sync active data to localStorage
+  // sync to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
@@ -100,7 +101,7 @@ const Expenses = () => {
 
   return (
     <div>
-      <Total data={mockData} />
+      <Total data={tableData} />
       <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
       <DataTable
         data={filteredData}

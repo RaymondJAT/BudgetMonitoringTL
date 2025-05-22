@@ -6,6 +6,7 @@ import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
 import { columns } from "../mock-data/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
+import { useTotalData } from "../hooks/useTotalData";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_ARCHIVE = "archiveData";
@@ -14,10 +15,10 @@ const LOCAL_KEY_TRASH = "trashData";
 
 const Approval = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [tableData, setTableData] = useState([]);
   const navigate = useNavigate();
+  const { data: tableData, setData: setTableData } = useTotalData();
 
-  // custom hook load from localStorage
+  // Load data from localStorage only once
   useExpenseDataLoader({
     setTableData,
     LOCAL_KEY_ACTIVE,
@@ -94,7 +95,7 @@ const Approval = () => {
 
   return (
     <div>
-      <Total data={mockData} />
+      <Total data={tableData} />
       <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
       <DataTable
         data={filteredData}

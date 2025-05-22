@@ -1,6 +1,9 @@
 import { Container } from "react-bootstrap";
+import { useTotalData } from "../hooks/useTotalData";
 
-const Total = ({ data }) => {
+const Total = () => {
+  const { data } = useTotalData();
+
   const statusList = [
     { label: "To Approve", key: "pending" },
     { label: "For Reimbursement", key: "approved" },
@@ -8,44 +11,45 @@ const Total = ({ data }) => {
   ];
 
   const mapStatusesToKeys = {
-    Pending: "pending",
-    Approved: "approved",
-    "In Payment": "inPayment",
+    pending: "pending",
+    approved: "approved",
+    "in payment": "inPayment",
   };
 
-  // Calculate totals
-  const totals = {
-    pending: 0,
-    approved: 0,
-    inPayment: 0,
-  };
+  const totals = { pending: 0, approved: 0, inPayment: 0 };
 
   data.forEach((item) => {
-    const key = mapStatusesToKeys[item.status];
-    const amount = isNaN(item.total) ? 0 : Number(item.total);
+    if (!item.status) return;
 
-    if (key === "pending" || key === "approved") {
-      if (item.paidBy === "Employee") {
-        totals[key] += amount;
-      }
+    const normalizedStatus = item.status.toLowerCase().trim();
+    const key = mapStatusesToKeys[normalizedStatus];
+    if (!key) return;
+
+    const amount = Number(item.total);
+    if (isNaN(amount)) return;
+
+    if (
+      (key === "pending" || key === "approved") &&
+      item.paidBy === "Employee"
+    ) {
+      totals[key] += amount;
     } else if (key === "inPayment") {
       totals.inPayment += amount;
     }
   });
 
-  // Ensure no negative values
   Object.keys(totals).forEach((key) => {
     if (totals[key] < 0) totals[key] = 0;
   });
 
   return (
     <Container fluid className="total-container mt-3">
-      {statusList.map((status) => (
-        <div className="total-box" key={status.key}>
-          <h5>{status.label}</h5>
+      {statusList.map(({ label, key }) => (
+        <div className="total-box" key={key}>
+          <h5>{label}</h5>
           <p>
             ₱{" "}
-            {totals[status.key].toLocaleString("en-PH", {
+            {totals[key].toLocaleString("en-PH", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
