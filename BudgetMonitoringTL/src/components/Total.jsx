@@ -1,8 +1,6 @@
-import React from "react";
 import { Container } from "react-bootstrap";
-import { mockData } from "../mock-data/mockData";
 
-const Total = () => {
+const Total = ({ data }) => {
   const statusList = [
     { label: "To Approve", key: "pending" },
     { label: "For Reimbursement", key: "approved" },
@@ -15,28 +13,29 @@ const Total = () => {
     "In Payment": "inPayment",
   };
 
-  // total
+  // Calculate totals
   const totals = {
     pending: 0,
     approved: 0,
     inPayment: 0,
   };
 
-  // total per status
-  mockData.forEach((item) => {
+  data.forEach((item) => {
     const key = mapStatusesToKeys[item.status];
+    const amount = isNaN(item.total) ? 0 : Number(item.total);
 
-    if (key === "pending") {
-      if (item.paidBy === "Employee" && !isNaN(item.total)) {
-        totals.pending += Number(item.total);
+    if (key === "pending" || key === "approved") {
+      if (item.paidBy === "Employee") {
+        totals[key] += amount;
       }
-    } else if (key === "approved") {
-      if (item.paidBy === "Employee" && !isNaN(item.total)) {
-        totals.approved += Number(item.total);
-      }
-    } else if (key === "inPayment" && !isNaN(item.total)) {
-      totals.inPayment += Number(item.total);
+    } else if (key === "inPayment") {
+      totals.inPayment += amount;
     }
+  });
+
+  // Ensure no negative values
+  Object.keys(totals).forEach((key) => {
+    if (totals[key] < 0) totals[key] = 0;
   });
 
   return (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { trashColumns } from "../mock-data/columnHeaders";
 import ToolBar from "../components/ToolBar";
 import EntryStates from "../components/EntryStates";
 
@@ -39,16 +40,6 @@ const Trash = () => {
         )
       )
     : [];
-
-  const trashColumns = [
-    { header: "Employee", accessor: "employee" },
-    { header: "Department", accessor: "department" },
-    { header: "Description", accessor: "description" },
-    { header: "Category", accessor: "category" },
-    { header: "Paid By", accessor: "paidBy" },
-    { header: "Total", accessor: "total" },
-    { header: "Status", accessor: "status" },
-  ];
 
   return (
     <div>

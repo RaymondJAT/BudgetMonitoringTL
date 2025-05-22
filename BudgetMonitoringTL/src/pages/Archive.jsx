@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import EntryStates from "../components/EntryStates";
 import ToolBar from "../components/ToolBar";
 import { useNavigate } from "react-router-dom";
+import { archiveColumns } from "../mock-data/columnHeaders";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -63,16 +64,6 @@ const Archive = () => {
       String(value).toLowerCase().includes(searchValue.toLowerCase())
     )
   );
-
-  const archiveColumns = [
-    { header: "Employee", accessor: "employee" },
-    { header: "Department", accessor: "department" },
-    { header: "Description", accessor: "description" },
-    { header: "Category", accessor: "category" },
-    { header: "Paid By", accessor: "paidBy" },
-    { header: "Total", accessor: "total" },
-    { header: "Status", accessor: "status" },
-  ];
 
   return (
     <div>

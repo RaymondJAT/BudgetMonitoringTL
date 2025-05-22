@@ -23,20 +23,8 @@ export const meatballActions = ({ onDelete, onArchive, onToggleImportant }) => [
   {
     label: "Archive",
     onClick: (entry) => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "This will move the entry to archive.",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#aaa",
-        confirmButtonText: "Yes, archive it!",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          onArchive(entry);
-          Swal.fire("Archived!", "The entry has been archived.", "success");
-        }
-      });
+      onArchive(entry);
+      Swal.fire("Archived!", "The entry has been archived.", "success");
     },
   },
   {

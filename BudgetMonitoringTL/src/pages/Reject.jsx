@@ -5,9 +5,11 @@ import ToolBar from "../components/ToolBar";
 import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
 import { columns } from "../mock-data/tableHeader";
+import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_ARCHIVE = "archiveData";
+const LOCAL_KEY_IMPORTANT = "importantData";
 const LOCAL_KEY_TRASH = "trashData";
 
 const Reject = () => {
@@ -15,47 +17,15 @@ const Reject = () => {
   const [tableData, setTableData] = useState([]);
   const navigate = useNavigate();
 
-  // Load from localStorage
-  useEffect(() => {
-    const storedData = localStorage.getItem(LOCAL_KEY_ACTIVE);
-    const storedTrash = localStorage.getItem(LOCAL_KEY_TRASH);
-    let parsedData = [];
-    let trashData = [];
-
-    try {
-      parsedData = JSON.parse(storedData) || [];
-    } catch {
-      parsedData = [];
-    }
-
-    try {
-      trashData = JSON.parse(storedTrash) || [];
-    } catch {
-      trashData = [];
-    }
-
-    if (parsedData.length > 0) {
-      setTableData(parsedData);
-    } else {
-      const storedArchive = localStorage.getItem(LOCAL_KEY_ARCHIVE);
-      let archiveData = [];
-
-      try {
-        archiveData = JSON.parse(storedArchive) || [];
-      } catch {
-        archiveData = [];
-      }
-
-      const filteredMockData = mockData.filter(
-        (item) =>
-          !trashData.find((trash) => trash.id === item.id) &&
-          !archiveData.find((archived) => archived.id === item.id)
-      );
-
-      setTableData(filteredMockData);
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(filteredMockData));
-    }
-  }, []);
+  // custom hook load from localStorage
+  useExpenseDataLoader({
+    setTableData,
+    LOCAL_KEY_ACTIVE,
+    LOCAL_KEY_ARCHIVE,
+    LOCAL_KEY_IMPORTANT,
+    LOCAL_KEY_TRASH,
+    mockData,
+  });
 
   // Sync active data to localStorage
   useEffect(() => {
@@ -93,6 +63,22 @@ const Reject = () => {
     }
   };
 
+  const handleToggleImportant = async (entryToImportant) => {
+    const updatedData = tableData.filter((e) => e.id !== entryToImportant.id);
+    setTableData(updatedData);
+
+    const currentImportant =
+      JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
+
+    const newImportant = currentImportant.some(
+      (item) => item.id === entryToImportant.id
+    )
+      ? currentImportant
+      : [...currentImportant, entryToImportant];
+
+    localStorage.setItem(LOCAL_KEY_IMPORTANT, JSON.stringify(newImportant));
+  };
+
   const normalize = (value) =>
     String(value || "")
       .toLowerCase()
@@ -108,7 +94,7 @@ const Reject = () => {
 
   return (
     <div>
-      <Total />
+      <Total data={mockData} />
       <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
       <DataTable
         data={filteredData}
@@ -116,6 +102,7 @@ const Reject = () => {
         onRowClick={handleRowClick}
         onDelete={handleDelete}
         onArchive={handleArchive}
+        onToggleImportant={handleToggleImportant}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { importantColumns } from "../mock-data/columnHeaders";
 import EntryStates from "../components/EntryStates";
 import ToolBar from "../components/ToolBar";
 
@@ -12,7 +13,7 @@ const Important = () => {
   const [importantItems, setImportantItems] = useState([]);
   const navigate = useNavigate();
 
-  // Load from localStorage
+  // load from localStorage
   useEffect(() => {
     const storedImportant =
       JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
@@ -50,16 +51,6 @@ const Important = () => {
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
   };
-
-  const importantColumns = [
-    { header: "Employee", accessor: "employee" },
-    { header: "Department", accessor: "department" },
-    { header: "Description", accessor: "description" },
-    { header: "Category", accessor: "category" },
-    { header: "Paid By", accessor: "paidBy" },
-    { header: "Total", accessor: "total" },
-    { header: "Status", accessor: "status" },
-  ];
 
   const filteredItems = importantItems.filter((item) =>
     Object.values(item).some((value) =>
