@@ -76,7 +76,7 @@ export const mockData = [
     expenseDate: "04/10/2025",
     teamLead: "Bob Marley",
     category: "Supplies",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "550.00",
     status: "Approved",
     transactions: [
@@ -93,7 +93,7 @@ export const mockData = [
     expenseDate: "04/12/2025",
     teamLead: "Scarlett Johansson",
     category: "Software",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "2500.00",
     status: "Pending",
     transactions: [
@@ -127,7 +127,7 @@ export const mockData = [
     expenseDate: "05/03/2025",
     teamLead: "John Cena",
     category: "Marketing",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "5000.00",
     status: "Pending",
     transactions: [
@@ -178,7 +178,7 @@ export const mockData = [
     expenseDate: "06/22/2025",
     teamLead: "Judi Dench",
     category: "Supplies",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "650.00",
     status: "Pending",
     transactions: [
@@ -212,7 +212,7 @@ export const mockData = [
     expenseDate: "07/02/2025",
     teamLead: "Samuel L. Jackson",
     category: "Software",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "4500.00",
     status: "Approved",
     transactions: [
@@ -246,7 +246,7 @@ export const mockData = [
     expenseDate: "07/15/2025",
     teamLead: "Chris Hemsworth",
     category: "Tools",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "3500.00",
     status: "Approved",
     transactions: [
@@ -317,7 +317,7 @@ export const mockData = [
     expenseDate: "09/25/2025",
     teamLead: "Scarlett Johansson",
     category: "Design",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "8000.00",
     status: "Pending",
     transactions: [
@@ -368,7 +368,7 @@ export const mockData = [
     expenseDate: "10/05/2025",
     teamLead: "Mark Ruffalo",
     category: "Hosting",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "12000.00",
     status: "Pending",
     transactions: [
@@ -385,7 +385,7 @@ export const mockData = [
     expenseDate: "10/10/2025",
     teamLead: "John Cena",
     category: "Marketing",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "7000.00",
     status: "Pending",
     transactions: [
@@ -419,7 +419,7 @@ export const mockData = [
     expenseDate: "10/20/2025",
     teamLead: "Chris Hemsworth",
     category: "Software",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "6000.00",
     status: "Pending",
     transactions: [
@@ -453,7 +453,7 @@ export const mockData = [
     expenseDate: "10/27/2025",
     teamLead: "Gaten Matarazzo",
     category: "Hardware",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "4500.00",
     status: "Approved",
     transactions: [{ label: "Enterprise Router", quantity: 1, price: 4500 }],
@@ -481,7 +481,7 @@ export const mockData = [
     expenseDate: "10/30/2025",
     teamLead: "Bella Ramsey",
     category: "Consulting",
-    paidBy: "Company",
+    paidBy: "Employee",
     total: "7500.00",
     status: "Pending",
     transactions: [{ label: "Audit Services", quantity: 1, price: 7500 }],

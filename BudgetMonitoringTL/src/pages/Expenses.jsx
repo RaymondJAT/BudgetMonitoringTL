@@ -7,7 +7,6 @@ import ToolBar from "../components/ToolBar";
 import { columns } from "../mock-data/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 import ExpenseReport from "../components/ExpenseReport";
-import { useTotalData } from "../hooks/useTotalData";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -16,7 +15,7 @@ const LOCAL_KEY_IMPORTANT = "importantData";
 
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
-  const { data: tableData, setData: setTableData } = useTotalData(); // <-- use context
+  const [tableData, setTableData] = useState([]);
   const navigate = useNavigate();
 
   // load from localStorage using custom hook
@@ -82,6 +81,7 @@ const Expenses = () => {
       console.error("Failed to archive entry:", error);
     }
   };
+
   // important logic
   const handleToggleImportant = async (entryToImportant) => {
     const updatedData = tableData.filter((e) => e.id !== entryToImportant.id);

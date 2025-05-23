@@ -6,7 +6,6 @@ import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
 import { columns } from "../mock-data/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
-import { useTotalData } from "../hooks/useTotalData";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_ARCHIVE = "archiveData";
@@ -16,7 +15,7 @@ const LOCAL_KEY_TRASH = "trashData";
 const Approval = () => {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
-  const { data: tableData, setData: setTableData } = useTotalData();
+  const [tableData, setTableData] = useState([]);
 
   // Load data from localStorage only once
   useExpenseDataLoader({

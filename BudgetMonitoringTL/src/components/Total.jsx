@@ -1,9 +1,6 @@
 import { Container } from "react-bootstrap";
-import { useTotalData } from "../hooks/useTotalData";
 
-const Total = () => {
-  const { data } = useTotalData();
-
+const Total = ({ data }) => {
   const statusList = [
     { label: "To Approve", key: "pending" },
     { label: "For Reimbursement", key: "approved" },
@@ -17,6 +14,10 @@ const Total = () => {
   };
 
   const totals = { pending: 0, approved: 0, inPayment: 0 };
+
+  if (!data || !Array.isArray(data)) {
+    return null;
+  }
 
   data.forEach((item) => {
     if (!item.status) return;
