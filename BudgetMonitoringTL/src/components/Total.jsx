@@ -20,8 +20,7 @@ const Total = ({ data }) => {
   }
 
   data.forEach((item) => {
-    if (!item.status) return;
-
+    if (!item.status || item.status === "Deleted") return; // ❌ skip deleted
     const normalizedStatus = item.status.toLowerCase().trim();
     const key = mapStatusesToKeys[normalizedStatus];
     if (!key) return;

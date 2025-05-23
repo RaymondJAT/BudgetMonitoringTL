@@ -211,6 +211,12 @@ body {
   border: 1px solid darkred;
 }
 
+.status-badge.deleted {
+  background-color: #282828;
+  color: white;
+  border: 1px solid darkslategrey;
+}
+
 /* TOTAL BOX */
 .total-container {
   display: flex;

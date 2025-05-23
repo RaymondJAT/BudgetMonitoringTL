@@ -17,6 +17,11 @@ const Reject = () => {
   const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
 
+  const archiveData = JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
+  const importantData =
+    JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
+  const totalComputationData = [...tableData, ...archiveData, ...importantData];
+
   useExpenseDataLoader({
     setTableData,
     LOCAL_KEY_ACTIVE,
@@ -39,9 +44,11 @@ const Reject = () => {
       const updatedData = tableData.filter((e) => e.id !== entryToDelete.id);
       setTableData(updatedData);
 
+      const deletedEntry = { ...entryToDelete, status: "Deleted" };
+
       const currentTrash =
         JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
-      const newTrash = [...currentTrash, entryToDelete];
+      const newTrash = [...currentTrash, deletedEntry];
       localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(newTrash));
     } catch (error) {
       console.error("Failed to delete entry:", error);
@@ -93,7 +100,7 @@ const Reject = () => {
 
   return (
     <div>
-      <Total data={tableData} />
+      <Total data={totalComputationData} />
       <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
       <DataTable
         data={filteredData}
