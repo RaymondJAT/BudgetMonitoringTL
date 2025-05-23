@@ -4,6 +4,11 @@ import AppButton from "./AppButton";
 import { FaFilter } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 
+import {
+  actionDropdownItems,
+  filterDropdownItems,
+} from "../mock-data/toolbarActions";
+
 const ToolBar = ({ searchValue, onSearchChange }) => {
   const handlePrint = () => console.log("Print clicked");
   const handleDelete = () => console.log("Delete clicked");
@@ -32,12 +37,11 @@ const ToolBar = ({ searchValue, onSearchChange }) => {
         variant="secondary"
         size="sm"
         className="custom-app-button"
-        dropdownItems={[
-          { label: "Print", onClick: handlePrint },
-          { label: "Delete", onClick: handleDelete },
-          { label: "Mark as important", onClick: handleMarkImportant },
-          { label: "Export" },
-        ]}
+        dropdownItems={actionDropdownItems({
+          handlePrint,
+          handleDelete,
+          handleMarkImportant,
+        })}
       />
 
       <AppButton
@@ -51,12 +55,7 @@ const ToolBar = ({ searchValue, onSearchChange }) => {
         variant="info"
         size="sm"
         className="custom-app-button"
-        dropdownItems={[
-          { label: "A - Z", onClick: () => handleFilter("az") },
-          { label: "Z - A", onClick: () => handleFilter("za") },
-          { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
-          { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
-        ]}
+        dropdownItems={filterDropdownItems(handleFilter)}
       />
 
       <SearchBar

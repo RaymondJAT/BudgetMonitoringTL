@@ -103,12 +103,21 @@ body {
 
 /* HEADER */
 .main-header {
-  height: 60px;
   background-color: #fff;
   border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
   z-index: 1100;
+  height: 60px;
+  transition: margin-left 0.3s ease;
+}
+
+.main-header.sidebar-open {
+  margin-left: 230px;
+}
+
+.main-header.sidebar-collapsed {
+  margin-left: 60px;
 }
 
 /* DROPDOWN ITEMS */

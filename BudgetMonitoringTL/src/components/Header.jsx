@@ -29,17 +29,9 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
   const pageTitle = getPageTitle();
   return (
     <header
-      className="main-header shadow-sm d-flex align-items-center"
-      style={{
-        marginLeft: isSidebarOpen ? "230px" : "60px",
-        transition: "margin-left 0.3s ease",
-        backgroundColor: "#fff",
-        borderBottom: "1px solid #ddd",
-        position: "sticky",
-        top: 0,
-        zIndex: 1100,
-        height: "60px",
-      }}
+      className={`main-header shadow-sm d-flex align-items-center ${
+        isSidebarOpen ? "sidebar-open" : "sidebar-collapsed"
+      }`}
     >
       <Container fluid>
         <Row className="align-items-center">

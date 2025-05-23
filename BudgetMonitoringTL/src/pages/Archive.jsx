@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import EntryStates from "../components/EntryStates";
 import ToolBar from "../components/ToolBar";
-import { useNavigate } from "react-router-dom";
 import { archiveColumns } from "../mock-data/columnHeaders";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
@@ -25,34 +26,54 @@ const Archive = () => {
     setArchiveItems(filteredArchive);
   }, []);
 
-  const handleRestore = (entryToRestore) => {
-    // remove from archive page
-    const updatedArchive = archiveItems.filter(
-      (item) => item.id !== entryToRestore.id
-    );
-    setArchiveItems(updatedArchive);
-    localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
+  const handleRestore = async (entryToRestore) => {
+    const result = await Swal.fire({
+      title: "Restore Entry?",
+      text: "This entry will be moved back to Active.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, restore it",
+    });
 
-    // add to active expenses in approval
-    const currentActive =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
-    const newActive = [...currentActive, entryToRestore];
-    localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
+    if (result.isConfirmed) {
+      const updatedArchive = archiveItems.filter(
+        (item) => item.id !== entryToRestore.id
+      );
+      setArchiveItems(updatedArchive);
+      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
+
+      const currentActive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
+      const newActive = [...currentActive, entryToRestore];
+      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
+
+      Swal.fire("Restored!", "The entry has been moved to Active.", "success");
+    }
   };
 
-  const handleDelete = (entryToDelete) => {
-    // Remove from archive list
-    const updatedArchive = archiveItems.filter(
-      (item) => item.id !== entryToDelete.id
-    );
-    setArchiveItems(updatedArchive);
-    localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
+  const handleDelete = async (entryToDelete) => {
+    const result = await Swal.fire({
+      title: "Delete Entry?",
+      text: "This entry will be moved to Trash.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+    });
 
-    // Add to trash
-    const currentTrash =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
-    const newTrash = [...currentTrash, entryToDelete];
-    localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(newTrash));
+    if (result.isConfirmed) {
+      const updatedArchive = archiveItems.filter(
+        (item) => item.id !== entryToDelete.id
+      );
+      setArchiveItems(updatedArchive);
+      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
+
+      const currentTrash =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
+      const newTrash = [...currentTrash, entryToDelete];
+      localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(newTrash));
+
+      Swal.fire("Deleted!", "The entry has been moved to Trash.", "success");
+    }
   };
 
   const handleRowClick = (entry) => {
