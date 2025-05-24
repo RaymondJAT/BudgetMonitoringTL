@@ -1,6 +1,6 @@
 export const actionDropdownItems = (handlers) => [
-  { label: "Print", onClick: handlers.handlePrint },
-  { label: "Delete", onClick: handlers.handleDelete },
+  { label: "Approve", onClick: handlers.handlePrint },
+  { label: "Reject", onClick: handlers.handleDelete },
   { label: "Mark as important", onClick: handlers.handleMarkImportant },
   { label: "Export", onClick: () => console.log("Export clicked") },
 ];

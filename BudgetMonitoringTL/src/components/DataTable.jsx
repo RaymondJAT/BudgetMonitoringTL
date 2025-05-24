@@ -10,34 +10,34 @@ const DataTable = ({
   onDelete,
   onArchive,
   onToggleImportant,
+  selectedRows = {}, // <-- from parent
+  onSelectionChange,
 }) => {
-  const [selectedRows, setSelectedRows] = useState({});
   const [allSelected, setAllSelected] = useState(false);
-  const [openDropdownIndex, setOpenDropdownIndex] = useState(false);
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
   useEffect(() => {
-    const initialSelection = {};
-    data.forEach((entry, index) => {
-      initialSelection[index] = false;
-    });
-    setSelectedRows(initialSelection);
-    setAllSelected(false);
-  }, [data]);
+    setAllSelected(
+      data.length > 0 && data.every((entry) => selectedRows[entry.id])
+    );
+  }, [selectedRows, data]);
 
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
     const newSelection = {};
-    Object.keys(selectedRows).forEach((key) => {
-      newSelection[key] = checked;
+    data.forEach((entry) => {
+      newSelection[entry.id] = checked;
     });
-    setSelectedRows(newSelection);
-    setAllSelected(checked);
+    if (typeof onSelectionChange === "function") {
+      onSelectionChange(newSelection);
+    }
   };
 
-  const handleRowCheck = (index) => {
-    const updated = { ...selectedRows, [index]: !selectedRows[index] };
-    setSelectedRows(updated);
-    setAllSelected(Object.values(updated).every((val) => val));
+  const handleRowCheck = (entryId) => {
+    const updated = { ...selectedRows, [entryId]: !selectedRows[entryId] };
+    if (typeof onSelectionChange === "function") {
+      onSelectionChange(updated);
+    }
   };
 
   const handleDelete = (entryToDelete) => {
@@ -45,6 +45,9 @@ const DataTable = ({
       onDelete(entryToDelete);
     }
   };
+
+  const getSelectedEntries = (selection) =>
+    data.filter((entry) => selection[entry.id]);
 
   const meatballItems = meatballActions({
     onDelete: handleDelete,
@@ -77,19 +80,22 @@ const DataTable = ({
             {data && data.length > 0 ? (
               data.map((entry, index) => (
                 <tr
-                  key={index}
-                  onClick={() => onRowClick(entry)}
+                  key={entry.id || index}
                   className={`clickable-row ${
-                    selectedRows[index] ? "highlighted-row" : ""
+                    selectedRows[entry.id] ? "highlighted-row" : ""
                   }`}
                 >
                   <td onClick={(e) => e.stopPropagation()}>
                     <Form.Check
                       type="checkbox"
-                      checked={selectedRows[index] || false}
-                      onChange={() => handleRowCheck(index)}
+                      checked={selectedRows[entry.id] || false}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleRowCheck(entry.id);
+                      }}
                     />
                   </td>
+
                   {columns.map((col, colIndex) => (
                     <td
                       key={colIndex}
@@ -103,25 +109,25 @@ const DataTable = ({
                             }
                           : {}
                       }
+                      onClick={() => onRowClick(entry)} // Move the onClick here
                     >
                       {col.accessor === "status" ? (
                         <span
-                          className={`status-badge ${entry[
-                            col.accessor
-                          ].toLowerCase()}`}
+                          className={`status-badge ${String(
+                            entry[col.accessor]
+                          ).toLowerCase()}`}
                         >
                           {entry[col.accessor]}
                         </span>
                       ) : col.accessor === "total" ? (
-                        `₱ ${parseFloat(entry[col.accessor]).toLocaleString(
-                          "en-PH",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }
-                        )}`
+                        `₱ ${parseFloat(
+                          entry[col.accessor] || 0
+                        ).toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
                       ) : (
-                        entry[col.accessor]
+                        entry[col.accessor] ?? ""
                       )}
                     </td>
                   ))}
@@ -156,7 +162,10 @@ const DataTable = ({
                         {meatballItems.map((action, i) => (
                           <Dropdown.Item
                             key={i}
-                            onClick={() => action.onClick(entry)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              action.onClick(entry);
+                            }}
                             className="meat-dropdown"
                           >
                             {action.label}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { trashColumns } from "../mock-data/columnHeaders";
+import Swal from "sweetalert2";
 import ToolBar from "../components/ToolBar";
 import EntryStates from "../components/EntryStates";
 
+const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
 
 const Trash = () => {
@@ -20,14 +22,32 @@ const Trash = () => {
     navigate("/approval-form", { state: entry });
   };
 
-  const handleRestore = (entry) => {
+  const handleRestore = async (entryToRestore) => {
+    const result = await Swal.fire({
+      title: "Restore Entry?",
+      text: "This entry will be moved back to Active.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, restore it",
+    });
     // restore logic
-    const updatedTrash = trashItems.filter((item) => item.id !== entry.id);
-    setTrashItems(updatedTrash);
-    localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
+    if (result.isConfirmed) {
+      const updatedTrash = trashItems.filter(
+        (item) => item.id !== entryToRestore.id
+      );
+      setTrashItems(updatedTrash);
+      localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
+
+      const currentActive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
+      const newActive = [...currentActive, entryToRestore];
+      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
+
+      Swal.fire("Restored!", "The entry has been moved to Active.", "success");
+    }
   };
 
-  const handlePermanentDelete = (entry) => {
+  const handlePermanentDelete = async (entry) => {
     const updatedTrash = trashItems.filter((item) => item.id !== entry.id);
     setTrashItems(updatedTrash);
     localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));

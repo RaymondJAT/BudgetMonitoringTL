@@ -1,4 +1,3 @@
-import React from "react";
 import { Row, Col, Container, Table, Image } from "react-bootstrap";
 import logo from "../assets/logo5L.png";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
 const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {

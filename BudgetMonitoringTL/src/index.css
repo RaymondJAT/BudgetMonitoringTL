@@ -283,9 +283,9 @@ input[type="checkbox"]:checked {
 .custom-app-button.btn,
 .custom-app-button.dropdown-toggle {
   padding: 0.1rem 0.6rem !important;
-  font-size: 0.75rem !important;
-  background-color: #f8f9fa !important;
-  color: black !important;
+  font-size: 0.75rem;
+  background-color: #f8f9fa;
+  color: black;
   border: none !important;
   border-radius: 4px !important;
 }
@@ -296,6 +296,16 @@ input[type="checkbox"]:checked {
 
 .custom-dropdown-menu .dropdown-item:hover {
   background-color: #f8d7da;
+}
+
+.custom-left-button,
+.custom-left-button.btn {
+  padding: 0.1rem 0.6rem !important;
+  font-size: 0.75rem;
+  background-color: #f8f9fa;
+  color: black;
+  border: none !important;
+  border-radius: 4px !important;
 }
 
 /* MEATBALL MENU DataTable */

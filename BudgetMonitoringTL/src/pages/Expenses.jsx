@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import DataTable from "../components/DataTable";
 import { mockData } from "../mock-data/mockData";
+import { columns } from "../mock-data/tableHeader";
+import { MdDelete, MdLocalPrintshop } from "react-icons/md";
+import DataTable from "../components/DataTable";
 import Total from "../components/Total";
 import ToolBar from "../components/ToolBar";
-import { columns } from "../mock-data/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 import ExpenseReport from "../components/ExpenseReport";
+import AppButton from "../components/AppButton";
+import Swal from "sweetalert2";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -16,14 +19,16 @@ const LOCAL_KEY_IMPORTANT = "importantData";
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
   const navigate = useNavigate();
+
+  const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
   const archiveData = JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
   const importantData =
     JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
   const totalComputationData = [...tableData, ...archiveData, ...importantData];
 
-  // load from localStorage using custom hook
   useExpenseDataLoader({
     setTableData,
     LOCAL_KEY_ACTIVE,
@@ -33,7 +38,6 @@ const Expenses = () => {
     mockData,
   });
 
-  // sync to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
@@ -57,14 +61,16 @@ const Expenses = () => {
     )
   );
 
-  // delete logic
+  const getSelectedEntriesArray = () =>
+    filteredData.filter((entry) => selectedRows[entry.id]);
+  const selectedEntriesArray = getSelectedEntriesArray();
+
   const handleDelete = async (entryToDelete) => {
     try {
       const updatedData = tableData.filter((e) => e.id !== entryToDelete.id);
       setTableData(updatedData);
 
       const deletedEntry = { ...entryToDelete, status: "Deleted" };
-
       const currentTrash =
         JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
       const newTrash = [...currentTrash, deletedEntry];
@@ -76,10 +82,9 @@ const Expenses = () => {
 
   const handleArchive = async (entryToArchive) => {
     try {
-      // remove from active list
       const updatedData = tableData.filter((e) => e.id !== entryToArchive.id);
       setTableData(updatedData);
-      // archive logic
+
       const currentArchive =
         JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
       const newArchive = [...currentArchive, entryToArchive];
@@ -89,14 +94,12 @@ const Expenses = () => {
     }
   };
 
-  // important logic
   const handleToggleImportant = async (entryToImportant) => {
     const updatedData = tableData.filter((e) => e.id !== entryToImportant.id);
     setTableData(updatedData);
 
     const currentImportant =
       JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
-
     const newImportant = currentImportant.some(
       (item) => item.id === entryToImportant.id
     )
@@ -106,10 +109,77 @@ const Expenses = () => {
     localStorage.setItem(LOCAL_KEY_IMPORTANT, JSON.stringify(newImportant));
   };
 
+  const handlePrint = () => {
+    console.log("Print clicked", selectedEntriesArray);
+    // Add your print logic here using selectedEntriesArray
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedCount === 0) return;
+
+    Swal.fire({
+      title: `Delete ${selectedCount} selected entr${
+        selectedCount === 1 ? "y" : "ies"
+      }?`,
+      text: "This action will move them to Trash. Do you want to proceed?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Delete all
+        selectedEntriesArray.forEach((entry) => handleDelete(entry));
+        // Clear selection
+        setSelectedRows({});
+        Swal.fire("Deleted!", "Entries have been moved to Trash.", "success");
+      }
+    });
+  };
+
   return (
     <div>
       <Total data={totalComputationData} />
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+      <ToolBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        leftContent={
+          selectedCount > 0 && (
+            <>
+              {selectedCount === 1 && (
+                <AppButton
+                  label={
+                    <>
+                      <MdLocalPrintshop style={{ marginRight: "5px" }} />
+                      Print
+                    </>
+                  }
+                  size="sm"
+                  className="custom-app-button no-hover"
+                  variant="outline-primary"
+                  onClick={handlePrint}
+                />
+              )}
+              {selectedCount >= 2 && (
+                <AppButton
+                  label={
+                    <>
+                      <MdDelete style={{ marginRight: "5px" }} />
+                      Delete
+                    </>
+                  }
+                  size="sm"
+                  className="custom-app-button no-hover"
+                  variant="outline-danger"
+                  onClick={handleDeleteSelected}
+                />
+              )}
+            </>
+          )
+        }
+      />
+
       <DataTable
         data={filteredData}
         columns={columns}
@@ -117,7 +187,10 @@ const Expenses = () => {
         onDelete={handleDelete}
         onArchive={handleArchive}
         onToggleImportant={handleToggleImportant}
+        selectedRows={selectedRows}
+        onSelectionChange={setSelectedRows}
       />
+
       <div style={{ display: "none" }}>
         <ExpenseReport />
       </div>
