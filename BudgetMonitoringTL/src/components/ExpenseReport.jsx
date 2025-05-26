@@ -11,6 +11,14 @@ const ExpenseReport = ({ data, contentRef }) => {
           amount:
             (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
         }))
+      : data?.transactions?.length > 0
+      ? data.transactions.map((item) => ({
+          label: data.description || " ",
+          price: parseFloat(item.price) || 0,
+          quantity: parseFloat(item.quantity) || 0,
+          amount:
+            (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
+        }))
       : [
           {
             label: data?.description || " ",

@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { mockData } from "../handlers/mockData";
 import { columns } from "../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { moveEntries } from "../utils/entryActions";
+import { useReactToPrint } from "react-to-print";
 import DataTable from "../components/DataTable";
 import Total from "../components/Total";
 import ToolBar from "../components/ToolBar";
@@ -21,7 +22,11 @@ const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
+  const [particulars, setParticulars] = useState([]);
+  const { state: data } = useLocation();
   const navigate = useNavigate();
+  const contentRef = useRef(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -29,6 +34,11 @@ const Expenses = () => {
   const importantData =
     JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
   const totalComputationData = [...tableData, ...archiveData, ...importantData];
+
+  const employeeData = mockData.find((e) => e.employee === data?.employee) || {
+    transactions: [],
+  };
+  const transactions = employeeData.transactions;
 
   useExpenseDataLoader({
     setTableData,
@@ -42,6 +52,21 @@ const Expenses = () => {
   useEffect(() => {
     localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
+
+  useEffect(() => {
+    const items = transactions.map((item) => ({
+      label: item.label ?? "N/A",
+      quantity: item.quantity ?? 0,
+      price: item.price ?? 0,
+      amount: (item.quantity ?? 0) * (item.price ?? 0),
+    }));
+
+    const isSame = JSON.stringify(particulars) === JSON.stringify(items);
+
+    if (!isSame) {
+      setParticulars(items);
+    }
+  }, [transactions]);
 
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
@@ -96,11 +121,6 @@ const Expenses = () => {
       destinationKey: LOCAL_KEY_IMPORTANT,
       avoidDuplicates: true,
     });
-  };
-
-  // print toolbar
-  const handlePrint = () => {
-    console.log("Print clicked", selectedEntriesArray);
   };
 
   // delete selected row toolbar
@@ -158,7 +178,7 @@ const Expenses = () => {
                     size="sm"
                     className="custom-app-button no-hover"
                     variant="outline-primary"
-                    onClick={handlePrint}
+                    onClick={reactToPrintFn}
                   />
                   <AppButton
                     label={
@@ -206,7 +226,7 @@ const Expenses = () => {
       />
 
       <div style={{ display: "none" }}>
-        <ExpenseReport />
+        <ExpenseReport contentRef={contentRef} />
       </div>
     </div>
   );

@@ -28,26 +28,15 @@ const DataTable = ({
     data.forEach((entry) => {
       newSelection[entry.id] = checked;
     });
-    if (typeof onSelectionChange === "function") {
-      onSelectionChange(newSelection);
-    }
+    onSelectionChange?.(newSelection);
   };
 
   const handleRowCheck = (entryId) => {
     const updated = { ...selectedRows, [entryId]: !selectedRows[entryId] };
-    if (typeof onSelectionChange === "function") {
-      onSelectionChange(updated);
-    }
+    onSelectionChange?.(updated);
   };
 
-  const handleDelete = (entryToDelete) => {
-    if (typeof onDelete === "function") {
-      onDelete(entryToDelete);
-    }
-  };
-
-  const getSelectedEntries = (selection) =>
-    data.filter((entry) => selection[entry.id]);
+  const handleDelete = (entry) => onDelete?.(entry);
 
   const meatballItems = meatballActions({
     onDelete: handleDelete,
@@ -69,15 +58,24 @@ const DataTable = ({
                 />
               </th>
               {columns.map((col, index) => (
-                <th key={index} style={{ width: col.width || "auto" }}>
+                <th
+                  key={index}
+                  style={{ width: col.width || "auto" }}
+                  className={
+                    col.accessor === "price" || col.accessor === "quantity"
+                      ? "d-none"
+                      : ""
+                  }
+                >
                   {col.header}
                 </th>
               ))}
               <th style={{ width: "30px" }}></th>
             </tr>
           </thead>
+
           <tbody>
-            {data && data.length > 0 ? (
+            {data?.length > 0 ? (
               data.map((entry, index) => (
                 <tr
                   key={entry.id || index}
@@ -99,6 +97,11 @@ const DataTable = ({
                   {columns.map((col, colIndex) => (
                     <td
                       key={colIndex}
+                      className={
+                        col.accessor === "price" || col.accessor === "quantity"
+                          ? "d-none"
+                          : ""
+                      }
                       style={
                         col.accessor === "description"
                           ? {
@@ -126,11 +129,26 @@ const DataTable = ({
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}`
+                      ) : col.accessor === "quantity" ? (
+                        entry.transactions?.map((item, i) => (
+                          <div key={i}>{item.quantity}</div>
+                        ))
+                      ) : col.accessor === "price" ? (
+                        entry.transactions?.map((item, i) => (
+                          <div key={i}>
+                            ₱{" "}
+                            {parseFloat(item.price).toLocaleString("en-PH", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </div>
+                        ))
                       ) : (
                         entry[col.accessor] ?? ""
                       )}
                     </td>
                   ))}
+
                   <td onClick={(e) => e.stopPropagation()}>
                     <Dropdown
                       align="end"
