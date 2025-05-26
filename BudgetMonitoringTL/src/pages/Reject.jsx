@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Total from "../components/Total";
 import ToolBar from "../components/ToolBar";
 import DataTable from "../components/DataTable";
-import { mockData } from "../mock-data/mockData";
-import { columns } from "../mock-data/tableHeader";
+import { mockData } from "../handlers/mockData";
+import { columns } from "../handlers/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 
 const LOCAL_KEY_ACTIVE = "expensesData";

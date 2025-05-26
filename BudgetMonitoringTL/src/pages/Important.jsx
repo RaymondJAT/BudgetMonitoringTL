@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { importantColumns } from "../mock-data/columnHeaders";
+import { importantColumns } from "../handlers/columnHeaders";
 import EntryStates from "../components/EntryStates";
 import ToolBar from "../components/ToolBar";
 

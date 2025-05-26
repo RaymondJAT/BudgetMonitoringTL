@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Table } from "react-bootstrap";
 import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
-import { numberToWords } from "../js/numberToWords";
-import { mockData } from "../mock-data/mockData";
+import { numberToWords } from "../utils/numberToWords";
+import { mockData } from "../handlers/mockData";
 import PrintableCashRequest from "./PrintableCashRequest";
 import AppButton from "./AppButton";
 

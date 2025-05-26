@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import EntryStates from "../components/EntryStates";
 import ToolBar from "../components/ToolBar";
-import { archiveColumns } from "../mock-data/columnHeaders";
+import { archiveColumns } from "../handlers/columnHeaders";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";

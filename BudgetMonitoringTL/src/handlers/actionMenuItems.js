@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 
+// meatball menu
 export const meatballActions = ({ onDelete, onArchive, onToggleImportant }) => [
   {
     label: "Delete",
@@ -54,4 +55,21 @@ export const meatballActions = ({ onDelete, onArchive, onToggleImportant }) => [
     label: "Print",
     onClick: (entry) => console.log("Print", entry),
   },
+];
+
+// actions dropdown menu
+export const actionDropdownItems = (handlers) => [
+  { label: "Approve", onClick: handlers.handlePrint },
+  { label: "Reject", onClick: handlers.handleDelete },
+  { label: "Archive", onClick: handlers.handleArchive },
+  { label: "Mark as important", onClick: handlers.handleMarkImportant },
+  { label: "Export", onClick: handlers.handleExport },
+];
+
+// filter dropdown menu
+export const filterDropdownItems = (handleFilter) => [
+  { label: "A - Z", onClick: () => handleFilter("az") },
+  { label: "Z - A", onClick: () => handleFilter("za") },
+  { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
+  { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
 ];

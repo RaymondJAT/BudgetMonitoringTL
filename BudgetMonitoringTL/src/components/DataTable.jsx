@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, Form, Container, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
-import { meatballActions } from "../mock-data/meatballActions";
+import { meatballActions } from "../handlers/actionMenuItems";
 
 const DataTable = ({
   data,
@@ -10,7 +10,7 @@ const DataTable = ({
   onDelete,
   onArchive,
   onToggleImportant,
-  selectedRows = {}, // <-- from parent
+  selectedRows = {},
   onSelectionChange,
 }) => {
   const [allSelected, setAllSelected] = useState(false);
@@ -109,7 +109,7 @@ const DataTable = ({
                             }
                           : {}
                       }
-                      onClick={() => onRowClick(entry)} // Move the onClick here
+                      onClick={() => onRowClick(entry)}
                     >
                       {col.accessor === "status" ? (
                         <span

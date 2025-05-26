@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, Container } from "react-bootstrap";
-import { numberToWords } from "../js/numberToWords";
-import { mockData } from "../mock-data/mockData";
+import { numberToWords } from "../utils/numberToWords";
+import { mockData } from "../handlers/mockData";
 
 const DataTables = ({ employeeName, setAmountInWords, setParticulars }) => {
   // Find transactions for the selected employee, default to empty array if not found

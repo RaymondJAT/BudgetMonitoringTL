@@ -1,12 +1,12 @@
 import { Container } from "react-bootstrap";
-import SearchBar from "./SearchBar";
-import AppButton from "./AppButton";
 import { FaFilter } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import {
   actionDropdownItems,
   filterDropdownItems,
-} from "../mock-data/toolbarActions";
+} from "../handlers/actionMenuItems";
+import SearchBar from "./SearchBar";
+import AppButton from "./AppButton";
 
 const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
   const handleApprove = () => console.log("Approve clicked");
@@ -25,12 +25,12 @@ const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
         marginTop: "1rem",
       }}
     >
-      {/* Left content (Print and Delete buttons) */}
+      {/* print & delete button */}
       <div className="d-flex align-items-center" style={{ gap: "10px" }}>
         {leftContent}
       </div>
 
-      {/* Right content (existing toolbar items) */}
+      {/* actions, filter, search bar */}
       <div className="d-flex align-items-center" style={{ gap: "10px" }}>
         <AppButton
           isDropdown
