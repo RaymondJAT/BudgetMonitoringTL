@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { mockData } from "../handlers/mockData";
 import { columns } from "../handlers/tableHeader";
 import { moveEntries } from "../utils/entryActions";
+import { printData } from "../utils/printData";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
 import Total from "../components/layout/Total";
@@ -53,13 +54,7 @@ const Reject = () => {
   }, [tableData]);
 
   useEffect(() => {
-    const items = transactions.map((item) => ({
-      label: item.label ?? "N/A",
-      quantity: item.quantity ?? 0,
-      price: item.price ?? 0,
-      amount: (item.quantity ?? 0) * (item.price ?? 0),
-    }));
-
+    const items = printData(transactions);
     const isSame = JSON.stringify(particulars) === JSON.stringify(items);
 
     if (!isSame) {

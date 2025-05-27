@@ -5,6 +5,7 @@ import { columns } from "../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
 import { moveEntries } from "../utils/entryActions";
+import { printData } from "../utils/printData";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
 import DataTable from "../components/layout/DataTable";
@@ -53,13 +54,7 @@ const Approval = () => {
   }, [tableData]);
 
   useEffect(() => {
-    const items = transactions.map((item) => ({
-      label: item.label ?? "N/A",
-      quantity: item.quantity ?? 0,
-      price: item.price ?? 0,
-      amount: (item.quantity ?? 0) * (item.price ?? 0),
-    }));
-
+    const items = printData(transactions);
     const isSame = JSON.stringify(particulars) === JSON.stringify(items);
 
     if (!isSame) {
