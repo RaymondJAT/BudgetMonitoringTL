@@ -87,10 +87,6 @@ const Expenses = () => {
     )
   );
 
-  const getSelectedEntriesArray = () =>
-    filteredData.filter((entry) => selectedRows[entry.id]);
-  const selectedEntriesArray = getSelectedEntriesArray();
-
   // delete meatball action
   const handleDelete = (entryToDelete) => {
     moveEntries({

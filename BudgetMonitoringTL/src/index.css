@@ -101,6 +101,34 @@ body {
   font-size: 0.95rem;
 }
 
+/* FLOATING MENU */
+.floating-dropdown {
+  position: fixed;
+  border-radius: 5px;
+  z-index: 9999;
+  min-width: 150px;
+  animation: fadeIn 0.1s ease-in-out;
+}
+
+.floating-dropdown .dropdown-item {
+  font-size: 0.75rem;
+}
+
+.floating-dropdown .dropdown-item:hover {
+  background-color: #f8d7da;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* HEADER */
 .main-header {
   background-color: #fff;

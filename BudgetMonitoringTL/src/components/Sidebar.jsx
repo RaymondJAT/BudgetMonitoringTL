@@ -1,30 +1,83 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { navItems } from "../handlers/navLinks";
 
 const Sidebar = ({ isSidebarOpen }) => {
   const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const sidebarRef = useRef(null);
+  const dropdownRef = useRef(null);
 
-  const toggleDropdown = (label) => {
+  const toggleDropdown = (e, label) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDropdownPosition({ top: rect.top, left: rect.right + 4 });
     setOpenDropdown(openDropdown === label ? null : label);
   };
 
-  // Close dropdowns when sidebar is collapsed
+  // close dropdowns when sidebar is collapsed
   useEffect(() => {
     if (!isSidebarOpen) {
       setOpenDropdown(null);
     }
   }, [isSidebarOpen]);
 
+  // close floating dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(e.target)
+      ) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const HeaderIcon = navItems[0].icon;
 
   return (
     <div
+      ref={sidebarRef}
       className={`sidebar d-flex flex-column vh-100 py-2 bg-light border-end ${
         isSidebarOpen ? "open" : "collapsed"
       }`}
     >
+      {!isSidebarOpen && openDropdown && (
+        <div
+          ref={dropdownRef}
+          className="floating-dropdown bg-white border shadow-sm"
+          style={{
+            position: "fixed",
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            zIndex: 9999,
+            minWidth: "150px",
+          }}
+        >
+          {navItems
+            .find((item) => item.label === openDropdown)
+            ?.children.map((child) => (
+              <div
+                key={child.label}
+                className="dropdown-item px-3 py-2"
+                onClick={() => {
+                  navigate(child.path);
+                  setOpenDropdown(null);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                {child.label}
+              </div>
+            ))}
+        </div>
+      )}
+
       <div className="sidebar-header px-3 py-2 d-flex align-items-center">
         <span className="nav-icon">
           <HeaderIcon />
@@ -39,8 +92,10 @@ const Sidebar = ({ isSidebarOpen }) => {
           <div key={item.label}>
             <div
               className="nav-item d-flex align-items-center justify-content-between px-3 py-2"
-              onClick={() =>
-                item.children ? toggleDropdown(item.label) : navigate(item.path)
+              onClick={(e) =>
+                item.children
+                  ? toggleDropdown(e, item.label)
+                  : navigate(item.path)
               }
               style={{ cursor: "pointer" }}
             >

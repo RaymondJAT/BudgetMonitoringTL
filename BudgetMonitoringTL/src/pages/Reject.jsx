@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { mockData } from "../handlers/mockData";
+import { columns } from "../handlers/tableHeader";
+import { moveEntries } from "../utils/entryActions";
+import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import Total from "../components/Total";
 import ToolBar from "../components/ToolBar";
 import DataTable from "../components/DataTable";
-import { mockData } from "../handlers/mockData";
-import { columns } from "../handlers/tableHeader";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
+import AppButton from "../components/AppButton";
+import Swal from "sweetalert2";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_ARCHIVE = "archiveData";
@@ -14,8 +18,8 @@ const LOCAL_KEY_TRASH = "trashData";
 
 const Reject = () => {
   const [searchValue, setSearchValue] = useState("");
-  const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
+  const navigate = useNavigate();
 
   const archiveData = JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
   const importantData =
@@ -39,52 +43,6 @@ const Reject = () => {
     navigate("/approval-form", { state: entry });
   };
 
-  const handleDelete = async (entryToDelete) => {
-    try {
-      const updatedData = tableData.filter((e) => e.id !== entryToDelete.id);
-      setTableData(updatedData);
-
-      const deletedEntry = { ...entryToDelete, status: "Deleted" };
-
-      const currentTrash =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
-      const newTrash = [...currentTrash, deletedEntry];
-      localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(newTrash));
-    } catch (error) {
-      console.error("Failed to delete entry:", error);
-    }
-  };
-
-  const handleArchive = async (entryToArchive) => {
-    try {
-      const updatedData = tableData.filter((e) => e.id !== entryToArchive.id);
-      setTableData(updatedData);
-
-      const currentArchive =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
-      const newArchive = [...currentArchive, entryToArchive];
-      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(newArchive));
-    } catch (error) {
-      console.error("Failed to archive entry:", error);
-    }
-  };
-
-  const handleToggleImportant = async (entryToImportant) => {
-    const updatedData = tableData.filter((e) => e.id !== entryToImportant.id);
-    setTableData(updatedData);
-
-    const currentImportant =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
-
-    const newImportant = currentImportant.some(
-      (item) => item.id === entryToImportant.id
-    )
-      ? currentImportant
-      : [...currentImportant, entryToImportant];
-
-    localStorage.setItem(LOCAL_KEY_IMPORTANT, JSON.stringify(newImportant));
-  };
-
   const normalize = (value) =>
     String(value || "")
       .toLowerCase()
@@ -98,10 +56,83 @@ const Reject = () => {
     )
   );
 
+  const handleDelete = (entryToDelete) => {
+    moveEntries({
+      entriesToMove: [{ ...entryToDelete, status: "Deleted" }],
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEY_TRASH,
+      avoidDuplicates: true,
+    });
+  };
+
+  const handleArchive = (entryToArchive) => {
+    moveEntries({
+      entriesToMove: [entryToArchive],
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEY_ARCHIVE,
+      avoidDuplicates: true,
+    });
+  };
+
+  const handleToggleImportant = (entryToImportant) => {
+    moveEntries({
+      entriesToMove: [entryToImportant],
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEY_IMPORTANT,
+      avoidDuplicates: true,
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedCount < 1) return;
+
+    Swal.fire({
+      title: `Delete ${selectedCount} selected entr${
+        selectedCount === 1 ? "y" : "ies"
+      }?`,
+      text: "This will move them to Trash. Continue?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete",
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      const deletedEntries = tableData
+        .filter((entry) => seletedRows[entry.id])
+        .map((entry) => ({ ...entry, status: "Deleted" }));
+
+      moveEntries({
+        entriesToMove: deletedEntries,
+        sourceData: tableData,
+        setSourceData: setTableData,
+        destinationKey: LOCAL_KEY_TRASH,
+        avoidDuplicates: true,
+      });
+
+      setSelecetedRows({});
+      Swal.fire("Deleted!", "Entries moved to Trash.", "success");
+    });
+  };
+
   return (
     <div>
       <Total data={totalComputationData} />
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+      <ToolBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        leftContent={
+          selectedCount > 0 && (
+            <>
+              <AppButton label={<></>} />
+            </>
+          )
+        }
+      />
       <DataTable
         data={filteredData}
         columns={columns}
