@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { trashColumns } from "../handlers/columnHeaders";
 import Swal from "sweetalert2";
-import ToolBar from "../components/ToolBar";
-import EntryStates from "../components/EntryStates";
+import ToolBar from "../components/layout/ToolBar";
+import EntryStates from "../components/layout/EntryStates";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";

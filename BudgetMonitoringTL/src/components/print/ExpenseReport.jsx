@@ -1,5 +1,5 @@
 import { Row, Col, Container, Table, Image } from "react-bootstrap";
-import logo from "../assets/logo5L.png";
+import logo from "../../assets/logo5L.png";
 
 const ExpenseReport = ({ data, contentRef }) => {
   const particulars =

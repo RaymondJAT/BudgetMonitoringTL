@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Table, Form } from "react-bootstrap";
-import AppButton from "../components/AppButton";
+import AppButton from "../ui/AppButton";
 
 const EntryStates = ({
   columns,

@@ -5,12 +5,12 @@ import { columns } from "../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { moveEntries } from "../utils/entryActions";
 import { useReactToPrint } from "react-to-print";
-import DataTable from "../components/DataTable";
-import Total from "../components/Total";
-import ToolBar from "../components/ToolBar";
+import DataTable from "../components/layout/DataTable";
+import Total from "../components/layout/Total";
+import ToolBar from "../components/layout/ToolBar";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
-import ExpenseReport from "../components/ExpenseReport";
-import AppButton from "../components/AppButton";
+import ExpenseReport from "../components/print/ExpenseReport";
+import AppButton from "../components/ui/AppButton";
 import Swal from "sweetalert2";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
@@ -29,12 +29,13 @@ const Expenses = () => {
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
-
+  const pendingData = tableData.filter(
+    (item) => item.status !== "Approved" && item.status !== "Rejected"
+  );
   const archiveData = JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
   const importantData =
     JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
   const totalComputationData = [...tableData, ...archiveData, ...importantData];
-
   const employeeData = mockData.find((e) => e.employee === data?.employee) || {
     transactions: [],
   };
@@ -76,10 +77,6 @@ const Expenses = () => {
     String(value || "")
       .toLowerCase()
       .trim();
-
-  const pendingData = tableData.filter(
-    (item) => item.status !== "Approved" && item.status !== "Rejected"
-  );
 
   const filteredData = pendingData.filter((item) =>
     columns.some((col) =>
@@ -172,8 +169,8 @@ const Expenses = () => {
                       </>
                     }
                     size="sm"
-                    className="custom-app-button no-hover"
-                    variant="outline-primary"
+                    className="custom-app-button"
+                    variant="outline-dark"
                     onClick={reactToPrintFn}
                   />
                   <AppButton
@@ -184,7 +181,7 @@ const Expenses = () => {
                       </>
                     }
                     size="sm"
-                    className="custom-app-button no-hover"
+                    className="custom-app-button"
                     variant="outline-danger"
                     onClick={handleDeleteSelected}
                   />
@@ -200,7 +197,7 @@ const Expenses = () => {
                     </>
                   }
                   size="sm"
-                  className="custom-app-button no-hover"
+                  className="custom-app-button"
                   variant="outline-danger"
                   onClick={handleDeleteSelected}
                 />

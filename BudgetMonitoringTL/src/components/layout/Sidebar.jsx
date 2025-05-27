@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { navItems } from "../handlers/navLinks";
+import { navItems } from "../../handlers/navLinks";
 
 const Sidebar = ({ isSidebarOpen }) => {
   const navigate = useNavigate();

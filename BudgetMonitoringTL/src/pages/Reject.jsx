@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { mockData } from "../handlers/mockData";
 import { columns } from "../handlers/tableHeader";
 import { moveEntries } from "../utils/entryActions";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
-import Total from "../components/Total";
-import ToolBar from "../components/ToolBar";
-import DataTable from "../components/DataTable";
+import { useReactToPrint } from "react-to-print";
+import Total from "../components/layout/Total";
+import ToolBar from "../components/layout/ToolBar";
+import DataTable from "../components/layout/DataTable";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
-import AppButton from "../components/AppButton";
+import ExpenseReport from "../components/print/ExpenseReport";
+import AppButton from "../components/ui/AppButton";
 import Swal from "sweetalert2";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
@@ -18,13 +20,24 @@ const LOCAL_KEY_TRASH = "trashData";
 
 const Reject = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [selectedRows, setSelectedRows] = useState({});
   const [tableData, setTableData] = useState([]);
+  const [particulars, setParticulars] = useState([]);
+  const { state: data } = useLocation();
   const navigate = useNavigate();
+  const contentRef = useRef(null);
+  const reactToPrintFn = useReactToPrint({ contentRef });
 
+  const selectedCount = Object.values(selectedRows).filter(Boolean).length;
+  const rejectedData = tableData.filter((item) => item.status === "Rejected");
   const archiveData = JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
   const importantData =
     JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
   const totalComputationData = [...tableData, ...archiveData, ...importantData];
+  const employeeData = mockData.find((e) => e.employee === data?.employee) || {
+    transactions: [],
+  };
+  const transactions = employeeData.transactions;
 
   useExpenseDataLoader({
     setTableData,
@@ -39,6 +52,21 @@ const Reject = () => {
     localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
 
+  useEffect(() => {
+    const items = transactions.map((item) => ({
+      label: item.label ?? "N/A",
+      quantity: item.quantity ?? 0,
+      price: item.price ?? 0,
+      amount: (item.quantity ?? 0) * (item.price ?? 0),
+    }));
+
+    const isSame = JSON.stringify(particulars) === JSON.stringify(items);
+
+    if (!isSame) {
+      setParticulars(items);
+    }
+  }, [transactions]);
+
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
   };
@@ -47,8 +75,6 @@ const Reject = () => {
     String(value || "")
       .toLowerCase()
       .trim();
-
-  const rejectedData = tableData.filter((item) => item.status === "Rejected");
 
   const filteredData = rejectedData.filter((item) =>
     columns.some((col) =>
@@ -103,7 +129,7 @@ const Reject = () => {
       if (!result.isConfirmed) return;
 
       const deletedEntries = tableData
-        .filter((entry) => seletedRows[entry.id])
+        .filter((entry) => selectedRows[entry.id])
         .map((entry) => ({ ...entry, status: "Deleted" }));
 
       moveEntries({
@@ -114,7 +140,7 @@ const Reject = () => {
         avoidDuplicates: true,
       });
 
-      setSelecetedRows({});
+      setSelectedRows({});
       Swal.fire("Deleted!", "Entries moved to Trash.", "success");
     });
   };
@@ -128,11 +154,53 @@ const Reject = () => {
         leftContent={
           selectedCount > 0 && (
             <>
-              <AppButton label={<></>} />
+              {selectedCount === 1 && (
+                <>
+                  <AppButton
+                    label={
+                      <>
+                        <MdLocalPrintshop style={{ marginRight: "5px" }} />
+                        Print
+                      </>
+                    }
+                    size="sm"
+                    className="custom-app-button no-hover"
+                    variant="outline-primary"
+                    onClick={reactToPrintFn}
+                  />
+                  <AppButton
+                    label={
+                      <>
+                        <MdDelete style={{ marginRight: "5px" }} />
+                        Delete
+                      </>
+                    }
+                    size="sm"
+                    className="custom-app-button no-hover"
+                    variant="outline-danger"
+                    onClick={handleDeleteSelected}
+                  />
+                </>
+              )}
+              {selectedCount > 1 && (
+                <AppButton
+                  label={
+                    <>
+                      <MdDelete style={{ marginRight: "5px" }} />
+                      Delete
+                    </>
+                  }
+                  size="sm"
+                  className="custom-app-button no-hover"
+                  variant="outline-danger"
+                  onClick={handleDeleteSelected}
+                />
+              )}
             </>
           )
         }
       />
+
       <DataTable
         data={filteredData}
         columns={columns}
@@ -140,7 +208,13 @@ const Reject = () => {
         onDelete={handleDelete}
         onArchive={handleArchive}
         onToggleImportant={handleToggleImportant}
+        selectedRows={selectedRows}
+        onSelectionChange={setSelectedRows}
       />
+
+      <div style={{ display: "none" }}>
+        <ExpenseReport contentRef={contentRef} />
+      </div>
     </div>
   );
 };

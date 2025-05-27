@@ -4,9 +4,9 @@ import { IoMdSettings } from "react-icons/io";
 import {
   actionDropdownItems,
   filterDropdownItems,
-} from "../handlers/actionMenuItems";
-import SearchBar from "./SearchBar";
-import AppButton from "./AppButton";
+} from "../../handlers/actionMenuItems";
+import SearchBar from "../ui/SearchBar";
+import AppButton from "../ui/AppButton";
 
 const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
   const handleApprove = () => console.log("Approve clicked");
@@ -40,7 +40,7 @@ const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
               Actions
             </>
           }
-          variant="secondary"
+          variant="outline-dark"
           size="sm"
           className="custom-app-button"
           dropdownItems={actionDropdownItems({
@@ -58,7 +58,7 @@ const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
               Filter
             </>
           }
-          variant="info"
+          variant="outline-dark"
           size="sm"
           className="custom-app-button"
           dropdownItems={filterDropdownItems(handleFilter)}

@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Table } from "react-bootstrap";
 import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
-import { numberToWords } from "../utils/numberToWords";
-import { mockData } from "../handlers/mockData";
-import PrintableCashRequest from "./PrintableCashRequest";
-import AppButton from "./AppButton";
+import { numberToWords } from "../../utils/numberToWords";
+import { mockData } from "../../handlers/mockData";
+import PrintableCashRequest from "../print/PrintableCashRequest";
+import AppButton from "../ui/AppButton";
 
 const ApprovalForm = () => {
   const [amountInWords, setAmountInWords] = useState("");
@@ -30,7 +30,7 @@ const ApprovalForm = () => {
     { label: "Team Lead", key: "teamLead" },
   ];
 
-  // DataTables logic
+  // DataTable logic
   const employeeData = mockData.find((e) => e.employee === data?.employee) || {
     transactions: [],
   };
@@ -176,7 +176,7 @@ const ApprovalForm = () => {
           </Row>
         </div>
 
-        {/* Table (was DataTables) */}
+        {/* Table */}
         <Table responsive className="custom-table ">
           <thead className="tableHead text-center">
             <tr>

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import EntryStates from "../components/EntryStates";
-import ToolBar from "../components/ToolBar";
 import { archiveColumns } from "../handlers/columnHeaders";
+import Swal from "sweetalert2";
+import EntryStates from "../components/layout/EntryStates";
+import ToolBar from "../components/layout/ToolBar";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
