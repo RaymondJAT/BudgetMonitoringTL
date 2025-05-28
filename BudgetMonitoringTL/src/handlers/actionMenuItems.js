@@ -59,17 +59,21 @@ export const meatballActions = ({ onDelete, onArchive, onToggleImportant }) => [
 
 // actions dropdown menu
 export const actionDropdownItems = (handlers) => [
-  { label: "Approve", onClick: handlers.handlePrint },
-  { label: "Reject", onClick: handlers.handleDelete },
-  { label: "Archive", onClick: handlers.handleArchive },
-  { label: "Mark as important", onClick: handlers.handleMarkImportant },
   { label: "Export", onClick: handlers.handleExport },
+  { label: "Insert in spreadsheet", onClick: handlers.handleInsert },
+  { label: "Duplicate", onClick: handlers.handleDuplicate },
 ];
 
 // filter dropdown menu
 export const filterDropdownItems = (handleFilter) => [
-  { label: "A - Z", onClick: () => handleFilter("az") },
-  { label: "Z - A", onClick: () => handleFilter("za") },
+  {
+    label: "Custom Range (Date Picker)",
+    onClick: () => handleFilter("custom"),
+  },
+
+  { type: "divider" },
+
+  { label: "Sort by:", type: "header" },
   { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
   { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
 ];

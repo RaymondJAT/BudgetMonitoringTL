@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { trashColumns } from "../handlers/columnHeaders";
+import { MdRestore } from "react-icons/md";
 import Swal from "sweetalert2";
 import ToolBar from "../components/layout/ToolBar";
 import EntryStates from "../components/layout/EntryStates";
+import AppButton from "../components/ui/AppButton";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -11,6 +13,7 @@ const LOCAL_KEY_TRASH = "trashData";
 const Trash = () => {
   const [trashItems, setTrashItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,6 +56,41 @@ const Trash = () => {
     localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
   };
 
+  const handleRestoreSelected = async () => {
+    const result = await Swal.fire({
+      title: "Restore Entries?",
+      text: "Selected entries will be moved back to Active.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, restore them",
+    });
+
+    if (result.isConfirmed) {
+      const updatedTrash = trashItems.filter(
+        (item) => !selectedItems.includes(item.id)
+      );
+      const restoredItems = trashItems.filter((item) =>
+        selectedItems.includes(item.id)
+      );
+
+      setTrashItems(updatedTrash);
+      localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
+
+      const currentActive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
+      const newActive = [...currentActive, ...restoredItems];
+      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
+
+      setSelectedItems([]);
+
+      Swal.fire(
+        "Restored!",
+        "Selected entries were moved to Active.",
+        "success"
+      );
+    }
+  };
+
   const filteredItems = Array.isArray(trashItems)
     ? trashItems.filter((item) =>
         Object.values(item).some((value) =>
@@ -61,9 +99,31 @@ const Trash = () => {
       )
     : [];
 
+  const selectedCount = selectedItems.length;
+
   return (
     <div>
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+      <ToolBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        leftContent={
+          selectedCount >= 2 && (
+            <AppButton
+              label={
+                <>
+                  <MdRestore style={{ marginRight: "5px" }} />
+                  Restore All
+                </>
+              }
+              size="sm"
+              className="custom-app-button"
+              variant="outline-success"
+              onClick={handleRestoreSelected}
+            />
+          )
+        }
+      />
+
       <EntryStates
         columns={trashColumns}
         items={filteredItems}
@@ -73,6 +133,8 @@ const Trash = () => {
         showDelete={true}
         onRestore={handleRestore}
         onDelete={handlePermanentDelete}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
       />
     </div>
   );

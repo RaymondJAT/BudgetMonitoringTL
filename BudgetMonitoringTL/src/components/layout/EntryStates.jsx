@@ -10,9 +10,10 @@ const EntryStates = ({
   showDelete = false,
   onRestore,
   onDelete,
+  selectedItems = [],
+  setSelectedItems = () => {},
 }) => {
   const [selectedRows, setSelectedRows] = useState({});
-  const [allSelected, setAllSelected] = useState(false);
 
   useEffect(() => {
     const initialSelection = {};
@@ -20,23 +21,22 @@ const EntryStates = ({
       initialSelection[item.id] = false;
     });
     setSelectedRows(initialSelection);
-    setAllSelected(false);
   }, [items]);
 
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
-    const newSelection = {};
-    Object.keys(selectedRows).forEach((id) => {
-      newSelection[id] = checked;
-    });
-    setSelectedRows(newSelection);
-    setAllSelected(checked);
+    const newSelected = checked ? items.map((item) => item.id) : [];
+    setSelectedItems(newSelected);
   };
 
   const handleRowCheck = (id) => {
-    const updated = { ...selectedRows, [id]: !selectedRows[id] };
-    setSelectedRows(updated);
-    setAllSelected(Object.values(updated).every(Boolean));
+    let newSelected = [];
+    if (selectedItems.includes(id)) {
+      newSelected = selectedItems.filter((itemId) => itemId !== id);
+    } else {
+      newSelected = [...selectedItems, id];
+    }
+    setSelectedItems(newSelected);
   };
 
   return (
@@ -48,7 +48,9 @@ const EntryStates = ({
               <th>
                 <Form.Check
                   type="checkbox"
-                  checked={allSelected}
+                  checked={
+                    selectedItems.length === items.length && items.length > 0
+                  }
                   onChange={handleSelectAll}
                 />
               </th>
@@ -65,7 +67,7 @@ const EntryStates = ({
                   key={entry.id}
                   onClick={() => onRowClick(entry)}
                   className={`clickable-row ${
-                    selectedRows[entry.id] ? "highlighted-row" : ""
+                    selectedItems.includes(entry.id) ? "highlighted-row" : ""
                   }`}
                 >
                   <td
@@ -74,7 +76,7 @@ const EntryStates = ({
                   >
                     <Form.Check
                       type="checkbox"
-                      checked={selectedRows[entry.id] || false}
+                      checked={selectedItems.includes(entry.id)}
                       onChange={() => handleRowCheck(entry.id)}
                     />
                   </td>
