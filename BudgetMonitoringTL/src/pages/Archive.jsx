@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { archiveColumns } from "../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
+import { restoreItems } from "../utils/restoreItems";
 import Swal from "sweetalert2";
 import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
 import AppButton from "../components/ui/AppButton";
+import { restoreSingleEntry } from "../utils/restoreSingleItem";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -29,29 +31,14 @@ const Archive = () => {
     setArchiveItems(filteredArchive);
   }, []);
 
-  const handleRestore = async (entryToRestore) => {
-    const result = await Swal.fire({
-      title: "Restore Entry?",
-      text: "This entry will be moved back to Active.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, restore it",
+  const handleRestore = () => {
+    restoreSingleEntry({
+      entryToRestore,
+      sourceItems: archiveItems,
+      setSourceItems: setArchiveItems,
+      localKeySource: LOCAL_KEY_ARCHIVE,
+      localKeyActive: LOCAL_KEY_ACTIVE,
     });
-
-    if (result.isConfirmed) {
-      const updatedArchive = archiveItems.filter(
-        (item) => item.id !== entryToRestore.id
-      );
-      setArchiveItems(updatedArchive);
-      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
-
-      const currentActive =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
-      const newActive = [...currentActive, entryToRestore];
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
-
-      Swal.fire("Restored!", "The entry has been moved to Active.", "success");
-    }
   };
 
   const handleDelete = async (entryToDelete) => {
@@ -79,39 +66,15 @@ const Archive = () => {
     }
   };
 
-  const handleRestoreSelected = async () => {
-    const result = await Swal.fire({
-      title: "Restore Entries?",
-      text: "Selected entries will be moved back to Active.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, restore them",
+  const handleRestoreSelected = () => {
+    restoreItems({
+      sourceItems: archiveItems,
+      setSourceItems: setArchiveItems,
+      localKeySource: LOCAL_KEY_ARCHIVE,
+      selectedItems,
+      setSelectedItems,
+      localKeyActive: LOCAL_KEY_ACTIVE,
     });
-
-    if (result.isConfirmed) {
-      const updatedArchive = archiveItems.filter(
-        (item) => !selectedItems.includes(item.id)
-      );
-      const restoredItems = archiveItems.filter((item) =>
-        selectedItems.includes(item.id)
-      );
-
-      setArchiveItems(updatedArchive);
-      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
-
-      const currentActive =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
-      const newActive = [...currentActive, ...restoredItems];
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
-
-      setSelectedItems([]);
-
-      Swal.fire(
-        "Restored!",
-        "Selected entries were moved to Active.",
-        "success"
-      );
-    }
   };
 
   const handleRowClick = (entry) => {

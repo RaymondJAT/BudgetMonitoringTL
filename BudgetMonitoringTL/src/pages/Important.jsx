@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { importantColumns } from "../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
+import { restoreItems } from "../utils/restoreItems";
 import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
 import AppButton from "../components/ui/AppButton";
 import Swal from "sweetalert2";
+import { restoreSingleEntry } from "../utils/restoreSingleItem";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_IMPORTANT = "importantData";
@@ -23,70 +25,25 @@ const Important = () => {
     setImportantItems(storedImportant);
   }, []);
 
-  const handleRestore = async (entryToRestore) => {
-    const result = await Swal.fire({
-      title: "Restore Entry?",
-      text: "This entry will be moved back to Active.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, restore it",
+  const handleRestore = () => {
+    restoreSingleEntry({
+      entryToRestore,
+      sourceItems: importantItems,
+      setSourceItems: setImportantItems,
+      localKeySource: LOCAL_KEY_IMPORTANT,
+      localKeyActive: LOCAL_KEY_ACTIVE,
     });
-
-    if (result.isConfirmed) {
-      const updatedImportant = importantItems.filter(
-        (item) => item.id !== entryToRestore.id
-      );
-      setImportantItems(updatedImportant);
-      localStorage.setItem(
-        LOCAL_KEY_IMPORTANT,
-        JSON.stringify(updatedImportant)
-      );
-
-      const currentActive =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
-      const newActive = [...currentActive, entryToRestore];
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
-
-      Swal.fire("Restored!", "The entry has been moved to Active.", "success");
-    }
   };
 
-  const handleRestoreSelected = async () => {
-    const result = await Swal.fire({
-      title: "Restore Entries?",
-      text: "Selected entries will be moved back to Active.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, restore them",
+  const handleRestoreSelected = () => {
+    restoreItems({
+      sourceItems: importantItems,
+      setSourceItems: setImportantItems,
+      localKeySource: LOCAL_KEY_IMPORTANT,
+      selectedItems,
+      setSelectedItems,
+      localKeyActive: LOCAL_KEY_ACTIVE,
     });
-
-    if (result.isConfirmed) {
-      const updatedImportant = importantItems.filter(
-        (item) => !selectedItems.includes(item.id)
-      );
-      const restoredItems = importantItems.filter((item) =>
-        selectedItems.includes(item.id)
-      );
-
-      setImportantItems(updatedImportant);
-      localStorage.setItem(
-        LOCAL_KEY_IMPORTANT,
-        JSON.stringify(updatedImportant)
-      );
-
-      const currentActive =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
-      const newActive = [...currentActive, ...restoredItems];
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
-
-      setSelectedItems([]);
-
-      Swal.fire(
-        "Restored!",
-        "Selected entries were moved to Active.",
-        "success"
-      );
-    }
   };
 
   const handleDelete = async (entryToDelete) => {

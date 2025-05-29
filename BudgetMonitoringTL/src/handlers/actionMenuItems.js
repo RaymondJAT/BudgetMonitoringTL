@@ -51,10 +51,6 @@ export const meatballActions = ({ onDelete, onArchive, onToggleImportant }) => [
     label: "Change Status",
     onClick: (entry) => console.log("Change Status", entry),
   },
-  {
-    label: "Print",
-    onClick: (entry) => console.log("Print", entry),
-  },
 ];
 
 // actions dropdown menu

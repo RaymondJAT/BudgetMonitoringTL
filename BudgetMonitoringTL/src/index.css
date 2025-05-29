@@ -366,6 +366,21 @@ input[type="checkbox"]:checked {
   border-radius: 4px !important;
 }
 
+.custom-dropdown-menu {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  display: block !important;
+  pointer-events: none;
+}
+
+.custom-dropdown-menu.show {
+  max-height: 300px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
 /* MEATBALL MENU DataTable */
 .meat-dropdown {
   font-size: 0.75rem;

@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { trashColumns } from "../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
-import Swal from "sweetalert2";
+import { restoreItems } from "../utils/restoreItems";
 import ToolBar from "../components/layout/ToolBar";
 import EntryStates from "../components/layout/EntryStates";
 import AppButton from "../components/ui/AppButton";
+import Swal from "sweetalert2";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -56,39 +57,15 @@ const Trash = () => {
     localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
   };
 
-  const handleRestoreSelected = async () => {
-    const result = await Swal.fire({
-      title: "Restore Entries?",
-      text: "Selected entries will be moved back to Active.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, restore them",
+  const handleRestoreSelected = () => {
+    restoreItems({
+      sourceItems: trashItems,
+      setSourceItems: setTrashItems,
+      localKeySource: LOCAL_KEY_TRASH,
+      selectedItems,
+      setSelectedItems,
+      localKeyActive: LOCAL_KEY_ACTIVE,
     });
-
-    if (result.isConfirmed) {
-      const updatedTrash = trashItems.filter(
-        (item) => !selectedItems.includes(item.id)
-      );
-      const restoredItems = trashItems.filter((item) =>
-        selectedItems.includes(item.id)
-      );
-
-      setTrashItems(updatedTrash);
-      localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
-
-      const currentActive =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
-      const newActive = [...currentActive, ...restoredItems];
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
-
-      setSelectedItems([]);
-
-      Swal.fire(
-        "Restored!",
-        "Selected entries were moved to Active.",
-        "success"
-      );
-    }
   };
 
   const filteredItems = Array.isArray(trashItems)
