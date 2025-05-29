@@ -116,20 +116,22 @@ const Sidebar = ({ isSidebarOpen }) => {
 
             {item.children && isSidebarOpen && (
               <div
-                className={`dropdown-links ps-5 transition-container ${
+                className={`dropdown-wrapper ms-4 me-3 ${
                   openDropdown === item.label ? "open" : ""
                 }`}
               >
-                {item.children.map((child) => (
-                  <div
-                    key={child.label}
-                    className="nav-item py-1"
-                    onClick={() => navigate(child.path)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {child.label}
-                  </div>
-                ))}
+                <div className="dropdown-box my-2 p-2 rounded shadow-sm bg-white border">
+                  {item.children.map((child) => (
+                    <div
+                      key={child.label}
+                      className="nav-item py-1 px-2 rounded hover-bg"
+                      onClick={() => navigate(child.path)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {child.label}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

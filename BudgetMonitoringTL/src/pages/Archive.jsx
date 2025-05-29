@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { archiveColumns } from "../handlers/columnHeaders";
+import { MdRestore } from "react-icons/md";
 import Swal from "sweetalert2";
 import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
+import AppButton from "../components/ui/AppButton";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";
@@ -12,6 +14,7 @@ const LOCAL_KEY_ARCHIVE = "archiveData";
 const Archive = () => {
   const [archiveItems, setArchiveItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,6 +79,41 @@ const Archive = () => {
     }
   };
 
+  const handleRestoreSelected = async () => {
+    const result = await Swal.fire({
+      title: "Restore Entries?",
+      text: "Selected entries will be moved back to Active.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, restore them",
+    });
+
+    if (result.isConfirmed) {
+      const updatedArchive = archiveItems.filter(
+        (item) => !selectedItems.includes(item.id)
+      );
+      const restoredItems = archiveItems.filter((item) =>
+        selectedItems.includes(item.id)
+      );
+
+      setArchiveItems(updatedArchive);
+      localStorage.setItem(LOCAL_KEY_ARCHIVE, JSON.stringify(updatedArchive));
+
+      const currentActive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
+      const newActive = [...currentActive, ...restoredItems];
+      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
+
+      setSelectedItems([]);
+
+      Swal.fire(
+        "Restored!",
+        "Selected entries were moved to Active.",
+        "success"
+      );
+    }
+  };
+
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
   };
@@ -88,7 +126,26 @@ const Archive = () => {
 
   return (
     <div>
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+      <ToolBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        leftContent={
+          selectedItems.length >= 2 && (
+            <AppButton
+              label={
+                <>
+                  <MdRestore style={{ marginRight: "5px" }} />
+                  Restore All
+                </>
+              }
+              size="sm"
+              className="custom-app-button"
+              variant="outline-success"
+              onClick={handleRestoreSelected}
+            />
+          )
+        }
+      />
       <EntryStates
         columns={archiveColumns}
         items={filteredItems}
@@ -98,6 +155,8 @@ const Archive = () => {
         showDelete={true}
         onRestore={handleRestore}
         onDelete={handleDelete}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
       />
     </div>
   );

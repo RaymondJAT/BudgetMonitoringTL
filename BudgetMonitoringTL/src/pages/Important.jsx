@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
 import { importantColumns } from "../handlers/columnHeaders";
+import { MdRestore } from "react-icons/md";
 import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
+import AppButton from "../components/ui/AppButton";
+import Swal from "sweetalert2";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_IMPORTANT = "importantData";
@@ -12,6 +14,7 @@ const LOCAL_KEY_TRASH = "trashData";
 const Important = () => {
   const [searchValue, setSearchValue] = useState("");
   const [importantItems, setImportantItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +48,44 @@ const Important = () => {
       localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
 
       Swal.fire("Restored!", "The entry has been moved to Active.", "success");
+    }
+  };
+
+  const handleRestoreSelected = async () => {
+    const result = await Swal.fire({
+      title: "Restore Entries?",
+      text: "Selected entries will be moved back to Active.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, restore them",
+    });
+
+    if (result.isConfirmed) {
+      const updatedImportant = importantItems.filter(
+        (item) => !selectedItems.includes(item.id)
+      );
+      const restoredItems = importantItems.filter((item) =>
+        selectedItems.includes(item.id)
+      );
+
+      setImportantItems(updatedImportant);
+      localStorage.setItem(
+        LOCAL_KEY_IMPORTANT,
+        JSON.stringify(updatedImportant)
+      );
+
+      const currentActive =
+        JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
+      const newActive = [...currentActive, ...restoredItems];
+      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(newActive));
+
+      setSelectedItems([]);
+
+      Swal.fire(
+        "Restored!",
+        "Selected entries were moved to Active.",
+        "success"
+      );
     }
   };
 
@@ -88,7 +129,27 @@ const Important = () => {
 
   return (
     <div>
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+      <ToolBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        leftContent={
+          selectedItems.length >= 2 && (
+            <AppButton
+              label={
+                <>
+                  <MdRestore style={{ marginRight: "5px" }} />
+                  Restore All
+                </>
+              }
+              size="sm"
+              className="custom-app-button"
+              variant="outline-success"
+              onClick={handleRestoreSelected}
+            />
+          )
+        }
+      />
+
       <EntryStates
         columns={importantColumns}
         items={filteredItems}
@@ -98,6 +159,8 @@ const Important = () => {
         showDelete={true}
         onRestore={handleRestore}
         onDelete={handleDelete}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
       />
     </div>
   );
