@@ -21,35 +21,56 @@ const LOCAL_KEYS = {
   IMPORTANT: "importantData",
 };
 
+const STATUS = {
+  APPROVED: "Approved",
+  DELETED: "Deleted",
+};
+
+const PrintButton = ({ onClick }) => (
+  <AppButton
+    label={
+      <>
+        <MdLocalPrintshop style={{ marginRight: "5px" }} />
+        Print
+      </>
+    }
+    size="sm"
+    className="custom-app-button"
+    variant="outline-dark"
+    onClick={onClick}
+  />
+);
+
+const DeleteButton = ({ onClick }) => (
+  <AppButton
+    label={
+      <>
+        <MdDelete style={{ marginRight: "5px" }} />
+        Delete
+      </>
+    }
+    size="sm"
+    className="custom-app-button"
+    variant="outline-danger"
+    onClick={onClick}
+  />
+);
+
 const Approval = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
-  const [particulars, setParticulars] = useState([]);
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
+
   const approvedData = useMemo(
-    () => tableData.filter((item) => item.status === "Approved"),
+    () => tableData.filter((item) => item.status === STATUS.APPROVED),
     [tableData]
   );
-  const archiveData =
-    JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
-  const importantData =
-    JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-  const totalComputationData = [...tableData, ...archiveData, ...importantData];
-  const employeeData = useMemo(() => {
-    return (
-      mockData.find((e) => e.employee === data?.employee) || {
-        transactions: [],
-      }
-    );
-  }, [data?.employee]);
-
-  const transactions = employeeData.transactions;
 
   useExpenseDataLoader({
     setTableData,
@@ -64,60 +85,29 @@ const Approval = () => {
     localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
 
-  useEffect(() => {
-    const items = printData(transactions);
-    const isSame = JSON.stringify(particulars) === JSON.stringify(items);
-
-    if (!isSame) {
-      setParticulars(items);
-    }
-  }, [transactions]);
+  const filteredData = useMemo(() => {
+    const normalize = (value) =>
+      String(value || "")
+        .toLowerCase()
+        .trim();
+    return approvedData.filter((item) =>
+      columns.some((col) =>
+        normalize(item[col.accessor]).includes(normalize(searchValue))
+      )
+    );
+  }, [approvedData, searchValue]);
 
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
   };
 
-  const normalize = (value) =>
-    String(value || "")
-      .toLowerCase()
-      .trim();
-
-  const filteredData = useMemo(
-    () =>
-      approvedData.filter((item) =>
-        columns.some((col) =>
-          normalize(item[col.accessor]).includes(normalize(searchValue))
-        )
-      ),
-    [approvedData, searchValue]
-  );
-
-  const handleDelete = (entryToDelete) => {
+  const handleMoveEntry = (entry, destinationKey, statusUpdate = null) => {
     moveEntries({
-      entriesToMove: [{ ...entryToDelete, status: "Deleted" }],
+      entriesToMove: [entry],
       sourceData: tableData,
       setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.TRASH,
-      avoidDuplicates: true,
-    });
-  };
-
-  const handleArchive = (entryToArchive) => {
-    moveEntries({
-      entriesToMove: [entryToArchive],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.ARCHIVE,
-      avoidDuplicates: true,
-    });
-  };
-
-  const handleToggleImportant = (entryToImportant) => {
-    moveEntries({
-      entriesToMove: [entryToImportant],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.IMPORTANT,
+      destinationKey,
+      statusUpdate,
       avoidDuplicates: true,
     });
   };
@@ -128,7 +118,6 @@ const Approval = () => {
     const selectedEntries = filteredData.filter(
       (entry) => selectedRows[entry.id]
     );
-
     deleteItems({
       selectedEntries,
       sourceData: tableData,
@@ -137,6 +126,27 @@ const Approval = () => {
       setSelectedRows,
     });
   };
+
+  const employeeData = useMemo(() => {
+    return (
+      mockData.find((e) => e.employee === data?.employee) || {
+        transactions: [],
+      }
+    );
+  }, [data?.employee]);
+
+  const particulars = useMemo(
+    () => printData(employeeData.transactions),
+    [employeeData.transactions]
+  );
+
+  const totalComputationData = useMemo(() => {
+    const archiveData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
+    const importantData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
+    return [...tableData, ...archiveData, ...importantData];
+  }, [tableData]);
 
   return (
     <div>
@@ -149,46 +159,12 @@ const Approval = () => {
             <>
               {selectedCount === 1 && (
                 <>
-                  <AppButton
-                    label={
-                      <>
-                        <MdLocalPrintshop style={{ marginRight: "5px" }} />
-                        Print
-                      </>
-                    }
-                    size="sm"
-                    className="custom-app-button no-hover"
-                    variant="outline-primary"
-                    onClick={reactToPrintFn}
-                  />
-
-                  <AppButton
-                    label={
-                      <>
-                        <MdDelete style={{ marginRight: "5px" }} />
-                        Delete
-                      </>
-                    }
-                    size="sm"
-                    className="custom-app-button no-hover"
-                    variant="outline-danger"
-                    onClick={handleDeleteSelected}
-                  />
+                  <PrintButton onClick={reactToPrintFn} />
+                  <DeleteButton onClick={handleDeleteSelected} />
                 </>
               )}
               {selectedCount > 1 && (
-                <AppButton
-                  label={
-                    <>
-                      <MdDelete style={{ marginRight: "5px" }} />
-                      Delete
-                    </>
-                  }
-                  size="sm"
-                  className="custom-app-button no-hover"
-                  variant="outline-danger"
-                  onClick={handleDeleteSelected}
-                />
+                <DeleteButton onClick={handleDeleteSelected} />
               )}
             </>
           )
@@ -199,15 +175,18 @@ const Approval = () => {
         data={filteredData}
         columns={columns}
         onRowClick={handleRowClick}
-        onDelete={handleDelete}
-        onArchive={handleArchive}
-        onToggleImportant={handleToggleImportant}
+        onDelete={(entry) =>
+          handleMoveEntry(entry, LOCAL_KEYS.TRASH, STATUS.DELETED)
+        }
+        onArchive={(entry) => handleMoveEntry(entry, LOCAL_KEYS.ARCHIVE)}
+        onToggleImportant={(entry) =>
+          handleMoveEntry(entry, LOCAL_KEYS.IMPORTANT)
+        }
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
       />
-
       <div style={{ display: "none" }}>
-        <ExpenseReport contentRef={contentRef} />
+        <ExpenseReport contentRef={contentRef} particulars={particulars} />
       </div>
     </div>
   );

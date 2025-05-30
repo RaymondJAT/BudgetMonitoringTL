@@ -9,9 +9,11 @@ import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
 import AppButton from "../components/ui/AppButton";
 
-const LOCAL_KEY_ACTIVE = "expensesData";
-const LOCAL_KEY_TRASH = "trashData";
-const LOCAL_KEY_ARCHIVE = "archiveData";
+const LOCAL_KEYS = {
+  ACTIVE: "expensesData",
+  ARCHIVE: "archiveData",
+  TRASH: "trashData",
+};
 
 const Archive = () => {
   const [archiveItems, setArchiveItems] = useState([]);
@@ -21,8 +23,8 @@ const Archive = () => {
 
   useEffect(() => {
     const storedArchive =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
-    const trashData = JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
+    const trashData = JSON.parse(localStorage.getItem(LOCAL_KEYS.TRASH)) || [];
 
     const filteredArchive = storedArchive.filter(
       (item) => !trashData.find((trash) => trash.id === item.id)
@@ -36,8 +38,8 @@ const Archive = () => {
       entryToRestore,
       sourceItems: archiveItems,
       setSourceItems: setArchiveItems,
-      localKeySource: LOCAL_KEY_ARCHIVE,
-      localKeyActive: LOCAL_KEY_ACTIVE,
+      localKeySource: LOCAL_KEYS.ARCHIVE,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
@@ -46,8 +48,8 @@ const Archive = () => {
       entryToDelete,
       sourceItems: archiveItems,
       setSourceItems: setArchiveItems,
-      localKeySource: LOCAL_KEY_ARCHIVE,
-      localKeyTrash: LOCAL_KEY_TRASH,
+      localKeySource: LOCAL_KEYS.ARCHIVE,
+      localKeyTrash: LOCAL_KEYS.TRASH,
     });
   };
 
@@ -55,10 +57,10 @@ const Archive = () => {
     restoreItems({
       sourceItems: archiveItems,
       setSourceItems: setArchiveItems,
-      localKeySource: LOCAL_KEY_ARCHIVE,
+      localKeySource: LOCAL_KEYS.ARCHIVE,
       selectedItems,
       setSelectedItems,
-      localKeyActive: LOCAL_KEY_ACTIVE,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 

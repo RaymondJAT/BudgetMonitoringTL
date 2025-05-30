@@ -1,17 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { mockData } from "../handlers/mockData";
 import { columns } from "../handlers/tableHeader";
 import { moveEntries } from "../utils/entryActions";
 import { printData } from "../utils/printData";
+import { deleteItems } from "../utils/deleteItems";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
-import { deleteItems } from "../utils/deleteItems";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
 import DataTable from "../components/layout/DataTable";
-import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 import ExpenseReport from "../components/print/ExpenseReport";
+import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 import AppButton from "../components/ui/AppButton";
 
 const LOCAL_KEYS = {
@@ -21,27 +21,51 @@ const LOCAL_KEYS = {
   IMPORTANT: "importantData",
 };
 
+const STATUS = {
+  REJECTED: "Rejected",
+  DELETED: "Deleted",
+};
+
+const PrintButton = ({ onClick }) => (
+  <AppButton
+    label={
+      <>
+        <MdLocalPrintshop style={{ marginRight: "5px" }} />
+        Print
+      </>
+    }
+    size="sm"
+    className="custom-app-button"
+    variant="outline-dark"
+    onClick={onClick}
+  />
+);
+
+const DeleteButton = ({ onClick }) => (
+  <AppButton
+    label={
+      <>
+        <MdDelete style={{ marginRight: "5px" }} />
+        Delete
+      </>
+    }
+    size="sm"
+    className="custom-app-button"
+    variant="outline-danger"
+    onClick={onClick}
+  />
+);
+
 const Reject = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [selectedRows, setSelectedRows] = useState({});
   const [tableData, setTableData] = useState([]);
-  const [particulars, setParticulars] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
-  const rejectedData = tableData.filter((item) => item.status === "Rejected");
-  const archiveData =
-    JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
-  const importantData =
-    JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-  const totalComputationData = [...tableData, ...archiveData, ...importantData];
-  const employeeData = mockData.find((e) => e.employee === data?.employee) || {
-    transactions: [],
-  };
-  const transactions = employeeData.transactions;
 
   useExpenseDataLoader({
     setTableData,
@@ -56,56 +80,34 @@ const Reject = () => {
     localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
 
-  useEffect(() => {
-    const items = printData(transactions);
-    const isSame = JSON.stringify(particulars) === JSON.stringify(items);
+  const rejectedData = useMemo(
+    () => tableData.filter((item) => item.status === STATUS.REJECTED),
+    [tableData]
+  );
 
-    if (!isSame) {
-      setParticulars(items);
-    }
-  }, [transactions]);
+  const filteredData = useMemo(() => {
+    const normalize = (value) =>
+      String(value || "")
+        .toLowerCase()
+        .trim();
+    return rejectedData.filter((item) =>
+      columns.some((col) =>
+        normalize(item[col.accessor]).includes(normalize(searchValue))
+      )
+    );
+  }, [rejectedData, searchValue]);
 
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
   };
 
-  const normalize = (value) =>
-    String(value || "")
-      .toLowerCase()
-      .trim();
-
-  const filteredData = rejectedData.filter((item) =>
-    columns.some((col) =>
-      normalize(item[col.accessor]).includes(normalize(searchValue))
-    )
-  );
-
-  const handleDelete = (entryToDelete) => {
+  const handleMoveEntry = (entry, destinationKey, statusUpdate = null) => {
     moveEntries({
-      entriesToMove: [{ ...entryToDelete, status: "Deleted" }],
+      entriesToMove: [entry],
       sourceData: tableData,
       setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.TRASH,
-      avoidDuplicates: true,
-    });
-  };
-
-  const handleArchive = (entryToArchive) => {
-    moveEntries({
-      entriesToMove: [entryToArchive],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.ARCHIVE,
-      avoidDuplicates: true,
-    });
-  };
-
-  const handleToggleImportant = (entryToImportant) => {
-    moveEntries({
-      entriesToMove: [entryToImportant],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.IMPORTANT,
+      destinationKey,
+      statusUpdate,
       avoidDuplicates: true,
     });
   };
@@ -126,6 +128,27 @@ const Reject = () => {
     });
   };
 
+  const employeeData = useMemo(() => {
+    return (
+      mockData.find((e) => e.employee === data?.employee) || {
+        transactions: [],
+      }
+    );
+  }, [data?.employee]);
+
+  const particulars = useMemo(
+    () => printData(employeeData.transactions),
+    [employeeData.transactions]
+  );
+
+  const totalComputationData = useMemo(() => {
+    const archiveData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
+    const importantData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
+    return [...tableData, ...archiveData, ...importantData];
+  }, [tableData]);
+
   return (
     <div>
       <Total data={totalComputationData} />
@@ -137,45 +160,12 @@ const Reject = () => {
             <>
               {selectedCount === 1 && (
                 <>
-                  <AppButton
-                    label={
-                      <>
-                        <MdLocalPrintshop style={{ marginRight: "5px" }} />
-                        Print
-                      </>
-                    }
-                    size="sm"
-                    className="custom-app-button no-hover"
-                    variant="outline-primary"
-                    onClick={reactToPrintFn}
-                  />
-                  <AppButton
-                    label={
-                      <>
-                        <MdDelete style={{ marginRight: "5px" }} />
-                        Delete
-                      </>
-                    }
-                    size="sm"
-                    className="custom-app-button no-hover"
-                    variant="outline-danger"
-                    onClick={handleDeleteSelected}
-                  />
+                  <PrintButton onClick={reactToPrintFn} />
+                  <DeleteButton onClick={handleDeleteSelected} />
                 </>
               )}
               {selectedCount > 1 && (
-                <AppButton
-                  label={
-                    <>
-                      <MdDelete style={{ marginRight: "5px" }} />
-                      Delete
-                    </>
-                  }
-                  size="sm"
-                  className="custom-app-button no-hover"
-                  variant="outline-danger"
-                  onClick={handleDeleteSelected}
-                />
+                <DeleteButton onClick={handleDeleteSelected} />
               )}
             </>
           )
@@ -186,15 +176,19 @@ const Reject = () => {
         data={filteredData}
         columns={columns}
         onRowClick={handleRowClick}
-        onDelete={handleDelete}
-        onArchive={handleArchive}
-        onToggleImportant={handleToggleImportant}
+        onDelete={(entry) =>
+          handleMoveEntry(entry, LOCAL_KEYS.TRASH, STATUS.DELETED)
+        }
+        onArchive={(entry) => handleMoveEntry(entry, LOCAL_KEYS.ARCHIVE)}
+        onToggleImportant={(entry) =>
+          handleMoveEntry(entry, LOCAL_KEYS.IMPORTANT)
+        }
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
       />
 
       <div style={{ display: "none" }}>
-        <ExpenseReport contentRef={contentRef} />
+        <ExpenseReport contentRef={contentRef} particulars={particulars} />
       </div>
     </div>
   );

@@ -129,7 +129,7 @@ const Expenses = () => {
           (item) =>
             item.status !== STATUS.APPROVED && item.status !== STATUS.REJECTED
         )
-        .filter((item) => isMatch(item, searchValue)),
+        .filter((item) => isMatch(item, searchValue, columns)),
     [tableData, searchValue]
   );
 

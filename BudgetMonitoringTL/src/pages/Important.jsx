@@ -9,9 +9,11 @@ import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
 import AppButton from "../components/ui/AppButton";
 
-const LOCAL_KEY_ACTIVE = "expensesData";
-const LOCAL_KEY_IMPORTANT = "importantData";
-const LOCAL_KEY_TRASH = "trashData";
+const LOCAL_KEYS = {
+  ACTIVE: "expensesData",
+  IMPORTANT: "importantData",
+  TRASH: "trashData",
+};
 
 const Important = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -21,7 +23,7 @@ const Important = () => {
 
   useEffect(() => {
     const storedImportant =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
     setImportantItems(storedImportant);
   }, []);
 
@@ -30,8 +32,8 @@ const Important = () => {
       entryToRestore,
       sourceItems: importantItems,
       setSourceItems: setImportantItems,
-      localKeySource: LOCAL_KEY_IMPORTANT,
-      localKeyActive: LOCAL_KEY_ACTIVE,
+      localKeySource: LOCAL_KEYS.IMPORTANT,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
@@ -39,10 +41,10 @@ const Important = () => {
     restoreItems({
       sourceItems: importantItems,
       setSourceItems: setImportantItems,
-      localKeySource: LOCAL_KEY_IMPORTANT,
+      localKeySource: LOCAL_KEYS.IMPORTANT,
       selectedItems,
       setSelectedItems,
-      localKeyActive: LOCAL_KEY_ACTIVE,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
@@ -51,8 +53,8 @@ const Important = () => {
       entryToDelete,
       sourceItems: importantItems,
       setSourceItems: setImportantItems,
-      localKeySource: LOCAL_KEY_IMPORTANT,
-      localKeyTrash: LOCAL_KEY_TRASH,
+      localKeySource: LOCAL_KEYS.IMPORTANT,
+      localKeyTrash: LOCAL_KEYS.TRASH,
     });
   };
 
