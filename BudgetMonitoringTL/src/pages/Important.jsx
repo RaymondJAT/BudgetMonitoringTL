@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { importantColumns } from "../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
 import { restoreItems } from "../utils/restoreItems";
+import { restoreSingleItem } from "../utils/restoreSingleItem";
+import { deleteSingleItem } from "../utils/deleteSingleItem";
 import EntryStates from "../components/layout/EntryStates";
 import ToolBar from "../components/layout/ToolBar";
 import AppButton from "../components/ui/AppButton";
-import Swal from "sweetalert2";
-import { restoreSingleEntry } from "../utils/restoreSingleItem";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_IMPORTANT = "importantData";
@@ -25,8 +25,8 @@ const Important = () => {
     setImportantItems(storedImportant);
   }, []);
 
-  const handleRestore = () => {
-    restoreSingleEntry({
+  const handleRestore = (entryToRestore) => {
+    restoreSingleItem({
       entryToRestore,
       sourceItems: importantItems,
       setSourceItems: setImportantItems,
@@ -46,32 +46,14 @@ const Important = () => {
     });
   };
 
-  const handleDelete = async (entryToDelete) => {
-    const result = await Swal.fire({
-      title: "Delete Entry?",
-      text: "This entry will be moved to Trash.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it",
+  const handleDelete = (entryToDelete) => {
+    deleteSingleItem({
+      entryToDelete,
+      sourceItems: importantItems,
+      setSourceItems: setImportantItems,
+      localKeySource: LOCAL_KEY_IMPORTANT,
+      localKeyTrash: LOCAL_KEY_TRASH,
     });
-
-    if (result.isConfirmed) {
-      const updatedImportant = importantItems.filter(
-        (item) => item.id !== entryToDelete.id
-      );
-      setImportantItems(updatedImportant);
-      localStorage.setItem(
-        LOCAL_KEY_IMPORTANT,
-        JSON.stringify(updatedImportant)
-      );
-
-      const currentTrash =
-        JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
-      const newTrash = [...currentTrash, entryToDelete];
-      localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(newTrash));
-
-      Swal.fire("Deleted!", "The entry has been moved to Trash.", "success");
-    }
   };
 
   const handleRowClick = (entry) => {

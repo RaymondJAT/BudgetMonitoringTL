@@ -1,10 +1,4 @@
-import {
-  FaMoneyBillWave,
-  FaCheckCircle,
-  FaArchive,
-  FaStar,
-  FaTrash,
-} from "react-icons/fa";
+import { FaMoneyBillWave, FaArchive, FaStar, FaTrash } from "react-icons/fa";
 
 export const navItems = [
   {

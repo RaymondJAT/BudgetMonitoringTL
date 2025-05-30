@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-export const restoreSingleEntry = async ({
+export const restoreSingleItem = async ({
   entryToRestore,
   sourceItems,
   setSourceItems,
@@ -18,13 +18,21 @@ export const restoreSingleEntry = async ({
   if (!result.isConfirmed) return;
 
   const updatedSource = sourceItems.filter(
-    (item) => item.id !== entryToRestore.id
+    (entry) => entry.id !== entryToRestore.id
   );
   setSourceItems(updatedSource);
   localStorage.setItem(localKeySource, JSON.stringify(updatedSource));
 
   const currentActive = JSON.parse(localStorage.getItem(localKeyActive)) || [];
-  const newActive = [...currentActive, entryToRestore];
+
+  const isDuplicate = currentActive.some(
+    (entry) => entry.id === entryToRestore.id
+  );
+
+  const newActive = isDuplicate
+    ? currentActive
+    : [...currentActive, entryToRestore];
+
   localStorage.setItem(localKeyActive, JSON.stringify(newActive));
 
   Swal.fire("Restored!", "The entry has been moved to Active.", "success");

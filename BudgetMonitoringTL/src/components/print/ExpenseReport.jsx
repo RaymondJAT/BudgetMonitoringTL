@@ -36,7 +36,7 @@ const ExpenseReport = ({ data, contentRef }) => {
   );
 
   return (
-    <div ref={contentRef} className="expense-report">
+    <div ref={contentRef}>
       <Container fluid className="px-0" style={{ maxWidth: "90%" }}>
         {/* Header */}
         <Row className="border-bottom pb-3 mb-4 align-items-center">

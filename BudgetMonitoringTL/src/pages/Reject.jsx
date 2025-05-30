@@ -6,18 +6,20 @@ import { moveEntries } from "../utils/entryActions";
 import { printData } from "../utils/printData";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
+import { deleteItems } from "../utils/deleteItems";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
 import DataTable from "../components/layout/DataTable";
 import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
 import ExpenseReport from "../components/print/ExpenseReport";
 import AppButton from "../components/ui/AppButton";
-import Swal from "sweetalert2";
 
-const LOCAL_KEY_ACTIVE = "expensesData";
-const LOCAL_KEY_ARCHIVE = "archiveData";
-const LOCAL_KEY_IMPORTANT = "importantData";
-const LOCAL_KEY_TRASH = "trashData";
+const LOCAL_KEYS = {
+  ACTIVE: "expensesData",
+  TRASH: "trashData",
+  ARCHIVE: "archiveData",
+  IMPORTANT: "importantData",
+};
 
 const Reject = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -31,9 +33,10 @@ const Reject = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
   const rejectedData = tableData.filter((item) => item.status === "Rejected");
-  const archiveData = JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
+  const archiveData =
+    JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
   const importantData =
-    JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
+    JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
   const totalComputationData = [...tableData, ...archiveData, ...importantData];
   const employeeData = mockData.find((e) => e.employee === data?.employee) || {
     transactions: [],
@@ -42,15 +45,15 @@ const Reject = () => {
 
   useExpenseDataLoader({
     setTableData,
-    LOCAL_KEY_ACTIVE,
-    LOCAL_KEY_ARCHIVE,
-    LOCAL_KEY_IMPORTANT,
-    LOCAL_KEY_TRASH,
+    LOCAL_KEY_ACTIVE: LOCAL_KEYS.ACTIVE,
+    LOCAL_KEY_ARCHIVE: LOCAL_KEYS.ARCHIVE,
+    LOCAL_KEY_IMPORTANT: LOCAL_KEYS.IMPORTANT,
+    LOCAL_KEY_TRASH: LOCAL_KEYS.TRASH,
     mockData,
   });
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(tableData));
+    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
 
   useEffect(() => {
@@ -82,7 +85,7 @@ const Reject = () => {
       entriesToMove: [{ ...entryToDelete, status: "Deleted" }],
       sourceData: tableData,
       setSourceData: setTableData,
-      destinationKey: LOCAL_KEY_TRASH,
+      destinationKey: LOCAL_KEYS.TRASH,
       avoidDuplicates: true,
     });
   };
@@ -92,7 +95,7 @@ const Reject = () => {
       entriesToMove: [entryToArchive],
       sourceData: tableData,
       setSourceData: setTableData,
-      destinationKey: LOCAL_KEY_ARCHIVE,
+      destinationKey: LOCAL_KEYS.ARCHIVE,
       avoidDuplicates: true,
     });
   };
@@ -102,7 +105,7 @@ const Reject = () => {
       entriesToMove: [entryToImportant],
       sourceData: tableData,
       setSourceData: setTableData,
-      destinationKey: LOCAL_KEY_IMPORTANT,
+      destinationKey: LOCAL_KEYS.IMPORTANT,
       avoidDuplicates: true,
     });
   };
@@ -110,33 +113,16 @@ const Reject = () => {
   const handleDeleteSelected = () => {
     if (selectedCount < 1) return;
 
-    Swal.fire({
-      title: `Delete ${selectedCount} selected entr${
-        selectedCount === 1 ? "y" : "ies"
-      }?`,
-      text: "This will move them to Trash. Continue?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete",
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+    const selectedEntries = filteredData.filter(
+      (entry) => selectedRows[entry.id]
+    );
 
-      const deletedEntries = tableData
-        .filter((entry) => selectedRows[entry.id])
-        .map((entry) => ({ ...entry, status: "Deleted" }));
-
-      moveEntries({
-        entriesToMove: deletedEntries,
-        sourceData: tableData,
-        setSourceData: setTableData,
-        destinationKey: LOCAL_KEY_TRASH,
-        avoidDuplicates: true,
-      });
-
-      setSelectedRows({});
-      Swal.fire("Deleted!", "Entries moved to Trash.", "success");
+    deleteItems({
+      selectedEntries,
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEYS.TRASH,
+      setSelectedRows,
     });
   };
 
