@@ -5,7 +5,7 @@ import { columns } from "../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { moveEntries } from "../utils/entryActions";
 import { useReactToPrint } from "react-to-print";
-import { printData } from "../utils/printData";
+import { formatPrintData } from "../utils/formatPrintData";
 import { deleteItems } from "../utils/deleteItems";
 import DataTable from "../components/layout/DataTable";
 import Total from "../components/layout/Total";
@@ -62,6 +62,7 @@ const Expenses = () => {
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
   const [particulars, setParticulars] = useState([]);
+  const [printData, setPrintData] = useState(null);
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -102,13 +103,23 @@ const Expenses = () => {
   }, [tableData]);
 
   useEffect(() => {
-    const items = printData(transactions);
+    const items = formatPrintData(transactions);
     const isSame = JSON.stringify(particulars) === JSON.stringify(items);
     if (!isSame) setParticulars(items);
   }, [transactions]);
 
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
+  };
+
+  const handlePrint = () => {
+    if (!selectedEntry) return;
+
+    setPrintData(selectedEntry);
+
+    setTimeout(() => {
+      reactToPrintFn();
+    }, 100);
   };
 
   const normalize = (value) =>
@@ -132,6 +143,11 @@ const Expenses = () => {
         .filter((item) => isMatch(item, searchValue, columns)),
     [tableData, searchValue]
   );
+
+  const selectedEntry =
+    selectedCount === 1
+      ? filteredData.find((item) => selectedRows[item.id])
+      : null;
 
   const handleDelete = (entryToDelete) => {
     moveEntries({
@@ -189,7 +205,7 @@ const Expenses = () => {
             <>
               {selectedCount === 1 && (
                 <>
-                  <PrintButton onClick={reactToPrintFn} />
+                  <PrintButton onClick={handlePrint} />
                   <DeleteButton onClick={handleDeleteSelected} />
                 </>
               )}
@@ -211,8 +227,8 @@ const Expenses = () => {
         onSelectionChange={setSelectedRows}
       />
 
-      <div style={{ display: "none" }}>
-        <ExpenseReport contentRef={contentRef} />
+      <div className="d-none">
+        <ExpenseReport contentRef={contentRef} data={printData || {}} />
       </div>
     </div>
   );

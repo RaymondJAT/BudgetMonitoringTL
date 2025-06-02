@@ -5,7 +5,7 @@ import { columns } from "../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
 import { moveEntries } from "../utils/entryActions";
-import { printData } from "../utils/printData";
+import { formatPrintData } from "../utils/formatPrintData";
 import { deleteItems } from "../utils/deleteItems";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
@@ -136,7 +136,7 @@ const Approval = () => {
   }, [data?.employee]);
 
   const particulars = useMemo(
-    () => printData(employeeData.transactions),
+    () => formatPrintData(employeeData.transactions),
     [employeeData.transactions]
   );
 

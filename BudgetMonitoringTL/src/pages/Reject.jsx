@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { mockData } from "../handlers/mockData";
 import { columns } from "../handlers/tableHeader";
 import { moveEntries } from "../utils/entryActions";
-import { printData } from "../utils/printData";
+import { formatPrintData } from "../utils/formatPrintData";
 import { deleteItems } from "../utils/deleteItems";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
@@ -137,7 +137,7 @@ const Reject = () => {
   }, [data?.employee]);
 
   const particulars = useMemo(
-    () => printData(employeeData.transactions),
+    () => formatPrintData(employeeData.transactions),
     [employeeData.transactions]
   );
 

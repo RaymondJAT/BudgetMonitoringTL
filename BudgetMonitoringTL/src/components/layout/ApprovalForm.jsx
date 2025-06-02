@@ -228,7 +228,7 @@ const ApprovalForm = () => {
       </Container>
 
       {/* Hidden Printable */}
-      <div style={{ display: "none" }}>
+      <div className="d-none">
         <PrintableCashRequest
           data={{ ...data, items: particulars }}
           amountInWords={amountInWords}

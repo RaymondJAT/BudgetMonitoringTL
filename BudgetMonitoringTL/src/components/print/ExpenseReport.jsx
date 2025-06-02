@@ -5,7 +5,7 @@ const ExpenseReport = ({ data, contentRef }) => {
   const particulars =
     data?.items?.length > 0
       ? data.items.map((item) => ({
-          label: item.label || data.description || " ",
+          label: item.label || " ",
           price: parseFloat(item.price) || 0,
           quantity: parseFloat(item.quantity) || 0,
           amount:
@@ -13,7 +13,7 @@ const ExpenseReport = ({ data, contentRef }) => {
         }))
       : data?.transactions?.length > 0
       ? data.transactions.map((item) => ({
-          label: data.description || " ",
+          label: item.label || " ",
           price: parseFloat(item.price) || 0,
           quantity: parseFloat(item.quantity) || 0,
           amount:
@@ -21,7 +21,7 @@ const ExpenseReport = ({ data, contentRef }) => {
         }))
       : [
           {
-            label: data?.description || " ",
+            label: data?.label || " ",
             price: parseFloat(data?.unitPrice) || 0,
             quantity: parseFloat(data?.quantity) || 0,
             amount:
@@ -37,7 +37,7 @@ const ExpenseReport = ({ data, contentRef }) => {
 
   return (
     <div ref={contentRef}>
-      <Container fluid className="px-0" style={{ maxWidth: "90%" }}>
+      <Container fluid className="px-0 mt-4" style={{ maxWidth: "90%" }}>
         {/* Header */}
         <Row className="border-bottom pb-3 mb-4 align-items-center">
           <Col xs={6}>
@@ -86,7 +86,7 @@ const ExpenseReport = ({ data, contentRef }) => {
           <thead className="border-top">
             <tr>
               <th className="text-center">Label</th>
-              <th className="text-center">Unit Price</th>
+              <th className="text-center">Price</th>
               <th className="text-center">Quantity</th>
               <th className="text-center">Subtotal</th>
             </tr>
