@@ -16,33 +16,38 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
 
   return (
     <div ref={contentRef}>
-      <Container>
+      <Container className="px-0 mt-4">
         <h4 className="text-center w-100 fw-bold">CASH REQUEST FORM</h4>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
         {/* Employee Details */}
-        <Row className="custom-col">
-          <Col xs={12} md={6} className="d-flex align-items-center mb-2">
-            <strong className="title">Name:</strong>
-            <p className="ms-2 mb-0">{data?.employee || " "}</p>
+        <Row className="custom-col small">
+          <Col xs={12} md={6} className="mb-2">
+            <div className="d-flex align-items-center mb-2">
+              <strong className="title">Name:</strong>
+              <p className="ms-2 mb-0">{data?.employee || " "}</p>
+            </div>
+            <div className="d-flex align-items-center">
+              <strong className="title">Position:</strong>
+              <p className="ms-2 mb-0">{data?.position || " "}</p>
+            </div>
           </Col>
-          <Col xs={12} md={6} className="d-flex align-items-center mb-2">
-            <strong className="title">Date Filed:</strong>
-            <p className="ms-2 mb-0">{dateFiled}</p>
-          </Col>
-          <Col xs={12} md={6} className="d-flex align-items-center mb-2">
-            <strong className="title">Position:</strong>
-            <p className="ms-2 mb-0">{data?.position || " "}</p>
-          </Col>
-          <Col xs={12} md={6} className="d-flex align-items-center mb-2">
-            <strong className="title">Department:</strong>
-            <p className="ms-2 mb-0">{data?.department || " "}</p>
+
+          <Col xs={12} md={6} className="mb-2 text-md-end">
+            <div className="d-flex justify-content-md-end align-items-center mb-2">
+              <strong className="title">Date Filed:</strong>
+              <p className="ms-2 mb-0">{dateFiled}</p>
+            </div>
+            <div className="d-flex justify-content-md-end align-items-center">
+              <strong className="title">Department:</strong>
+              <p className="ms-2 mb-0">{data?.department || " "}</p>
+            </div>
           </Col>
         </Row>
 
         {/* Particulars Table */}
         <Row>
           <Col xs={12}>
-            <Table bordered className="print-table">
+            <Table bordered className="print-table small">
               <thead>
                 <tr>
                   <th className="text-center">Particulars</th>
@@ -101,7 +106,7 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
         </Row>
 
         {/* Signatures */}
-        <Row className="signature mt-4">
+        <Row className="signature mt-4 small">
           <Col xs={12} md={4} className="text-center">
             <p className="mb-0">
               <strong>Requested by:</strong>

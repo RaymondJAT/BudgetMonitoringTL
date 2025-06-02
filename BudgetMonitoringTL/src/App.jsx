@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import Sidebar from "./components/layout/Sidebar";
@@ -28,6 +30,8 @@ const App = () => {
           transition: "margin-left 0.3s ease",
         }}
       >
+        <ToastContainer position="top-right" autoClose={1000} />
+
         <Routes>
           <Route path="/" element={<Expenses />} />
           <Route path="/my-approvals" element={<Approval />} />

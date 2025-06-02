@@ -49,7 +49,7 @@ const ExpenseReport = ({ data, contentRef }) => {
         </Row>
 
         {/* Employee Details */}
-        <Row className="mb-4">
+        <Row className="mb-4 small">
           <Col xs={6} className="mb-2">
             <p>
               <strong>Employee:</strong> {data?.employee || " "}
@@ -73,7 +73,7 @@ const ExpenseReport = ({ data, contentRef }) => {
         </Row>
 
         {/* Reference */}
-        <Row className="reference-section mb-4">
+        <Row className="reference-section mb-4 small">
           <Col>
             <p>
               <strong>Reference:</strong> {data?.description || " "}
