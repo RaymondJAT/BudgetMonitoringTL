@@ -66,6 +66,7 @@ const Expenses = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
+  const downloadRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
@@ -225,10 +226,13 @@ const Expenses = () => {
         onToggleImportant={handleToggleImportant}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
+        downloadRef={downloadRef}
+        setPrintData={setPrintData}
       />
 
       <div className="d-none">
         <ExpenseReport contentRef={contentRef} data={printData || {}} />
+        <ExpenseReport contentRef={downloadRef} data={printData || {}} />
       </div>
     </div>
   );

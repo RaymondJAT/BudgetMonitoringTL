@@ -50,6 +50,16 @@ const ApprovalForm = () => {
     localStorage.setItem("trashData", JSON.stringify([...trashData, entry]));
   };
 
+  const markAsImportant = (entry) => {
+    const importantData = JSON.parse(
+      localStorage.getItem("importantData") || "[]"
+    );
+    localStorage.setItem(
+      "importantData",
+      JSON.stringify([...importantData, entry])
+    );
+  };
+
   const fields = [
     { label: "Employee", key: "employee" },
     { label: "Position", key: "position" },
@@ -138,12 +148,14 @@ const ApprovalForm = () => {
           </div>
 
           <div className="d-flex gap-2 ms-md-auto mt-2 mt-md-0">
+            {/* mark as important */}
             <AppButton
               variant="warning"
               size="sm"
               className="custom-button btn-responsive d-flex align-items-center justify-content-center"
               onClick={() => {
-                // mark as important
+                markAsImportant(data);
+                toast.success("Entry marked as important.");
               }}
             >
               <FaStar size="0.75rem" />

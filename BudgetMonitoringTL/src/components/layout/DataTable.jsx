@@ -10,8 +10,10 @@ const DataTable = ({
   onDelete,
   onArchive,
   onToggleImportant,
+  downloadRef,
   selectedRows = {},
   onSelectionChange,
+  setPrintData,
 }) => {
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
@@ -42,6 +44,8 @@ const DataTable = ({
     onDelete: handleDelete,
     onArchive,
     onToggleImportant,
+    downloadRef,
+    setPrintData,
   });
 
   return (
