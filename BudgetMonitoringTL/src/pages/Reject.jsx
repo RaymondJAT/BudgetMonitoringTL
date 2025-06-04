@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { mockData } from "../handlers/mockData";
 import { columns } from "../handlers/tableHeader";
 import { moveEntries } from "../utils/entryActions";
-import { formatPrintData } from "../utils/formatPrintData";
 import { deleteItems } from "../utils/deleteItems";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
@@ -60,9 +59,10 @@ const Reject = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
-  const { state: data } = useLocation();
+  const [printData, setPrintData] = useState(null);
   const navigate = useNavigate();
   const contentRef = useRef(null);
+  const downloadRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
@@ -101,6 +101,21 @@ const Reject = () => {
     navigate("/approval-form", { state: entry });
   };
 
+  const handlePrint = () => {
+    if (!selectedEntry) return;
+
+    setPrintData(selectedEntry);
+
+    setTimeout(() => {
+      reactToPrintFn();
+    }, 100);
+  };
+
+  const selectedEntry =
+    selectedCount === 1
+      ? filteredData.find((item) => selectedRows[item.id])
+      : null;
+
   const handleMoveEntry = (entry, destinationKey, statusUpdate = null) => {
     moveEntries({
       entriesToMove: [entry],
@@ -128,19 +143,6 @@ const Reject = () => {
     });
   };
 
-  const employeeData = useMemo(() => {
-    return (
-      mockData.find((e) => e.employee === data?.employee) || {
-        transactions: [],
-      }
-    );
-  }, [data?.employee]);
-
-  const particulars = useMemo(
-    () => formatPrintData(employeeData.transactions),
-    [employeeData.transactions]
-  );
-
   const totalComputationData = useMemo(() => {
     const archiveData =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
@@ -160,7 +162,7 @@ const Reject = () => {
             <>
               {selectedCount === 1 && (
                 <>
-                  <PrintButton onClick={reactToPrintFn} />
+                  <PrintButton onClick={handlePrint} />
                   <DeleteButton onClick={handleDeleteSelected} />
                 </>
               )}
@@ -185,10 +187,13 @@ const Reject = () => {
         }
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
+        downloadRef={downloadRef}
+        setPrintData={setPrintData}
       />
 
       <div style={{ display: "none" }}>
-        <ExpenseReport contentRef={contentRef} particulars={particulars} />
+        <ExpenseReport contentRef={contentRef} data={printData || {}} />
+        <ExpenseReport contentRef={downloadRef} data={printData || {}} />
       </div>
     </div>
   );

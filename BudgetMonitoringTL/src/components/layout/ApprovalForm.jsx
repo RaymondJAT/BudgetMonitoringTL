@@ -204,8 +204,8 @@ const ApprovalForm = () => {
           <thead className="tableHead text-center">
             <tr>
               <th>Label</th>
-              <th>Quantity</th>
               <th>Price</th>
+              <th>Quantity</th>
               <th>Subtotal</th>
             </tr>
           </thead>
@@ -213,13 +213,14 @@ const ApprovalForm = () => {
             {transactions.map((row, index) => (
               <tr key={index}>
                 <td>{row.label || "N/A"}</td>
-                <td>{row.quantity ?? 0}</td>
+
                 <td>
                   ₱
                   {(row.price ?? 0).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
                 </td>
+                <td>{row.quantity ?? 0}</td>
                 <td>
                   ₱
                   {((row.quantity ?? 0) * (row.price ?? 0)).toLocaleString(

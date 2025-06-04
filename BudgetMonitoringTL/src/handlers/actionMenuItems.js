@@ -41,7 +41,7 @@ export const meatballActions = ({
       setPrintData(entry);
 
       setTimeout(async () => {
-        await downloadPDF(downloadRef, `entry-${entry.id || "download"}.pdf`);
+        await downloadPDF(downloadRef, `entry-${"download"}.pdf`);
       }, 200);
     },
   },
