@@ -44,7 +44,13 @@ const ExpenseReport = ({ data, contentRef }) => {
             <h4 className="m-0">Expense Report</h4>
           </Col>
           <Col xs={6} className="text-end">
-            <Image src={logo} alt="Company Logo" width={100} height="auto" />
+            <Image
+              src={logo}
+              crossOrigin="anonymous"
+              alt="Company Logo"
+              width={100}
+              height="auto"
+            />
           </Col>
         </Row>
 

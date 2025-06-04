@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { downloadPDF } from "../utils/downloadAsPdf";
+import downloadPDF from "../utils/downloadAsPdf";
 
 // meatball menu
 export const meatballActions = ({
@@ -9,7 +9,6 @@ export const meatballActions = ({
   downloadRef,
   setPrintData,
 }) => [
-  // delete action
   {
     label: "Delete",
     onClick: (entry) => {
@@ -29,7 +28,6 @@ export const meatballActions = ({
       });
     },
   },
-  // archive action
   {
     label: "Archive",
     onClick: (entry) => {
@@ -37,20 +35,16 @@ export const meatballActions = ({
       Swal.fire("Archived!", "The entry has been archived.", "success");
     },
   },
-  // download action
   {
     label: "Download",
     onClick: async (entry) => {
-      // Dynamically set printData before rendering the component
       setPrintData(entry);
 
-      // Wait a bit for printData to update and component to re-render
       setTimeout(async () => {
         await downloadPDF(downloadRef, `entry-${entry.id || "download"}.pdf`);
       }, 200);
     },
   },
-  // important action
   {
     label: "Mark as Important",
     onClick: (entry) => {
