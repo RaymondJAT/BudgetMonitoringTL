@@ -6,6 +6,7 @@ import { moveEntries } from "../utils/entryActions";
 import { deleteItems } from "../utils/deleteItems";
 import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
+import { handleExportData } from "../utils/exportItems";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
 import DataTable from "../components/layout/DataTable";
@@ -143,6 +144,17 @@ const Reject = () => {
     });
   };
 
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "Reject",
+    });
+
+    setSelectedRows(resetSelection);
+  };
+
   const totalComputationData = useMemo(() => {
     const archiveData =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
@@ -172,6 +184,8 @@ const Reject = () => {
             </>
           )
         }
+        handleExport={handleExport}
+        selectedCount={selectedCount}
       />
 
       <DataTable
