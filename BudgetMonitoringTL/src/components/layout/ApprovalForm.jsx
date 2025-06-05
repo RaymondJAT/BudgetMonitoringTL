@@ -247,6 +247,36 @@ const ApprovalForm = () => {
             </tr>
           </tfoot>
         </Table>
+
+        {/* Image Container */}
+        <div className="custom-container border p-3 bg-white">
+          <h6 className="mb-3">Attached Images</h6>
+          <div className="d-flex flex-wrap gap-3">
+            {(data?.images?.length > 0 ? data.images : []).map(
+              (imgSrc, index) => (
+                <div
+                  key={index}
+                  className="image-box border rounded p-1"
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={imgSrc}
+                    alt={`attachment-${index}`}
+                    className="img-fluid w-100 h-100"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              )
+            )}
+            {(!data?.images || data.images.length === 0) && (
+              <p className="text-muted">No images attached.</p>
+            )}
+          </div>
+        </div>
       </Container>
 
       {/* Hidden Printable */}

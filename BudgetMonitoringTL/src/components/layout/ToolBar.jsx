@@ -1,17 +1,16 @@
 import { Container } from "react-bootstrap";
-import { FaFilter } from "react-icons/fa";
-import { IoMdSettings } from "react-icons/io";
-import {
-  actionDropdownItems,
-  filterDropdownItems,
-} from "../../handlers/actionMenuItems";
+import { FaFilter, FaFileExport } from "react-icons/fa";
+import { filterDropdownItems } from "../../handlers/actionMenuItems";
 import SearchBar from "../ui/SearchBar";
 import AppButton from "../ui/AppButton";
 
-const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
-  const handleApprove = () => console.log("Approve clicked");
-  const handleReject = () => console.log("Reject clicked");
-  const handleMarkImportant = () => console.log("Marked as Important");
+const ToolBar = ({
+  searchValue,
+  onSearchChange,
+  leftContent,
+  handleExport,
+  selectedCount,
+}) => {
   const handleFilter = (type) => console.log("Filter by:", type);
 
   return (
@@ -28,28 +27,24 @@ const ToolBar = ({ searchValue, onSearchChange, leftContent }) => {
       {/* print & delete button */}
       <div className="d-flex align-items-center" style={{ gap: "10px" }}>
         {leftContent}
+
+        {selectedCount > 0 && (
+          <AppButton
+            label={
+              <>
+                <FaFileExport style={{ marginRight: "5px" }} /> Export
+              </>
+            }
+            variant="outline-dark"
+            size="sm"
+            onClick={handleExport}
+            className="custom-app-button"
+          />
+        )}
       </div>
 
       {/* actions, filter, search bar */}
       <div className="d-flex align-items-center" style={{ gap: "10px" }}>
-        <AppButton
-          isDropdown
-          label={
-            <>
-              <IoMdSettings style={{ marginRight: "5px" }} />
-              Actions
-            </>
-          }
-          variant="outline-dark"
-          size="sm"
-          className="custom-app-button"
-          dropdownItems={actionDropdownItems({
-            handleApprove,
-            handleReject,
-            handleMarkImportant,
-          })}
-        />
-
         <AppButton
           isDropdown
           label={

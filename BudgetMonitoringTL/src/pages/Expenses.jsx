@@ -7,6 +7,7 @@ import { moveEntries } from "../utils/entryActions";
 import { useReactToPrint } from "react-to-print";
 import { formatPrintData } from "../utils/formatPrintData";
 import { deleteItems } from "../utils/deleteItems";
+import { exportToExcel } from "../utils/exportToExcel";
 import DataTable from "../components/layout/DataTable";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
@@ -195,6 +196,21 @@ const Expenses = () => {
     });
   };
 
+  const handleExport = () => {
+    let exportData = [];
+
+    if (selectedCount > 0) {
+      exportData = filteredData.filter((entry) => selectedRows[entry.id]);
+    } else {
+      exportData = filteredData;
+    }
+
+    if (exportData.length === 0) return;
+
+    const cleanedData = exportData.map(({ transactions, ...rest }) => rest);
+    exportToExcel(cleanedData, "Expenses");
+  };
+
   return (
     <div>
       <Total data={totalComputationData} />
@@ -216,6 +232,8 @@ const Expenses = () => {
             </>
           )
         }
+        handleExport={handleExport}
+        selectedCount={selectedCount}
       />
       <DataTable
         data={filteredData}

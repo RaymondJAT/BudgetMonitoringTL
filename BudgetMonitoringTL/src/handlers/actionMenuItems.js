@@ -63,10 +63,8 @@ export const meatballActions = ({
 ];
 
 // actions dropdown menu
-export const actionDropdownItems = (handlers) => [
-  { label: "Export", onClick: handlers.handleExport },
-  { label: "Insert in spreadsheet", onClick: handlers.handleInsert },
-  { label: "Duplicate", onClick: handlers.handleDuplicate },
+export const actionDropdownItems = ({ handleExport }) => [
+  { label: "Export", onClick: handleExport },
 ];
 
 // filter dropdown menu
