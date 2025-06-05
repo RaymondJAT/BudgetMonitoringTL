@@ -16,6 +16,13 @@ export const mockData = [
       { label: "Mouse", quantity: 1, price: 50 },
       { label: "Keyboard", quantity: 1, price: 100.85 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 2,
@@ -32,6 +39,13 @@ export const mockData = [
     transactions: [
       { label: "Training Course", quantity: 4, price: 500 },
       { label: "Conference Ticket", quantity: 2, price: 200 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -50,6 +64,13 @@ export const mockData = [
       { label: "Training Course", quantity: 2, price: 1500 },
       { label: "Conference Ticket", quantity: 1, price: 300 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 4,
@@ -65,6 +86,13 @@ export const mockData = [
     status: "Rejected",
     transactions: [
       { label: "Jollibee Mix and Match", quantity: 10, price: 500 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -83,6 +111,13 @@ export const mockData = [
       { label: "Printer Paper", quantity: 10, price: 50 },
       { label: "Pens", quantity: 5, price: 10 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 6,
@@ -99,6 +134,13 @@ export const mockData = [
     transactions: [
       { label: "Visual Studio License", quantity: 1, price: 1000 },
       { label: "JetBrains License", quantity: 1, price: 1500 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -117,6 +159,13 @@ export const mockData = [
       { label: "AWS Hosting", quantity: 1, price: 2000 },
       { label: "Azure Hosting", quantity: 1, price: 1500 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 8,
@@ -133,6 +182,13 @@ export const mockData = [
     transactions: [
       { label: "Google Ads", quantity: 1, price: 3000 },
       { label: "Facebook Ads", quantity: 1, price: 2000 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -151,6 +207,13 @@ export const mockData = [
       { label: "Adobe Photoshop License", quantity: 1, price: 1200 },
       { label: "Illustrator Subscription", quantity: 1, price: 1000 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 10,
@@ -167,6 +230,13 @@ export const mockData = [
     transactions: [
       { label: "RStudio License", quantity: 1, price: 1500 },
       { label: "Tableau License", quantity: 1, price: 4500 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -185,6 +255,13 @@ export const mockData = [
       { label: "Whiteboards", quantity: 3, price: 200 },
       { label: "Markers", quantity: 10, price: 5 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 12,
@@ -201,6 +278,13 @@ export const mockData = [
     transactions: [
       { label: "Team Incentive", quantity: 5, price: 1000 },
       { label: "Top Performer Bonus", quantity: 2, price: 1500 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -219,6 +303,13 @@ export const mockData = [
       { label: "Zendesk Subscription", quantity: 1, price: 2000 },
       { label: "Freshdesk Subscription", quantity: 1, price: 2500 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 14,
@@ -236,6 +327,13 @@ export const mockData = [
       { label: "Court Filing Fee", quantity: 1, price: 14000 },
       { label: "Consultation Fee", quantity: 2, price: 3500 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 15,
@@ -252,6 +350,13 @@ export const mockData = [
     transactions: [
       { label: "UserTesting Subscription", quantity: 1, price: 1500 },
       { label: "Sketch License", quantity: 1, price: 2000 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -271,6 +376,13 @@ export const mockData = [
       { label: "Travel Expenses", quantity: 1, price: 5000 },
       { label: "Film Equipment", quantity: 1, price: 7500 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 17,
@@ -288,6 +400,13 @@ export const mockData = [
       { label: "On-Set Catering", quantity: 3, price: 800 },
       { label: "Location Fees", quantity: 1, price: 4000 },
       { label: "Set Design", quantity: 2, price: 2000 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -307,6 +426,13 @@ export const mockData = [
       { label: "Costume Rentals", quantity: 2, price: 1000 },
       { label: "Set Equipment", quantity: 1, price: 7000 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 19,
@@ -323,6 +449,13 @@ export const mockData = [
     transactions: [
       { label: "UI/UX Redesign", quantity: 1, price: 4000 },
       { label: "New Website Hosting", quantity: 1, price: 4000 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -341,6 +474,13 @@ export const mockData = [
       { label: "Power BI License", quantity: 1, price: 1500 },
       { label: "SQL Server License", quantity: 1, price: 3000 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 21,
@@ -357,6 +497,13 @@ export const mockData = [
     transactions: [
       { label: "Team Dinner", quantity: 1, price: 1500 },
       { label: "Outdoor Activities", quantity: 1, price: 1500 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -375,6 +522,13 @@ export const mockData = [
       { label: "Server Maintenance", quantity: 1, price: 8000 },
       { label: "Server Upgrades", quantity: 1, price: 4000 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 23,
@@ -391,6 +545,13 @@ export const mockData = [
     transactions: [
       { label: "Social Media Ads", quantity: 1, price: 3000 },
       { label: "Influencer Collaboration", quantity: 1, price: 4000 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -409,6 +570,13 @@ export const mockData = [
       { label: "Adobe Illustrator Subscription", quantity: 1, price: 1500 },
       { label: "CorelDraw License", quantity: 1, price: 2000 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 25,
@@ -425,6 +593,13 @@ export const mockData = [
     transactions: [
       { label: "JetBrains Tools", quantity: 1, price: 3000 },
       { label: "Visual Studio Tools", quantity: 1, price: 3000 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
   {
@@ -443,6 +618,13 @@ export const mockData = [
       { label: "Workshop Fee", quantity: 1, price: 3000 },
       { label: "Materials", quantity: 1, price: 200 },
     ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 27,
@@ -457,6 +639,13 @@ export const mockData = [
     total: "4500.00",
     status: "Approved",
     transactions: [{ label: "Enterprise Router", quantity: 1, price: 4500 }],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 28,
@@ -471,6 +660,13 @@ export const mockData = [
     total: "6000.00",
     status: "Pending",
     transactions: [{ label: "Influencer Fee", quantity: 1, price: 6000 }],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 29,
@@ -485,6 +681,13 @@ export const mockData = [
     total: "7500.00",
     status: "Pending",
     transactions: [{ label: "Audit Services", quantity: 1, price: 7500 }],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+    ],
   },
   {
     id: 30,
@@ -500,6 +703,13 @@ export const mockData = [
     status: "Approved",
     transactions: [
       { label: "Survey Platform Subscription", quantity: 1, price: 5800 },
+    ],
+    images: [
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
+      "/receipt.jpg",
     ],
   },
 ];

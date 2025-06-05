@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Table } from "react-bootstrap";
+import { Container, Row, Col, Table, Modal } from "react-bootstrap";
 import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../utils/numberToWords";
@@ -16,6 +16,8 @@ const ApprovalForm = () => {
 
   const [particulars, setParticulars] = useState([]);
   const [amountInWords, setAmountInWords] = useState("");
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
@@ -112,6 +114,7 @@ const ApprovalForm = () => {
         {/* Action Buttons */}
         <div className="custom-btn d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-3">
           <div className="d-flex gap-1">
+            {/* back button */}
             <AppButton
               variant="dark"
               size="sm"
@@ -138,6 +141,7 @@ const ApprovalForm = () => {
                 // refusal logic
               }}
             />
+            {/* print button */}
             <AppButton
               label="Print"
               variant="secondary"
@@ -146,7 +150,6 @@ const ApprovalForm = () => {
               onClick={reactToPrintFn}
             />
           </div>
-
           <div className="d-flex gap-2 ms-md-auto mt-2 mt-md-0">
             {/* mark as important */}
             <AppButton
@@ -160,7 +163,6 @@ const ApprovalForm = () => {
             >
               <FaStar size="0.75rem" />
             </AppButton>
-
             {/* delete button */}
             <AppButton
               variant="dark"
@@ -249,8 +251,11 @@ const ApprovalForm = () => {
         </Table>
 
         {/* Image Container */}
-        <div className="custom-container border p-3 bg-white">
-          <h6 className="mb-3">Attached Images</h6>
+        <div
+          className="custom-container border p-3 bg-white"
+          style={{ borderRadius: "6px" }}
+        >
+          <p className="mb-3">Attached Images</p>
           <div className="d-flex flex-wrap gap-3">
             {(data?.images?.length > 0 ? data.images : []).map(
               (imgSrc, index) => (
@@ -258,16 +263,21 @@ const ApprovalForm = () => {
                   key={index}
                   className="image-box border rounded p-1"
                   style={{
-                    width: "150px",
-                    height: "150px",
+                    width: "100px",
+                    height: "100px",
                     overflow: "hidden",
+                    borderRadius: "8px",
                   }}
                 >
                   <img
                     src={imgSrc}
                     alt={`attachment-${index}`}
                     className="img-fluid w-100 h-100"
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "cover", cursor: "pointer" }}
+                    onClick={() => {
+                      setSelectedImage(imgSrc);
+                      setShowImageModal(true);
+                    }}
                   />
                 </div>
               )
@@ -278,7 +288,6 @@ const ApprovalForm = () => {
           </div>
         </div>
       </Container>
-
       {/* Hidden Printable */}
       <div className="d-none">
         <PrintableCashRequest
@@ -287,6 +296,17 @@ const ApprovalForm = () => {
           contentRef={contentRef}
         />
       </div>
+      <Modal
+        show={showImageModal}
+        onHide={() => setShowImageModal(false)}
+        centered
+      >
+        <Modal.Header closeButton></Modal.Header>
+        <Modal.Body className="text-center">
+          <img src={selectedImage} alt="Full View" className="img-fluid" />
+        </Modal.Body>
+      </Modal>
+      ;
     </>
   );
 };

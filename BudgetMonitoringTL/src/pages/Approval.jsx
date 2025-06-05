@@ -6,6 +6,7 @@ import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
 import { moveEntries } from "../utils/entryActions";
 import { deleteItems } from "../utils/deleteItems";
+import { exportToExcel } from "../utils/exportToExcel";
 import Total from "../components/layout/Total";
 import ToolBar from "../components/layout/ToolBar";
 import DataTable from "../components/layout/DataTable";
@@ -142,6 +143,25 @@ const Approval = () => {
     });
   };
 
+  const handleExport = () => {
+    let exportData = [];
+
+    if (selectedCount > 0) {
+      exportData = filteredData.filter((entry) => selectedRows[entry.id]);
+    } else {
+      exportData = filteredData;
+    }
+
+    if (exportData.length === 0) return;
+
+    const cleanedData = exportData.map(
+      ({ transactions, images, ...rest }) => rest
+    );
+    exportToExcel(cleanedData, "Approval");
+
+    setSelectedRows({});
+  };
+
   const totalComputationData = useMemo(() => {
     const archiveData =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
@@ -171,6 +191,8 @@ const Approval = () => {
             </>
           )
         }
+        handleExport={handleExport}
+        selectedCount={selectedCount}
       />
 
       <DataTable

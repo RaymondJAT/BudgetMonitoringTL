@@ -207,8 +207,12 @@ const Expenses = () => {
 
     if (exportData.length === 0) return;
 
-    const cleanedData = exportData.map(({ transactions, ...rest }) => rest);
+    const cleanedData = exportData.map(
+      ({ transactions, images, ...rest }) => rest
+    );
     exportToExcel(cleanedData, "Expenses");
+
+    setSelectedRows({});
   };
 
   return (
