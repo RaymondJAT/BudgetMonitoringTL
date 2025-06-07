@@ -1,49 +1,44 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { importantColumns } from "../handlers/columnHeaders";
+import { archiveColumns } from "../../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
-import { restoreItems } from "../utils/restoreItems";
-import { restoreSingleItem } from "../utils/restoreSingleItem";
-import { deleteSingleItem } from "../utils/deleteSingleItem";
-import EntryStates from "../components/layout/EntryStates";
-import ToolBar from "../components/layout/ToolBar";
-import AppButton from "../components/ui/AppButton";
+import { restoreItems } from "../../utils/restoreItems";
+import { restoreSingleItem } from "../../utils/restoreSingleItem";
+import { deleteSingleItem } from "../../utils/deleteSingleItem";
+import EntryStates from "../../components/layout/EntryStates";
+import ToolBar from "../../components/layout/ToolBar";
+import AppButton from "../../components/ui/AppButton";
 
 const LOCAL_KEYS = {
   ACTIVE: "expensesData",
-  IMPORTANT: "importantData",
+  ARCHIVE: "archiveData",
   TRASH: "trashData",
 };
 
-const Important = () => {
+const Archive = () => {
+  const [archiveItems, setArchiveItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [importantItems, setImportantItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedImportant =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-    setImportantItems(storedImportant);
+    const storedArchive =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
+    const trashData = JSON.parse(localStorage.getItem(LOCAL_KEYS.TRASH)) || [];
+
+    const filteredArchive = storedArchive.filter(
+      (item) => !trashData.find((trash) => trash.id === item.id)
+    );
+
+    setArchiveItems(filteredArchive);
   }, []);
 
   const handleRestore = (entryToRestore) => {
     restoreSingleItem({
       entryToRestore,
-      sourceItems: importantItems,
-      setSourceItems: setImportantItems,
-      localKeySource: LOCAL_KEYS.IMPORTANT,
-      localKeyActive: LOCAL_KEYS.ACTIVE,
-    });
-  };
-
-  const handleRestoreSelected = () => {
-    restoreItems({
-      sourceItems: importantItems,
-      setSourceItems: setImportantItems,
-      localKeySource: LOCAL_KEYS.IMPORTANT,
-      selectedItems,
-      setSelectedItems,
+      sourceItems: archiveItems,
+      setSourceItems: setArchiveItems,
+      localKeySource: LOCAL_KEYS.ARCHIVE,
       localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
@@ -51,10 +46,21 @@ const Important = () => {
   const handleDelete = (entryToDelete) => {
     deleteSingleItem({
       entryToDelete,
-      sourceItems: importantItems,
-      setSourceItems: setImportantItems,
-      localKeySource: LOCAL_KEYS.IMPORTANT,
+      sourceItems: archiveItems,
+      setSourceItems: setArchiveItems,
+      localKeySource: LOCAL_KEYS.ARCHIVE,
       localKeyTrash: LOCAL_KEYS.TRASH,
+    });
+  };
+
+  const handleRestoreSelected = () => {
+    restoreItems({
+      sourceItems: archiveItems,
+      setSourceItems: setArchiveItems,
+      localKeySource: LOCAL_KEYS.ARCHIVE,
+      selectedItems,
+      setSelectedItems,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
@@ -62,7 +68,7 @@ const Important = () => {
     navigate("/approval-form", { state: entry });
   };
 
-  const filteredItems = importantItems.filter((item) =>
+  const filteredItems = archiveItems.filter((item) =>
     Object.values(item).some((value) =>
       String(value).toLowerCase().includes(searchValue.toLowerCase())
     )
@@ -90,11 +96,10 @@ const Important = () => {
           )
         }
       />
-
       <EntryStates
-        columns={importantColumns}
+        columns={archiveColumns}
         items={filteredItems}
-        setItems={setImportantItems}
+        setItems={setArchiveItems}
         onRowClick={handleRowClick}
         showRestore={true}
         showDelete={true}
@@ -107,4 +112,4 @@ const Important = () => {
   );
 };
 
-export default Important;
+export default Archive;

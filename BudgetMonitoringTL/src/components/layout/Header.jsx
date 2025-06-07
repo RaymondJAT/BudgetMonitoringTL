@@ -1,10 +1,11 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaBars, FaBell } from "react-icons/fa";
-import { Container, Row, Col, Button, Image, Dropdown } from "react-bootstrap";
+import { Container, Row, Col, Button, Dropdown } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 
-const Header = ({ toggleSidebar, isSidebarOpen }) => {
+const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -26,7 +27,15 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("role");
+    setUserRole(null);
+    navigate("/login");
+    window.location.reload();
+  };
+
   const pageTitle = getPageTitle();
+
   return (
     <header
       className={`main-header shadow-sm d-flex align-items-center ${
@@ -93,7 +102,7 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                 <Dropdown.Menu>
                   <Dropdown.Item href="#">Settings</Dropdown.Item>
                   <Dropdown.Divider />
-                  <Dropdown.Item href="#">Logout</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>

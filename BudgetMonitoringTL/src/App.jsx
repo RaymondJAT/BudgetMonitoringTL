@@ -4,44 +4,63 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
+
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
-import Expenses from "./pages/Expenses";
-import ApprovalForm from "./components/layout/ApprovalForm";
-import Approval from "./pages/Approval";
-import Reject from "./pages/Reject";
-import Archive from "./pages/Archive";
-import Trash from "./pages/Trash";
-import Important from "./pages/Important";
+import Login from "./pages/Login";
+
+// Role-based routes
+import TeamLeadRoutes from "./routes/TeamLeadRoutes";
+// import AdminRoutes from "./routes/AdminRoutes";
+// import EmployeeRoutes from "./routes/EmployeeRoutes";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userRole, setUserRole] = useState(localStorage.getItem("role"));
+
+  const renderRoutes = () => {
+    switch (userRole) {
+      case "employee":
+        return <EmployeeRoutes />;
+      case "admin":
+        return <AdminRoutes />;
+      case "teamlead":
+      default:
+        return <TeamLeadRoutes />;
+    }
+  };
 
   return (
     <Router>
-      <Header
-        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        isSidebarOpen={isSidebarOpen}
-      />
-      <Sidebar isSidebarOpen={isSidebarOpen} />
-      <main
-        style={{
-          marginLeft: isSidebarOpen ? "230px" : "60px",
-          transition: "margin-left 0.3s ease",
-        }}
-      >
-        <ToastContainer position="top-right" autoClose={1000} />
+      <Routes>
+        <Route path="/login" element={<Login setUserRole={setUserRole} />} />
 
-        <Routes>
-          <Route path="/" element={<Expenses />} />
-          <Route path="/my-approvals" element={<Approval />} />
-          <Route path="/rejected-requests" element={<Reject />} />
-          <Route path="/archive" element={<Archive />} />
-          <Route path="/important" element={<Important />} />
-          <Route path="/trash" element={<Trash />} />
-          <Route path="/approval-form" element={<ApprovalForm />} />
-        </Routes>
-      </main>
+        {!userRole ? (
+          <Route path="*" element={<Login setUserRole={setUserRole} />} />
+        ) : (
+          <>
+            <Route
+              path="/*"
+              element={
+                <>
+                  <Header
+                    toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                    isSidebarOpen={isSidebarOpen}
+                    setUserRole={setUserRole}
+                  />
+                  <Sidebar isSidebarOpen={isSidebarOpen} />
+                  <main
+                    style={{ marginLeft: isSidebarOpen ? "230px" : "60px" }}
+                  >
+                    <ToastContainer position="top-right" autoClose={1000} />
+                    {renderRoutes()}
+                  </main>
+                </>
+              }
+            />
+          </>
+        )}
+      </Routes>
     </Router>
   );
 };

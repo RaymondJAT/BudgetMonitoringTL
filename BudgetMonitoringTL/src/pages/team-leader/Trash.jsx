@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { trashColumns } from "../handlers/columnHeaders";
+import { trashColumns } from "../../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
-import { restoreItems } from "../utils/restoreItems";
-import { restoreSingleItem } from "../utils/restoreSingleItem";
-import ToolBar from "../components/layout/ToolBar";
-import EntryStates from "../components/layout/EntryStates";
-import AppButton from "../components/ui/AppButton";
+import { restoreItems } from "../../utils/restoreItems";
+import { restoreSingleItem } from "../../utils/restoreSingleItem";
+import ToolBar from "../../components/layout/ToolBar";
+import EntryStates from "../../components/layout/EntryStates";
+import AppButton from "../../components/ui/AppButton";
 
 const LOCAL_KEY_ACTIVE = "expensesData";
 const LOCAL_KEY_TRASH = "trashData";

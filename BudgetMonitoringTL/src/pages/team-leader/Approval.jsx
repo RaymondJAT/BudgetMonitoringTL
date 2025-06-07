@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { mockData } from "../handlers/mockData";
-import { columns } from "../handlers/tableHeader";
-import { moveEntries } from "../utils/entryActions";
-import { deleteItems } from "../utils/deleteItems";
-import { MdLocalPrintshop, MdDelete } from "react-icons/md";
+import { mockData } from "../../handlers/mockData";
+import { columns } from "../../handlers/tableHeader";
+import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
-import { handleExportData } from "../utils/exportItems";
-import Total from "../components/layout/Total";
-import ToolBar from "../components/layout/ToolBar";
-import DataTable from "../components/layout/DataTable";
-import ExpenseReport from "../components/print/ExpenseReport";
-import useExpenseDataLoader from "../hooks/useExpenseDataLoader";
-import AppButton from "../components/ui/AppButton";
+import { moveEntries } from "../../utils/entryActions";
+import { deleteItems } from "../../utils/deleteItems";
+import { handleExportData } from "../../utils/exportItems";
+import Total from "../../components/layout/Total";
+import ToolBar from "../../components/layout/ToolBar";
+import DataTable from "../../components/layout/DataTable";
+import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
+import ExpenseReport from "../../components/print/ExpenseReport";
+import AppButton from "../../components/ui/AppButton";
 
 const LOCAL_KEYS = {
   ACTIVE: "expensesData",
@@ -22,7 +22,7 @@ const LOCAL_KEYS = {
 };
 
 const STATUS = {
-  REJECTED: "Rejected",
+  APPROVED: "Approved",
   DELETED: "Deleted",
 };
 
@@ -56,7 +56,7 @@ const DeleteButton = ({ onClick }) => (
   />
 );
 
-const Reject = () => {
+const Approval = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
@@ -67,6 +67,11 @@ const Reject = () => {
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
+
+  const approvedData = useMemo(
+    () => tableData.filter((item) => item.status === STATUS.APPROVED),
+    [tableData]
+  );
 
   useExpenseDataLoader({
     setTableData,
@@ -81,22 +86,17 @@ const Reject = () => {
     localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
   }, [tableData]);
 
-  const rejectedData = useMemo(
-    () => tableData.filter((item) => item.status === STATUS.REJECTED),
-    [tableData]
-  );
-
   const filteredData = useMemo(() => {
     const normalize = (value) =>
       String(value || "")
         .toLowerCase()
         .trim();
-    return rejectedData.filter((item) =>
+    return approvedData.filter((item) =>
       columns.some((col) =>
         normalize(item[col.accessor]).includes(normalize(searchValue))
       )
     );
-  }, [rejectedData, searchValue]);
+  }, [approvedData, searchValue]);
 
   const handleRowClick = (entry) => {
     navigate("/approval-form", { state: entry });
@@ -134,7 +134,6 @@ const Reject = () => {
     const selectedEntries = filteredData.filter(
       (entry) => selectedRows[entry.id]
     );
-
     deleteItems({
       selectedEntries,
       sourceData: tableData,
@@ -149,7 +148,7 @@ const Reject = () => {
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "Reject",
+      filename: "Approval",
     });
 
     setSelectedRows(resetSelection);
@@ -205,7 +204,7 @@ const Reject = () => {
         setPrintData={setPrintData}
       />
 
-      <div style={{ display: "none" }}>
+      <div className="d-none">
         <ExpenseReport contentRef={contentRef} data={printData || {}} />
         <ExpenseReport contentRef={downloadRef} data={printData || {}} />
       </div>
@@ -213,4 +212,4 @@ const Reject = () => {
   );
 };
 
-export default Reject;
+export default Approval;
