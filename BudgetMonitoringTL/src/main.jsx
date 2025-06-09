@@ -5,7 +5,13 @@ import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <div style={{ backgroundColor: "#800000", minHeight: "100vh" }}>
+    <div
+      style={{
+        backgroundImage:
+          "linear-gradient(to bottom right, #800000,rgb(64, 31, 31))",
+        minHeight: "100vh",
+      }}
+    >
       <App />
     </div>
   </StrictMode>

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { navItems } from "../../handlers/navLinks";
+import { navConfig } from "../../handlers/navLinks";
+import { FaMoneyBillWave } from "react-icons/fa";
 
-const Sidebar = ({ isSidebarOpen }) => {
+const Sidebar = ({ isSidebarOpen, userRole }) => {
   const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
@@ -39,7 +40,8 @@ const Sidebar = ({ isSidebarOpen }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const HeaderIcon = navItems[0].icon;
+  const navItems = navConfig[userRole] || [];
+  const HeaderIcon = navItems.length > 0 ? navItems[0].icon : null;
 
   return (
     <div
@@ -79,9 +81,13 @@ const Sidebar = ({ isSidebarOpen }) => {
       )}
 
       <div className="sidebar-header px-3 py-2 d-flex align-items-center">
-        <span className="nav-icon">
-          <HeaderIcon />
-        </span>
+        <FaMoneyBillWave
+          style={{
+            fontSize: isSidebarOpen ? "1.5rem" : "1.3rem",
+            color: "#800000",
+            transition: "font-size 0.3s ease",
+          }}
+        />
         {isSidebarOpen && (
           <span className="nav-label ms-2 fw-bold">Expense Flow</span>
         )}

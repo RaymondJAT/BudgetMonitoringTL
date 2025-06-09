@@ -12,7 +12,7 @@ import Login from "./pages/Login";
 // Role-based routes
 import TeamLeadRoutes from "./routes/TeamLeadRoutes";
 // import AdminRoutes from "./routes/AdminRoutes";
-// import EmployeeRoutes from "./routes/EmployeeRoutes";
+import EmployeeRoutes from "./routes/EmployeeRoutes";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -48,7 +48,7 @@ const App = () => {
                     isSidebarOpen={isSidebarOpen}
                     setUserRole={setUserRole}
                   />
-                  <Sidebar isSidebarOpen={isSidebarOpen} />
+                  <Sidebar isSidebarOpen={isSidebarOpen} userRole={userRole} />
                   <main
                     style={{ marginLeft: isSidebarOpen ? "230px" : "60px" }}
                   >

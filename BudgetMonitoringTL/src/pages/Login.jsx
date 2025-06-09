@@ -22,14 +22,17 @@ const Login = ({ setUserRole }) => {
     // authentication
     if (username === "employee" && password === "pass") {
       localStorage.setItem("role", "employee");
+      localStorage.setItem("username", "Employee");
       setUserRole("employee");
       navigate("/");
     } else if (username === "teamlead" && password === "pass") {
       localStorage.setItem("role", "teamlead");
+      localStorage.setItem("username", "Team Lead");
       setUserRole("teamlead");
       navigate("/");
     } else if (username === "admin" && password === "pass") {
       localStorage.setItem("role", "admin");
+      localStorage.setItem("username", "Admin");
       setUserRole("admin");
       navigate("/");
     } else {
@@ -41,12 +44,23 @@ const Login = ({ setUserRole }) => {
     <Container
       fluid
       className="d-flex justify-content-center align-items-center vh-100"
-      style={{ backgroundColor: "#f8f9fa" }}
+      style={{
+        background: "linear-gradient(to bottom right, #8B0000,rgb(45, 31, 31))",
+      }}
     >
       <Row className="w-100 justify-content-center">
         <Col xs={12} sm={8} md={5} lg={4}>
-          <Card className="shadow-sm p-4">
-            <h3 className="text-center mb-4">Sign In</h3>
+          <Card
+            className="p-4"
+            style={{
+              borderRadius: "6px",
+              background: "linear-gradient(145deg, #ffffff,rgb(211, 211, 211))",
+              boxShadow: "10px 10px 25px rgba(0, 0, 0, 0.3)",
+              border: "none",
+              fontSize: "0.75rem",
+            }}
+          >
+            <h3 className="text-center mb-4 fw-bold">Log In</h3>
 
             {error && (
               <Alert variant="danger" onClose={() => setError("")} dismissible>
@@ -55,48 +69,36 @@ const Login = ({ setUserRole }) => {
             )}
 
             <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="formUsername">
-                <Form.Label>Username</Form.Label>
+              <Form.Floating className="mb-3">
                 <Form.Control
+                  id="floatingUsername"
                   type="text"
-                  placeholder="Enter username"
+                  placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  autoFocus
                   required
+                  className="custom-floating-input"
                 />
-              </Form.Group>
+                <label htmlFor="floatingUsername">Username</label>
+              </Form.Floating>
 
-              <Form.Group className="mb-4" controlId="formPassword">
-                <Form.Label>Password</Form.Label>
+              <Form.Floating className="mb-4">
                 <Form.Control
+                  id="floatingPassword"
                   type="password"
-                  placeholder="Enter password"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="custom-floating-input"
                 />
-              </Form.Group>
+                <label htmlFor="floatingPassword">Password</label>
+              </Form.Floating>
 
-              <Button variant="primary" type="submit" className="w-100">
+              <Button variant="outline-dark" type="submit" className="w-100">
                 Login
               </Button>
             </Form>
-
-            <div
-              className="mt-3 text-center text-muted"
-              style={{ fontSize: "0.85rem" }}
-            >
-              <p>
-                Demo credentials:
-                <br />
-                <b>employee</b> / pass
-                <br />
-                <b>teamlead</b> / pass
-                <br />
-                <b>admin</b> / pass
-              </p>
-            </div>
           </Card>
         </Col>
       </Row>

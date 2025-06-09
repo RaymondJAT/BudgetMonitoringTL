@@ -1,34 +1,37 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaBars, FaBell } from "react-icons/fa";
+import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
 import { Container, Row, Col, Button, Dropdown } from "react-bootstrap";
-import { FaUserCircle } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
+
+  const pageTitles = {
+    "/": "Expenses",
+    "/my-approvals": "Expenses",
+    "/rejected-requests": "Expenses",
+    "/archive": "Archive",
+    "/important": "Importants",
+    "/trash": "Trash",
+  };
 
   const getPageTitle = () => {
     const path = location.pathname;
-
-    if (
-      path === "/" ||
-      path === "/my-approvals" ||
-      path === "/rejected-requests"
-    ) {
-      return "Expenses";
-    } else if (path === "/archive") {
-      return "Archive";
-    } else if (path === "/important") {
-      return "Importants";
-    } else if (path === "/trash") {
-      return "Trash";
-    } else {
-      return "";
-    }
+    return pageTitles[path] || "";
   };
 
   const handleLogout = () => {
     localStorage.removeItem("role");
+    localStorage.removeItem("username");
     setUserRole(null);
     navigate("/login");
     window.location.reload();
@@ -87,22 +90,23 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
                   className="d-flex align-items-center gap-2 p-0 border-0 bg-transparent"
                   id="dropdown-user"
                 >
-                  <FaUserCircle
-                    size={30}
-                    style={{
-                      borderRadius: "100%",
-                      backgroundColor: "transparent",
-                    }}
-                  />
+                  <FaUserCircle size={30} />
                   <span style={{ fontWeight: 400, fontSize: "13px" }}>
-                    Username
+                    {username}
                   </span>
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                  <Dropdown.Item href="#">Settings</Dropdown.Item>
+                  <Dropdown.Item href="#" style={{ fontSize: "0.75rem" }}>
+                    Settings
+                  </Dropdown.Item>
                   <Dropdown.Divider />
-                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={handleLogout}
+                    style={{ fontSize: "0.75rem" }}
+                  >
+                    Logout
+                  </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
