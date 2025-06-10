@@ -1,13 +1,8 @@
 import { useMemo, useState } from "react";
+import { LOCAL_KEYS } from "../../constants/localKeys";
+import { EMPLOYEE_STATUS_LIST } from "../../constants/employeeStatusList";
 import ToolBar from "../../components/layout/ToolBar";
 import Total from "../../components/layout/Total";
-
-const LOCAL_KEYS = {
-  ACTIVE: "expensesData",
-  TRASH: "trashData",
-  ARCHIVE: "archiveData",
-  IMPORTANT: "importantData",
-};
 
 const MyExpenses = () => {
   const [tableData, setTableData] = useState([]);
@@ -27,7 +22,7 @@ const MyExpenses = () => {
 
   return (
     <div>
-      <Total data={totalComputationData} />
+      <Total data={totalComputationData} statusList={EMPLOYEE_STATUS_LIST} />
       <ToolBar />
     </div>
   );

@@ -4,7 +4,7 @@ import MyExpenses from "../pages/employee/MyExpenses";
 const EmployeeRoutes = () => {
   return (
     <Routes>
-      <Route path="/my-expenses" element={<MyExpenses />} />
+      <Route path="/" element={<MyExpenses />} />
     </Routes>
   );
 };

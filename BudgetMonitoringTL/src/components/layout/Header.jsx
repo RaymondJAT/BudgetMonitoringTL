@@ -24,7 +24,6 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
     "/trash": "Trash",
 
     // employee
-    "/my-expenses": "My Expenses",
     "/employee-archive": "Archive",
     "/employee-important": "Importants",
     "/employee-trash": "Trash",

@@ -4,12 +4,10 @@ import { trashColumns } from "../../handlers/columnHeaders";
 import { MdRestore } from "react-icons/md";
 import { restoreItems } from "../../utils/restoreItems";
 import { restoreSingleItem } from "../../utils/restoreSingleItem";
+import { LOCAL_KEYS } from "../../constants/localKeys";
 import ToolBar from "../../components/layout/ToolBar";
 import EntryStates from "../../components/layout/EntryStates";
 import AppButton from "../../components/ui/AppButton";
-
-const LOCAL_KEY_ACTIVE = "expensesData";
-const LOCAL_KEY_TRASH = "trashData";
 
 const Trash = () => {
   const [trashItems, setTrashItems] = useState([]);
@@ -18,7 +16,8 @@ const Trash = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedTrash = JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
+    const storedTrash =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.TRASH)) || [];
     setTrashItems(storedTrash);
   }, []);
 
@@ -31,25 +30,25 @@ const Trash = () => {
       entryToRestore,
       sourceItems: trashItems,
       setSourceItems: setTrashItems,
-      localKeySource: LOCAL_KEY_TRASH,
-      localKeyActive: LOCAL_KEY_ACTIVE,
+      localKeySource: LOCAL_KEYS.TRASH,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
   const handlePermanentDelete = async (entry) => {
     const updatedTrash = trashItems.filter((item) => item.id !== entry.id);
     setTrashItems(updatedTrash);
-    localStorage.setItem(LOCAL_KEY_TRASH, JSON.stringify(updatedTrash));
+    localStorage.setItem(LOCAL_KEYS.TRASH, JSON.stringify(updatedTrash));
   };
 
   const handleRestoreSelected = () => {
     restoreItems({
       sourceItems: trashItems,
       setSourceItems: setTrashItems,
-      localKeySource: LOCAL_KEY_TRASH,
+      localKeySource: LOCAL_KEYS.TRASH,
       selectedItems,
       setSelectedItems,
-      localKeyActive: LOCAL_KEY_ACTIVE,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 

@@ -1,18 +1,7 @@
 import { Container } from "react-bootstrap";
+import { mapStatusesToKeys } from "../../constants/mapStatus";
 
-const Total = ({ data }) => {
-  const statusList = [
-    { label: "To Approve", key: "pending" },
-    { label: "For Reimbursement", key: "approved" },
-    { label: "In Payment", key: "inPayment" },
-  ];
-
-  const mapStatusesToKeys = {
-    pending: "pending",
-    approved: "approved",
-    "in payment": "inPayment",
-  };
-
+const Total = ({ data, statusList = defaultStatusList }) => {
   const totals = { pending: 0, approved: 0, inPayment: 0 };
 
   if (!data || !Array.isArray(data)) {

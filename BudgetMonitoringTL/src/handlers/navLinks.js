@@ -21,7 +21,7 @@ export const navConfig = {
     {
       label: "Expenses",
       icon: FaMoneyBillWave,
-      children: [{ label: "My Expenses", path: "/my-expenses" }],
+      children: [{ label: "My Expenses", path: "/" }],
     },
     { label: "Archive", icon: FaArchive, path: "/employee-archive" },
     { label: "Important", icon: FaStar, path: "/employee-important" },

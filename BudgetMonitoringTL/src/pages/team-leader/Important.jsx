@@ -5,15 +5,10 @@ import { MdRestore } from "react-icons/md";
 import { restoreItems } from "../../utils/restoreItems";
 import { restoreSingleItem } from "../../utils/restoreSingleItem";
 import { deleteSingleItem } from "../../utils/deleteSingleItem";
+import { LOCAL_KEYS } from "../../constants/localKeys";
 import EntryStates from "../../components/layout/EntryStates";
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
-
-const LOCAL_KEYS = {
-  ACTIVE: "expensesData",
-  IMPORTANT: "importantData",
-  TRASH: "trashData",
-};
 
 const Important = () => {
   const [searchValue, setSearchValue] = useState("");

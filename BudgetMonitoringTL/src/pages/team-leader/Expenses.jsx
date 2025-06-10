@@ -8,25 +8,15 @@ import { useReactToPrint } from "react-to-print";
 import { formatPrintData } from "../../utils/formatPrintData";
 import { deleteItems } from "../../utils/deleteItems";
 import { handleExportData } from "../../utils/exportItems";
+import { LOCAL_KEYS } from "../../constants/localKeys";
+import { STATUS } from "../../constants/status";
+import { TEAMLEAD_STATUS_LIST } from "../../constants/teamLeadTotal";
 import DataTable from "../../components/layout/DataTable";
 import Total from "../../components/layout/Total";
 import ToolBar from "../../components/layout/ToolBar";
 import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
-
-const LOCAL_KEYS = {
-  ACTIVE: "expensesData",
-  TRASH: "trashData",
-  ARCHIVE: "archiveData",
-  IMPORTANT: "importantData",
-};
-
-const STATUS = {
-  APPROVED: "Approved",
-  REJECTED: "Rejected",
-  DELETED: "Deleted",
-};
 
 const PrintButton = ({ onClick }) => (
   <AppButton
@@ -204,7 +194,7 @@ const Expenses = () => {
 
   return (
     <div>
-      <Total data={totalComputationData} />
+      <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
       <ToolBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}
