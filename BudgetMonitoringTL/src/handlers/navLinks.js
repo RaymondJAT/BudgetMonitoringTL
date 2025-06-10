@@ -17,6 +17,15 @@ export const navConfig = {
   ],
 
   // Example: add more roles
-  // employee: [...]
+  employee: [
+    {
+      label: "Expenses",
+      icon: FaMoneyBillWave,
+      children: [{ label: "My Expenses", path: "/my-expenses" }],
+    },
+    { label: "Archive", icon: FaArchive, path: "/employee-archive" },
+    { label: "Important", icon: FaStar, path: "/employee-important" },
+    { label: "Trash", icon: FaTrash, path: "/employee-trash" },
+  ],
   // admin: [...]
 };

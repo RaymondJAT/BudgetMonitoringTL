@@ -7,8 +7,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <div
       style={{
-        backgroundImage:
-          "linear-gradient(to bottom right, #800000,rgb(64, 31, 31))",
+        backgroundColor: "#800000",
         minHeight: "100vh",
       }}
     >

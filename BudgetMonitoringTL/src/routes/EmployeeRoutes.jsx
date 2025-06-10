@@ -1,11 +1,11 @@
 import { Routes, Route } from "react-router-dom";
-import { Container } from "react-bootstrap";
+import MyExpenses from "../pages/employee/MyExpenses";
 
 const EmployeeRoutes = () => {
   return (
-    <Container fluid>
-      <h1>hello</h1>
-    </Container>
+    <Routes>
+      <Route path="/my-expenses" element={<MyExpenses />} />
+    </Routes>
   );
 };
 

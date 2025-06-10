@@ -72,18 +72,13 @@ const Expenses = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  const archiveData = useMemo(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
-  }, []);
-
-  const importantData = useMemo(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-  }, []);
-
-  const totalComputationData = useMemo(
-    () => [...tableData, ...archiveData, ...importantData],
-    [tableData, archiveData, importantData]
-  );
+  const totalComputationData = useMemo(() => {
+    const archiveData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
+    const importantData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
+    return [...tableData, ...archiveData, ...importantData];
+  }, [tableData]);
 
   const employeeData = mockData.find((e) => e.employee === data?.employee) || {
     transactions: [],
