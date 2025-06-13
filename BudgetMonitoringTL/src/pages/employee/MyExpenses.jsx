@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { EMPLOYEE_STATUS_LIST } from "../../constants/employeeStatusList";
 import { expenseHeaders } from "../../handlers/columnHeaders";
+import { Modal } from "react-bootstrap";
+import CashReqForm from "./CashReqForm";
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
 import Total from "../../components/layout/Total";
@@ -13,15 +15,14 @@ const MyExpenses = () => {
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
 
+  const [showCashReqModal, setShowCashReqModal] = useState(false);
+  const handleCloseModal = () => setShowCashReqModal(false);
+
   const dropdownItems = [
     {
       label: "Cash Request Form",
-      onClick: () => navigate("/forms/cash-request"),
+      onClick: () => setShowCashReqModal(true),
     },
-    // {
-    //   label: "Cash Voucher Form",
-    //   onClick: () => navigate("/forms/cash-voucher"),
-    // },
     {
       label: "Liquidation Form",
       onClick: () => navigate("/forms/liquidation"),
@@ -77,6 +78,7 @@ const MyExpenses = () => {
   return (
     <div>
       <Total data={totalComputationData} statusList={EMPLOYEE_STATUS_LIST} />
+
       <ToolBar setTableData={setTableData} leftContent={newButton} />
 
       <DataTable
@@ -89,6 +91,28 @@ const MyExpenses = () => {
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
       />
+
+      {/* 👉 PLACE THIS HERE */}
+      <Modal
+        show={showCashReqModal}
+        onHide={handleCloseModal}
+        dialogClassName="modal-xl"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Cash Request Form</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <CashReqForm data={{}} signatures={{}} particulars={[]} />
+        </Modal.Body>
+        <Modal.Footer>
+          <AppButton
+            label="Close"
+            variant="secondary"
+            onClick={handleCloseModal}
+          />
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

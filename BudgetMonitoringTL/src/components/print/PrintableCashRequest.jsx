@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
-const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
+const PrintableCashRequest = ({
+  data,
+  amountInWords,
+  contentRef,
+  signatures = {},
+}) => {
   const [dateFiled, setDateFiled] = useState("");
 
   useEffect(() => {
@@ -17,7 +22,7 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
   return (
     <div ref={contentRef}>
       <Container className="px-0 mt-4">
-        <h4 className="text-center w-100 fw-bold">CASH REQUEST FORM</h4>
+        <h2 className="text-center w-100 fw-bold">CASH REQUEST FORM</h2>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
         {/* Employee Details */}
         <Row className="custom-col small">
@@ -107,23 +112,142 @@ const PrintableCashRequest = ({ data, amountInWords, contentRef }) => {
 
         {/* Signatures */}
         <Row className="signature mt-4 small">
+          {/* Requested by */}
           <Col xs={12} md={4} className="text-center">
             <p className="mb-0">
               <strong>Requested by:</strong>
             </p>
-            <div className="signature-box mt-4"></div>
+            <div
+              className="text-center mt-4 position-relative"
+              style={{ height: "100px" }}
+            >
+              {signatures?.requested && (
+                <img
+                  src={signatures.requested}
+                  alt="Signature"
+                  style={{
+                    height: "80px",
+                    position: "absolute",
+                    top: "-45px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 1,
+                    opacity: 0.9,
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "-14px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontWeight: "bold", zIndex: 2 }}>
+                  {signatures?.requestedName || ""}
+                </div>
+                <div
+                  style={{
+                    borderTop: "1px solid #000",
+                    width: "210px",
+                    margin: "2px auto 0 auto",
+                  }}
+                ></div>
+              </div>
+            </div>
           </Col>
+
+          {/* Approved by */}
           <Col xs={12} md={4} className="text-center">
             <p className="mb-0">
               <strong>Approved by:</strong>
             </p>
-            <div className="signature-box mt-4"></div>
+            <div
+              className="text-center mt-4 position-relative"
+              style={{ height: "100px" }}
+            >
+              {signatures?.approved && (
+                <img
+                  src={signatures.approved}
+                  alt="Signature"
+                  style={{
+                    height: "80px",
+                    position: "absolute",
+                    top: "-45px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 1,
+                    opacity: 0.9,
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "-14px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontWeight: "bold", zIndex: 2 }}>
+                  {signatures?.approvedName || ""}
+                </div>
+                <div
+                  style={{
+                    borderTop: "1px solid #000",
+                    width: "210px",
+                    margin: "2px auto 0 auto",
+                  }}
+                ></div>
+              </div>
+            </div>
           </Col>
+
+          {/* Received by */}
           <Col xs={12} md={4} className="text-center">
             <p className="mb-0">
               <strong>Received by:</strong>
             </p>
-            <div className="signature-box mt-4"></div>
+            <div
+              className="text-center mt-4 position-relative"
+              style={{ height: "100px" }}
+            >
+              {signatures?.received && (
+                <img
+                  src={signatures.received}
+                  alt="Signature"
+                  style={{
+                    height: "80px",
+                    position: "absolute",
+                    top: "-45px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 1,
+                    opacity: 0.9,
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "-14px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontWeight: "bold", zIndex: 2 }}>
+                  {signatures?.receivedName || ""}
+                </div>
+                <div
+                  style={{
+                    borderTop: "1px solid #000",
+                    width: "210px",
+                    margin: "2px auto 0 auto",
+                  }}
+                ></div>
+              </div>
+            </div>
           </Col>
         </Row>
       </Container>

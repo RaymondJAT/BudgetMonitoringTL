@@ -466,6 +466,13 @@ input[type="checkbox"]:checked {
   white-space: nowrap;
 }
 
+/* CASH REQUEST FORM MODAL */
+.modal-title {
+  width: 100%;
+  text-align: center;
+  font-weight: 900 !important;
+}
+
 /* REACT-TO-PRINT */
 @media print {
   @page {

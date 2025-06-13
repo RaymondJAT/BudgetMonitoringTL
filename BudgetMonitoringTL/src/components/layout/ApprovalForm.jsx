@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Table, Modal } from "react-bootstrap";
+import { Container, Row, Col, Table } from "react-bootstrap";
 import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../utils/numberToWords";
@@ -13,11 +13,12 @@ const ApprovalForm = () => {
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const { state: data } = useLocation();
-
   const [particulars, setParticulars] = useState([]);
   const [amountInWords, setAmountInWords] = useState("");
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [signatures, setSignatures] = useState({
+    approved: null,
+    approvedName: "",
+  });
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
@@ -62,17 +63,26 @@ const ApprovalForm = () => {
     );
   };
 
+  const handleSignatureUpload = (e, type) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignatures((prev) => ({ ...prev, [type]: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const fields = [
-    { label: "Employee", key: "employee" },
     { label: "Position", key: "position" },
-    { label: "Department", key: "department" },
-    { label: "Paid By", key: "paidBy" },
+    { label: "Total", key: "total" },
   ];
 
   const partnerFields = [
-    { label: "Category", key: "category" },
+    { label: "Employee", key: "employee" },
     { label: "Expense Date", key: "expenseDate" },
-    { label: "Total", key: "total" },
+    { label: "Department", key: "department" },
     { label: "Team Lead", key: "teamLead" },
   ];
 
@@ -250,42 +260,38 @@ const ApprovalForm = () => {
           </tfoot>
         </Table>
 
-        {/* Image Container */}
         <div
           className="custom-container border p-3 bg-white"
           style={{ borderRadius: "6px" }}
         >
-          <p className="mb-3">Attached Images</p>
-          <div className="d-flex flex-wrap gap-3">
-            {(data?.images?.length > 0 ? data.images : []).map(
-              (imgSrc, index) => (
-                <div
-                  key={index}
-                  className="image-box border rounded p-1"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    overflow: "hidden",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <img
-                    src={imgSrc}
-                    alt={`attachment-${index}`}
-                    className="img-fluid w-100 h-100"
-                    style={{ objectFit: "cover", cursor: "pointer" }}
-                    onClick={() => {
-                      setSelectedImage(imgSrc);
-                      setShowImageModal(true);
-                    }}
-                  />
-                </div>
-              )
-            )}
-            {(!data?.images || data.images.length === 0) && (
-              <p className="text-muted">No images attached.</p>
-            )}
-          </div>
+          <p className="mb-3 fw-bold">Upload Signature</p>
+          <Row className="g-2">
+            <Col xs={12} md={3}>
+              <label className="form-label">
+                Approved by <span className="fw-bold">(Printed Name)</span>:
+              </label>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                value={signatures.approvedName || ""}
+                onChange={(e) =>
+                  setSignatures((prev) => ({
+                    ...prev,
+                    approvedName: e.target.value,
+                  }))
+                }
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <label className="form-label">Signature:</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleSignatureUpload(e, "approved")}
+                className="form-control form-control-sm"
+              />
+            </Col>
+          </Row>
         </div>
       </Container>
       {/* Hidden Printable */}
@@ -294,19 +300,9 @@ const ApprovalForm = () => {
           data={{ ...data, items: particulars }}
           amountInWords={amountInWords}
           contentRef={contentRef}
+          signatures={signatures}
         />
       </div>
-      <Modal
-        show={showImageModal}
-        onHide={() => setShowImageModal(false)}
-        centered
-      >
-        <Modal.Header closeButton></Modal.Header>
-        <Modal.Body className="text-center">
-          <img src={selectedImage} alt="Full View" className="img-fluid" />
-        </Modal.Body>
-      </Modal>
-      ;
     </>
   );
 };
