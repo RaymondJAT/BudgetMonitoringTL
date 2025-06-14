@@ -14,7 +14,6 @@ const MyExpenses = () => {
   const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
-
   const [showCashReqModal, setShowCashReqModal] = useState(false);
   const handleCloseModal = () => setShowCashReqModal(false);
 
@@ -92,24 +91,31 @@ const MyExpenses = () => {
         onSelectionChange={setSelectedRows}
       />
 
-      {/* 👉 PLACE THIS HERE */}
+      {/* cash request modal */}
       <Modal
         show={showCashReqModal}
         onHide={handleCloseModal}
         dialogClassName="modal-xl"
         centered
+        scrollable
       >
-        <Modal.Header closeButton>
+        <Modal.Header closeButton style={{ backgroundColor: "#E4E6C9" }}>
           <Modal.Title>Cash Request Form</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ backgroundColor: "#800000" }}>
           <CashReqForm data={{}} signatures={{}} particulars={[]} />
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer style={{ backgroundColor: "#E4E6C9" }}>
           <AppButton
             label="Close"
-            variant="secondary"
+            variant="outline-danger"
             onClick={handleCloseModal}
+            className="custom-app-button"
+          />
+          <AppButton
+            label="Submit"
+            variant="outline-success"
+            className="custom-app-button"
           />
         </Modal.Footer>
       </Modal>

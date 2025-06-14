@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Table, Form } from "react-bootstrap";
-
-const numberToWords = (num) => {
-  if (num === 0) return "Zero Pesos Only";
-  return (
-    num.toLocaleString("en-US", { style: "currency", currency: "PHP" }) +
-    " Only"
-  );
-};
+import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
+import { numberToWords } from "../../utils/numberToWords";
+import { cashReqFields } from "../../handlers/columnHeaders";
+import AppButton from "../../components/ui/AppButton";
 
 const CashReqForm = ({
   data = {},
@@ -25,33 +20,52 @@ const CashReqForm = ({
     ...data,
   });
 
-  const total = particulars.reduce(
-    (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
-    0
+  const [rows, setRows] = useState(
+    particulars.length ? particulars : [{ label: "", price: "", quantity: "" }]
   );
+
+  const total = rows.reduce((sum, row) => {
+    const price = parseFloat(row.price) || 0;
+    const quantity = parseFloat(row.quantity) || 0;
+    return sum + price * quantity;
+  }, 0);
 
   const amountInWords = total ? numberToWords(total) : "Zero Pesos Only";
 
   useEffect(() => {
-    onChange({ ...formData, total, amountInWords });
-  }, [formData, total]);
+    onChange({ ...formData, particulars: rows, total, amountInWords });
+  }, [formData, rows, total]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fields = [
-    { label: "Employee", key: "employee" },
-    { label: "Expense Date", key: "expenseDate", type: "date" },
-    { label: "Department", key: "department" },
-    { label: "Team Lead", key: "teamLead" },
-    { label: "Position", key: "position" },
-  ];
+  const handleRowChange = (index, field, value) => {
+    const updated = [...rows];
+    if (field === "price" || field === "quantity") {
+      updated[index][field] = value;
+    } else {
+      updated[index][field] = value;
+    }
+    setRows(updated);
+  };
+
+  const handleAddRow = () => {
+    setRows([...rows, { label: "", price: "", quantity: "" }]);
+  };
+
+  const handleRemoveRow = (index) => {
+    const updated = [...rows];
+    updated.splice(index, 1);
+    setRows(
+      updated.length ? updated : [{ label: "", price: "", quantity: "" }]
+    );
+  };
 
   return (
     <Container fluid>
-      <div className="custom-container border p-3 bg-white">
+      <div className="custom-container border p-3 bg-white mb-3">
         <Row className="mb-2">
           <Col xs={12}>
             <Form.Group controlId="description">
@@ -64,13 +78,14 @@ const CashReqForm = ({
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
+                size="sm"
               />
             </Form.Group>
           </Col>
         </Row>
 
         <Row>
-          {fields.map(({ label, key, type = "text" }) => (
+          {cashReqFields.map(({ label, key, type = "text" }) => (
             <Col xs={12} md={6} className="mb-2" key={key}>
               <Form.Group controlId={key}>
                 <Form.Label>
@@ -81,6 +96,7 @@ const CashReqForm = ({
                   name={key}
                   value={formData[key]}
                   onChange={handleInputChange}
+                  size="sm"
                 />
               </Form.Group>
             </Col>
@@ -95,52 +111,122 @@ const CashReqForm = ({
         </Row>
       </div>
 
-      <Table responsive className="custom-table mt-3">
-        <thead className="tableHead text-center">
-          <tr>
-            <th>Label</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody className="tableBody text-center">
-          {particulars.map((row, index) => (
-            <tr key={index}>
-              <td>{row.label || "N/A"}</td>
-              <td>
-                ₱
-                {(row.price ?? 0).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}
+      <div
+        className="table-scroll-wrapper mt-3"
+        style={{
+          maxHeight: rows.length >= 2 ? "180px" : "unset",
+          overflowY: rows.length >= 2 ? "auto" : "unset",
+        }}
+      >
+        <Table hover className="expense-table mt-3">
+          <thead className="tableHead text-center">
+            <tr>
+              <th>Label</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody className="tableBody text-center">
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td>
+                  <Form.Control
+                    type="text"
+                    value={row.label}
+                    onChange={(e) =>
+                      handleRowChange(index, "label", e.target.value)
+                    }
+                    size="sm"
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    value={row.price}
+                    onChange={(e) =>
+                      handleRowChange(index, "price", e.target.value)
+                    }
+                    onKeyDown={(e) => {
+                      if (
+                        ["e", "E", "+", "-"].includes(e.key) ||
+                        (e.ctrlKey && e.key === "v")
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    size="sm"
+                  />
+                </td>
+                <td>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    value={row.quantity}
+                    onChange={(e) =>
+                      handleRowChange(index, "quantity", e.target.value)
+                    }
+                    onKeyDown={(e) => {
+                      if (
+                        ["e", "E", "+", "-"].includes(e.key) ||
+                        (e.ctrlKey && e.key === "v")
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    size="sm"
+                  />
+                </td>
+                <td>
+                  ₱
+                  {(
+                    parseFloat(row.quantity || 0) * parseFloat(row.price || 0)
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </td>
+                <td>
+                  <AppButton
+                    label="Remove"
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleRemoveRow(index)}
+                    className="custom-app-button"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan="4" className="text-end">
+                <strong>Total:</strong>
               </td>
-              <td>{row.quantity ?? 0}</td>
-              <td>
-                ₱
-                {((row.quantity ?? 0) * (row.price ?? 0)).toLocaleString(
-                  "en-US",
-                  { minimumFractionDigits: 2 }
-                )}
+              <td className="text-center">
+                <strong>
+                  ₱
+                  {total.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </strong>
               </td>
             </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colSpan="3" className="text-end border-end">
-              <strong>Total:</strong>
-            </td>
-            <td className="text-center border-end">
-              <strong>
-                ₱
-                {total.toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}
-              </strong>
-            </td>
-          </tr>
-        </tfoot>
-      </Table>
+          </tfoot>
+        </Table>
+      </div>
+
+      <div className="text-end mt-3 ">
+        <AppButton
+          label="+ Add
+        Row"
+          onClick={handleAddRow}
+          variant="success"
+          size="sm"
+          className="custom-app-button"
+        />
+      </div>
     </Container>
   );
 };

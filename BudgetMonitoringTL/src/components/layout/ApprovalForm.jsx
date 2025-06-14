@@ -2,6 +2,10 @@ import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Table } from "react-bootstrap";
 import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
+import {
+  approvalFormFields,
+  approvalPartnerFields,
+} from "../../handlers/columnHeaders";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../utils/numberToWords";
 import { mockData } from "../../handlers/mockData";
@@ -74,21 +78,9 @@ const ApprovalForm = () => {
     }
   };
 
-  const fields = [
-    { label: "Position", key: "position" },
-    { label: "Total", key: "total" },
-  ];
-
-  const partnerFields = [
-    { label: "Employee", key: "employee" },
-    { label: "Expense Date", key: "expenseDate" },
-    { label: "Department", key: "department" },
-    { label: "Team Lead", key: "teamLead" },
-  ];
-
   const renderPartnerFields = () => (
     <Row>
-      {partnerFields.map(({ label, key }, index) => (
+      {approvalPartnerFields.map(({ label, key }, index) => (
         <Col
           key={index}
           xs={12}
@@ -109,7 +101,7 @@ const ApprovalForm = () => {
   );
 
   const renderEmployeeFields = () =>
-    fields.map(({ label, key }, index) => (
+    approvalFormFields.map(({ label, key }, index) => (
       <Row key={index}>
         <Col xs={12} className="d-flex align-items-center mb-2">
           <strong className="title">{label}:</strong>
