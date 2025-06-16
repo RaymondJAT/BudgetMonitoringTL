@@ -45,7 +45,7 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
   return (
     <div
       ref={sidebarRef}
-      className={`sidebar d-flex flex-column vh-100 py-2 bg-light border-end ${
+      className={`sidebar d-flex flex-column vh-100 py-2 border-end ${
         isSidebarOpen ? "open" : "collapsed"
       }`}
     >

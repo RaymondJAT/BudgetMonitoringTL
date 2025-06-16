@@ -22,6 +22,11 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
     ...data,
   });
 
+  const [signatures, setSignatures] = useState({
+    approvedName: "",
+    approvedSignature: null,
+  });
+
   const [rows, setRows] = useState(
     particulars.length ? particulars : [{ label: "", price: "", quantity: "" }]
   );
@@ -65,9 +70,23 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
     );
   };
 
+  const handleSignatureUpload = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignatures((prev) => ({
+          ...prev,
+          [`${type}Signature`]: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Container fluid>
-      <div className="request-container border p-3 bg-white">
+      <div className="request-container border p-3">
         <Row className="mb-2">
           <Col xs={12}>
             <FloatingLabel
@@ -140,7 +159,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
       </div>
 
       <div className="request-table-wrapper">
-        <Table hover className="request-table">
+        <Table className="request-table">
           <thead className="tableHead text-center">
             <tr>
               <th>Label</th>
@@ -215,10 +234,10 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
                 <td>
                   <AppButton
                     label="Remove"
-                    variant="danger"
+                    variant="outline-danger"
                     size="sm"
                     onClick={() => handleRemoveRow(index)}
-                    className="custom-app-button"
+                    className="custom-app-button text-center"
                   />
                 </td>
               </tr>
@@ -246,11 +265,60 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
           <AppButton
             label="+"
             onClick={handleAddRow}
-            variant="outline-success"
+            variant="outline-dark"
             size="sm"
             className="add-circle-btn"
           />
         </div>
+      </div>
+
+      <div
+        className="request-container border p-3 mt-3"
+        style={{ borderRadius: "6px" }}
+      >
+        <p className="mb-3 fw-bold">Upload Signature</p>
+        <Row className="g-2">
+          <Col xs={12} md={3}>
+            <FloatingLabel
+              controlId="approvedName"
+              label="Requested by (Printed Name)"
+              className="mb-2"
+            >
+              <Form.Control
+                type="text"
+                placeholder="Requested by (Printed Name)"
+                className="form-control-sm small-input"
+                value={signatures.approvedName}
+                onChange={(e) =>
+                  setSignatures((prev) => ({
+                    ...prev,
+                    approvedName: e.target.value,
+                  }))
+                }
+              />
+            </FloatingLabel>
+          </Col>
+
+          <Col xs={12} md={3}>
+            <label className="form-label">Signature:</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleSignatureUpload(e, "approved")}
+              className="form-control form-control-sm small-input"
+            />
+          </Col>
+
+          {signatures.approvedSignature && (
+            <Col xs={12} md={3} className="d-flex align-items-end">
+              <img
+                src={signatures.approvedSignature}
+                alt="Approved Signature"
+                style={{ maxHeight: "60px" }}
+              />
+            </Col>
+          )}
+        </Row>
       </div>
     </Container>
   );
