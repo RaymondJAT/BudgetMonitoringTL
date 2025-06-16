@@ -7,9 +7,10 @@ import {
   Form,
   FloatingLabel,
 } from "react-bootstrap";
-import { numberToWords } from "../../utils/numberToWords";
-import { cashReqFields } from "../../handlers/columnHeaders";
-import AppButton from "../../components/ui/AppButton";
+import { numberToWords } from "../../../utils/numberToWords";
+import { cashReqFields } from "../../../handlers/columnHeaders";
+import AppButton from "../../ui/AppButton";
+import RequestForm from "../../ui/employee/RequestForm";
 
 const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -86,77 +87,12 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
 
   return (
     <Container fluid>
-      <div className="request-container border p-3">
-        <Row className="mb-2">
-          <Col xs={12}>
-            <FloatingLabel
-              controlId="description"
-              label="Description"
-              className="mb-2"
-            >
-              <Form.Control
-                as="textarea"
-                rows={1}
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Description"
-                className="form-control-sm small-input"
-              />
-            </FloatingLabel>
-          </Col>
-        </Row>
-
-        <Row className="mb-2">
-          {["employee", "department", "position"].map((key) => {
-            const { label, type = "text" } = cashReqFields.find(
-              (f) => f.key === key
-            );
-            return (
-              <Col xs={12} md={4} key={key}>
-                <FloatingLabel controlId={key} label={label} className="mb-2">
-                  <Form.Control
-                    type={type}
-                    name={key}
-                    value={formData[key]}
-                    onChange={handleInputChange}
-                    placeholder={label}
-                    className="form-control-sm small-input"
-                  />
-                </FloatingLabel>
-              </Col>
-            );
-          })}
-        </Row>
-
-        <Row>
-          {cashReqFields
-            .filter(
-              ({ key }) => !["employee", "department", "position"].includes(key)
-            )
-            .map(({ label, key, type = "text" }) => (
-              <Col xs={12} md={6} className="mb-2" key={key}>
-                <FloatingLabel controlId={key} label={label} className="mb-2">
-                  <Form.Control
-                    type={type}
-                    name={key}
-                    value={formData[key]}
-                    onChange={handleInputChange}
-                    placeholder={label}
-                    className="form-control-sm small-input"
-                  />
-                </FloatingLabel>
-              </Col>
-            ))}
-        </Row>
-
-        <Row className="mb-2">
-          <Col xs={12}>
-            <strong>Amount in Words:</strong>
-            <p className="ms-md-2 mb-0 text-start">{amountInWords}</p>
-          </Col>
-        </Row>
-      </div>
+      <RequestForm
+        fields={cashReqFields}
+        formData={formData}
+        onChange={handleInputChange}
+        amountInWords={amountInWords}
+      />
 
       <div className="request-table-wrapper">
         <Table className="request-table">

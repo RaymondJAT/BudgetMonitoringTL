@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { EMPLOYEE_STATUS_LIST } from "../../constants/employeeStatusList";
 import { expenseHeaders } from "../../handlers/columnHeaders";
-import { Modal } from "react-bootstrap";
-import CashReqForm from "./CashReqForm";
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
 import Total from "../../components/layout/Total";
 import DataTable from "../../components/layout/DataTable";
+import CashReqModal from "../../components/ui/employee/CashReqModal";
+import LiqFormModal from "../../components/ui/employee/LiqFormModal";
 
 const MyExpenses = () => {
   const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
   const [showCashReqModal, setShowCashReqModal] = useState(false);
-  const handleCloseModal = () => setShowCashReqModal(false);
+  const [showLiqFormModal, setShowLiqFormModal] = useState(false);
 
   const dropdownItems = [
     {
@@ -24,7 +24,7 @@ const MyExpenses = () => {
     },
     {
       label: "Liquidation Form",
-      onClick: () => navigate("/forms/liquidation"),
+      onClick: () => setShowLiqFormModal(true),
     },
   ];
 
@@ -90,40 +90,16 @@ const MyExpenses = () => {
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
       />
-
       {/* cash request modal */}
-      <Modal
+      <CashReqModal
         show={showCashReqModal}
-        onHide={handleCloseModal}
-        dialogClassName="modal-xl"
-        centered
-        scrollable
-      >
-        <Modal.Header closeButton style={{ backgroundColor: "#EFEEEA" }}>
-          <Modal.Title className="text-uppercase">
-            Cash Request Form
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body
-          className="cashreq-scroll"
-          style={{ backgroundColor: "#800000" }}
-        >
-          <CashReqForm data={{}} signatures={{}} particulars={[]} />
-        </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>
-          <AppButton
-            label="Close"
-            variant="outline-danger"
-            onClick={handleCloseModal}
-            className="custom-app-button"
-          />
-          <AppButton
-            label="Submit"
-            variant="outline-success"
-            className="custom-app-button"
-          />
-        </Modal.Footer>
-      </Modal>
+        onHide={() => setShowCashReqModal(false)}
+      />
+
+      <LiqFormModal
+        show={showLiqFormModal}
+        onHide={() => setShowLiqFormModal(false)}
+      />
     </div>
   );
 };

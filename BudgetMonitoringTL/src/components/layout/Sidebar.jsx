@@ -88,7 +88,7 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
           }}
         />
         {isSidebarOpen && (
-          <span className="nav-label ms-2 fw-bold">Expense Flow</span>
+          <span className="nav-label ms-2 fw-bold">Budget Monitoring</span>
         )}
       </div>
 
