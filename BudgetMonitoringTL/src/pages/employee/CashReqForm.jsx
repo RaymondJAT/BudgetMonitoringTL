@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Table, Form, Button } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Table,
+  Form,
+  FloatingLabel,
+} from "react-bootstrap";
 import { numberToWords } from "../../utils/numberToWords";
 import { cashReqFields } from "../../handlers/columnHeaders";
 import AppButton from "../../components/ui/AppButton";
 
-const CashReqForm = ({
-  data = {},
-  signatures = {},
-  particulars = [],
-  onChange = () => {},
-}) => {
+const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
   const [formData, setFormData] = useState({
     employee: "",
     expenseDate: "",
@@ -65,42 +67,68 @@ const CashReqForm = ({
 
   return (
     <Container fluid>
-      <div className="custom-container border p-3 bg-white mb-3">
+      <div className="request-container border p-3 bg-white">
         <Row className="mb-2">
           <Col xs={12}>
-            <Form.Group controlId="description">
-              <Form.Label>
-                <strong>Description</strong>
-              </Form.Label>
+            <FloatingLabel
+              controlId="description"
+              label="Description"
+              className="mb-2"
+            >
               <Form.Control
                 as="textarea"
                 rows={1}
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                size="sm"
+                placeholder="Description"
+                className="form-control-sm small-input"
               />
-            </Form.Group>
+            </FloatingLabel>
           </Col>
         </Row>
 
+        <Row className="mb-2">
+          {["employee", "department", "position"].map((key) => {
+            const { label, type = "text" } = cashReqFields.find(
+              (f) => f.key === key
+            );
+            return (
+              <Col xs={12} md={4} key={key}>
+                <FloatingLabel controlId={key} label={label} className="mb-2">
+                  <Form.Control
+                    type={type}
+                    name={key}
+                    value={formData[key]}
+                    onChange={handleInputChange}
+                    placeholder={label}
+                    className="form-control-sm small-input"
+                  />
+                </FloatingLabel>
+              </Col>
+            );
+          })}
+        </Row>
+
         <Row>
-          {cashReqFields.map(({ label, key, type = "text" }) => (
-            <Col xs={12} md={6} className="mb-2" key={key}>
-              <Form.Group controlId={key}>
-                <Form.Label>
-                  <strong>{label}</strong>
-                </Form.Label>
-                <Form.Control
-                  type={type}
-                  name={key}
-                  value={formData[key]}
-                  onChange={handleInputChange}
-                  size="sm"
-                />
-              </Form.Group>
-            </Col>
-          ))}
+          {cashReqFields
+            .filter(
+              ({ key }) => !["employee", "department", "position"].includes(key)
+            )
+            .map(({ label, key, type = "text" }) => (
+              <Col xs={12} md={6} className="mb-2" key={key}>
+                <FloatingLabel controlId={key} label={label} className="mb-2">
+                  <Form.Control
+                    type={type}
+                    name={key}
+                    value={formData[key]}
+                    onChange={handleInputChange}
+                    placeholder={label}
+                    className="form-control-sm small-input"
+                  />
+                </FloatingLabel>
+              </Col>
+            ))}
         </Row>
 
         <Row className="mb-2">
@@ -111,14 +139,8 @@ const CashReqForm = ({
         </Row>
       </div>
 
-      <div
-        className="table-scroll-wrapper mt-3"
-        style={{
-          maxHeight: rows.length >= 2 ? "180px" : "unset",
-          overflowY: rows.length >= 2 ? "auto" : "unset",
-        }}
-      >
-        <Table hover className="expense-table mt-3">
+      <div className="request-table-wrapper">
+        <Table hover className="request-table">
           <thead className="tableHead text-center">
             <tr>
               <th>Label</th>
@@ -139,6 +161,7 @@ const CashReqForm = ({
                       handleRowChange(index, "label", e.target.value)
                     }
                     size="sm"
+                    className="small-input"
                   />
                 </td>
                 <td>
@@ -158,6 +181,7 @@ const CashReqForm = ({
                       }
                     }}
                     size="sm"
+                    className="small-input"
                   />
                 </td>
                 <td>
@@ -177,6 +201,7 @@ const CashReqForm = ({
                       }
                     }}
                     size="sm"
+                    className="small-input"
                   />
                 </td>
                 <td>
@@ -201,7 +226,7 @@ const CashReqForm = ({
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan="4" className="text-end">
+              <td colSpan="3" className="text-end">
                 <strong>Total:</strong>
               </td>
               <td className="text-center">
@@ -212,20 +237,20 @@ const CashReqForm = ({
                   })}
                 </strong>
               </td>
+              <td />
             </tr>
           </tfoot>
         </Table>
-      </div>
 
-      <div className="text-end mt-3 ">
-        <AppButton
-          label="+ Add
-        Row"
-          onClick={handleAddRow}
-          variant="success"
-          size="sm"
-          className="custom-app-button"
-        />
+        <div className="text-center mb-3">
+          <AppButton
+            label="+"
+            onClick={handleAddRow}
+            variant="outline-success"
+            size="sm"
+            className="add-circle-btn"
+          />
+        </div>
       </div>
     </Container>
   );

@@ -41,7 +41,6 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
   }, []);
 
   const navItems = navConfig[userRole] || [];
-  const HeaderIcon = navItems.length > 0 ? navItems[0].icon : null;
 
   return (
     <div

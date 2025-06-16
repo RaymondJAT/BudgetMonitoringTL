@@ -99,13 +99,18 @@ const MyExpenses = () => {
         centered
         scrollable
       >
-        <Modal.Header closeButton style={{ backgroundColor: "#E4E6C9" }}>
-          <Modal.Title>Cash Request Form</Modal.Title>
+        <Modal.Header closeButton>
+          <Modal.Title className="text-uppercase">
+            Cash Request Form
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: "#800000" }}>
+        <Modal.Body
+          className="cashreq-scroll"
+          style={{ backgroundColor: "#800000" }}
+        >
           <CashReqForm data={{}} signatures={{}} particulars={[]} />
         </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: "#E4E6C9" }}>
+        <Modal.Footer>
           <AppButton
             label="Close"
             variant="outline-danger"
