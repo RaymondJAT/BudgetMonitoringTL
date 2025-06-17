@@ -46,7 +46,10 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleRowChange = (index, field, value) => {
@@ -197,7 +200,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
           </tfoot>
         </Table>
 
-        <div className="text-center mb-3">
+        <div className="d-flex justify-content-center mt-4 mb-3">
           <AppButton
             label="+"
             onClick={handleAddRow}

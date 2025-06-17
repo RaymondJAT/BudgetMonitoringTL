@@ -15,7 +15,7 @@ const CashReqModal = ({ show, onHide }) => {
       centered
       scrollable
     >
-      <Modal.Header closeButton style={{ backgroundColor: "#EFEEEA" }}>
+      <Modal.Header style={{ backgroundColor: "#EFEEEA" }}>
         <Modal.Title
           className="text-uppercase"
           style={{ letterSpacing: "3px" }}

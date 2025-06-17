@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
-import LiquidForm from "../../layout/employee/LiquidForm";
+import LiqReqForm from "../../layout/employee/LiqReqForm";
 import AppButton from "../AppButton";
 
 const LiqFormModal = ({ show, onHide }) => {
@@ -15,7 +15,7 @@ const LiqFormModal = ({ show, onHide }) => {
       centered
       scrollable
     >
-      <Modal.Header closeButton style={{ backgroundColor: "#EFEEEA" }}>
+      <Modal.Header style={{ backgroundColor: "#EFEEEA" }}>
         <Modal.Title
           className="text-uppercase"
           style={{ letterSpacing: "4px" }}
@@ -24,7 +24,7 @@ const LiqFormModal = ({ show, onHide }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body style={{ backgroundColor: "#800000" }}>
-        <LiquidForm />
+        <LiqReqForm />
       </Modal.Body>
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>
         <AppButton

@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { EMPLOYEE_STATUS_LIST } from "../../constants/employeeStatusList";
 import { expenseHeaders } from "../../handlers/columnHeaders";
@@ -11,7 +10,6 @@ import CashReqModal from "../../components/ui/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/employee/LiqFormModal";
 
 const MyExpenses = () => {
-  const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
   const [showCashReqModal, setShowCashReqModal] = useState(false);

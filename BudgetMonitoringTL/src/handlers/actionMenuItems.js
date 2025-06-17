@@ -10,6 +10,16 @@ export const meatballActions = ({
   setPrintData,
 }) => [
   {
+    label: "Download",
+    onClick: async (entry) => {
+      setPrintData(entry);
+
+      setTimeout(async () => {
+        await downloadPDF(downloadRef, `entry-${"download"}.pdf`);
+      }, 200);
+    },
+  },
+  {
     label: "Delete",
     onClick: (entry) => {
       Swal.fire({
@@ -33,16 +43,6 @@ export const meatballActions = ({
     onClick: (entry) => {
       onArchive(entry);
       Swal.fire("Archived!", "The entry has been archived.", "success");
-    },
-  },
-  {
-    label: "Download",
-    onClick: async (entry) => {
-      setPrintData(entry);
-
-      setTimeout(async () => {
-        await downloadPDF(downloadRef, `entry-${"download"}.pdf`);
-      }, 200);
     },
   },
   {

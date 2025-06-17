@@ -489,7 +489,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .request-table-wrapper {
   position: relative;
   margin-top: 15px;
-  height: 180px;
+  height: 190px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
