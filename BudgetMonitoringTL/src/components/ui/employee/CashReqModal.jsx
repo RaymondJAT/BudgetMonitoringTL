@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import CashReqForm from "../../layout/employee/CashReqForm";
 import AppButton from "../AppButton";
 
 const CashReqModal = ({ show, onHide }) => {
-  const [showCashReqModal, setShowCashReqModal] = useState(false);
-  const handleCloseModal = () => setShowCashReqModal(false);
+  const handleCloseModal = () => {
+    onHide();
+  };
 
   return (
     <Modal

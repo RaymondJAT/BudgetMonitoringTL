@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Table,
-  Form,
-  FloatingLabel,
-} from "react-bootstrap";
-import { FiTrash2 } from "react-icons/fi";
+import { useEffect, useState, useRef } from "react";
+import { Container, Row, Col, Form, FloatingLabel } from "react-bootstrap";
 import { numberToWords } from "../../../utils/numberToWords";
 import { cashReqFields } from "../../../handlers/columnHeaders";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
 import AppButton from "../../ui/AppButton";
 import RequestForm from "../../ui/employee/RequestForm";
+import CashReqTable from "./CashReqTable";
 
 const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -26,12 +20,14 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
 
   const [signatures, setSignatures] = useState({
     approvedName: "",
-    approvedSignature: null,
+    requestSignature: null,
   });
 
   const [rows, setRows] = useState(
     particulars.length ? particulars : [{ label: "", price: "", quantity: "" }]
   );
+
+  const signatureInputRef = useRef(null);
 
   const total = rows.reduce((sum, row) => {
     const price = parseFloat(row.price) || 0;
@@ -55,11 +51,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
 
   const handleRowChange = (index, field, value) => {
     const updated = [...rows];
-    if (field === "price" || field === "quantity") {
-      updated[index][field] = value;
-    } else {
-      updated[index][field] = value;
-    }
+    updated[index][field] = value;
     setRows(updated);
   };
 
@@ -75,158 +67,69 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
     );
   };
 
-  const handleSignatureUpload = (e, type) => {
+  const handleSignatureUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setSignatures((prev) => ({
           ...prev,
-          [`${type}Signature`]: reader.result,
+          requestSignature: reader.result,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleRemoveSignature = () => {
+    setSignatures((prev) => ({
+      ...prev,
+      requestSignature: null,
+    }));
+    if (signatureInputRef.current) {
+      signatureInputRef.current.value = "";
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (signatureInputRef.current) {
+      signatureInputRef.current.value = "";
+    }
+    signatureInputRef.current.click();
+  };
+
   return (
     <Container fluid>
+      {/* CASH REQUEST FORM */}
       <RequestForm
         fields={cashReqFields}
         formData={formData}
         onChange={handleInputChange}
         amountInWords={amountInWords}
       />
-
-      <div className="request-table-wrapper">
-        <Table className="request-table">
-          <thead className="tableHead text-center">
-            <tr>
-              <th>Label</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Subtotal</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody className="tableBody text-center">
-            {rows.map((row, index) => (
-              <tr key={index}>
-                <td>
-                  <Form.Control
-                    type="text"
-                    value={row.label}
-                    onChange={(e) =>
-                      handleRowChange(index, "label", e.target.value)
-                    }
-                    size="sm"
-                    className="small-input"
-                  />
-                </td>
-                <td>
-                  <Form.Control
-                    type="number"
-                    min="0"
-                    value={row.price}
-                    onChange={(e) =>
-                      handleRowChange(index, "price", e.target.value)
-                    }
-                    onKeyDown={(e) => {
-                      if (
-                        ["e", "E", "+", "-"].includes(e.key) ||
-                        (e.ctrlKey && e.key === "v")
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    size="sm"
-                    className="small-input"
-                  />
-                </td>
-                <td>
-                  <Form.Control
-                    type="number"
-                    min="0"
-                    value={row.quantity}
-                    onChange={(e) =>
-                      handleRowChange(index, "quantity", e.target.value)
-                    }
-                    onKeyDown={(e) => {
-                      if (
-                        ["e", "E", "+", "-"].includes(e.key) ||
-                        (e.ctrlKey && e.key === "v")
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    size="sm"
-                    className="small-input"
-                  />
-                </td>
-                <td>
-                  ₱
-                  {(
-                    parseFloat(row.quantity || 0) * parseFloat(row.price || 0)
-                  ).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </td>
-                <td>
-                  <AppButton
-                    label={<FiTrash2 className="trash-icon" />}
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => handleRemoveRow(index)}
-                    className="custom-app-button text-center"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan="3" className="text-end">
-                <strong>Total:</strong>
-              </td>
-              <td className="text-center">
-                <strong>
-                  ₱
-                  {total.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </strong>
-              </td>
-              <td />
-            </tr>
-          </tfoot>
-        </Table>
-
-        <div className="d-flex justify-content-center mt-4 mb-3">
-          <AppButton
-            label="+"
-            onClick={handleAddRow}
-            variant="outline-dark"
-            size="sm"
-            className="add-circle-btn"
-          />
-        </div>
-      </div>
+      {/* CASH REQ TABLE */}
+      <CashReqTable
+        rows={rows}
+        onRowChange={handleRowChange}
+        onAddRow={handleAddRow}
+        onRemoveRow={handleRemoveRow}
+      />
 
       <div
         className="request-container border p-3 mt-3"
         style={{ borderRadius: "6px" }}
       >
         <p className="mb-3 fw-bold">Upload Signature</p>
-        <Row className="g-2">
+        <Row className="g-2 align-items-center">
           <Col xs={12} md={3}>
             <FloatingLabel
               controlId="approvedName"
-              label="Requested by (Printed Name)"
+              label="Requested by"
               className="mb-2"
             >
               <Form.Control
                 type="text"
-                placeholder="Requested by (Printed Name)"
+                placeholder="Requested by"
                 className="form-control-sm small-input"
                 value={signatures.approvedName}
                 onChange={(e) =>
@@ -240,22 +143,68 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
           </Col>
 
           <Col xs={12} md={3}>
-            <label className="form-label fw-bold">Signature:</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleSignatureUpload(e, "approved")}
-              className="form-control form-control-sm small-input"
-            />
+            <div className="d-flex align-items-center gap-2">
+              <div className="position-relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSignatureUpload}
+                  className="d-none"
+                  ref={signatureInputRef}
+                />
+                <AppButton
+                  label="Choose File"
+                  variant="outline-dark"
+                  onClick={handleButtonClick}
+                  className="custom-app-button"
+                />
+              </div>
+            </div>
           </Col>
 
-          {signatures.approvedSignature && (
-            <Col xs={12} md={3} className="d-flex align-items-end">
-              <img
-                src={signatures.approvedSignature}
-                alt="Approved Signature"
-                style={{ maxHeight: "60px" }}
-              />
+          {signatures.requestSignature && (
+            <Col
+              xs={12}
+              md={3}
+              className="d-flex align-items-center"
+              style={{ marginLeft: "-170px" }}
+            >
+              <div className="position-relative">
+                <img
+                  src={signatures.requestSignature}
+                  alt="Requested Signature"
+                  style={{
+                    maxHeight: "50px",
+                    padding: "2px",
+                  }}
+                />
+                <IoIosRemoveCircleOutline
+                  size={20}
+                  className="position-absolute top-0 end-0"
+                  style={{
+                    cursor: "pointer",
+                    color: "red",
+                    backgroundColor: "white",
+                    borderRadius: "50%",
+                    transform: "translate(80%, -70%)",
+                    transition: "all 0.2s ease",
+                    boxShadow: "0 0 3px rgba(0,0,0,0.3)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#36454F";
+                    e.currentTarget.style.transform =
+                      "translate(80%, -70%) scale(1.1)";
+                    e.currentTarget.style.boxShadow = "0 0 5px rgba(0,0,0,0.5)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "red";
+                    e.currentTarget.style.transform = "translate(80%, -70%)";
+                    e.currentTarget.style.boxShadow = "0 0 3px rgba(0,0,0,0.3)";
+                  }}
+                  onClick={handleRemoveSignature}
+                  title="Remove Signature"
+                />
+              </div>
             </Col>
           )}
         </Row>

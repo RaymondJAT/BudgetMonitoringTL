@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { Modal } from "react-bootstrap";
 import LiqReqForm from "../../layout/employee/LiqReqForm";
 import AppButton from "../AppButton";
 
 const LiqFormModal = ({ show, onHide }) => {
-  const [showCashReqModal, setShowLiqFormModal] = useState(false);
-  const handleCloseModal = () => setShowLiqFormModal(false);
+  const handleCloseModal = () => onHide();
 
   return (
     <Modal
@@ -23,7 +21,10 @@ const LiqFormModal = ({ show, onHide }) => {
           Liquidation Form
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ backgroundColor: "#800000" }}>
+      <Modal.Body
+        className="cashreq-scroll"
+        style={{ backgroundColor: "#800000" }}
+      >
         <LiqReqForm />
       </Modal.Body>
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>

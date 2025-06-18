@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import AppButton from "../AppButton";
@@ -8,6 +8,7 @@ const LiquidReceipt = () => {
   const [previews, setPreviews] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
+  const fileInputRef = useRef(null);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -20,6 +21,10 @@ const LiquidReceipt = () => {
 
     setImages((prev) => [...prev, ...validImages]);
     setPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
   };
 
   const handleImageClick = (src) => {
@@ -45,19 +50,28 @@ const LiquidReceipt = () => {
   return (
     <div className="request-container border p-3 mt-3">
       <Form.Group controlId="formFileMultiple" className="mb-3">
-        <Form.Label className="fw-bold">Upload Liquidation Receipts</Form.Label>
+        <Form.Label className="fw-bold">Upload Receipts</Form.Label>
         <div className="d-flex align-items-center gap-2">
-          <Form.Control
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="small-input w-25"
-          />
+          <div className="position-relative">
+            <Form.Control
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              className="d-none"
+              ref={fileInputRef}
+            />
+            <AppButton
+              label="Choose File"
+              variant="outline-dark"
+              onClick={handleButtonClick}
+              className="custom-app-button"
+            />
+          </div>
+
           <AppButton
             label="Clear All"
             variant="outline-danger"
-            size="sm"
             onClick={handleClearImages}
             disabled={previews.length === 0}
             className="custom-app-button"
@@ -66,7 +80,7 @@ const LiquidReceipt = () => {
       </Form.Group>
 
       {previews.length > 0 && (
-        <div className="mt-3">
+        <div className="mt-4">
           <div
             className="d-flex flex-nowrap gap-3"
             style={{
@@ -78,7 +92,7 @@ const LiquidReceipt = () => {
             {previews.map((preview, index) => (
               <div
                 key={index}
-                className="position-relative"
+                className="position-relative mt-2"
                 style={{ display: "inline-block" }}
               >
                 <img
@@ -86,25 +100,17 @@ const LiquidReceipt = () => {
                   alt={`Receipt ${index + 1}`}
                   onClick={() => handleImageClick(preview.url)}
                   style={{
-                    maxWidth: "200px",
-                    maxHeight: "200px",
+                    maxWidth: "150px",
+                    maxHeight: "150px",
                     borderRadius: "5px",
                     border: "1px solid #ccc",
                   }}
                 />
                 <IoIosRemoveCircleOutline
-                  size={24}
-                  color="red"
+                  size={18}
+                  className="remove-icon"
                   title="Remove"
                   onClick={() => handleRemoveImage(index)}
-                  style={{
-                    position: "absolute",
-                    top: "-8px",
-                    right: "-8px",
-                    cursor: "pointer",
-                    backgroundColor: "#fff",
-                    borderRadius: "50%",
-                  }}
                 />
               </div>
             ))}

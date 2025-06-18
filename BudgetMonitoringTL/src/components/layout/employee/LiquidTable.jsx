@@ -40,8 +40,10 @@ const LiquidTable = () => {
   };
 
   const handleRemoveRow = (index) => {
-    const updated = tableRows.filter((_, i) => i !== index);
-    setTableRows(updated);
+    if (tableRows.length > 1) {
+      const updated = tableRows.filter((_, i) => i !== index);
+      setTableRows(updated);
+    }
   };
 
   return (
@@ -165,30 +167,28 @@ const LiquidTable = () => {
                     onChange={(e) =>
                       handleTableChange(index, "amount", e.target.value)
                     }
-                    onKeyDown={(e) => preventInvalidKeys(e, "number")}
+                    onKeyDown={(e) => {
+                      if (
+                        ["e", "E", "+", "-"].includes(e.key) ||
+                        (e.ctrlKey && e.key === "v")
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
                     className="form-control-sm small-input mx-auto"
                     style={{ width: "65px" }}
                   />
                 </td>
 
                 <td className="text-center p-1">
-                  {index === 0 ? (
-                    <AppButton
-                      label={<FiTrash2 className="trash-icon" />}
-                      variant="outline-danger"
-                      size="sm"
-                      disabled
-                      className="custom-app-button mx-auto"
-                    />
-                  ) : (
-                    <AppButton
-                      label={<FiTrash2 className="trash-icon" />}
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => handleRemoveRow(index)}
-                      className="custom-app-button mx-auto"
-                    />
-                  )}
+                  <AppButton
+                    label={<FiTrash2 className="trash-icon" />}
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => handleRemoveRow(index)}
+                    className="custom-app-button mx-auto"
+                    disabled={tableRows.length === 1}
+                  />
                 </td>
               </tr>
             ))}
