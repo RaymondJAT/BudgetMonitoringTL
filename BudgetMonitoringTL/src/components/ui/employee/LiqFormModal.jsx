@@ -15,7 +15,7 @@ const LiqFormModal = ({ show, onHide }) => {
       centered
       scrollable
     >
-      <Modal.Header style={{ backgroundColor: "#EFEEEA" }}>
+      <Modal.Header closeButton style={{ backgroundColor: "#EFEEEA" }}>
         <Modal.Title
           className="text-uppercase"
           style={{ letterSpacing: "4px" }}

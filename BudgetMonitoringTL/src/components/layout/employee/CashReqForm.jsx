@@ -7,6 +7,7 @@ import {
   Form,
   FloatingLabel,
 } from "react-bootstrap";
+import { FiTrash2 } from "react-icons/fi";
 import { numberToWords } from "../../../utils/numberToWords";
 import { cashReqFields } from "../../../handlers/columnHeaders";
 import AppButton from "../../ui/AppButton";
@@ -172,7 +173,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
                 </td>
                 <td>
                   <AppButton
-                    label="Remove"
+                    label={<FiTrash2 className="trash-icon" />}
                     variant="outline-danger"
                     size="sm"
                     onClick={() => handleRemoveRow(index)}
@@ -239,7 +240,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
           </Col>
 
           <Col xs={12} md={3}>
-            <label className="form-label">Signature:</label>
+            <label className="form-label fw-bold">Signature:</label>
             <input
               type="file"
               accept="image/*"

@@ -528,6 +528,15 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: #f9f9f9;
 }
 
+.trash-icon {
+  color: red;
+  transition: color 0.2s ease;
+}
+
+.custom-app-button:hover .trash-icon {
+  color: white;
+}
+
 /* inputs */
 .small-input {
   padding-top: 0.3rem;
