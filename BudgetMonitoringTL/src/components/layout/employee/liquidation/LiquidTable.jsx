@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { Table, Form } from "react-bootstrap";
-import AppButton from "../../ui/AppButton";
+import AppButton from "../../../ui/AppButton";
 
 const LiquidTable = () => {
   const [tableRows, setTableRows] = useState([
@@ -43,6 +43,22 @@ const LiquidTable = () => {
     if (tableRows.length > 1) {
       const updated = tableRows.filter((_, i) => i !== index);
       setTableRows(updated);
+    } else {
+      const isEmpty = Object.values(tableRows[0]).every((val) => val === "");
+      if (!isEmpty) {
+        setTableRows([
+          {
+            date: "",
+            rtNumber: "",
+            storeName: "",
+            particulars: "",
+            from: "",
+            to: "",
+            modeOfTransport: "",
+            amount: "",
+          },
+        ]);
+      }
     }
   };
 

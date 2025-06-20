@@ -1,13 +1,9 @@
 import { useRef } from "react";
 import { Row, Col, FloatingLabel, Form } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
-import AppButton from "../AppButton";
+import AppButton from "../../../ui/AppButton";
 
-const LiquidSignature = ({
-  signatures,
-  setSignatures,
-  handleSignatureUpload,
-}) => {
+const CashReqSignature = ({ signatures, setSignatures, onSignatureUpload }) => {
   const signatureInputRef = useRef(null);
 
   const handleButtonClick = () => {
@@ -20,9 +16,8 @@ const LiquidSignature = ({
   const handleRemoveSignature = () => {
     setSignatures((prev) => ({
       ...prev,
-      preparedSignature: null,
+      requestSignature: null,
     }));
-
     if (signatureInputRef.current) {
       signatureInputRef.current.value = "";
     }
@@ -37,19 +32,19 @@ const LiquidSignature = ({
       <Row className="g-2 align-items-center">
         <Col xs={12} md={3}>
           <FloatingLabel
-            controlId="preparedBy"
-            label="Prepared by"
+            controlId="approvedName"
+            label="Requested by"
             className="mb-2"
           >
             <Form.Control
               type="text"
-              placeholder="Prepared by"
+              placeholder="Requested by"
               className="form-control-sm small-input"
-              value={signatures.preparedBy || ""}
+              value={signatures.approvedName}
               onChange={(e) =>
                 setSignatures((prev) => ({
                   ...prev,
-                  preparedBy: e.target.value,
+                  approvedName: e.target.value,
                 }))
               }
             />
@@ -62,7 +57,7 @@ const LiquidSignature = ({
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleSignatureUpload(e, "preparedSignature")}
+                onChange={onSignatureUpload}
                 className="d-none"
                 ref={signatureInputRef}
               />
@@ -76,7 +71,7 @@ const LiquidSignature = ({
           </div>
         </Col>
 
-        {signatures.preparedSignature && (
+        {signatures.requestSignature && (
           <Col
             xs={12}
             md={3}
@@ -85,11 +80,10 @@ const LiquidSignature = ({
           >
             <div className="position-relative">
               <img
-                src={signatures.preparedSignature}
-                alt="Prepared Signature"
+                src={signatures.requestSignature}
+                alt="Requested Signature"
                 style={{
                   maxHeight: "50px",
-
                   padding: "2px",
                 }}
               />
@@ -127,4 +121,4 @@ const LiquidSignature = ({
   );
 };
 
-export default LiquidSignature;
+export default CashReqSignature;

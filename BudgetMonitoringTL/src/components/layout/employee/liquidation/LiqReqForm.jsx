@@ -1,5 +1,8 @@
 import { useState } from "react";
-import LiquidForm from "../../ui/employee/LiquidForm";
+import LiquidForm from "../liquidation/LiquidForm";
+import LiquidTable from "../liquidation/LiquidTable";
+import LiquidReceipt from "../liquidation/LiquidReceipt";
+import LiquidSignature from "../liquidation/LiquidSignature";
 
 const LiqReqForm = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +25,21 @@ const LiqReqForm = () => {
       amount: "",
     },
   ]);
+  const [signatures, setSignatures] = useState({
+    preparedBy: "",
+    preparedSignature: "",
+  });
+
+  const handleSignatureUpload = (e, field) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignatures((prev) => ({ ...prev, [field]: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleLiqRowChange = (index, field, value) => {
     const updated = [...liqRows];
@@ -59,6 +77,7 @@ const LiqReqForm = () => {
 
   return (
     <div>
+      {/* LIQUIDATION FORM */}
       <LiquidForm
         formData={formData}
         onChange={handleInputChange}
@@ -66,6 +85,16 @@ const LiqReqForm = () => {
         onLiqRowChange={handleLiqRowChange}
         onAddLiqRow={handleAddLiqRow}
         onRemoveLiqRow={handleRemoveLiqRow}
+      />
+      {/* LIQUIDATION TABLE */}
+      <LiquidTable />
+      {/* LIQUIDATION UPLOAD RECEIPT */}
+      <LiquidReceipt />
+      {/* LIQUIDATION SIGNATURE */}
+      <LiquidSignature
+        signatures={signatures}
+        setSignatures={setSignatures}
+        handleSignatureUpload={handleSignatureUpload}
       />
     </div>
   );

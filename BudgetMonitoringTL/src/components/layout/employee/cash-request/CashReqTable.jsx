@@ -1,6 +1,6 @@
 import { Table, Form } from "react-bootstrap";
 import { FiTrash2 } from "react-icons/fi";
-import AppButton from "../../ui/AppButton";
+import AppButton from "../../../ui/AppButton";
 
 const CashReqTable = ({ rows, onRowChange, onAddRow, onRemoveRow }) => {
   const total = rows.reduce((sum, row) => {

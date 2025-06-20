@@ -21,14 +21,6 @@ export const expenseHeaders = [
   { header: "Status", accessor: "status" },
 ];
 
-export const cashReqFields = [
-  { label: "Employee", key: "employee" },
-  { label: "Expense Date", key: "expenseDate", type: "date" },
-  { label: "Department", key: "department" },
-  { label: "Team Lead", key: "teamLead" },
-  { label: "Position", key: "position" },
-];
-
 export const approvalFormFields = [
   { label: "Position", key: "position" },
   { label: "Total", key: "total" },
@@ -41,28 +33,48 @@ export const approvalPartnerFields = [
   { label: "Team Lead", key: "teamLead" },
 ];
 
+// cash request form
+export const cashReqFields = [
+  { label: "Employee", key: "employee" },
+  { label: "Expense Date", key: "expenseDate", type: "date" },
+  { label: "Department", key: "department" },
+  { label: "Team Lead", key: "teamLead" },
+  { label: "Position", key: "position" },
+];
+
 // liquidation form
-export const liquidationFields = [
+export const formFields = [
   [
-    { key: "employee", label: "Employee", type: "text", col: 6 },
-    { key: "amountObtained", label: "Amount Obtained", type: "number", col: 6 },
-  ],
-  [
-    { key: "department", label: "Department", type: "text", col: 6 },
-    { key: "amountExpended", label: "Amount Expended", type: "number", col: 6 },
+    { controlId: "employee", label: "Employee", name: "employee" },
+    { controlId: "department", label: "Department", name: "department" },
+    {
+      controlId: "date",
+      label: "Date of Liquidation",
+      name: "date",
+      type: "date",
+    },
   ],
   [
     {
-      key: "liquidationDate",
-      label: "Date of Liquidation",
-      type: "date",
-      col: 6,
+      controlId: "amountObtained",
+      label: "Amount Obtained",
+      name: "amountObtained",
+      type: "number",
+      min: 0,
     },
     {
-      key: "reimburseReturn",
-      label: "Reimburse / Return",
+      controlId: "amountExpended",
+      label: "Amount Expended",
+      name: "amountExpended",
       type: "number",
-      col: 6,
+      min: 0,
+    },
+    {
+      controlId: "reimburseOrReturn",
+      label: "Reimburse/Return",
+      name: "reimburseOrReturn",
+      type: "number",
+      min: 0,
     },
   ],
 ];

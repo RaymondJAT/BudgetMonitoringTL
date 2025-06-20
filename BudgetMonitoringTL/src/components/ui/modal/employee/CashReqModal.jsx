@@ -1,6 +1,6 @@
 import { Modal } from "react-bootstrap";
-import CashReqForm from "../../layout/employee/CashReqForm";
-import AppButton from "../AppButton";
+import CashReqForm from "../../../layout/employee/cash-request/CashReqForm";
+import AppButton from "../../AppButton";
 
 const CashReqModal = ({ show, onHide }) => {
   const handleCloseModal = () => {

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
-import AppButton from "../AppButton";
+import AppButton from "../../../ui/AppButton";
 
 const LiquidReceipt = () => {
   const [images, setImages] = useState([]);
@@ -102,8 +102,6 @@ const LiquidReceipt = () => {
                   style={{
                     maxWidth: "150px",
                     maxHeight: "150px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
                   }}
                 />
                 <IoIosRemoveCircleOutline

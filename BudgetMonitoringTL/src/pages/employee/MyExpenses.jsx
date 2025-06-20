@@ -6,8 +6,8 @@ import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
 import Total from "../../components/layout/Total";
 import DataTable from "../../components/layout/DataTable";
-import CashReqModal from "../../components/ui/employee/CashReqModal";
-import LiqFormModal from "../../components/ui/employee/LiqFormModal";
+import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
+import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
 
 const MyExpenses = () => {
   const [tableData, setTableData] = useState([]);
