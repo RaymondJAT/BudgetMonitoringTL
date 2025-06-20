@@ -681,6 +681,45 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: #999;
 }
 
+/* DATE PICKER */
+/* Month & Year */
+.react-datepicker__current-month,
+.react-datepicker__year-read-view--down-arrow,
+.react-datepicker__year-read-view--selected-year {
+  color: #800000 !important;
+}
+
+/* Day numbers */
+.react-datepicker__day,
+.react-datepicker__day-name {
+  color: #800000 !important;
+}
+
+/* Selected day */
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #800000 !important;
+  color: white !important;
+}
+
+/* Today’s date */
+.react-datepicker__day--today {
+  border: 1px solid #800000 !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #800000 !important;
+}
+
+/* Full date range highlight */
+.react-datepicker__day--in-range,
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background-color: #800000 !important;
+  color: white !important;
+  border-radius: 0.3rem;
+}
+
 /* responsiveness */
 /* @media (max-width: 1700px) {
 }

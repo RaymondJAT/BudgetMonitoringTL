@@ -1,6 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Table } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Table,
+  FloatingLabel,
+  Form,
+} from "react-bootstrap";
 import { FaStar, FaTrash, FaArrowLeft } from "react-icons/fa";
 import {
   approvalFormFields,
@@ -10,6 +17,7 @@ import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../utils/numberToWords";
 import { mockData } from "../../handlers/mockData";
 import { toast } from "react-toastify";
+import { IoIosRemoveCircleOutline } from "react-icons/io";
 import PrintableCashRequest from "../print/PrintableCashRequest";
 import AppButton from "../ui/AppButton";
 
@@ -109,6 +117,26 @@ const ApprovalForm = () => {
         </Col>
       </Row>
     ));
+
+  // SIGNATURE
+  const signatureInputRef = useRef(null);
+
+  const handleSignatureButtonClick = () => {
+    if (signatureInputRef.current) {
+      signatureInputRef.current.value = "";
+    }
+    signatureInputRef.current.click();
+  };
+
+  const handleRemoveSignature = () => {
+    setSignatures((prev) => ({
+      ...prev,
+      approved: null,
+    }));
+    if (signatureInputRef.current) {
+      signatureInputRef.current.value = "";
+    }
+  };
 
   return (
     <>
@@ -253,36 +281,94 @@ const ApprovalForm = () => {
         </Table>
 
         <div
-          className="custom-container border p-3 bg-white"
+          className="custom-container border p-3 bg-white mt-3"
           style={{ borderRadius: "6px" }}
         >
           <p className="mb-3 fw-bold">Upload Signature</p>
-          <Row className="g-2">
+          <Row className="g-2 align-items-center">
             <Col xs={12} md={3}>
-              <label className="form-label">
-                Approved by <span className="fw-bold">(Printed Name)</span>:
-              </label>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                value={signatures.approvedName || ""}
-                onChange={(e) =>
-                  setSignatures((prev) => ({
-                    ...prev,
-                    approvedName: e.target.value,
-                  }))
-                }
-              />
+              <FloatingLabel
+                controlId="approvedName"
+                label="Approved by"
+                className="mb-2"
+              >
+                <Form.Control
+                  type="text"
+                  placeholder="Approved by"
+                  className="form-control-sm small-input"
+                  value={signatures.approvedName}
+                  onChange={(e) =>
+                    setSignatures((prev) => ({
+                      ...prev,
+                      approvedName: e.target.value,
+                    }))
+                  }
+                />
+              </FloatingLabel>
             </Col>
+
             <Col xs={12} md={3}>
-              <label className="form-label">Signature:</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleSignatureUpload(e, "approved")}
-                className="form-control form-control-sm"
-              />
+              <div className="d-flex align-items-center gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleSignatureUpload(e, "approved")}
+                  className="d-none"
+                  ref={signatureInputRef}
+                />
+                <AppButton
+                  label="Choose File"
+                  variant="outline-dark"
+                  onClick={handleSignatureButtonClick}
+                  className="custom-app-button"
+                />
+              </div>
             </Col>
+
+            {signatures.approved && (
+              <Col
+                xs={12}
+                md={3}
+                className="d-flex align-items-center"
+                style={{ marginLeft: "-210px" }}
+              >
+                <div className="position-relative">
+                  <img
+                    src={signatures.approved}
+                    alt="Approved Signature"
+                    style={{ maxHeight: "50px", padding: "2px" }}
+                  />
+                  <IoIosRemoveCircleOutline
+                    size={20}
+                    className="position-absolute top-0 end-0"
+                    style={{
+                      cursor: "pointer",
+                      color: "red",
+                      backgroundColor: "white",
+                      borderRadius: "50%",
+                      transform: "translate(80%, -70%)",
+                      transition: "all 0.2s ease",
+                      boxShadow: "0 0 3px rgba(0,0,0,0.3)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "#36454F";
+                      e.currentTarget.style.transform =
+                        "translate(80%, -70%) scale(1.1)";
+                      e.currentTarget.style.boxShadow =
+                        "0 0 5px rgba(0,0,0,0.5)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "red";
+                      e.currentTarget.style.transform = "translate(80%, -70%)";
+                      e.currentTarget.style.boxShadow =
+                        "0 0 3px rgba(0,0,0,0.3)";
+                    }}
+                    onClick={handleRemoveSignature}
+                    title="Remove Signature"
+                  />
+                </div>
+              </Col>
+            )}
           </Row>
         </div>
       </Container>

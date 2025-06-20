@@ -69,14 +69,8 @@ export const actionDropdownItems = ({ handleExport }) => [
 
 // filter dropdown menu
 export const filterDropdownItems = (handleFilter) => [
-  {
-    label: "Custom Range (Date Picker)",
-    onClick: () => handleFilter("custom"),
-  },
-
   { type: "divider" },
 
-  { label: "Sort by:", type: "header" },
   { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
   { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
 ];
