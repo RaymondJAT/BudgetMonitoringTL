@@ -12,15 +12,6 @@ export const archiveColumns = [...colHeaders];
 export const importantColumns = [...colHeaders];
 export const trashColumns = [...colHeaders];
 
-export const expenseHeaders = [
-  { header: "Employee", accessor: "employee" },
-  { header: "Department", accessor: "department" },
-  { header: "Description", accessor: "description" },
-  { header: "Expense Date", accessor: "expenseDate" },
-  { header: "Total", accessor: "total" },
-  { header: "Status", accessor: "status" },
-];
-
 export const approvalFormFields = [
   { label: "Position", key: "position" },
   { label: "Total", key: "total" },
@@ -41,6 +32,20 @@ export const cashReqFields = [
   { label: "Team Lead", key: "teamLead" },
   { label: "Position", key: "position" },
 ];
+
+// employee headers
+export const expenseHeaders = [
+  { header: "Employee", accessor: "employee" },
+  { header: "Department", accessor: "department" },
+  { header: "Description", accessor: "description" },
+  { header: "Expense Date", accessor: "expenseDate" },
+  { header: "Total", accessor: "total" },
+  { header: "Status", accessor: "status" },
+];
+
+export const employeeArchiveColumns = [...expenseHeaders];
+export const employeeImportantColumns = [...expenseHeaders];
+export const employeeTrashColumns = [...expenseHeaders];
 
 // liquidation form
 export const formFields = [

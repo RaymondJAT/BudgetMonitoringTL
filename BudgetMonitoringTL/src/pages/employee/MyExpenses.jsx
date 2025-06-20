@@ -75,7 +75,6 @@ const MyExpenses = () => {
   return (
     <div>
       <Total data={totalComputationData} statusList={EMPLOYEE_STATUS_LIST} />
-
       <ToolBar setTableData={setTableData} leftContent={newButton} />
 
       <DataTable
@@ -88,12 +87,12 @@ const MyExpenses = () => {
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
       />
-      {/* cash request modal */}
+      {/* CASH REQUEST MODAL */}
       <CashReqModal
         show={showCashReqModal}
         onHide={() => setShowCashReqModal(false)}
       />
-
+      {/* LIQUIDATION MODAL */}
       <LiqFormModal
         show={showLiqFormModal}
         onHide={() => setShowLiqFormModal(false)}
