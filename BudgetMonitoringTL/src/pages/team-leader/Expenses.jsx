@@ -17,6 +17,7 @@ import ToolBar from "../../components/layout/ToolBar";
 import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
+import LiquidApprovalForm from "../../components/layout/team-leader/liquidation/LiquidApprovalForm";
 
 const PrintButton = ({ onClick }) => (
   <AppButton
@@ -194,7 +195,8 @@ const Expenses = () => {
 
   return (
     <div>
-      <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
+      <LiquidApprovalForm />
+      {/* <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
       <ToolBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}
@@ -232,7 +234,7 @@ const Expenses = () => {
       <div className="d-none">
         <ExpenseReport contentRef={contentRef} data={printData || {}} />
         <ExpenseReport contentRef={downloadRef} data={printData || {}} />
-      </div>
+      </div> */}
     </div>
   );
 };

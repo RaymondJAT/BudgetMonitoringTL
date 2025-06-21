@@ -1,11 +1,9 @@
-import { Container } from "react-bootstrap";
+import React from 'react'
 
-const PrintableLiquidForm = ({ contentRef }) => {
+const PrintableLiquidForm = () => {
   return (
-    <div ref={contentRef}>
-      <Container fluid>Printable LiquidForm</Container>
-    </div>
-  );
-};
+    <div>PrintableLiquidForm</div>
+  )
+}
 
-export default PrintableLiquidForm;
+export default PrintableLiquidForm
