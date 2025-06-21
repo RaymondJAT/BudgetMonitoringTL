@@ -4,7 +4,7 @@ import { numberToWords } from "../../../../utils/numberToWords";
 import { cashReqFields } from "../../../../handlers/columnHeaders";
 import RequestForm from "../cash-request/RequestForm";
 import CashReqTable from "./CashReqTable";
-import CashReqSignature from "./CashReqSignature";
+import SignatureUpload from "../../../SignatureUpload";
 
 const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -95,11 +95,15 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
         onRemoveRow={handleRemoveRow}
       />
       {/* CASH REQ SIGNATURE */}
-      <CashReqSignature
-        signatures={signatures}
-        setSignatures={setSignatures}
-        onSignatureUpload={handleSignatureUpload}
-      />
+      <div className="mt-3">
+        <SignatureUpload
+          label="Requested by"
+          nameKey="approvedName"
+          signatureKey="requestSignature"
+          signatures={signatures}
+          setSignatures={setSignatures}
+        />
+      </div>
     </Container>
   );
 };

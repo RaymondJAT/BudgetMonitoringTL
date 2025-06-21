@@ -1,50 +1,62 @@
 import { useRef } from "react";
 import { Row, Col, FloatingLabel, Form } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
-import AppButton from "../../../ui/AppButton";
+import AppButton from "./ui/AppButton";
 
-const CashReqSignature = ({ signatures, setSignatures, onSignatureUpload }) => {
-  const signatureInputRef = useRef(null);
+const SignatureUpload = ({
+  label,
+  nameKey,
+  signatureKey,
+  signatures,
+  setSignatures,
+}) => {
+  const inputRef = useRef(null);
 
   const handleButtonClick = () => {
-    if (signatureInputRef.current) {
-      signatureInputRef.current.value = "";
+    if (inputRef.current) inputRef.current.value = "";
+    inputRef.current.click();
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file?.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSignatures((prev) => ({
+          ...prev,
+          [signatureKey]: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
-    signatureInputRef.current.click();
   };
 
   const handleRemoveSignature = () => {
     setSignatures((prev) => ({
       ...prev,
-      requestSignature: null,
+      [signatureKey]: null,
     }));
-    if (signatureInputRef.current) {
-      signatureInputRef.current.value = "";
-    }
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   return (
     <div
-      className="request-container border p-3 mt-3"
+      className="request-container border p-3"
       style={{ borderRadius: "6px" }}
     >
       <p className="mb-3 fw-bold">Upload Signature</p>
       <Row className="g-2 align-items-center">
         <Col xs={12} md={3}>
-          <FloatingLabel
-            controlId="approvedName"
-            label="Requested by"
-            className="mb-2"
-          >
+          <FloatingLabel controlId={nameKey} label={label} className="mb-2">
             <Form.Control
               type="text"
-              placeholder="Requested by"
+              placeholder={label}
               className="form-control-sm small-input"
-              value={signatures.approvedName}
+              value={signatures[nameKey] || ""}
               onChange={(e) =>
                 setSignatures((prev) => ({
                   ...prev,
-                  approvedName: e.target.value,
+                  [nameKey]: e.target.value,
                 }))
               }
             />
@@ -53,25 +65,23 @@ const CashReqSignature = ({ signatures, setSignatures, onSignatureUpload }) => {
 
         <Col xs={12} md={3}>
           <div className="d-flex align-items-center gap-2">
-            <div className="position-relative">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={onSignatureUpload}
-                className="d-none"
-                ref={signatureInputRef}
-              />
-              <AppButton
-                label="Choose File"
-                variant="outline-dark"
-                onClick={handleButtonClick}
-                className="custom-app-button"
-              />
-            </div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="d-none"
+              ref={inputRef}
+            />
+            <AppButton
+              label="Choose File"
+              variant="outline-dark"
+              onClick={handleButtonClick}
+              className="custom-app-button"
+            />
           </div>
         </Col>
 
-        {signatures.requestSignature && (
+        {signatures[signatureKey] && (
           <Col
             xs={12}
             md={3}
@@ -80,12 +90,9 @@ const CashReqSignature = ({ signatures, setSignatures, onSignatureUpload }) => {
           >
             <div className="position-relative">
               <img
-                src={signatures.requestSignature}
-                alt="Requested Signature"
-                style={{
-                  maxHeight: "50px",
-                  padding: "2px",
-                }}
+                src={signatures[signatureKey]}
+                alt="Signature"
+                style={{ maxHeight: "50px", padding: "2px" }}
               />
               <IoIosRemoveCircleOutline
                 size={20}
@@ -121,4 +128,4 @@ const CashReqSignature = ({ signatures, setSignatures, onSignatureUpload }) => {
   );
 };
 
-export default CashReqSignature;
+export default SignatureUpload;

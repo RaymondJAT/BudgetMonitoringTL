@@ -2,7 +2,7 @@ import { useState } from "react";
 import LiquidForm from "../liquidation/LiquidForm";
 import LiquidTable from "../liquidation/LiquidTable";
 import LiquidReceipt from "../liquidation/LiquidReceipt";
-import LiquidSignature from "../liquidation/LiquidSignature";
+import SignatureUpload from "../../../SignatureUpload";
 
 const LiqReqForm = () => {
   const [formData, setFormData] = useState({
@@ -91,11 +91,15 @@ const LiqReqForm = () => {
       {/* LIQUIDATION UPLOAD RECEIPT */}
       <LiquidReceipt />
       {/* LIQUIDATION SIGNATURE */}
-      <LiquidSignature
-        signatures={signatures}
-        setSignatures={setSignatures}
-        handleSignatureUpload={handleSignatureUpload}
-      />
+      <div className="mt-3">
+        <SignatureUpload
+          label="Prepared by"
+          nameKey="preparedBy"
+          signatureKey="preparedSignature"
+          signatures={signatures}
+          setSignatures={setSignatures}
+        />
+      </div>
     </div>
   );
 };
