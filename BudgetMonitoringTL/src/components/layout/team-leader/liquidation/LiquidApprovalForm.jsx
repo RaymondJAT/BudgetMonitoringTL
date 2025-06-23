@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "react-toastify";
-
 import {
   liquidationLeftFields,
   liquidationRightFields,
@@ -12,18 +11,19 @@ import ActionButtons from "../../../ActionButtons";
 import SignatureUpload from "../../../SignatureUpload";
 import LiquidApprovalTable from "./LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
-import { numberToWords } from "../../../../utils/numberToWords";
 import LiquidationReceipt from "./LiquidationReceipt";
 
+import { mockLiquidationData } from "../../../../handlers/liquidData";
+
 const LiquidApprovalForm = () => {
-  const { state: data } = useLocation();
+  // const { state: data } = useLocation();
+  const data = mockLiquidationData[0];
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
   const [transactions, setTransactions] = useState([]);
   const [particulars, setParticulars] = useState([]);
   const [total, setTotal] = useState(0);
-  const [amountInWords, setAmountInWords] = useState("");
 
   const [signatures, setSignatures] = useState({
     verified: null,
@@ -100,7 +100,7 @@ const LiquidApprovalForm = () => {
 
   return (
     <>
-      <Container fluid>
+      <Container fluid className="pb-3">
         {/* ACTION BUTTON */}
         <ActionButtons
           onApprove={() => {}}

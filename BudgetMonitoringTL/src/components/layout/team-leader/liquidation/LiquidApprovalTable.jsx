@@ -5,14 +5,14 @@ const LiquidApprovalTable = ({ transactions, total }) => {
     <Table responsive className="custom-table">
       <thead className="tableHead text-center">
         <tr>
-          <th style={{ width: "80px" }}>Date</th>
+          <th style={{ width: "90px" }}>Date</th>
           <th style={{ width: "80px" }}>RT#</th>
-          <th>Store Name</th>
+          <th style={{ width: "200px" }}>Store Name</th>
           <th>Particulars</th>
-          <th style={{ width: "90px" }}>From</th>
-          <th style={{ width: "90px" }}>To</th>
-          <th>Mode of Transportation</th>
-          <th>Amount</th>
+          <th style={{ width: "150px" }}>From</th>
+          <th style={{ width: "150px" }}>To</th>
+          <th style={{ width: "200px" }}>Mode of Transportation</th>
+          <th style={{ width: "90px" }}>Amount</th>
         </tr>
       </thead>
 

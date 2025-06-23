@@ -1,31 +1,71 @@
-import { Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import { Modal } from "react-bootstrap";
 
 const LiquidationReceipt = ({ images = [] }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [modalImage, setModalImage] = useState("");
+
+  const handleImageClick = (src) => {
+    setModalImage(src);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalImage("");
+    setShowModal(false);
+  };
+
   return (
     <div className="custom-container border mb-3 p-3 bg-white rounded">
       <p className="fw-bold mb-3">Proof of Liquidation</p>
 
       {images.length > 0 ? (
-        <Row className="g-3">
+        <div
+          className="d-flex flex-nowrap gap-2"
+          style={{
+            overflowX: "auto",
+            paddingBottom: "4px",
+            cursor: "pointer",
+          }}
+        >
           {images.map((src, index) => (
-            <Col xs={12} md={6} lg={4} key={index}>
-              <div className="border rounded overflow-hidden text-center p-2">
-                <img
-                  src={src}
-                  alt={`Proof ${index + 1}`}
-                  style={{
-                    maxHeight: "250px",
-                    width: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              </div>
-            </Col>
+            <div
+              key={index}
+              className="position-relative"
+              style={{ display: "inline-block", flex: "0 0 auto" }}
+              onClick={() => handleImageClick(src)}
+            >
+              <img
+                src={src}
+                alt={`Proof ${index + 1}`}
+                style={{
+                  maxWidth: "150px",
+                  maxHeight: "150px",
+                  objectFit: "contain",
+                  border: "1px solid #dee2e6",
+                  borderRadius: "4px",
+                  padding: "2px",
+                }}
+              />
+            </div>
           ))}
-        </Row>
+        </div>
       ) : (
         <p className="text-muted">No receipts provided.</p>
       )}
+
+      {/* PREVIEW */}
+      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
+        <Modal.Body className="text-center p-3">
+          {modalImage && (
+            <img
+              src={modalImage}
+              alt="Full preview"
+              style={{ maxWidth: "100%", maxHeight: "80vh" }}
+            />
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
