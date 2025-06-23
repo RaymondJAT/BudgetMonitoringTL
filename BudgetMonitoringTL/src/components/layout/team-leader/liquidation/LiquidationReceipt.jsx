@@ -25,7 +25,6 @@ const LiquidationReceipt = ({ images = [] }) => {
           style={{
             overflowX: "auto",
             paddingBottom: "4px",
-            cursor: "pointer",
           }}
         >
           {images.map((src, index) => (
@@ -33,11 +32,11 @@ const LiquidationReceipt = ({ images = [] }) => {
               key={index}
               className="position-relative"
               style={{ display: "inline-block", flex: "0 0 auto" }}
-              onClick={() => handleImageClick(src)}
             >
               <img
                 src={src}
                 alt={`Proof ${index + 1}`}
+                onClick={() => handleImageClick(src)}
                 style={{
                   maxWidth: "150px",
                   maxHeight: "150px",
@@ -45,6 +44,7 @@ const LiquidationReceipt = ({ images = [] }) => {
                   border: "1px solid #dee2e6",
                   borderRadius: "4px",
                   padding: "2px",
+                  cursor: "pointer", // moved here
                 }}
               />
             </div>

@@ -24,13 +24,12 @@ const LiquidApprovalForm = () => {
   const [transactions, setTransactions] = useState([]);
   const [particulars, setParticulars] = useState([]);
   const [total, setTotal] = useState(0);
-
   const [signatures, setSignatures] = useState({
     verified: null,
     verifiedName: "",
   });
 
-  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
+  const reactToPrintFn = useReactToPrint({ contentRef });
 
   useEffect(() => {
     const items = data?.transactions || [];
@@ -118,19 +117,18 @@ const LiquidApprovalForm = () => {
           }}
         />
 
-        {/* Info Fields */}
+        {/* INFO FIELDS */}
         <div className="custom-container border p-3 bg-white">
           {renderInfoFields()}
         </div>
 
-        {/* Table */}
+        {/* TABLE */}
         <LiquidApprovalTable transactions={transactions} total={total} />
-        {/* Image container */}
+        {/* IMAGE CONTAINER */}
         <LiquidationReceipt
           images={Array.isArray(data?.proofImages) ? data.proofImages : []}
         />
-
-        {/* Signature */}
+        {/* SIGNATURE */}
         <SignatureUpload
           label="Verified by"
           nameKey="verifiedName"
@@ -139,10 +137,13 @@ const LiquidApprovalForm = () => {
           setSignatures={setSignatures}
         />
       </Container>
-
-      {/* Hidden Printable */}
+      {/* PRINTABLE */}
       <div className="d-none">
-        <PrintableLiquidForm />
+        <PrintableLiquidForm
+          data={{ ...data }}
+          contentRef={contentRef}
+          signatures={signatures}
+        />
       </div>
     </>
   );
