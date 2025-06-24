@@ -127,12 +127,20 @@ const DataTable = ({
                           {entry[col.accessor]}
                         </span>
                       ) : col.accessor === "total" ? (
-                        `₱ ${parseFloat(
-                          entry[col.accessor] || 0
-                        ).toLocaleString("en-PH", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`
+                        (() => {
+                          const value =
+                            entry.formType === "Liquidation"
+                              ? entry.amountObtained
+                              : entry.total;
+
+                          return `₱ ${parseFloat(value || 0).toLocaleString(
+                            "en-PH",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }
+                          )}`;
+                        })()
                       ) : col.accessor === "quantity" ? (
                         entry.transactions?.map((item, i) => (
                           <div key={i}>{item.quantity}</div>

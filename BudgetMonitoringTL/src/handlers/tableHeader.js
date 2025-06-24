@@ -6,7 +6,7 @@ export const columns = [
   // { header: "Paid By", accessor: "paidBy" },
   { header: "Price", accessor: "price" },
   { header: "Quantity", accessor: "quantity" },
-  { header: "Total", accessor: "total" },
+  { header: "Amount", accessor: "total" },
   { header: "Status", accessor: "status" },
   { header: "Form Type", accessor: "formType" },
 ];

@@ -648,6 +648,7 @@ export const mockData = [
   {
     id: "liq-1",
     formType: "Liquidation",
+    description: "sample data",
     employee: "Juan Dela Cruz",
     department: "Finance",
     dateOfLiquidation: "2025-06-01",
@@ -709,10 +710,10 @@ export const mockData = [
     ],
     proofImages: ["./receipt.jpg", "./receipt.jpg"],
   },
-
   {
     id: "liq-2",
     formType: "Liquidation",
+    description: "sample data",
     employee: "Maria Santos",
     department: "HR",
     dateOfLiquidation: "2025-06-03",
@@ -747,6 +748,7 @@ export const mockData = [
   {
     id: "liq-3",
     formType: "Liquidation",
+    description: "sample data",
     employee: "Roberto Cruz",
     department: "IT",
     dateOfLiquidation: "2025-06-05",
@@ -781,6 +783,7 @@ export const mockData = [
   {
     id: "liq-4",
     formType: "Liquidation",
+    description: "sample data",
     employee: "Angela Reyes",
     department: "Operations",
     dateOfLiquidation: "2025-06-06",
@@ -815,6 +818,7 @@ export const mockData = [
   {
     id: "liq-5",
     formType: "Liquidation",
+    description: "sample data",
     employee: "Leo Fernandez",
     department: "Marketing",
     dateOfLiquidation: "2025-06-07",

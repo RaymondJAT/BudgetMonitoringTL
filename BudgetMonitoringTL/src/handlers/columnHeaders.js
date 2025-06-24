@@ -4,7 +4,19 @@ export const colHeaders = [
   { header: "Description", accessor: "description" },
   { header: "Category", accessor: "category" },
   { header: "Paid By", accessor: "paidBy" },
-  { header: "Total", accessor: "total" },
+  {
+    header: "Total",
+    accessor: (row) => {
+      const value =
+        row.formType === "Liquidation" ? row.amountObtained : row.total;
+
+      return value != null
+        ? `₱${parseFloat(value).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+          })}`
+        : "₱0.00";
+    },
+  },
   { header: "Status", accessor: "status" },
 ];
 
@@ -15,7 +27,7 @@ export const trashColumns = [...colHeaders];
 // cash request fields
 export const approvalFormFields = [
   { label: "Position", key: "position" },
-  { label: "Total", key: "total" },
+  { label: "Amount", key: "total" },
 ];
 
 export const approvalPartnerFields = [
