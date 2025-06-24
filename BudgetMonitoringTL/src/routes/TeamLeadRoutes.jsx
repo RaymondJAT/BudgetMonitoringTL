@@ -6,6 +6,7 @@ import Archive from "../pages/team-leader/Archive";
 import Trash from "../pages/team-leader/Trash";
 import Important from "../pages/team-leader/Important";
 import CashApprovalForm from "../components/layout/team-leader/cash-request/CashApprovalForm";
+import LiquidApprovalForm from "../components/layout/team-leader/liquidation/LiquidApprovalForm";
 
 const TeamLeadRoutes = () => (
   <Routes>
@@ -16,6 +17,7 @@ const TeamLeadRoutes = () => (
     <Route path="/important" element={<Important />} />
     <Route path="/trash" element={<Trash />} />
     <Route path="/approval-form" element={<CashApprovalForm />} />
+    <Route path="/liquidation-form" element={<LiquidApprovalForm />} />
   </Routes>
 );
 

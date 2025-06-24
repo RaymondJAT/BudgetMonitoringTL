@@ -13,11 +13,8 @@ import LiquidApprovalTable from "./LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "./LiquidationReceipt";
 
-import { mockLiquidationData } from "../../../../handlers/liquidData";
-
 const LiquidApprovalForm = () => {
-  // const { state: data } = useLocation();
-  const data = mockLiquidationData[0];
+  const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
 

@@ -77,7 +77,7 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
                   <th style={{ width: "100px" }}>Date</th>
                   <th>RT#</th>
                   <th style={{ width: "100px" }}>Store Name</th>
-                  <th style={{ width: "200px" }}>Particulars</th>
+                  <th style={{ width: "180px" }}>Particulars</th>
                   <th>From</th>
                   <th>To</th>
                   <th>Mode of Transportation</th>

@@ -17,7 +17,6 @@ import ToolBar from "../../components/layout/ToolBar";
 import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
-import LiquidApprovalForm from "../../components/layout/team-leader/liquidation/LiquidApprovalForm";
 
 const PrintButton = ({ onClick }) => (
   <AppButton
@@ -97,7 +96,11 @@ const Expenses = () => {
   }, [transactions]);
 
   const handleRowClick = (entry) => {
-    navigate("/approval-form", { state: entry });
+    if (entry.formType === "Cash Request") {
+      navigate("/approval-form", { state: entry });
+    } else if (entry.formType === "Liquidation") {
+      navigate("/liquidation-form", { state: entry });
+    }
   };
 
   const handlePrint = () => {
@@ -116,8 +119,9 @@ const Expenses = () => {
       .trim();
 
   const isMatch = (item, value) => {
-    return columns.some((col) =>
-      normalize(item[col.accessor]).includes(normalize(value))
+    const fieldsToSearch = [...columns.map((col) => col.accessor), "formType"];
+    return fieldsToSearch.some((key) =>
+      normalize(item[key]).includes(normalize(value))
     );
   };
 
@@ -195,8 +199,7 @@ const Expenses = () => {
 
   return (
     <div>
-      <LiquidApprovalForm />
-      {/* <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
+      <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
       <ToolBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}
@@ -234,7 +237,7 @@ const Expenses = () => {
       <div className="d-none">
         <ExpenseReport contentRef={contentRef} data={printData || {}} />
         <ExpenseReport contentRef={downloadRef} data={printData || {}} />
-      </div> */}
+      </div>
     </div>
   );
 };
