@@ -33,6 +33,23 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
 
   return (
     <div className="request-container border p-3 mb-2">
+      {/* DESCRIPTION FIELD */}
+      <Row className="mb-3">
+        <Col md={12}>
+          <FloatingLabel controlId="description" label="Description">
+            <Form.Control
+              type="text"
+              name="description"
+              value={formData.description || ""}
+              onChange={onChange}
+              placeholder="Enter description"
+              className="form-control-sm small-input"
+            />
+          </FloatingLabel>
+        </Col>
+      </Row>
+
+      {/* DYNAMIC FIELDS */}
       <Row>
         {enhancedFields.map((column, colIndex) => (
           <Col md={6} key={`col-${colIndex}`}>

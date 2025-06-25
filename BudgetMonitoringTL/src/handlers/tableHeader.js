@@ -8,5 +8,5 @@ export const columns = [
   { header: "Quantity", accessor: "quantity" },
   { header: "Amount", accessor: "total" },
   { header: "Status", accessor: "status" },
-  { header: "Form Type", accessor: "formType" },
+  // { header: "Form Type", accessor: "formType" },
 ];

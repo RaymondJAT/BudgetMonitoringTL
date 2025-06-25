@@ -97,44 +97,40 @@ const LiquidApprovalForm = () => {
   return (
     <>
       <Container fluid className="pb-3">
-        <div className="scroll-wrapper">
-          {/* ACTION BUTTON */}
-          <ActionButtons
-            onApprove={() => {}}
-            onReject={() => {}}
-            onPrint={reactToPrintFn}
-            onBack={() => navigate(-1)}
-            onImportant={() => {
-              markAsImportant(data);
-              toast.success("Entry marked as important.");
-            }}
-            onDelete={() => {
-              moveToTrash(data);
-              navigate(-1);
-              toast.success("Entry moved to trash.");
-            }}
-          />
+        {/* ACTION BUTTON */}
+        <ActionButtons
+          onApprove={() => {}}
+          onReject={() => {}}
+          onPrint={reactToPrintFn}
+          onBack={() => navigate(-1)}
+          onImportant={() => {
+            markAsImportant(data);
+            toast.success("Entry marked as important.");
+          }}
+          onDelete={() => {
+            moveToTrash(data);
+            navigate(-1);
+            toast.success("Entry moved to trash.");
+          }}
+        />
 
-          {/* INFO FIELDS */}
-          <div className="custom-container border p-3 bg-white">
-            {renderInfoFields()}
-          </div>
+        {/* INFO FIELDS */}
+        <div className="custom-container border p-3">{renderInfoFields()}</div>
 
-          {/* TABLE */}
-          <LiquidApprovalTable transactions={transactions} total={total} />
-          {/* IMAGE CONTAINER */}
-          <LiquidationReceipt
-            images={Array.isArray(data?.proofImages) ? data.proofImages : []}
-          />
-          {/* SIGNATURE */}
-          <SignatureUpload
-            label="Verified by"
-            nameKey="verifiedName"
-            signatureKey="verified"
-            signatures={signatures}
-            setSignatures={setSignatures}
-          />
-        </div>
+        {/* TABLE */}
+        <LiquidApprovalTable transactions={transactions} total={total} />
+        {/* IMAGE CONTAINER */}
+        <LiquidationReceipt
+          images={Array.isArray(data?.proofImages) ? data.proofImages : []}
+        />
+        {/* SIGNATURE */}
+        <SignatureUpload
+          label="Noted by"
+          nameKey="notedName"
+          signatureKey="noted"
+          signatures={signatures}
+          setSignatures={setSignatures}
+        />
       </Container>
       {/* PRINTABLE */}
       <div className="d-none">

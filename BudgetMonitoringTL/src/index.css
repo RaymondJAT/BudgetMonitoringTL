@@ -408,6 +408,7 @@ input[type="checkbox"]:checked {
 .custom-container,
 .custom-table {
   font-size: 0.75rem;
+  background-color: #efeeea;
 }
 
 .custom-button.btn-responsive {

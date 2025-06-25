@@ -11,7 +11,7 @@ import Login from "./pages/Login";
 
 // Role-based routes
 import TeamLeadRoutes from "./routes/TeamLeadRoutes";
-// import AdminRoutes from "./routes/AdminRoutes";
+import AdminRoutes from "./routes/AdminRoutes";
 import EmployeeRoutes from "./routes/EmployeeRoutes";
 
 const App = () => {

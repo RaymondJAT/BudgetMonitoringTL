@@ -5,7 +5,7 @@ export const colHeaders = [
   { header: "Category", accessor: "category" },
   { header: "Paid By", accessor: "paidBy" },
   {
-    header: "Total",
+    header: "Amount",
     accessor: (row) => {
       const value =
         row.formType === "Liquidation" ? row.amountObtained : row.total;

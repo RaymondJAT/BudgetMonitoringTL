@@ -124,7 +124,7 @@ const CashApprovalForm = () => {
           }}
         />
         {/* Info Fields */}
-        <div className="custom-container border p-3 bg-white">
+        <div className="custom-container border p-3 ">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Description:</strong>

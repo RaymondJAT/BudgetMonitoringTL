@@ -16,7 +16,7 @@ const LiquidationReceipt = ({ images = [] }) => {
   };
 
   return (
-    <div className="custom-container border mb-3 p-3 bg-white rounded">
+    <div className="custom-container border mb-3 p-3  rounded">
       <p className="fw-bold mb-3">Proof of Liquidation</p>
 
       {images.length > 0 ? (
