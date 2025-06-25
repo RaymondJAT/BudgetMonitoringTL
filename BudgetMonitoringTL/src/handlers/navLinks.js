@@ -16,7 +16,6 @@ export const navConfig = {
     { label: "Trash", icon: FaTrash, path: "/trash" },
   ],
 
-  // Example: add more roles
   employee: [
     {
       label: "Expenses",
@@ -27,5 +26,9 @@ export const navConfig = {
     { label: "Important", icon: FaStar, path: "/employee-important" },
     { label: "Trash", icon: FaTrash, path: "/employee-trash" },
   ],
-  // admin: [...]
+  admin: [{
+    label: "Expenses",
+    icon: FaMoneyBillWave,
+    children: [{label: ""}]
+  }]
 };
