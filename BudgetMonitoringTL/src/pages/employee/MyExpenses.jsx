@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import { LOCAL_KEYS } from "../../constants/localKeys";
-import { EMPLOYEE_STATUS_LIST } from "../../constants/employeeStatusList";
 import { expenseHeaders } from "../../handlers/columnHeaders";
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
-import Total from "../../components/layout/Total";
+import TotalEmployee from "../../components/layout/TotalEmployee";
 import DataTable from "../../components/layout/DataTable";
 import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
@@ -74,7 +73,7 @@ const MyExpenses = () => {
 
   return (
     <div>
-      <Total data={totalComputationData} statusList={EMPLOYEE_STATUS_LIST} />
+      <TotalEmployee data={totalComputationData} />
       <ToolBar setTableData={setTableData} leftContent={newButton} />
 
       <DataTable
