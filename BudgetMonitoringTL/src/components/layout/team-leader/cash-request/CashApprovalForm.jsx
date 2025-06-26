@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import {
@@ -20,22 +20,27 @@ const CashApprovalForm = () => {
   const { state: data } = useLocation();
   const [particulars, setParticulars] = useState([]);
   const [amountInWords, setAmountInWords] = useState("");
-  const [signatures, setSignatures] = useState({
-    approved: null,
-    approvedName: "",
-  });
+  const [signatures, setSignatures] = useState(
+    data?.signatures || {
+      approved: null,
+      approvedName: "",
+    }
+  );
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const employeeData = mockData.find((e) => e.employee === data?.employee) || {
-    transactions: [],
-  };
-  const transactions = employeeData.transactions;
+  // const employeeData = mockData.find((e) => e.employee === data?.employee) || {
+  //   transactions: [],
+  // };
+  // const transactions = employeeData.transactions;
+  const transactions = useMemo(() => data?.transactions || [], [data]);
 
-  const total = transactions.reduce(
-    (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
-    0
-  );
+  const total = useMemo(() => {
+    return transactions.reduce(
+      (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
+      0
+    );
+  }, [transactions]);
 
   useEffect(() => {
     const items = transactions.map((item) => ({

@@ -24,7 +24,7 @@ const TotalForEmployee = ({ data }) => {
     <Container fluid className="total-container mt-3 d-flex flex-wrap gap-3">
       {EMPLOYEE_STATUS_LIST.map(({ label, key }) => (
         <div
-          className="total-box p-3 rounded shadow-sm bg-light text-dark"
+          className="total-box p-3 rounded shadow-sm text-dark"
           key={key}
           style={{ minWidth: "200px", flex: "1" }}
         >

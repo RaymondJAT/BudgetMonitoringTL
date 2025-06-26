@@ -64,20 +64,6 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
     );
   };
 
-  const handleSignatureUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSignatures((prev) => ({
-          ...prev,
-          requestSignature: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <Container fluid>
       {/* CASH REQUEST FORM */}

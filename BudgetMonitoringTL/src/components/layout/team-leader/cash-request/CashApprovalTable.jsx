@@ -14,20 +14,19 @@ const CashApprovalTable = ({ transactions, total }) => {
       <tbody className="tableBody text-center">
         {transactions.map((row, index) => (
           <tr key={index}>
-            <td>{row.label || "N/A"}</td>
+            <td>{row.label}</td>
             <td>
               ₱
-              {(row.price ?? 0).toLocaleString("en-US", {
+              {parseFloat(row.price || 0).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
               })}
             </td>
-            <td>{row.quantity ?? 0}</td>
+            <td>{row.quantity}</td>
             <td>
               ₱
-              {((row.quantity ?? 0) * (row.price ?? 0)).toLocaleString(
-                "en-US",
-                { minimumFractionDigits: 2 }
-              )}
+              {(row.price * row.quantity).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </td>
           </tr>
         ))}

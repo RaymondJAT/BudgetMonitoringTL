@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { expenseHeaders } from "../../handlers/columnHeaders";
 import ToolBar from "../../components/layout/ToolBar";
@@ -9,10 +9,25 @@ import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
 
 const MyExpenses = () => {
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState(() => {
+    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+  });
   const [selectedRows, setSelectedRows] = useState({});
   const [showCashReqModal, setShowCashReqModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updated = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+      setTableData(updated);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
+  }, [tableData]);
 
   const dropdownItems = [
     {
@@ -50,7 +65,9 @@ const MyExpenses = () => {
   );
 
   const handleDelete = (entry) => {
-    setTableData((prev) => prev.filter((item) => item.id !== entry.id));
+    const updated = tableData.filter((item) => item.id !== entry.id);
+    setTableData(updated);
+    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updated));
   };
 
   const handleArchive = (entry) => {
@@ -60,6 +77,7 @@ const MyExpenses = () => {
       JSON.stringify([...archiveData, entry])
     );
     setTableData(updated);
+    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updated));
   };
 
   const handleToggleImportant = (entry) => {
@@ -69,6 +87,7 @@ const MyExpenses = () => {
       JSON.stringify([...importantData, entry])
     );
     setTableData(updated);
+    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updated));
   };
 
   return (
@@ -86,10 +105,12 @@ const MyExpenses = () => {
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
       />
+
       {/* CASH REQUEST MODAL */}
       <CashReqModal
         show={showCashReqModal}
         onHide={() => setShowCashReqModal(false)}
+        onSubmit={(updatedData) => setTableData(updatedData)} // ✅ important
       />
       {/* LIQUIDATION MODAL */}
       <LiqFormModal

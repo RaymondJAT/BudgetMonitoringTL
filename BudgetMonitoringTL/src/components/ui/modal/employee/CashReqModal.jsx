@@ -1,9 +1,34 @@
+import { useState } from "react";
 import { Modal } from "react-bootstrap";
+import { LOCAL_KEYS } from "../../../../constants/localKeys";
 import CashReqForm from "../../../layout/employee/cash-request/CashReqForm";
 import AppButton from "../../AppButton";
 
-const CashReqModal = ({ show, onHide }) => {
+const generateId = () => `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+const CashReqModal = ({ show, onHide, onSubmit }) => {
+  const [formOutput, setFormOutput] = useState({});
+
   const handleCloseModal = () => {
+    onHide();
+  };
+
+  const handleSave = () => {
+    const newEntry = {
+      ...formOutput,
+      id: generateId(),
+      formType: "Cash Request",
+      status: "Pending",
+    };
+
+    const existingData =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+    const updatedData = [...existingData, newEntry];
+    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedData));
+
+    // ✅ Notify parent to reload data
+    if (onSubmit) onSubmit(updatedData);
+
     onHide();
   };
 
@@ -27,7 +52,12 @@ const CashReqModal = ({ show, onHide }) => {
         className="cashreq-scroll"
         style={{ backgroundColor: "#800000" }}
       >
-        <CashReqForm data={{}} signatures={{}} particulars={{}} />
+        <CashReqForm
+          data={{}}
+          signatures={{}}
+          particulars={[]}
+          onChange={(data) => setFormOutput(data)}
+        />
       </Modal.Body>
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>
         <AppButton
@@ -40,6 +70,7 @@ const CashReqModal = ({ show, onHide }) => {
           label="Submit"
           variant="outline-success"
           className="custom-app-button"
+          onClick={handleSave}
         />
       </Modal.Footer>
     </Modal>

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { mockData } from "../../handlers/mockData";
 import { columns } from "../../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { moveEntries } from "../../utils/entryActions";
@@ -14,7 +13,6 @@ import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import DataTable from "../../components/layout/DataTable";
 import Total from "../../components/layout/TotalTeamLead";
 import ToolBar from "../../components/layout/ToolBar";
-import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
 
@@ -58,7 +56,7 @@ const Expenses = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -70,24 +68,19 @@ const Expenses = () => {
     return [...tableData, ...archiveData, ...importantData];
   }, [tableData]);
 
-  const employeeData = mockData.find((e) => e.employee === data?.employee) || {
-    transactions: [],
-  };
+  const transactions = tableData || [];
 
-  const transactions = employeeData.transactions;
-
-  useExpenseDataLoader({
-    setTableData,
-    LOCAL_KEY_ACTIVE: LOCAL_KEYS.ACTIVE,
-    LOCAL_KEY_ARCHIVE: LOCAL_KEYS.ARCHIVE,
-    LOCAL_KEY_IMPORTANT: LOCAL_KEYS.IMPORTANT,
-    LOCAL_KEY_TRASH: LOCAL_KEYS.TRASH,
-    mockData,
-  });
-
+  // 🔁 Sync from localStorage on mount & when localStorage changes
   useEffect(() => {
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
-  }, [tableData]);
+    const syncData = () => {
+      const stored = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+      // console.log("Expenses loaded data:", stored); // ✅ Add this
+      setTableData(stored);
+    };
+
+    const interval = setInterval(syncData, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const items = formatPrintData(transactions);
@@ -107,7 +100,6 @@ const Expenses = () => {
     if (!selectedEntry) return;
 
     setPrintData(selectedEntry);
-
     setTimeout(() => {
       reactToPrintFn();
     }, 100);
@@ -132,7 +124,7 @@ const Expenses = () => {
           (item) =>
             item.status !== STATUS.APPROVED && item.status !== STATUS.REJECTED
         )
-        .filter((item) => isMatch(item, searchValue, columns)),
+        .filter((item) => isMatch(item, searchValue)),
     [tableData, searchValue]
   );
 
