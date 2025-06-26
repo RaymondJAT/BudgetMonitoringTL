@@ -68,9 +68,9 @@ const Reject = () => {
     mockData,
   });
 
-  useEffect(() => {
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
-  }, [tableData]);
+  // useEffect(() => {
+  //   localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
+  // }, [tableData]);
 
   const rejectedData = useMemo(
     () => tableData.filter((item) => item.status === STATUS.REJECTED),

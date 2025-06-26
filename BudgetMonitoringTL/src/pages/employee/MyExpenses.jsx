@@ -110,7 +110,7 @@ const MyExpenses = () => {
       <CashReqModal
         show={showCashReqModal}
         onHide={() => setShowCashReqModal(false)}
-        onSubmit={(updatedData) => setTableData(updatedData)} // ✅ important
+        onSubmit={(updatedData) => setTableData(updatedData)}
       />
       {/* LIQUIDATION MODAL */}
       <LiqFormModal

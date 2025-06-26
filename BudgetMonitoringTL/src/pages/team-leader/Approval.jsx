@@ -73,9 +73,9 @@ const Approval = () => {
     mockData,
   });
 
-  useEffect(() => {
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
-  }, [tableData]);
+  // useEffect(() => {
+  //   localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
+  // }, [tableData]);
 
   const filteredData = useMemo(() => {
     const normalize = (value) =>

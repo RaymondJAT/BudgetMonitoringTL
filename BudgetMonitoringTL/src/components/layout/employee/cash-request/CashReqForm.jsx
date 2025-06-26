@@ -18,7 +18,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
   });
 
   const [signatures, setSignatures] = useState({
-    approvedName: "",
+    requestedName: "",
     requestSignature: null,
   });
 
@@ -35,8 +35,14 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
   const amountInWords = total ? numberToWords(total) : "Zero Pesos Only";
 
   useEffect(() => {
-    onChange({ ...formData, particulars: rows, total, amountInWords });
-  }, [formData, rows, total]);
+    onChange({
+      ...formData,
+      particulars: rows,
+      total,
+      amountInWords,
+      signatures,
+    });
+  }, [formData, rows, total, signatures]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -84,7 +90,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
       <div className="mt-3">
         <SignatureUpload
           label="Requested by"
-          nameKey="approvedName"
+          nameKey="requestedName"
           signatureKey="requestSignature"
           signatures={signatures}
           setSignatures={setSignatures}
