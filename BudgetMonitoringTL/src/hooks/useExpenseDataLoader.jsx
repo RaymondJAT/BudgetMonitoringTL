@@ -6,58 +6,44 @@ const useExpenseDataLoader = ({
   LOCAL_KEY_ARCHIVE,
   LOCAL_KEY_IMPORTANT,
   LOCAL_KEY_TRASH,
-  mockData,
+  mockData = [],
 }) => {
   useEffect(() => {
-    const storedData = localStorage.getItem(LOCAL_KEY_ACTIVE);
-    const storedTrash = localStorage.getItem(LOCAL_KEY_TRASH);
-    let parsedData = [];
-    let trashData = [];
+    const activeData = JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
 
-    try {
-      parsedData = JSON.parse(storedData) || [];
-    } catch {
-      parsedData = [];
-    }
+    const archiveData =
+      JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
 
-    try {
-      trashData = JSON.parse(storedTrash) || [];
-    } catch {
-      trashData = [];
-    }
+    const importantData =
+      JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
 
-    if (parsedData.length > 0) {
-      setTableData(parsedData);
-    } else {
-      const storedArchive = localStorage.getItem(LOCAL_KEY_ARCHIVE);
-      let archiveData = [];
+    const trashData = JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
 
-      try {
-        archiveData = JSON.parse(storedArchive) || [];
-      } catch {
-        archiveData = [];
+    const allData = [
+      ...activeData,
+      ...archiveData,
+      ...importantData,
+      ...trashData,
+    ];
+
+    const ids = new Set();
+    const uniqueData = allData.filter((item) => {
+      if (item && !ids.has(item.id)) {
+        ids.add(item.id);
+        return true;
       }
+      return false;
+    });
 
-      const storedImportant = localStorage.getItem(LOCAL_KEY_IMPORTANT);
-      let importantData = [];
-
-      try {
-        importantData = JSON.parse(storedImportant) || [];
-      } catch {
-        importantData = [];
-      }
-
-      const filteredMockData = mockData.filter(
-        (item) =>
-          !trashData.find((trash) => trash.id === item.id) &&
-          !archiveData.find((archived) => archived.id === item.id) &&
-          !importantData.find((important) => important.id === item.id)
-      );
-
-      setTableData(filteredMockData);
-      localStorage.setItem(LOCAL_KEY_ACTIVE, JSON.stringify(filteredMockData));
-    }
-  }, []);
+    setTableData(uniqueData.length > 0 ? uniqueData : mockData);
+  }, [
+    setTableData,
+    LOCAL_KEY_ACTIVE,
+    LOCAL_KEY_ARCHIVE,
+    LOCAL_KEY_IMPORTANT,
+    LOCAL_KEY_TRASH,
+    mockData,
+  ]);
 };
 
 export default useExpenseDataLoader;

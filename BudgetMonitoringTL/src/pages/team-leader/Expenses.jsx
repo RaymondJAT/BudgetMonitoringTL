@@ -70,16 +70,9 @@ const Expenses = () => {
 
   const transactions = tableData || [];
 
-  // 🔁 Sync from localStorage on mount & when localStorage changes
   useEffect(() => {
-    const syncData = () => {
-      const stored = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-      // console.log("Expenses loaded data:", stored); // ✅ Add this
-      setTableData(stored);
-    };
-
-    const interval = setInterval(syncData, 500);
-    return () => clearInterval(interval);
+    const stored = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+    setTableData(stored);
   }, []);
 
   useEffect(() => {

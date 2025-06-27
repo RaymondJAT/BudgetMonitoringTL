@@ -121,9 +121,9 @@ const PrintableCashRequest = ({
               className="text-center mt-4 position-relative"
               style={{ height: "100px" }}
             >
-              {signatures?.requested && (
+              {signatures?.requestedName && (
                 <img
-                  src={signatures.requested}
+                  src={signatures.requestSignature}
                   alt="Signature"
                   style={{
                     height: "80px",

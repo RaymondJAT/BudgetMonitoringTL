@@ -19,6 +19,7 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
       id: generateId(),
       formType: "Cash Request",
       status: "Pending",
+      transactions: formOutput.particulars,
     };
 
     const existingData =
@@ -26,7 +27,6 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
     const updatedData = [...existingData, newEntry];
     localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedData));
 
-    // ✅ Notify parent to reload data
     if (onSubmit) onSubmit(updatedData);
 
     onHide();

@@ -1,5 +1,5 @@
 import { Modal } from "react-bootstrap";
-import LiqReqForm from "../../../layout/employee/liquidation/LiqReqForm";
+import LiqReqForm from "../../../layout/employee/liquidation-request/LiqReqForm";
 import AppButton from "../../AppButton";
 
 const LiqFormModal = ({ show, onHide }) => {
