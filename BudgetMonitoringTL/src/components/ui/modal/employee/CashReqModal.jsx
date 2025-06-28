@@ -16,6 +16,7 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
   const handleSave = () => {
     const newEntry = {
       ...formOutput,
+      createdAt: new Date().toISOString(),
       id: generateId(),
       formType: "Cash Request",
       status: "Pending",

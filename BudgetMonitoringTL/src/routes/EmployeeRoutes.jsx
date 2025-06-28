@@ -3,6 +3,7 @@ import MyExpenses from "../pages/employee/MyExpenses";
 import EmpArchive from "../pages/employee/EmpArchive";
 import EmpImportant from "../pages/employee/EmpImportant";
 import EmpTrash from "../pages/employee/EmpTrash";
+import ViewCashRequestForm from "../components/ViewCashRequestForm";
 
 const EmployeeRoutes = () => {
   return (
@@ -11,6 +12,7 @@ const EmployeeRoutes = () => {
       <Route path="/employee-archive" element={<EmpArchive />} />
       <Route path="/employee-important" element={<EmpImportant />} />
       <Route path="/employee-trash" element={<EmpTrash />} />
+      <Route path="/cash-form" element={<ViewCashRequestForm />} />
     </Routes>
   );
 };

@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { expenseHeaders } from "../../handlers/columnHeaders";
 import ToolBar from "../../components/layout/ToolBar";
@@ -10,16 +11,21 @@ import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
 
 const MyExpenses = () => {
   const [tableData, setTableData] = useState(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+    return raw.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   });
   const [selectedRows, setSelectedRows] = useState({});
   const [showCashReqModal, setShowCashReqModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
       const updated = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-      setTableData(updated);
+      const sorted = [...updated].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setTableData(sorted);
     }, 500);
 
     return () => clearInterval(interval);
@@ -64,6 +70,14 @@ const MyExpenses = () => {
     [tableData, archiveData, importantData]
   );
 
+  const handleRowClick = (entry) => {
+    if (entry.formType === "Cash Request") {
+      navigate("/cash-form", { state: entry });
+    } else if (entry.formType === "Liquidation") {
+      navigate("/liquid-form", { state: entry });
+    }
+  };
+
   const handleDelete = (entry) => {
     const updated = tableData.filter((item) => item.id !== entry.id);
     setTableData(updated);
@@ -98,7 +112,7 @@ const MyExpenses = () => {
       <DataTable
         data={tableData}
         columns={expenseHeaders}
-        onRowClick={(entry) => console.log("Row clicked:", entry)}
+        onRowClick={handleRowClick}
         onDelete={handleDelete}
         onArchive={handleArchive}
         onToggleImportant={handleToggleImportant}
@@ -110,7 +124,13 @@ const MyExpenses = () => {
       <CashReqModal
         show={showCashReqModal}
         onHide={() => setShowCashReqModal(false)}
-        onSubmit={(updatedData) => setTableData(updatedData)}
+        onSubmit={(updatedData) =>
+          setTableData(
+            [...updatedData].sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            )
+          )
+        }
       />
       {/* LIQUIDATION MODAL */}
       <LiqFormModal
