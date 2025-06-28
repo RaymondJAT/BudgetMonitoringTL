@@ -1,17 +1,18 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Modal } from "react-bootstrap";
 import {
   approvalFormFields,
   approvalPartnerFields,
 } from "../handlers/columnHeaders";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../utils/numberToWords";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaStar, FaTrash } from "react-icons/fa";
 import PrintableCashRequest from "./print/PrintableCashRequest";
 import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
 import SignatureUpload from "./SignatureUpload";
 import AppButton from "./ui/AppButton";
+import CashReqActionButtons from "./CashReqActionButtons";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -25,6 +26,11 @@ const ViewCashRequestForm = () => {
       approvedName: "",
     }
   );
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
@@ -98,16 +104,14 @@ const ViewCashRequestForm = () => {
     });
 
   return (
-    <div className="mt-3">
+    <div className="">
       <Container fluid>
-        <AppButton
-          variant="dark"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="custom-button btn-responsive mb-3"
-        >
-          <FaArrowLeft />
-        </AppButton>
+        <CashReqActionButtons
+          onBack={() => navigate(-1)}
+          onView={handleOpenModal}
+          onPrint={reactToPrintFn}
+        />
+
         {/* Request Info */}
         <div className="custom-container border p-3">
           <Row className="mb-2">
@@ -145,14 +149,26 @@ const ViewCashRequestForm = () => {
       </Container>
 
       {/* Hidden Printable Component */}
-      <div className="d-none">
-        <PrintableCashRequest
-          data={{ ...data, items: particulars }}
-          amountInWords={amountInWords}
-          contentRef={contentRef}
-          signatures={signatures}
-        />
+      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+        <div ref={contentRef}>
+          <PrintableCashRequest
+            data={{ ...data, items: particulars }}
+            amountInWords={amountInWords}
+            signatures={signatures}
+          />
+        </div>
       </div>
+
+      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+        {/* <Modal.Header closeButton></Modal.Header> */}
+        <Modal.Body>
+          <PrintableCashRequest
+            data={{ ...data, items: particulars }}
+            amountInWords={amountInWords}
+            signatures={signatures}
+          />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
