@@ -15,6 +15,7 @@ import Total from "../../components/layout/TotalTeamLead";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
+import TotalCards from "../../components/TotalCards";
 
 const PrintButton = ({ onClick }) => (
   <AppButton
@@ -184,7 +185,8 @@ const Expenses = () => {
 
   return (
     <div>
-      <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
+      {/* <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} /> */}
+      <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
       <ToolBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}
