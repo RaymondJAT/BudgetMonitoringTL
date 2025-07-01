@@ -1,30 +1,33 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import BudgetUsageChart from "./ui/charts/BudgetUsageChart";
 import DepartmentBudgetChart from "./ui/charts/DepartmentBudgetChart";
 import StatusBreakDownChart from "./ui/charts/StatusBreakDownChart";
-
 import { budgetUsageData } from "../constants/budgetUsageData";
 import { departmentBudgetData } from "../constants/departmentBudgetData";
 import { statusBreakdownData } from "../constants/statusBreakdownData";
 
 const BudgetDashboardCharts = () => {
   return (
-    <Container fluid className="pb-3">
-      <Row>
-        <Col xs={12}>
-          <BudgetUsageChart data={budgetUsageData} />
-        </Col>
-      </Row>
+    <div className="pb-3 w-100">
+      {/* Top Line Chart */}
+      <div className="mb-3">
+        <BudgetUsageChart data={budgetUsageData} />
+      </div>
 
-      <Row className="mt-1 g-3">
-        <Col md={6} xs={12}>
-          <DepartmentBudgetChart data={departmentBudgetData} />
+      {/* Bottom Row: Pie + Donut Side by Side */}
+      <Row className="g-3 align-items-stretch" style={{ height: "100%" }}>
+        <Col md={6} className="d-flex">
+          <div className="flex-fill">
+            <DepartmentBudgetChart data={departmentBudgetData} />
+          </div>
         </Col>
-        <Col md={6} xs={12}>
-          <StatusBreakDownChart data={statusBreakdownData} />
+        <Col md={6} className="d-flex">
+          <div className="flex-fill">
+            <StatusBreakDownChart data={statusBreakdownData} />
+          </div>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 };
 

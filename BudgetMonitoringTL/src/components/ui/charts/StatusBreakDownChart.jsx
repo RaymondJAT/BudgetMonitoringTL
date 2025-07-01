@@ -17,8 +17,8 @@ const STATUS_COLORS = {
 
 const StatusBreakDownChart = ({ data }) => {
   return (
-    <div className="request-container p-3">
-      <h6 className="mb-3">📈 Status Breakdown</h6>
+    <div className="custom-container rounded p-3 w-100 h-100">
+      <p className="mb-3 fw-bold">📈 Status Breakdown</p>
       <ResponsiveContainer width="100%" height={250}>
         <PieChart>
           <Pie
@@ -27,8 +27,8 @@ const StatusBreakDownChart = ({ data }) => {
             nameKey="status"
             cx="50%"
             cy="50%"
-            innerRadius={50}
-            outerRadius={70}
+            innerRadius={40}
+            outerRadius={60}
             paddingAngle={3}
             label={({ name, percent }) =>
               `${name}: ${(percent * 100).toFixed(0)}%`

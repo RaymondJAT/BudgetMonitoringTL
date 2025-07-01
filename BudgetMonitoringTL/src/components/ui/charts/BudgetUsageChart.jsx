@@ -11,17 +11,15 @@ import {
 
 const BudgetUsageChart = ({ data }) => {
   return (
-    <div className="request-container p-3">
-      <h6 className="mb-3">📊 Budget Usage Over Time</h6>
-      <ResponsiveContainer width="100%" height={200}>
+    <div className="custom-container rounded p-3 w-100">
+      <p className="mb-3 fw-bold">📊 Budget Usage Over Time</p>
+      <ResponsiveContainer width="100%" height={160}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis />
           <Tooltip formatter={(value) => `₱${value.toLocaleString()}`} />
           <Legend />
-
-          {/* Allocated Line */}
           <Line
             type="monotone"
             dataKey="allocated"
@@ -32,8 +30,6 @@ const BudgetUsageChart = ({ data }) => {
             activeDot={{ r: 5 }}
             name="Allocated"
           />
-
-          {/* Used Line */}
           <Line
             type="monotone"
             dataKey="used"

@@ -11,8 +11,8 @@ const COLORS = ["#0d6efd", "#20c997", "#ffc107", "#dc3545", "#6f42c1"];
 
 const DepartmentBudgetChart = ({ data }) => {
   return (
-    <div className="request-container p-3">
-      <h6 className="mb-3">🏢 Budget Distribution by Department</h6>
+    <div className="custom-container rounded p-3 w-100 h-100">
+      <p className="mb-3 fw-bold">🏢 Budget Distribution by Department</p>
       <ResponsiveContainer width="100%" height={250}>
         <PieChart>
           <Pie
@@ -21,7 +21,7 @@ const DepartmentBudgetChart = ({ data }) => {
             nameKey="department"
             cx="50%"
             cy="50%"
-            outerRadius={70}
+            outerRadius={60}
             fill="#8884d8"
             label={({ name, percent }) =>
               `${name}: ${(percent * 100).toFixed(0)}%`
