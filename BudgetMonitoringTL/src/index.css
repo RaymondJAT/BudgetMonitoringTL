@@ -203,7 +203,7 @@ body {
 /* TABLE STYLING */
 .table-wrapper {
   position: relative;
-  margin-top: 15px;
+  /* margin-top: 15px; */
   height: 490px;
   overflow-y: auto;
   border: 1px solid #ddd;
@@ -232,7 +232,7 @@ body {
 .expense-table td {
   padding: 12px 16px;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
 }
 
 .expense-table tbody tr {

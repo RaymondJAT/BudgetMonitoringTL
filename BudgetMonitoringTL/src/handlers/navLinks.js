@@ -26,9 +26,11 @@ export const navConfig = {
     { label: "Important", icon: FaStar, path: "/employee-important" },
     { label: "Trash", icon: FaTrash, path: "/employee-trash" },
   ],
-  admin: [{
-    label: "Expenses",
-    icon: FaMoneyBillWave,
-    children: [{label: ""}]
-  }]
+  admin: [
+    {
+      label: "Expenses",
+      icon: FaMoneyBillWave,
+      children: [{ label: "Dashboard", path: "/" }],
+    },
+  ],
 };

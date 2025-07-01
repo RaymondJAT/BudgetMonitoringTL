@@ -15,10 +15,19 @@ const EmpTrash = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   const storedTrash =
+  //     JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_TRASH)) || [];
+  //   setTrashItems(storedTrash);
+  // }, []);
   useEffect(() => {
-    const storedTrash =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_TRASH)) || [];
-    setTrashItems(storedTrash);
+    const interval = setInterval(() => {
+      const storedTrash =
+        JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_TRASH)) || [];
+      setTrashItems(storedTrash);
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleRestore = (entryToRestore) => {
@@ -27,7 +36,7 @@ const EmpTrash = () => {
       sourceItems: trashItems,
       setSourceItems: setTrashItems,
       localKeySource: LOCAL_KEYS.EMP_TRASH,
-      localKeyActive: LOCAL_KEYS.EMP_ACTIVE,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
@@ -38,14 +47,14 @@ const EmpTrash = () => {
       selectedItems,
       setSelectedItems,
       localKeySource: LOCAL_KEYS.EMP_TRASH,
-      localKeyActive: LOCAL_KEYS.EMP_ACTIVE,
+      localKeyActive: LOCAL_KEYS.ACTIVE,
     });
   };
 
   const handlePermanentDelete = async (entry) => {
     const updatedTrash = trashItems.filter((item) => item.id !== entry.id);
     setTrashItems(updatedTrash);
-    localStorage.setItem(LOCAL_KEYS.TRASH, JSON.stringify(updatedTrash));
+    localStorage.setItem(LOCAL_KEYS.EMP_TRASH, JSON.stringify(updatedTrash));
   };
 
   const handleRowClick = (entry) => {

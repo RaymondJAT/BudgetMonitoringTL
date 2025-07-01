@@ -1,7 +1,7 @@
 import { useState } from "react";
-import LiquidForm from "../liquidation/LiquidForm";
-import LiquidTable from "../liquidation/LiquidTable";
-import LiquidReceipt from "../liquidation/LiquidReceipt";
+import LiquidForm from "../liquidation-request/LiquidForm";
+import LiquidTable from "../liquidation-request/LiquidTable";
+import LiquidReceipt from "../liquidation-request/LiquidReceipt";
 import SignatureUpload from "../../../SignatureUpload";
 
 const LiqReqForm = () => {

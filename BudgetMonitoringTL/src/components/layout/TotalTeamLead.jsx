@@ -7,7 +7,7 @@ const Total = ({ data, statusList = defaultStatusList }) => {
   if (!data || !Array.isArray(data)) {
     return null;
   }
-
+ 
   data.forEach((item) => {
     if (!item.status || item.status === "Deleted") return;
     const normalizedStatus = item.status.toLowerCase().trim();

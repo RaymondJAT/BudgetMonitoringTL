@@ -1,20 +1,20 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Modal } from "react-bootstrap";
 import {
   approvalFormFields,
   approvalPartnerFields,
-} from "../../../../handlers/columnHeaders";
+} from "../handlers/columnHeaders";
 import { useReactToPrint } from "react-to-print";
-import { numberToWords } from "../../../../utils/numberToWords";
-import { mockData } from "../../../../handlers/mockData";
-import { toast } from "react-toastify";
-import PrintableCashRequest from "../../../print/PrintableCashRequest";
-import CashApprovalTable from "./CashApprovalTable";
-import ActionButtons from "../../../ActionButtons";
-import SignatureUpload from "../../../SignatureUpload";
+import { numberToWords } from "../utils/numberToWords";
+import { FaArrowLeft, FaStar, FaTrash } from "react-icons/fa";
+import PrintableCashRequest from "./print/PrintableCashRequest";
+import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
+import SignatureUpload from "./SignatureUpload";
+import AppButton from "./ui/AppButton";
+import CashReqActionButtons from "./CashReqActionButtons";
 
-const CashApprovalForm = () => {
+const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const { state: data } = useLocation();
@@ -27,12 +27,13 @@ const CashApprovalForm = () => {
     }
   );
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // const employeeData = mockData.find((e) => e.employee === data?.employee) || {
-  //   transactions: [],
-  // };
-  // const transactions = employeeData.transactions;
   const transactions = useMemo(() => data?.transactions || [], [data]);
 
   const total = useMemo(() => {
@@ -57,21 +58,6 @@ const CashApprovalForm = () => {
       setAmountInWords(numberToWords(total));
     }
   }, [total]);
-
-  const moveToTrash = (entry) => {
-    const trashData = JSON.parse(localStorage.getItem("trashData") || "[]");
-    localStorage.setItem("trashData", JSON.stringify([...trashData, entry]));
-  };
-
-  const markAsImportant = (entry) => {
-    const importantData = JSON.parse(
-      localStorage.getItem("importantData") || "[]"
-    );
-    localStorage.setItem(
-      "importantData",
-      JSON.stringify([...importantData, entry])
-    );
-  };
 
   const renderPartnerFields = () => (
     <Row>
@@ -118,30 +104,16 @@ const CashApprovalForm = () => {
     });
 
   return (
-    <>
+    <div className="">
       <Container fluid>
-        {/* ACTION BUTTON */}
-        <ActionButtons
-          onApprove={() => {
-            /* approval logic */
-          }}
-          onReject={() => {
-            /* rejection logic */
-          }}
-          onPrint={reactToPrintFn}
+        <CashReqActionButtons
           onBack={() => navigate(-1)}
-          onImportant={() => {
-            markAsImportant(data);
-            toast.success("Entry marked as important.");
-          }}
-          onDelete={() => {
-            moveToTrash(data);
-            navigate(-1);
-            toast.success("Entry moved to trash.");
-          }}
+          onView={handleOpenModal}
+          onPrint={reactToPrintFn}
         />
-        {/* Info Fields */}
-        <div className="custom-container border p-3 ">
+
+        {/* Request Info */}
+        <div className="custom-container border p-3">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Description:</strong>
@@ -161,28 +133,44 @@ const CashApprovalForm = () => {
             </Col>
           </Row>
         </div>
-        {/* TABLE */}
+
+        {/* Table */}
         <CashApprovalTable transactions={transactions} total={total} />
-        {/* SIGNATURE UPLOAD */}
+
+        {/* Signatures */}
         <SignatureUpload
-          label="Approved by"
-          nameKey="approvedName"
-          signatureKey="approved"
+          label="Requested by"
+          nameKey="requestedName"
+          signatureKey="requestSignature"
           signatures={signatures}
           setSignatures={setSignatures}
+          readOnly={true}
         />
       </Container>
-      {/* HIDDEN PRINTABLE */}
-      <div className="d-none">
-        <PrintableCashRequest
-          data={{ ...data, items: particulars }}
-          amountInWords={amountInWords}
-          contentRef={contentRef}
-          signatures={signatures}
-        />
+
+      {/* Hidden Printable Component */}
+      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+        <div ref={contentRef}>
+          <PrintableCashRequest
+            data={{ ...data, items: particulars }}
+            amountInWords={amountInWords}
+            signatures={signatures}
+          />
+        </div>
       </div>
-    </>
+
+      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+        {/* <Modal.Header closeButton></Modal.Header> */}
+        <Modal.Body>
+          <PrintableCashRequest
+            data={{ ...data, items: particulars }}
+            amountInWords={amountInWords}
+            signatures={signatures}
+          />
+        </Modal.Body>
+      </Modal>
+    </div>
   );
 };
 
-export default CashApprovalForm;
+export default ViewCashRequestForm;

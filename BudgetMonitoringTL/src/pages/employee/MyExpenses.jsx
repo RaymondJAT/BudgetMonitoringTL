@@ -1,33 +1,135 @@
 import { useMemo, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { LOCAL_KEYS } from "../../constants/localKeys";
+import { STATUS } from "../../constants/status";
 import { expenseHeaders } from "../../handlers/columnHeaders";
+import { deleteItems } from "../../utils/deleteItems";
+import { moveEntries } from "../../utils/entryActions";
+import { handleExportData } from "../../utils/exportItems";
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
-import TotalEmployee from "../../components/layout/TotalEmployee";
+
 import DataTable from "../../components/layout/DataTable";
 import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
+import TotalCards from "../../components/TotalCards";
+import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 
 const MyExpenses = () => {
-  const [tableData, setTableData] = useState(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-  });
+  const [tableData, setTableData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
+  const [searchValue, setSearchValue] = useState("");
   const [showCashReqModal, setShowCashReqModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
+  const navigate = useNavigate();
 
+  const selectedCount = Object.values(selectedRows).filter(Boolean).length;
+
+  // Load fresh data from localStorage once on mount
   useEffect(() => {
-    const interval = setInterval(() => {
-      const updated = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-      setTableData(updated);
-    }, 500);
-
-    return () => clearInterval(interval);
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+    const filtered = raw.filter(
+      (item) =>
+        item.status !== STATUS.DELETED &&
+        item.status !== STATUS.APPROVED &&
+        item.status !== STATUS.REJECTED
+    );
+    const sorted = [...filtered].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    setTableData(sorted);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(tableData));
-  }, [tableData]);
+  const archiveData = useMemo(() => {
+    return JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_ARCHIVE)) || [];
+  }, []);
+
+  const importantData = useMemo(() => {
+    return JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_IMPORTANT)) || [];
+  }, []);
+
+  const totalComputationData = useMemo(
+    () => [...tableData, ...archiveData, ...importantData],
+    [tableData, archiveData, importantData]
+  );
+
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .trim();
+
+  const isMatch = (item, value) => {
+    const fields = [...expenseHeaders.map((col) => col.accessor), "formType"];
+    return fields.some((key) =>
+      normalize(item[key]).includes(normalize(value))
+    );
+  };
+
+  const filteredData = useMemo(
+    () => tableData.filter((item) => isMatch(item, searchValue)),
+    [tableData, searchValue]
+  );
+
+  const handleRowClick = (entry) => {
+    if (entry.formType === "Cash Request") {
+      navigate("/cash-form", { state: entry });
+    } else if (entry.formType === "Liquidation") {
+      navigate("/liquid-form", { state: entry });
+    }
+  };
+
+  const handleDelete = (entry) => {
+    moveEntries({
+      entriesToMove: [entry],
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEYS.EMP_TRASH,
+      statusUpdate: STATUS.DELETED,
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    const selectedEntries = filteredData.filter(
+      (entry) => selectedRows[entry.id]
+    );
+    deleteItems({
+      selectedEntries,
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEYS.EMP_TRASH,
+      setSelectedRows,
+      statusUpdate: STATUS.DELETED,
+    });
+  };
+
+  const handleArchive = (entry) => {
+    moveEntries({
+      entriesToMove: [entry],
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEYS.EMP_ARCHIVE,
+    });
+  };
+
+  const handleToggleImportant = (entry) => {
+    moveEntries({
+      entriesToMove: [entry],
+      sourceData: tableData,
+      setSourceData: setTableData,
+      destinationKey: LOCAL_KEYS.EMP_IMPORTANT,
+      avoidDuplicates: true,
+    });
+  };
+
+  const handleExport = () => {
+    const reset = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "MyExpenses",
+    });
+    setSelectedRows(reset);
+  };
 
   const dropdownItems = [
     {
@@ -51,54 +153,20 @@ const MyExpenses = () => {
     />
   );
 
-  const archiveData = useMemo(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
-  }, []);
-
-  const importantData = useMemo(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-  }, []);
-
-  const totalComputationData = useMemo(
-    () => [...tableData, ...archiveData, ...importantData],
-    [tableData, archiveData, importantData]
-  );
-
-  const handleDelete = (entry) => {
-    const updated = tableData.filter((item) => item.id !== entry.id);
-    setTableData(updated);
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updated));
-  };
-
-  const handleArchive = (entry) => {
-    const updated = tableData.filter((item) => item.id !== entry.id);
-    localStorage.setItem(
-      LOCAL_KEYS.ARCHIVE,
-      JSON.stringify([...archiveData, entry])
-    );
-    setTableData(updated);
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updated));
-  };
-
-  const handleToggleImportant = (entry) => {
-    const updated = tableData.filter((item) => item.id !== entry.id);
-    localStorage.setItem(
-      LOCAL_KEYS.IMPORTANT,
-      JSON.stringify([...importantData, entry])
-    );
-    setTableData(updated);
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updated));
-  };
-
   return (
     <div>
-      <TotalEmployee data={totalComputationData} />
-      <ToolBar setTableData={setTableData} leftContent={newButton} />
-
+      <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
+      <ToolBar
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+        leftContent={newButton}
+        handleExport={handleExport}
+        selectedCount={selectedCount}
+      />
       <DataTable
-        data={tableData}
+        data={filteredData}
         columns={expenseHeaders}
-        onRowClick={(entry) => console.log("Row clicked:", entry)}
+        onRowClick={handleRowClick}
         onDelete={handleDelete}
         onArchive={handleArchive}
         onToggleImportant={handleToggleImportant}
@@ -110,8 +178,21 @@ const MyExpenses = () => {
       <CashReqModal
         show={showCashReqModal}
         onHide={() => setShowCashReqModal(false)}
-        onSubmit={(updatedData) => setTableData(updatedData)}
+        onSubmit={(newData) => {
+          const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+          const updated = raw.filter(
+            (item) =>
+              item.status !== STATUS.DELETED &&
+              item.status !== STATUS.APPROVED &&
+              item.status !== STATUS.REJECTED
+          );
+          const sorted = [...updated].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setTableData(sorted);
+        }}
       />
+
       {/* LIQUIDATION MODAL */}
       <LiqFormModal
         show={showLiqFormModal}
