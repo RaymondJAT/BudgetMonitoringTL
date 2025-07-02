@@ -1,4 +1,10 @@
-import { FaMoneyBillWave, FaArchive, FaStar, FaTrash } from "react-icons/fa";
+import {
+  FaMoneyBillWave,
+  FaArchive,
+  FaBookmark,
+  FaTrash,
+} from "react-icons/fa";
+import { RxDashboard } from "react-icons/rx";
 
 export const navConfig = {
   teamlead: [
@@ -12,7 +18,7 @@ export const navConfig = {
       ],
     },
     { label: "Archive", icon: FaArchive, path: "/archive" },
-    { label: "Important", icon: FaStar, path: "/important" },
+    { label: "Important", icon: FaBookmark, path: "/important" },
     { label: "Trash", icon: FaTrash, path: "/trash" },
   ],
 
@@ -23,14 +29,18 @@ export const navConfig = {
       children: [{ label: "My Expenses", path: "/" }],
     },
     { label: "Archive", icon: FaArchive, path: "/employee-archive" },
-    { label: "Important", icon: FaStar, path: "/employee-important" },
+    { label: "Important", icon: FaBookmark, path: "/employee-important" },
     { label: "Trash", icon: FaTrash, path: "/employee-trash" },
   ],
+
   admin: [
+    { label: "Dashboard", icon: RxDashboard, path: "/" },
     {
       label: "Expenses",
       icon: FaMoneyBillWave,
-      children: [{ label: "Dashboard", path: "/" }],
+      children: [{}],
     },
   ],
+
+  finance: [{ label: "Dashboard", icon: RxDashboard, path: "/" }],
 };

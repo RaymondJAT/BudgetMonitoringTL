@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaTrash, FaStar } from "react-icons/fa";
+import { FaArrowLeft, FaTrash, FaBookmark } from "react-icons/fa";
 import AppButton from "./ui/AppButton";
 
 const CashReqActionButtons = ({ onBack, onPrint, onView }) => {
@@ -34,7 +34,7 @@ const CashReqActionButtons = ({ onBack, onPrint, onView }) => {
           size="sm"
           className="custom-button btn-responsive d-flex align-items-center justify-content-center"
         >
-          <FaStar size="0.75rem" />
+          <FaBookmark size="0.75rem" />
         </AppButton>
         <AppButton
           variant="dark"
