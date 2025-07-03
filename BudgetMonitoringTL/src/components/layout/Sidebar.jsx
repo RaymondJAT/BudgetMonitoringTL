@@ -5,25 +5,40 @@ import { FaMoneyBillWave } from "react-icons/fa";
 
 const Sidebar = ({ isSidebarOpen, userRole }) => {
   const navigate = useNavigate();
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const sidebarRef = useRef(null);
   const dropdownRef = useRef(null);
 
+  const [openDropdown, setOpenDropdown] = useState(isSidebarOpen ? [] : null);
+  const [dropdownPositions, setDropdownPositions] = useState({});
+
+  const navItems = navConfig[userRole] || [];
+
   const toggleDropdown = (e, label) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setDropdownPosition({ top: rect.top, left: rect.right + 4 });
-    setOpenDropdown(openDropdown === label ? null : label);
+
+    setDropdownPositions((prev) => ({
+      ...prev,
+      [label]: { top: rect.top, left: rect.right + 4 },
+    }));
+
+    if (isSidebarOpen) {
+      // Allow multiple dropdowns when sidebar is open
+      setOpenDropdown((prev) =>
+        prev.includes(label)
+          ? prev.filter((item) => item !== label)
+          : [...prev, label]
+      );
+    } else {
+      // Only one dropdown allowed when collapsed
+      setOpenDropdown((prev) => (prev === label ? null : label));
+    }
   };
 
-  // close dropdowns when sidebar is collapsed
   useEffect(() => {
-    if (!isSidebarOpen) {
-      setOpenDropdown(null);
-    }
+    // Reset dropdown state based on sidebar state
+    setOpenDropdown(isSidebarOpen ? [] : null);
   }, [isSidebarOpen]);
 
-  // close floating dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -32,15 +47,13 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
         sidebarRef.current &&
         !sidebarRef.current.contains(e.target)
       ) {
-        setOpenDropdown(null);
+        setOpenDropdown(isSidebarOpen ? [] : null);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const navItems = navConfig[userRole] || [];
+  }, [isSidebarOpen]);
 
   return (
     <div
@@ -49,36 +62,44 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
         isSidebarOpen ? "open" : "collapsed"
       }`}
     >
-      {!isSidebarOpen && openDropdown && (
-        <div
-          ref={dropdownRef}
-          className="floating-dropdown bg-white border shadow-sm"
-          style={{
-            position: "fixed",
-            top: dropdownPosition.top,
-            left: dropdownPosition.left,
-            zIndex: 9999,
-            minWidth: "150px",
-          }}
-        >
-          {navItems
-            .find((item) => item.label === openDropdown)
-            ?.children.map((child) => (
-              <div
-                key={child.label}
-                className="dropdown-item px-3 py-2"
-                onClick={() => {
-                  navigate(child.path);
-                  setOpenDropdown(null);
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {child.label}
-              </div>
-            ))}
-        </div>
-      )}
+      {/* Floating Dropdown (collapsed sidebar only) */}
+      {!isSidebarOpen &&
+        openDropdown &&
+        (() => {
+          const item = navItems.find((i) => i.label === openDropdown);
+          const position = dropdownPositions[openDropdown];
+          if (!item || !item.children || !position) return null;
 
+          return (
+            <div
+              ref={dropdownRef}
+              className="floating-dropdown bg-white border shadow-sm"
+              style={{
+                position: "fixed",
+                top: position.top,
+                left: position.left,
+                zIndex: 9999,
+                minWidth: "150px",
+              }}
+            >
+              {item.children.map((child) => (
+                <div
+                  key={child.label}
+                  className="dropdown-item px-3 py-2"
+                  onClick={() => {
+                    navigate(child.path);
+                    setOpenDropdown(null);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  {child.label}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+      {/* Sidebar Header */}
       <div className="sidebar-header px-3 py-2 d-flex align-items-center">
         <FaMoneyBillWave
           style={{
@@ -92,7 +113,8 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
         )}
       </div>
 
-      <div className="nav-links">
+      {/* Nav Items */}
+      <div className="nav-links flex-grow-1 overflow-y-auto">
         {navItems.map((item) => (
           <div key={item.label}>
             <div
@@ -107,11 +129,15 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
               <div className="d-flex align-items-center">
                 <span className="nav-icon">{<item.icon />}</span>
                 {isSidebarOpen && (
-                  <span className="nav-label ms-2 d-flex align-items-center gap-3">
+                  <span className="nav-label ms-2 d-flex align-items-center gap-4">
                     {item.label}
                     {item.children && (
                       <span className="dropdown-arrow">
-                        {openDropdown === item.label ? "▾" : "▸"}
+                        {(Array.isArray(openDropdown) &&
+                          openDropdown.includes(item.label)) ||
+                        openDropdown === item.label
+                          ? "▾"
+                          : "▸"}
                       </span>
                     )}
                   </span>
@@ -119,17 +145,21 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
               </div>
             </div>
 
+            {/* Inline Dropdown (only when sidebar is open) */}
             {item.children && isSidebarOpen && (
               <div
                 className={`dropdown-wrapper ms-4 me-3 ${
-                  openDropdown === item.label ? "open" : ""
+                  Array.isArray(openDropdown) &&
+                  openDropdown.includes(item.label)
+                    ? "open"
+                    : ""
                 }`}
               >
                 <div className="dropdown-box my-2 p-2 rounded shadow-sm bg-white border">
                   {item.children.map((child) => (
                     <div
                       key={child.label}
-                      className="nav-item py-1 px-2 rounded hover-bg"
+                      className="dropmenu-item py-1 px-2 rounded hover-bg"
                       onClick={() => navigate(child.path)}
                       style={{ cursor: "pointer" }}
                     >
