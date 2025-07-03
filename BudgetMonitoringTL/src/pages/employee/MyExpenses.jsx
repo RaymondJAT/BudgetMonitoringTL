@@ -26,18 +26,28 @@ const MyExpenses = () => {
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
   // Load fresh data from localStorage once on mount
-  useEffect(() => {
-    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-    const filtered = raw.filter(
-      (item) =>
-        item.status !== STATUS.DELETED &&
-        item.status !== STATUS.APPROVED &&
-        item.status !== STATUS.REJECTED
-    );
+  const loadActiveExpenses = () => {
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_ACTIVE)) || [];
+
+    const filtered = raw.filter((item) => item.status !== STATUS.DELETED);
+
     const sorted = [...filtered].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
     setTableData(sorted);
+  };
+
+  useEffect(() => {
+    loadActiveExpenses();
+
+    const handleRestoreEvent = () => {
+      loadActiveExpenses();
+    };
+
+    window.addEventListener("expenses-updated", handleRestoreEvent);
+    return () => {
+      window.removeEventListener("expenses-updated", handleRestoreEvent);
+    };
   }, []);
 
   const archiveData = useMemo(() => {
@@ -86,12 +96,17 @@ const MyExpenses = () => {
       destinationKey: LOCAL_KEYS.EMP_TRASH,
       statusUpdate: STATUS.DELETED,
     });
+
+    setTimeout(() => {
+      loadActiveExpenses();
+    }, 100); // small delay ensures localStorage is updated
   };
 
   const handleDeleteSelected = () => {
     const selectedEntries = filteredData.filter(
       (entry) => selectedRows[entry.id]
     );
+
     deleteItems({
       selectedEntries,
       sourceData: tableData,
@@ -100,6 +115,10 @@ const MyExpenses = () => {
       setSelectedRows,
       statusUpdate: STATUS.DELETED,
     });
+
+    setTimeout(() => {
+      loadActiveExpenses();
+    }, 100);
   };
 
   const handleArchive = (entry) => {

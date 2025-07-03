@@ -1,10 +1,13 @@
 export const LOCAL_KEYS = {
-  ACTIVE: "expensesData",
-  TRASH: "trashData",
-  ARCHIVE: "archiveData",
-  IMPORTANT: "importantData",
+  // employee keys
   EMP_ACTIVE: "employeeActive",
   EMP_ARCHIVE: "employeeArchive",
   EMP_IMPORTANT: "employeeImportant",
   EMP_TRASH: "employeeTrash",
+
+  // team leader keys
+  ACTIVE: "expensesData",
+  TRASH: "trashData",
+  ARCHIVE: "archiveData",
+  IMPORTANT: "importantData",
 };

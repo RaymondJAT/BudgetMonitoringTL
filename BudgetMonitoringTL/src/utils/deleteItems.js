@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import { LOCAL_KEYS } from "../constants/localKeys";
 
 export const deleteItems = async ({
   selectedEntries,
@@ -23,23 +24,28 @@ export const deleteItems = async ({
 
   if (!result.isConfirmed) return;
 
+  // 🔧 1. Remove from source
   const updatedSource = sourceData.filter(
     (entry) => !selectedEntries.some((sel) => sel.id === entry.id)
   );
   setSourceData(updatedSource);
 
-  localStorage.setItem(
-    destinationKey,
-    JSON.stringify([
-      ...new Map(
-        [
-          ...(JSON.parse(localStorage.getItem(destinationKey)) || []),
-          ...selectedEntries,
-        ].map((item) => [item.id, item])
-      ).values(),
-    ])
-  );
+  // 🔧 2. Persist ACTIVE update in localStorage
+  localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedSource));
 
+  // 🔧 3. Merge into Trash (deduplicated by ID)
+  const existingTrash = JSON.parse(localStorage.getItem(destinationKey)) || [];
+
+  const merged = [
+    ...new Map(
+      [...existingTrash, ...selectedEntries].map((item) => [item.id, item])
+    ).values(),
+  ];
+
+  localStorage.setItem(destinationKey, JSON.stringify(merged));
+
+  // 🔧 4. Reset selected rows
   setSelectedRows({});
+
   Swal.fire("Deleted!", "Entries have been moved to Trash.", "success");
 };

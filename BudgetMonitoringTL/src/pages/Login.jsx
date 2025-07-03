@@ -35,6 +35,11 @@ const Login = ({ setUserRole }) => {
       localStorage.setItem("username", "Admin");
       setUserRole("admin");
       navigate("/");
+    } else if (username === "finance" && password === "pass") {
+      localStorage.setItem("role", "finance");
+      localStorage.setItem("username", "Finance");
+      setUserRole("finance");
+      navigate("/");
     } else {
       setError("Invalid username or password");
     }

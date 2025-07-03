@@ -21,6 +21,7 @@ body {
 }
 
 /* SIDEBAR */
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -68,6 +69,21 @@ body {
   cursor: pointer;
   transition: background-color 0.2s ease;
   line-height: 1;
+}
+
+.dropmenu-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.dropmenu-item:last-child {
+  margin-bottom: 0;
 }
 
 .nav-item:hover {
@@ -136,6 +152,51 @@ body {
 
 .hover-bg:hover {
   background-color: #f8d7da;
+}
+
+/* ADVANCE STYLING */
+.sidebar .nav-links {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.sidebar .nav-item {
+  border-radius: 50px;
+  background-color: #f8f9fa;
+  margin: 8px 10px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .nav-item:hover {
+  background-color: #f8d7da;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar .nav-item .nav-label {
+  padding: 4px 10px;
+}
+
+/* Center icons inside oblong items when collapsed */
+.sidebar.collapsed .nav-item {
+  justify-content: center !important;
+  padding: 12px;
+  width: 45px;
+  height: 45px;
+  margin: 8px auto;
+  display: flex;
+  align-items: center;
+  border-radius: 50px;
+}
+
+/* Hide text label when collapsed */
+.sidebar.collapsed .nav-label {
+  display: none !important;
+}
+
+/* Remove margin on icon for proper centering */
+.sidebar.collapsed .nav-icon {
+  margin-right: 0;
 }
 
 /* FLOATING MENU */

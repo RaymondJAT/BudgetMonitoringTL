@@ -37,6 +37,9 @@ const EmpTrash = () => {
       setSourceItems: setTrashItems,
       localKeySource: LOCAL_KEYS.EMP_TRASH,
       localKeyActive: LOCAL_KEYS.ACTIVE,
+      onRestoreComplete: () => {
+        window.dispatchEvent(new Event("expenses-updated"));
+      },
     });
   };
 

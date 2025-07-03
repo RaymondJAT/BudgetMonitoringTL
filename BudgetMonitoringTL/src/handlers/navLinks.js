@@ -1,36 +1,82 @@
-import { FaMoneyBillWave, FaArchive, FaStar, FaTrash } from "react-icons/fa";
+import { RxDashboard, RxTrash } from "react-icons/rx";
+import { TbReport } from "react-icons/tb";
+import {
+  MdOutlineManageHistory,
+  MdOutlineArchive,
+  MdBookmarkBorder,
+} from "react-icons/md";
+import { GiMoneyStack } from "react-icons/gi";
 
 export const navConfig = {
-  teamlead: [
+  employee: [
     {
       label: "Expenses",
-      icon: FaMoneyBillWave,
+      icon: GiMoneyStack,
       children: [
-        { label: "Approval Requests", path: "/" },
+        { label: "My Requests", path: "/" },
+        { label: "My Liquidations", path: "#" },
+      ],
+    },
+    { label: "Archive", icon: MdOutlineArchive, path: "/employee-archive" },
+    { label: "Important", icon: MdBookmarkBorder, path: "/employee-important" },
+    { label: "Trash", icon: RxTrash, path: "/employee-trash" },
+  ],
+
+  teamlead: [
+    {
+      label: "Cash Requests",
+      icon: GiMoneyStack,
+      children: [
+        { label: "Pending Approvals", path: "/" },
         { label: "My Approvals", path: "/my-approvals" },
         { label: "Rejected Requests", path: "/rejected-requests" },
       ],
     },
-    { label: "Archive", icon: FaArchive, path: "/archive" },
-    { label: "Important", icon: FaStar, path: "/important" },
-    { label: "Trash", icon: FaTrash, path: "/trash" },
+    {
+      label: "Liquidations",
+      icon: GiMoneyStack,
+      children: [
+        { label: "Liquidation to Note", path: "#" },
+        { label: "History", path: "#" },
+      ],
+    },
+    { label: "Reports", icon: TbReport, path: "#" },
+    { label: "Archive", icon: MdOutlineArchive, path: "/archive" },
+    { label: "Important", icon: MdBookmarkBorder, path: "/important" },
+    { label: "Trash", icon: RxTrash, path: "/trash" },
   ],
 
-  employee: [
-    {
-      label: "Expenses",
-      icon: FaMoneyBillWave,
-      children: [{ label: "My Expenses", path: "/" }],
-    },
-    { label: "Archive", icon: FaArchive, path: "/employee-archive" },
-    { label: "Important", icon: FaStar, path: "/employee-important" },
-    { label: "Trash", icon: FaTrash, path: "/employee-trash" },
-  ],
   admin: [
+    { label: "Dashboard", icon: RxDashboard, path: "/" },
     {
-      label: "Expenses",
-      icon: FaMoneyBillWave,
-      children: [{ label: "Dashboard", path: "/" }],
+      label: "Cash Flow",
+      icon: GiMoneyStack,
+      children: [
+        { label: "All Requests", path: "#" },
+        { label: "All Liquidations", path: "#" },
+        { label: "Final Approvals", path: "#" },
+      ],
     },
+    {
+      label: "Management",
+      icon: MdOutlineManageHistory,
+      children: [
+        { label: "Budget Allocation", path: "#" },
+        { label: "User Management", path: "#" },
+      ],
+    },
+    {
+      label: "Reports & Logs",
+      icon: TbReport,
+      children: [
+        { label: "Rerports", path: "#" },
+        { label: "Audit Logs", path: "#" },
+      ],
+    },
+    { label: "Archive", icon: MdOutlineArchive, path: "#" },
+    { label: "Important", icon: MdBookmarkBorder, path: "#" },
+    { label: "Trash", icon: RxTrash, path: "#" },
   ],
+
+  finance: [{ label: "Dashboard", icon: RxDashboard, path: "/" }],
 };

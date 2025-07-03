@@ -6,6 +6,7 @@ export const restoreSingleItem = async ({
   setSourceItems,
   localKeySource,
   localKeyActive,
+  onRestoreComplete,
 }) => {
   const result = await Swal.fire({
     title: "Restore Entry?",
@@ -17,23 +18,32 @@ export const restoreSingleItem = async ({
 
   if (!result.isConfirmed) return;
 
+  // ✅ Retain original status (no override)
+  const restoredEntry = { ...entryToRestore };
+
+  // ✅ Remove from source (Trash)
   const updatedSource = sourceItems.filter(
-    (entry) => entry.id !== entryToRestore.id
+    (entry) => entry.id !== restoredEntry.id
   );
   setSourceItems(updatedSource);
   localStorage.setItem(localKeySource, JSON.stringify(updatedSource));
 
+  // ✅ Add to ACTIVE storage
   const currentActive = JSON.parse(localStorage.getItem(localKeyActive)) || [];
 
   const isDuplicate = currentActive.some(
-    (entry) => entry.id === entryToRestore.id
+    (entry) => entry.id === restoredEntry.id
   );
 
   const newActive = isDuplicate
     ? currentActive
-    : [...currentActive, entryToRestore];
+    : [...currentActive, restoredEntry];
 
   localStorage.setItem(localKeyActive, JSON.stringify(newActive));
 
+  // ✅ Notify + trigger refresh
   Swal.fire("Restored!", "The entry has been moved to Active.", "success");
+  window.dispatchEvent(new Event("expenses-updated"));
+
+  if (onRestoreComplete) onRestoreComplete();
 };

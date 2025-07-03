@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import TeamLeadRoutes from "./routes/TeamLeadRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
 import EmployeeRoutes from "./routes/EmployeeRoutes";
+import FinanceRoutes from "./routes/FinanceRoutes";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -25,8 +26,11 @@ const App = () => {
       case "admin":
         return <AdminRoutes />;
       case "teamlead":
-      default:
         return <TeamLeadRoutes />;
+      case "finance":
+        return <FinanceRoutes />;
+      default:
+        return <Login setUserRole={setUserRole} />;
     }
   };
 
