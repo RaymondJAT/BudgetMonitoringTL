@@ -1,31 +1,34 @@
+import { LOCAL_KEYS } from "../constants/localKeys";
+
 export const moveEntries = ({
   entriesToMove,
   sourceData,
   setSourceData,
   destinationKey,
-  statusUpdate = null,
+  statusUpdate,
   avoidDuplicates = false,
 }) => {
   const updatedSource = sourceData.filter(
-    (entry) => !entriesToMove.some((sel) => sel.id === entry.id)
+    (entry) => !entriesToMove.find((e) => e.id === entry.id)
   );
+
   setSourceData(updatedSource);
+  localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedSource)); // 🔥 fix here
 
-  const destinationData =
-    JSON.parse(localStorage.getItem(destinationKey)) || [];
+  const currentDest = JSON.parse(localStorage.getItem(destinationKey)) || [];
 
-  const filteredNewEntries = avoidDuplicates
-    ? entriesToMove.filter(
-        (entry) => !destinationData.some((d) => d.id === entry.id)
-      )
-    : entriesToMove;
+  const newDest = entriesToMove.map((entry) => ({
+    ...entry,
+    ...(statusUpdate && { status: statusUpdate }),
+  }));
 
-  const updatedEntries = statusUpdate
-    ? filteredNewEntries.map((entry) => ({ ...entry, status: statusUpdate }))
-    : filteredNewEntries;
+  const merged =
+    avoidDuplicates && destinationKey === LOCAL_KEYS.EMP_IMPORTANT
+      ? [
+          ...currentDest,
+          ...newDest.filter((e) => !currentDest.some((c) => c.id === e.id)),
+        ]
+      : [...currentDest, ...newDest];
 
-  localStorage.setItem(
-    destinationKey,
-    JSON.stringify([...destinationData, ...updatedEntries])
-  );
+  localStorage.setItem(destinationKey, JSON.stringify(merged));
 };
