@@ -74,16 +74,9 @@ const TotalCards = ({
   };
 
   return (
-    <Container
-      fluid
-      className="total-container mt-3 d-flex flex-wrap gap-3 mb-3"
-    >
+    <Container fluid className="total-container mt-3 mb-3">
       {list.map(({ label, key }) => (
-        <div
-          className="total-box p-3 rounded shadow-sm text-dark"
-          key={key}
-          style={{ minWidth: "200px", flex: "1" }}
-        >
+        <div className="total-box p-3 rounded shadow-sm text-dark" key={key}>
           <h5 className="mb-1">{label}</h5>
           <p className="fs-5 fw-bold m-0">
             {formatValue(key, totals[key] || 0)}

@@ -10,7 +10,7 @@ import { handleExportData } from "../../utils/exportItems";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
-import Total from "../../components/layout/TotalTeamLead";
+import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
@@ -151,7 +151,10 @@ const Approval = () => {
 
   return (
     <div>
-      <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
+      <TotalCards
+        data={totalComputationData}
+        statusList={TEAMLEAD_STATUS_LIST}
+      />
       <ToolBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}

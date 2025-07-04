@@ -27,7 +27,7 @@ const MyExpenses = () => {
 
   // Load fresh data from localStorage once on mount
   const loadActiveExpenses = () => {
-    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_ACTIVE)) || [];
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
 
     const filtered = raw.filter((item) => item.status !== STATUS.DELETED);
 

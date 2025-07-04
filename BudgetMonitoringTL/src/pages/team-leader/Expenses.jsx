@@ -11,7 +11,6 @@ import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import DataTable from "../../components/layout/DataTable";
-import Total from "../../components/layout/TotalTeamLead";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
@@ -185,7 +184,6 @@ const Expenses = () => {
 
   return (
     <div>
-      {/* <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} /> */}
       <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
       <ToolBar
         searchValue={searchValue}
