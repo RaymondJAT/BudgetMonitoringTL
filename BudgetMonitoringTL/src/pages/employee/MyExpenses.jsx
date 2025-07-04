@@ -216,6 +216,15 @@ const MyExpenses = () => {
       <LiqFormModal
         show={showLiqFormModal}
         onHide={() => setShowLiqFormModal(false)}
+        onSubmit={(newForm) => {
+          const current =
+            JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
+          const updated = [newForm, ...current];
+          localStorage.setItem(LOCAL_KEYS.LIQUIDATION, JSON.stringify(updated));
+
+          // Trigger custom event so EmpLiquidation can refresh
+          window.dispatchEvent(new Event("liquidations-updated"));
+        }}
       />
     </div>
   );

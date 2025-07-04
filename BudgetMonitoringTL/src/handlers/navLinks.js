@@ -14,7 +14,7 @@ export const navConfig = {
       icon: GiMoneyStack,
       children: [
         { label: "My Requests", path: "/" },
-        { label: "My Liquidations", path: "#" },
+        { label: "My Liquidations", path: "/employee-liquidation" },
       ],
     },
     { label: "Archive", icon: MdOutlineArchive, path: "/employee-archive" },

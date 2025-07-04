@@ -4,6 +4,7 @@ export const LOCAL_KEYS = {
   EMP_ARCHIVE: "employeeArchive",
   EMP_IMPORTANT: "employeeImportant",
   EMP_TRASH: "employeeTrash",
+  LIQUIDATION: "liquidation-entries",
 
   // team leader keys
   ACTIVE: "expensesData",

@@ -1,10 +1,16 @@
 import { FaArrowLeft, FaTrash, FaBookmark } from "react-icons/fa";
 import AppButton from "./ui/AppButton";
 
-const CashReqActionButtons = ({ onBack, onPrint, onView }) => {
+const CashReqActionButtons = ({
+  onBack,
+  onPrint,
+  onView,
+  onShowLiqFormModal,
+}) => {
   return (
     <div className="custom-btn d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-3">
       <div className="d-flex">
+        {/* Back Button */}
         <AppButton
           variant="dark"
           size="sm"
@@ -13,6 +19,17 @@ const CashReqActionButtons = ({ onBack, onPrint, onView }) => {
         >
           <FaArrowLeft />
         </AppButton>
+
+        {/* Create Liquidation Form Button */}
+        <AppButton
+          label="Create Liquidation Form"
+          variant="success"
+          size="sm"
+          onClick={onShowLiqFormModal}
+          className="custom-button btn-responsive ms-2"
+        />
+
+        {/* View Button */}
         <AppButton
           label="View"
           variant="dark"
@@ -20,6 +37,8 @@ const CashReqActionButtons = ({ onBack, onPrint, onView }) => {
           onClick={onView}
           className="custom-button btn-responsive ms-2"
         />
+
+        {/* Print Button */}
         <AppButton
           label="Print"
           variant="secondary"
@@ -28,6 +47,8 @@ const CashReqActionButtons = ({ onBack, onPrint, onView }) => {
           className="custom-button btn-responsive ms-2"
         />
       </div>
+
+      {/* Bookmark + Trash */}
       <div className="d-flex gap-2 ms-md-auto mt-2 mt-md-0">
         <AppButton
           variant="warning"

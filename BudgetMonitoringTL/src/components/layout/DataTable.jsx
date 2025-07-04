@@ -49,7 +49,7 @@ const DataTable = ({
   });
 
   return (
-    <Container fluid>
+    <Container fluid className="pb-3">
       <div className="table-wrapper">
         <Table hover className="expense-table mb-0">
           <thead>
