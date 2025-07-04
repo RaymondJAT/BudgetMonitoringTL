@@ -8,7 +8,7 @@ export const EMPLOYEE_STATUS_LIST = [
 
 export const TEAMLEAD_STATUS_LIST = [
   { label: "To Approve", key: "pending" },
-  { label: "Liquidations to Note", key: "liqToNote" },
+  { label: "Liquidation to Note", key: "liqToNote" },
   { label: "Approved Requests", key: "approvedRequest" },
 ];
 

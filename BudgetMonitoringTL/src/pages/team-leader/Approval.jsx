@@ -151,10 +151,7 @@ const Approval = () => {
 
   return (
     <div>
-      <TotalCards
-        data={totalComputationData}
-        statusList={TEAMLEAD_STATUS_LIST}
-      />
+      <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
       <ToolBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}
