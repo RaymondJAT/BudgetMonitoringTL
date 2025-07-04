@@ -150,22 +150,10 @@ const MyExpenses = () => {
     setSelectedRows(reset);
   };
 
-  const dropdownItems = [
-    {
-      label: "Cash Request Form",
-      onClick: () => setShowCashReqModal(true),
-    },
-    {
-      label: "Liquidation Form",
-      onClick: () => setShowLiqFormModal(true),
-    },
-  ];
-
   const newButton = (
     <AppButton
-      label="Create Request"
-      isDropdown
-      dropdownItems={dropdownItems}
+      label="New Request"
+      onClick={() => setShowCashReqModal(true)}
       size="sm"
       variant="outline-dark"
       className="custom-app-button"
@@ -182,6 +170,7 @@ const MyExpenses = () => {
         handleExport={handleExport}
         selectedCount={selectedCount}
       />
+
       <DataTable
         data={filteredData}
         columns={expenseHeaders}
