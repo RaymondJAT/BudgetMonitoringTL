@@ -40,7 +40,7 @@ export const navConfig = {
         { label: "History", path: "/lead-history" },
       ],
     },
-    { label: "Reports", icon: TbReport, path: "#" },
+    // { label: "Reports", icon: TbReport, path: "#" },
     { label: "Archive", icon: MdOutlineArchive, path: "/archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/important" },
     { label: "Trash", icon: RxTrash, path: "/trash" },
