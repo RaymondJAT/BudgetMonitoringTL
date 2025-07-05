@@ -78,5 +78,26 @@ export const navConfig = {
     { label: "Trash", icon: RxTrash, path: "#" },
   ],
 
-  finance: [{ label: "Dashboard", icon: RxDashboard, path: "/" }],
+  finance: [
+    { label: "Dashboard", icon: RxDashboard, path: "/" },
+    {
+      label: "Budget Request",
+      icon: GiMoneyStack,
+      children: [
+        { label: "Requests to Process", path: "#" },
+        { label: "Release Funds", path: "#" },
+      ],
+    },
+    {
+      label: "Liquidations",
+      icon: GiMoneyStack,
+      children: [
+        { label: "To Check", path: "#" },
+        { label: "Verified", path: "#" },
+      ],
+    },
+    { label: "Archive", icon: MdOutlineArchive, path: "#" },
+    { label: "Important", icon: MdBookmarkBorder, path: "#" },
+    { label: "Trash", icon: RxTrash, path: "#" },
+  ],
 };

@@ -1,7 +1,12 @@
-import React from "react";
+import { Routes, Route } from "react-router-dom";
+import FnceExpenses from "../pages/finance/FnceExpenses";
 
 const FinanceRoutes = () => {
-  return <div>FinanceRoutes</div>;
+  return (
+    <Routes>
+      <Route path="/" element={<FnceExpenses />} />
+    </Routes>
+  );
 };
 
 export default FinanceRoutes;

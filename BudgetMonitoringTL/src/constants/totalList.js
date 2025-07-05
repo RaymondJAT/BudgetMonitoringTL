@@ -12,6 +12,14 @@ export const TEAMLEAD_STATUS_LIST = [
   { label: "Approved Requests", key: "approvedRequest" },
 ];
 
+export const FINANCE_STATUS_LIST = [
+  { label: "Pending Fund Releases", key: "pending" },
+  { label: "Liquidations to Check", key: "approved" },
+  { label: "Reimbursements to Process", key: "reimbursed" },
+  { label: "Verified Transactions", key: "verified" },
+  { label: "Total Funds Released", key: "total" },
+];
+
 export const BudgetOverview = [
   { label: "Total Budget", key: "totalBudget" },
   { label: "Budget Used", key: "budgetUsed" },
