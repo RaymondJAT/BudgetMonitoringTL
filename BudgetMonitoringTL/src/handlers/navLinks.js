@@ -36,8 +36,8 @@ export const navConfig = {
       label: "Liquidations",
       icon: GiMoneyStack,
       children: [
-        { label: "Liquidation to Note", path: "#" },
-        { label: "History", path: "#" },
+        { label: "Liquidation to Note", path: "/liquidation-note" },
+        { label: "History", path: "/lead-history" },
       ],
     },
     { label: "Reports", icon: TbReport, path: "#" },
