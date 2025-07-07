@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Tab, Tabs } from "react-bootstrap";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { columns } from "../../handlers/tableHeader";
@@ -9,11 +9,9 @@ import ToolBar from "../../components/layout/ToolBar";
 const History = () => {
   const [cashHistory, setCashHistory] = useState([]);
   const [liqHistory, setLiqHistory] = useState([]);
-
-  const [searchValueCash, setSearchValueCash] = useState("");
-  const [searchValueLiq, setSearchValueLiq] = useState("");
-  const [filteredCash, setFilteredCash] = useState([]);
-  const [filteredLiq, setFilteredLiq] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const [activeTab, setActiveTab] = useState("cash");
 
   const normalize = (value) =>
     String(value || "")
@@ -28,7 +26,6 @@ const History = () => {
   useEffect(() => {
     const activeData =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-
     const cashRequests = activeData.filter(
       (item) =>
         item.formType === "Cash Request" &&
@@ -40,64 +37,57 @@ const History = () => {
 
     setCashHistory(cashRequests);
     setLiqHistory(liquidations);
-    setFilteredCash(cashRequests);
-    setFilteredLiq(liquidations);
+
+    setFilteredData(cashRequests);
   }, []);
 
-  const handleCashSearch = (val) => {
-    setSearchValueCash(val);
-    const filtered = cashHistory.filter((item) => isMatch(item, val));
-    setFilteredCash(filtered);
+  const handleSearch = (val) => {
+    setSearchValue(val);
+    const source = activeTab === "cash" ? cashHistory : liqHistory;
+    const filtered = source.filter((item) => isMatch(item, val));
+    setFilteredData(filtered);
   };
 
-  const handleLiqSearch = (val) => {
-    setSearchValueLiq(val);
-    const filtered = liqHistory.filter((item) => isMatch(item, val));
-    setFilteredLiq(filtered);
-  };
-
-  const handleCashDateRange = ([start, end]) => {
-    const filtered = cashHistory.filter((item) => {
+  const handleDateRange = ([start, end]) => {
+    const source = activeTab === "cash" ? cashHistory : liqHistory;
+    const filtered = source.filter((item) => {
       const date = new Date(item.createdAt);
       return date >= start && date <= end;
     });
-    setFilteredCash(filtered);
+    setFilteredData(filtered);
   };
 
-  const handleLiqDateRange = ([start, end]) => {
-    const filtered = liqHistory.filter((item) => {
-      const date = new Date(item.createdAt);
-      return date >= start && date <= end;
-    });
-    setFilteredLiq(filtered);
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    setSearchValue("");
+    setFilteredData(key === "cash" ? cashHistory : liqHistory);
   };
 
   return (
     <Container fluid className="py-3">
-      {/* Cash Request History */}
-      <div className="custom-container shadow-sm rounded p-1 mb-3">
+      <div className="custom-container shadow-sm rounded p-2">
+        <Tabs
+          activeKey={activeTab}
+          onSelect={handleTabChange}
+          className="mb-3 custom-tabs"
+        >
+          <Tab eventKey="cash" title="Cash Requests" />
+          <Tab eventKey="liquidation" title="Liquidations" />
+        </Tabs>
+
         <ToolBar
-          searchValue={searchValueCash}
-          onSearchChange={(e) => handleCashSearch(e.target.value)}
-          onDateRangeChange={handleCashDateRange}
+          searchValue={searchValue}
+          onSearchChange={(e) => handleSearch(e.target.value)}
+          onDateRangeChange={handleDateRange}
           leftContent={
-            <p className="fw-bold mb-0">Cash Request (Approved / Rejected)</p>
+            <p className="fw-bold mb-0">
+              {activeTab === "cash" ? "Cash Request" : "Liquidation"}
+            </p>
           }
           selectedCount={0}
         />
-        <DataTable data={filteredCash} columns={columns} hideActions />
-      </div>
 
-      {/* Liquidation History */}
-      <div className="custom-container shadow-sm rounded p-1">
-        <ToolBar
-          searchValue={searchValueLiq}
-          onSearchChange={(e) => handleLiqSearch(e.target.value)}
-          onDateRangeChange={handleLiqDateRange}
-          leftContent={<p className="fw-bold mb-0">Liquidation</p>}
-          selectedCount={0}
-        />
-        <DataTable data={filteredLiq} columns={columns} hideActions />
+        <DataTable data={filteredData} columns={columns} hideActions />
       </div>
     </Container>
   );
