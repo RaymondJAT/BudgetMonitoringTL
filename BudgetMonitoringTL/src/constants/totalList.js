@@ -7,14 +7,14 @@ export const EMPLOYEE_STATUS_LIST = [
 ];
 
 export const TEAMLEAD_STATUS_LIST = [
-  { label: "To Approve", key: "pending" },
-  { label: "Liquidation to Note", key: "liqToNote" },
+  { label: "Requests to Approve", key: "pending" },
+  { label: "Liquidations to Review", key: "liqToNote" },
   { label: "Approved Requests", key: "approvedRequest" },
 ];
 
 export const FINANCE_STATUS_LIST = [
   { label: "Pending Fund Releases", key: "pending" },
-  { label: "Liquidations to Check", key: "approved" },
+  { label: "Liquidations to Verify", key: "approved" },
   { label: "Reimbursements to Process", key: "reimbursed" },
   { label: "Verified Transactions", key: "verified" },
   { label: "Total Funds Released", key: "total" },

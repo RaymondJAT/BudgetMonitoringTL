@@ -13,7 +13,7 @@ import {
 const MonthlyCashChart = ({ data }) => {
   return (
     <Container fluid>
-      <div className="custom-container rounded p-3 w-100">
+      <div className="w-100">
         <p className="mb-3 fw-bold">💰 Monthly Cash Released</p>
         <ResponsiveContainer width="100%" height={160}>
           <BarChart data={data}>

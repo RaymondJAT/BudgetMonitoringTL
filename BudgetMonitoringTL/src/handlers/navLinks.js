@@ -10,7 +10,7 @@ import { GiMoneyStack } from "react-icons/gi";
 export const navConfig = {
   employee: [
     {
-      label: "Expenses",
+      label: "Cash Requests",
       icon: GiMoneyStack,
       children: [
         { label: "My Requests", path: "/" },
@@ -28,7 +28,7 @@ export const navConfig = {
       icon: GiMoneyStack,
       children: [
         { label: "Pending Approvals", path: "/" },
-        { label: "My Approvals", path: "/my-approvals" },
+        { label: "Approved Requests", path: "/my-approvals" },
         { label: "Rejected Requests", path: "/rejected-requests" },
       ],
     },
@@ -36,7 +36,7 @@ export const navConfig = {
       label: "Liquidations",
       icon: GiMoneyStack,
       children: [
-        { label: "Liquidation to Note", path: "/liquidation-note" },
+        { label: "For Review", path: "/liquidation-note" },
         { label: "History", path: "/lead-history" },
       ],
     },
@@ -44,6 +44,29 @@ export const navConfig = {
     { label: "Archive", icon: MdOutlineArchive, path: "/archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/important" },
     { label: "Trash", icon: RxTrash, path: "/trash" },
+  ],
+
+  finance: [
+    { label: "Dashboard", icon: RxDashboard, path: "/" },
+    {
+      label: "Cash Requests",
+      icon: GiMoneyStack,
+      children: [
+        { label: "For Processing", path: "/finance-processing" },
+        { label: "Released", path: "#" },
+      ],
+    },
+    {
+      label: "Liquidations",
+      icon: GiMoneyStack,
+      children: [
+        { label: "To Verify", path: "#" },
+        { label: "Verified", path: "#" },
+      ],
+    },
+    { label: "Archive", icon: MdOutlineArchive, path: "#" },
+    { label: "Important", icon: MdBookmarkBorder, path: "#" },
+    { label: "Trash", icon: RxTrash, path: "#" },
   ],
 
   admin: [
@@ -62,38 +85,15 @@ export const navConfig = {
       icon: MdOutlineManageHistory,
       children: [
         { label: "Budget Allocation", path: "#" },
-        { label: "User Management", path: "#" },
+        // { label: "User Management", path: "#" },
       ],
     },
     {
       label: "Reports & Logs",
       icon: TbReport,
       children: [
-        { label: "Rerports", path: "#" },
+        { label: "Budget Rerports", path: "#" },
         { label: "Audit Logs", path: "#" },
-      ],
-    },
-    { label: "Archive", icon: MdOutlineArchive, path: "#" },
-    { label: "Important", icon: MdBookmarkBorder, path: "#" },
-    { label: "Trash", icon: RxTrash, path: "#" },
-  ],
-
-  finance: [
-    { label: "Dashboard", icon: RxDashboard, path: "/" },
-    {
-      label: "Budget Request",
-      icon: GiMoneyStack,
-      children: [
-        { label: "Requests to Process", path: "#" },
-        { label: "Release Funds", path: "#" },
-      ],
-    },
-    {
-      label: "Liquidations",
-      icon: GiMoneyStack,
-      children: [
-        { label: "To Check", path: "#" },
-        { label: "Verified", path: "#" },
       ],
     },
     { label: "Archive", icon: MdOutlineArchive, path: "#" },

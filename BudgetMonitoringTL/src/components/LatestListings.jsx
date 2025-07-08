@@ -1,11 +1,14 @@
 import { Table } from "react-bootstrap";
 
-const LatestListings = ({ data }) => {
+const LatestListings = ({ data, title, height }) => {
   return (
     <div className="flex-fill d-flex flex-column mb-3">
       <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column">
-        <p className="mb-3 fw-bold">🕒 Latest Listings</p>
-        <div className="table-wrapper flex-grow-1 overflow-auto">
+        <p className="mb-3 fw-bold">{title}</p>
+        <div
+          className="table-wrapper flex-grow-1 overflow-auto"
+          style={{ maxHeight: height }}
+        >
           <Table hover className="expense-table mb-0">
             <thead>
               <tr>
