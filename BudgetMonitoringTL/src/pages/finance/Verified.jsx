@@ -8,7 +8,7 @@ import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 
-const Processing = () => {
+const Verified = () => {
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
@@ -34,4 +34,4 @@ const Processing = () => {
   );
 };
 
-export default Processing;
+export default Verified;

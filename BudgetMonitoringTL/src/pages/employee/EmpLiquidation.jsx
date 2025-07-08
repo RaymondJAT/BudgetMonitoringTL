@@ -68,6 +68,7 @@ const EmpLiquidation = () => {
       />
       <DataTable
         data={filteredData}
+        height="390px"
         columns={expenseHeaders}
         onRowClick={() => {}}
         selectedRows={selectedRows}

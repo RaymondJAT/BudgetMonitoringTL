@@ -173,6 +173,7 @@ const MyExpenses = () => {
 
       <DataTable
         data={filteredData}
+        height="390px"
         columns={expenseHeaders}
         onRowClick={handleRowClick}
         onDelete={handleDelete}

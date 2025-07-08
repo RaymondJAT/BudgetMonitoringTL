@@ -53,20 +53,20 @@ export const navConfig = {
       icon: GiMoneyStack,
       children: [
         { label: "For Processing", path: "/finance-processing" },
-        { label: "Released", path: "#" },
+        { label: "Released", path: "/finance-released" },
       ],
     },
     {
       label: "Liquidations",
       icon: GiMoneyStack,
       children: [
-        { label: "To Verify", path: "#" },
-        { label: "Verified", path: "#" },
+        { label: "To Verify", path: "/finance-verify" },
+        { label: "Verified", path: "/finance-verified" },
       ],
     },
-    { label: "Archive", icon: MdOutlineArchive, path: "#" },
-    { label: "Important", icon: MdBookmarkBorder, path: "#" },
-    { label: "Trash", icon: RxTrash, path: "#" },
+    { label: "Archive", icon: MdOutlineArchive, path: "/finance-archive" },
+    { label: "Important", icon: MdBookmarkBorder, path: "/finance-important" },
+    { label: "Trash", icon: RxTrash, path: "/finance-trash" },
   ],
 
   admin: [
