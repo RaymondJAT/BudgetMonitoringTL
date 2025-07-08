@@ -72,7 +72,7 @@ const DataTable = ({
                       : ""
                   }
                 >
-                  {col.header}
+                  {col.label}
                 </th>
               ))}
               <th style={{ width: "30px" }}></th>
