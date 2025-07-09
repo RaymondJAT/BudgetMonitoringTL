@@ -99,7 +99,7 @@ const FnceTrash = () => {
 
   return (
     <Container fluid className="py-3">
-      <div className="custom-container shadow-sm rounded p-2">
+      <div className="custom-container shadow-sm rounded p-3">
         <Tabs
           activeKey={activeTab}
           onSelect={handleTabChange}
@@ -132,7 +132,7 @@ const FnceTrash = () => {
 
         <EntryStates
           columns={filteredColumns}
-          height="510px"
+          height="495px"
           items={filteredData}
           setItems={activeTab === "cash" ? setCashTrash : setLiqTrash}
           showRestore
