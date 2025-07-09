@@ -8,7 +8,7 @@ import { LOCAL_KEYS } from "../../constants/localKeys";
 import { restoreSingleItem } from "../../utils/restoreSingleItem";
 import { restoreItems } from "../../utils/restoreItems";
 import { deleteSingleItem } from "../../utils/deleteSingleItem";
-import { expenseHeaders } from "../../handlers/columnHeaders";
+import { columns } from "../../handlers/tableHeader";
 
 const FnceImportant = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -36,7 +36,7 @@ const FnceImportant = () => {
 
   const filteredColumns = useMemo(
     () =>
-      expenseHeaders.filter(
+      columns.filter(
         (col) => col.accessor !== "price" && col.accessor !== "quantity"
       ),
     []

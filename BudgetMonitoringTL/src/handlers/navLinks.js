@@ -77,7 +77,7 @@ export const navConfig = {
       children: [
         { label: "All Requests", path: "#" },
         { label: "All Liquidations", path: "#" },
-        { label: "Final Approvals", path: "#" },
+        { label: "Pending Final Approval", path: "#" },
       ],
     },
     {
@@ -96,8 +96,8 @@ export const navConfig = {
         { label: "Audit Logs", path: "#" },
       ],
     },
-    { label: "Archive", icon: MdOutlineArchive, path: "#" },
-    { label: "Important", icon: MdBookmarkBorder, path: "#" },
+    { label: "Archive", icon: MdOutlineArchive, path: "/admin-archive" },
+    { label: "Important", icon: MdBookmarkBorder, path: "/admin-important" },
     { label: "Trash", icon: RxTrash, path: "#" },
   ],
 };

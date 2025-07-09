@@ -19,4 +19,10 @@ export const LOCAL_KEYS = {
   FNCE_ARCHIVE: "financeArchive",
   FNCE_IMPORTANT: "financeImportant",
   FNCE_TRASH: "financeTrash",
+
+  //Admin keys
+  ADM_ACTIVE: "adminActive",
+  ADM_ARCHIVE: "adminArchive",
+  ADM_IMPORTANT: "adminImportant",
+  ADM_TRASH: "adminTrash",
 };

@@ -1,28 +1,27 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Container, Tabs, Tab } from "react-bootstrap";
-import { MdRestore } from "react-icons/md";
-import { LOCAL_KEYS } from "../../constants/localKeys";
-import ToolBar from "../../components/layout/ToolBar";
-import EntryStates from "../../components/layout/EntryStates";
-import AppButton from "../../components/ui/AppButton";
-import { restoreItems } from "../../utils/restoreItems";
 import { restoreSingleItem } from "../../utils/restoreSingleItem";
 import { deleteSingleItem } from "../../utils/deleteSingleItem";
+
+import { LOCAL_KEYS } from "../../constants/localKeys";
 import { columns } from "../../handlers/tableHeader";
 
-const FnceArchive = () => {
+import ToolBar from "../../components/layout/ToolBar";
+import EntryStates from "../../components/layout/EntryStates";
+
+const AdmArchive = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [cashArchives, setCashArchives] = useState([]);
-  const [liqArchives, setLiqArchives] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [activeTab, setActiveTab] = useState("cash");
   const [selectedItems, setSelectedItems] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [cashArchives, setCashArchives] = useState([]);
+  const [liqArchives, setLiqArchives] = useState([]);
 
   useEffect(() => {
     const storedArchive =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ARCHIVE)) || [];
     const trashData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_TRASH)) || [];
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_TRASH)) || [];
 
     const cleanArchive = storedArchive.filter(
       (item) => !trashData.find((trash) => trash.id === item.id)
@@ -35,7 +34,7 @@ const FnceArchive = () => {
 
     setCashArchives(cash);
     setLiqArchives(liq);
-    setFilteredData(cash); // default tab
+    setFilteredData(cash);
   }, []);
 
   const filteredColumns = useMemo(
@@ -64,39 +63,28 @@ const FnceArchive = () => {
     setFilteredData(filtered);
   };
 
-  const handleRestore = (entry) => {
-    restoreSingleItem({
-      entryToRestore: entry,
-      sourceItems: activeTab === "cash" ? cashArchives : liqArchives,
-      setSourceItems: activeTab === "cash" ? setCashArchives : setLiqArchives,
-      localKeySource: LOCAL_KEYS.FNCE_ARCHIVE,
-      localKeyActive: LOCAL_KEYS.FNCE_ACTIVE,
-    });
-
-    setFilteredData((prev) => prev.filter((item) => item.id !== entry.id));
-  };
-
   const handleDelete = (entry) => {
     deleteSingleItem({
       entryToDelete: entry,
       sourceItems: activeTab === "cash" ? cashArchives : liqArchives,
       setSourceItems: activeTab === "cash" ? setCashArchives : setLiqArchives,
-      localKeySource: LOCAL_KEYS.FNCE_ARCHIVE,
-      localKeyTrash: LOCAL_KEYS.FNCE_TRASH,
+      localKeySource: LOCAL_KEYS.ADM_ARCHIVE,
+      localKeyTrash: LOCAL_KEYS.ADM_TRASH,
     });
 
     setFilteredData((prev) => prev.filter((item) => item.id !== entry.id));
   };
 
-  const handleRestoreSelected = () => {
-    restoreItems({
-      sourceItems: filteredData,
+  const handleRestore = (entry) => {
+    restoreSingleItem({
+      entryToRestore: entry,
+      sourceItems: activeTab === "cash" ? cashArchives : liqArchives,
       setSourceItems: activeTab === "cash" ? setCashArchives : setLiqArchives,
-      selectedItems,
-      setSelectedItems,
-      localKeySource: LOCAL_KEYS.FNCE_ARCHIVE,
-      localKeyActive: LOCAL_KEYS.FNCE_ACTIVE,
+      localKeySource: LOCAL_KEYS.ADM_ARCHIVE,
+      localKeyActive: LOCAL_KEYS.ADM_ACTIVE,
     });
+
+    setFilteredData((prev) => prev.filter((item) => item.id !== entry.id));
   };
 
   return (
@@ -114,22 +102,6 @@ const FnceArchive = () => {
         <ToolBar
           searchValue={searchValue}
           onSearchChange={(e) => handleSearch(e.target.value)}
-          leftContent={
-            selectedItems.length >= 2 && (
-              <AppButton
-                label={
-                  <>
-                    <MdRestore style={{ marginRight: "5px" }} />
-                    Restore All
-                  </>
-                }
-                size="sm"
-                className="custom-app-button"
-                variant="outline-success"
-                onClick={handleRestoreSelected}
-              />
-            )
-          }
         />
 
         <EntryStates
@@ -149,4 +121,4 @@ const FnceArchive = () => {
   );
 };
 
-export default FnceArchive;
+export default AdmArchive;

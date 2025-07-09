@@ -1,32 +1,36 @@
 import { useState, useEffect, useMemo } from "react";
 import { Container, Tabs, Tab } from "react-bootstrap";
-import { MdRestore } from "react-icons/md";
+
+import { LOCAL_KEYS } from "../../constants/localKeys";
+import { columns } from "../../handlers/tableHeader";
+
 import ToolBar from "../../components/layout/ToolBar";
 import EntryStates from "../../components/layout/EntryStates";
 import AppButton from "../../components/ui/AppButton";
-import { LOCAL_KEYS } from "../../constants/localKeys";
-import { columns } from "../../handlers/tableHeader";
-import { restoreSingleItem } from "../../utils/restoreSingleItem";
-import { restoreItems } from "../../utils/restoreItems";
+import { MdRestore } from "react-icons/md";
 
-const FnceTrash = () => {
+const AdmImportant = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [cashTrash, setCashTrash] = useState([]);
-  const [liqTrash, setLiqTrash] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [activeTab, setActiveTab] = useState("cash");
   const [selectedItems, setSelectedItems] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [cashItems, setCashItems] = useState([]);
+  const [liqItems, setLiqItems] = useState([]);
 
   useEffect(() => {
-    const storedTrash =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_TRASH)) || [];
+    const storedImportant =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_IMPORTANT)) || [];
 
-    const cash = storedTrash.filter((item) => item.formType === "Cash Request");
-    const liq = storedTrash.filter((item) => item.formType === "Liquidation");
+    const cash = storedImportant.filter(
+      (item) => item.formType === "Cash Request"
+    );
+    const liq = storedImportant.filter(
+      (item) => item.formType === "Liquidation"
+    );
 
-    setCashTrash(cash);
-    setLiqTrash(liq);
-    setFilteredData(cash); // default view
+    setCashItems(cash);
+    setLiqItems(liq);
+    setFilteredData(cash);
   }, []);
 
   const filteredColumns = useMemo(
@@ -41,15 +45,17 @@ const FnceTrash = () => {
     setActiveTab(key);
     setSearchValue("");
     setSelectedItems([]);
-    setFilteredData(key === "cash" ? cashTrash : liqTrash);
+    setFilteredData(key === "cash" ? cashItems : liqItems);
   };
 
   const handleSearch = (val) => {
     setSearchValue(val);
-    const source = activeTab === "cash" ? cashTrash : liqTrash;
+    const source = activeTab === "cash" ? cashItems : liqItems;
     const filtered = source.filter((item) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(val.toLowerCase())
+      Object.values(
+        item.some((value) =>
+          String(value).toLowerCase().includes(val.toLowerCase())
+        )
       )
     );
     setFilteredData(filtered);
@@ -58,42 +64,35 @@ const FnceTrash = () => {
   const handleRestore = (entry) => {
     restoreSingleItem({
       entryToRestore: entry,
-      sourceItems: activeTab === "cash" ? cashTrash : liqTrash,
-      setSourceItems: activeTab === "cash" ? setCashTrash : setLiqTrash,
-      localKeySource: LOCAL_KEYS.FNCE_TRASH,
-      localKeyActive: LOCAL_KEYS.FNCE_ACTIVE,
+      sourceItems: activeTab === "cash" ? cashItems : liqItems,
+      setSourceItems: activeTab === "cash" ? setCashItems : setLiqItems,
+      localKeySource: LOCAL_KEYS.ADM_IMPORTANT,
+      localKeyActive: LOCAL_KEYS.ADM_ACTIVE,
     });
 
     setFilteredData((prev) => prev.filter((item) => item.id !== entry.id));
   };
 
-  const handlePermanentDelete = (entry) => {
-    const updated =
-      activeTab === "cash"
-        ? cashTrash.filter((item) => item.id !== entry.id)
-        : liqTrash.filter((item) => item.id !== entry.id);
+  const handleDelete = (entry) => {
+    deleteSingleItem({
+      entryToDelete: entry,
+      sourceItems: activeTab === "cash" ? cashItems : liqItems,
+      setSourceItems: activeTab === "cash" ? setCashItems : setLiqItems,
+      localKeySource: LOCAL_KEYS.ADM_IMPORTANT,
+      localKeyTrash: LOCAL_KEYS.ADM_TRASH,
+    });
 
-    const updatedAll = [
-      ...updated,
-      ...(activeTab === "cash" ? liqTrash : cashTrash),
-    ];
-
-    localStorage.setItem(LOCAL_KEYS.FNCE_TRASH, JSON.stringify(updatedAll));
-
-    if (activeTab === "cash") setCashTrash(updated);
-    else setLiqTrash(updated);
-
-    setFilteredData(updated);
+    setFilteredData((prev) => prev.filter((item) => item.id !== entry.id));
   };
 
   const handleRestoreSelected = () => {
     restoreItems({
       sourceItems: filteredData,
-      setSourceItems: activeTab === "cash" ? setCashTrash : setLiqTrash,
+      setSourceItems: activeTab === "cash" ? setCashItems : setLiqItems,
       selectedItems,
       setSelectedItems,
-      localKeySource: LOCAL_KEYS.FNCE_TRASH,
-      localKeyActive: LOCAL_KEYS.FNCE_ACTIVE,
+      localKeySource: LOCAL_KEYS.ADM_IMPORTANT,
+      localKeyActive: LOCAL_KEYS.ADM_ACTIVE,
     });
   };
 
@@ -134,11 +133,11 @@ const FnceTrash = () => {
           columns={filteredColumns}
           height="495px"
           items={filteredData}
-          setItems={activeTab === "cash" ? setCashTrash : setLiqTrash}
+          setItems={activeTab === "cash" ? setCashItems : setLiqItems}
           showRestore
           showDelete
           onRestore={handleRestore}
-          onDelete={handlePermanentDelete}
+          onDelete={handleDelete}
           selectedItems={selectedItems}
           setSelectedItems={setSelectedItems}
         />
@@ -147,4 +146,4 @@ const FnceTrash = () => {
   );
 };
 
-export default FnceTrash;
+export default AdmImportant;
