@@ -83,7 +83,7 @@ export const navConfig = {
       label: "Management",
       icon: MdOutlineManageHistory,
       children: [
-        { label: "Budget Allocation", path: "#" },
+        { label: "Budget Allocation", path: "/budget-allocation" },
         // { label: "User Management", path: "#" },
       ],
     },

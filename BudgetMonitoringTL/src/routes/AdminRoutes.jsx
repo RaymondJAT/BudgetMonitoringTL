@@ -5,6 +5,7 @@ import AdmImportant from "../pages/admin/AdmImportant";
 import AdmTrash from "../pages/admin/AdmTrash";
 import FinalApproval from "../pages/admin/FinalApproval";
 import AllRequest from "../pages/admin/AllRequest";
+import BudgetAllocation from "../pages/admin/BudgetAllocation";
 
 const AdminRoutes = () => {
   return (
@@ -12,6 +13,7 @@ const AdminRoutes = () => {
       <Route path="/" element={<AdmExpenses />} />
       <Route path="/final-approval" element={<FinalApproval />} />
       <Route path="/all-request" element={<AllRequest />} />
+      <Route path="/budget-allocation" element={<BudgetAllocation />} />
 
       <Route path="/admin-archive" element={<AdmArchive />} />
       <Route path="/admin-important" element={<AdmImportant />} />

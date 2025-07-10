@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Container, Tabs, Tab } from "react-bootstrap";
 
 import { restoreSingleItem } from "../../utils/restoreSingleItem";
