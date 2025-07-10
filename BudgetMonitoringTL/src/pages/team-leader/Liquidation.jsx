@@ -1,8 +1,11 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { Container } from "react-bootstrap";
+
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import { STATUS } from "../../constants/status";
 import { columns } from "../../handlers/tableHeader";
+
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
@@ -40,11 +43,15 @@ const Liquidation = () => {
   );
 
   return (
-    <div>
+    <>
       <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-      <DataTable data={filteredData} columns={columns} />
-    </div>
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+          <DataTable data={filteredData} height="460px" columns={columns} />
+        </div>
+      </Container>
+    </>
   );
 };
 

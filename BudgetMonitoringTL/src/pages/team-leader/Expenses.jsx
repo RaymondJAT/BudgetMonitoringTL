@@ -1,15 +1,19 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { columns } from "../../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
-import { moveEntries } from "../../utils/entryActions";
+import { Container } from "react-bootstrap";
+
 import { useReactToPrint } from "react-to-print";
+
+import { columns } from "../../handlers/tableHeader";
+import { moveEntries } from "../../utils/entryActions";
 import { formatPrintData } from "../../utils/formatPrintData";
 import { deleteItems } from "../../utils/deleteItems";
 import { handleExportData } from "../../utils/exportItems";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
+
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
@@ -183,47 +187,52 @@ const Expenses = () => {
   };
 
   return (
-    <div>
+    <>
       <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-      <ToolBar
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        leftContent={
-          selectedCount > 0 && (
-            <>
-              {selectedCount === 1 && (
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            leftContent={
+              selectedCount > 0 && (
                 <>
-                  <PrintButton onClick={handlePrint} />
-                  <DeleteButton onClick={handleDeleteSelected} />
+                  {selectedCount === 1 && (
+                    <>
+                      <PrintButton onClick={handlePrint} />
+                      <DeleteButton onClick={handleDeleteSelected} />
+                    </>
+                  )}
+                  {selectedCount > 1 && (
+                    <DeleteButton onClick={handleDeleteSelected} />
+                  )}
                 </>
-              )}
-              {selectedCount > 1 && (
-                <DeleteButton onClick={handleDeleteSelected} />
-              )}
-            </>
-          )
-        }
-        handleExport={handleExport}
-        selectedCount={selectedCount}
-      />
-      <DataTable
-        data={filteredData}
-        columns={columns}
-        onRowClick={handleRowClick}
-        onDelete={handleDelete}
-        onArchive={handleArchive}
-        onToggleImportant={handleToggleImportant}
-        selectedRows={selectedRows}
-        onSelectionChange={setSelectedRows}
-        downloadRef={downloadRef}
-        setPrintData={setPrintData}
-      />
+              )
+            }
+            handleExport={handleExport}
+            selectedCount={selectedCount}
+          />
+          <DataTable
+            data={filteredData}
+            height="460px"
+            columns={columns}
+            onRowClick={handleRowClick}
+            onDelete={handleDelete}
+            onArchive={handleArchive}
+            onToggleImportant={handleToggleImportant}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
+          />
 
-      <div className="d-none">
-        <ExpenseReport contentRef={contentRef} data={printData || {}} />
-        <ExpenseReport contentRef={downloadRef} data={printData || {}} />
-      </div>
-    </div>
+          <div className="d-none">
+            <ExpenseReport contentRef={contentRef} data={printData || {}} />
+            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+          </div>
+        </div>
+      </Container>
+    </>
   );
 };
 

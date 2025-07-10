@@ -65,7 +65,7 @@ const History = () => {
 
   return (
     <Container fluid className="py-3">
-      <div className="custom-container shadow-sm rounded p-2">
+      <div className="custom-container shadow-sm rounded p-3">
         <Tabs
           activeKey={activeTab}
           onSelect={handleTabChange}
@@ -79,11 +79,6 @@ const History = () => {
           searchValue={searchValue}
           onSearchChange={(e) => handleSearch(e.target.value)}
           onDateRangeChange={handleDateRange}
-          leftContent={
-            <p className="fw-bold mb-0">
-              {activeTab === "cash" ? "Cash Request" : "Liquidation"}
-            </p>
-          }
           selectedCount={0}
         />
 
