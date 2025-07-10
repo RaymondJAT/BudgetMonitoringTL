@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { LOCAL_KEYS } from "../../constants/localKeys";
+import { Container } from "react-bootstrap";
 
+import { LOCAL_KEYS } from "../../constants/localKeys";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { columns } from "../../handlers/tableHeader";
 
@@ -26,11 +27,15 @@ const Processing = () => {
   );
 
   return (
-    <div>
+    <>
       <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
-      <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-      <DataTable data={filteredData} height="390px" columns={columns} />
-    </div>
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+          <DataTable data={filteredData} height="360px" columns={columns} />
+        </div>
+      </Container>
+    </>
   );
 };
 

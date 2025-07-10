@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Form } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import AppButton from "../ui/AppButton";
 
 const EntryStates = ({
@@ -41,7 +41,7 @@ const EntryStates = ({
   };
 
   return (
-    <Container fluid>
+    <>
       <div className="trash-wrapper" style={{ maxHeight: height }}>
         <Table hover className="expense-table mb-0">
           <thead>
@@ -153,7 +153,7 @@ const EntryStates = ({
           </tbody>
         </Table>
       </div>
-    </Container>
+    </>
   );
 };
 

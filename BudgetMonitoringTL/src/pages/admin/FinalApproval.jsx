@@ -7,11 +7,10 @@ import { columns } from "../../handlers/tableHeader";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
-import EntryStates from "../../components/layout/EntryStates";
+import DataTable from "../../components/layout/DataTable";
 
 const FinalApproval = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [selectedItems, setSelectedItems] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -51,20 +50,17 @@ const FinalApproval = () => {
   return (
     <>
       <TotalCards data={totalComputationData} list={BudgetOverview} />
-      <Container fluid className="">
+      <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
           <ToolBar
             searchValue={searchValue}
             onSearchChange={(e) => handleSearch(e.target.value)}
           />
 
-          <EntryStates
+          <DataTable
             columns={filteredColumns}
             height="360px"
-            items={filteredData}
-            setItems={setTableData}
-            selectedItems={selectedItems}
-            setSelectedItems={setSelectedItems}
+            data={filteredData}
           />
         </div>
       </Container>

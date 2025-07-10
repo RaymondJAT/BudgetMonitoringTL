@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Table, Form, Container, Dropdown } from "react-bootstrap";
+import { Table, Form, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
+
 import { meatballActions } from "../../handlers/actionMenuItems";
 
 const DataTable = ({
@@ -50,7 +51,7 @@ const DataTable = ({
   });
 
   return (
-    <Container fluid className="pb-3">
+    <>
       <div className="table-wrapper" style={{ maxHeight: height }}>
         <Table hover className="expense-table mb-0">
           <thead>
@@ -217,7 +218,7 @@ const DataTable = ({
           </tbody>
         </Table>
       </div>
-    </Container>
+    </>
   );
 };
 
