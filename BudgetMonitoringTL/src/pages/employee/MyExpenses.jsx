@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Container } from "react-bootstrap";
 
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
@@ -162,62 +163,70 @@ const MyExpenses = () => {
   );
 
   return (
-    <div>
+    <>
       <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
-      <ToolBar
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        leftContent={newButton}
-        handleExport={handleExport}
-        selectedCount={selectedCount}
-      />
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            leftContent={newButton}
+            handleExport={handleExport}
+            selectedCount={selectedCount}
+          />
 
-      <DataTable
-        data={filteredData}
-        height="390px"
-        columns={columns}
-        onRowClick={handleRowClick}
-        onDelete={handleDelete}
-        onArchive={handleArchive}
-        onToggleImportant={handleToggleImportant}
-        selectedRows={selectedRows}
-        onSelectionChange={setSelectedRows}
-      />
+          <DataTable
+            data={filteredData}
+            height="360px"
+            columns={columns}
+            onRowClick={handleRowClick}
+            onDelete={handleDelete}
+            onArchive={handleArchive}
+            onToggleImportant={handleToggleImportant}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+          />
 
-      {/* CASH REQUEST MODAL */}
-      <CashReqModal
-        show={showCashReqModal}
-        onHide={() => setShowCashReqModal(false)}
-        onSubmit={(newData) => {
-          const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-          const updated = raw.filter(
-            (item) =>
-              item.status !== STATUS.DELETED &&
-              item.status !== STATUS.APPROVED &&
-              item.status !== STATUS.REJECTED
-          );
-          const sorted = [...updated].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          setTableData(sorted);
-        }}
-      />
+          {/* CASH REQUEST MODAL */}
+          <CashReqModal
+            show={showCashReqModal}
+            onHide={() => setShowCashReqModal(false)}
+            onSubmit={(newData) => {
+              const raw =
+                JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+              const updated = raw.filter(
+                (item) =>
+                  item.status !== STATUS.DELETED &&
+                  item.status !== STATUS.APPROVED &&
+                  item.status !== STATUS.REJECTED
+              );
+              const sorted = [...updated].sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+              );
+              setTableData(sorted);
+            }}
+          />
 
-      {/* LIQUIDATION MODAL */}
-      <LiqFormModal
-        show={showLiqFormModal}
-        onHide={() => setShowLiqFormModal(false)}
-        onSubmit={(newForm) => {
-          const current =
-            JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
-          const updated = [newForm, ...current];
-          localStorage.setItem(LOCAL_KEYS.LIQUIDATION, JSON.stringify(updated));
+          {/* LIQUIDATION MODAL */}
+          <LiqFormModal
+            show={showLiqFormModal}
+            onHide={() => setShowLiqFormModal(false)}
+            onSubmit={(newForm) => {
+              const current =
+                JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
+              const updated = [newForm, ...current];
+              localStorage.setItem(
+                LOCAL_KEYS.LIQUIDATION,
+                JSON.stringify(updated)
+              );
 
-          // Trigger custom event so EmpLiquidation can refresh
-          window.dispatchEvent(new Event("liquidations-updated"));
-        }}
-      />
-    </div>
+              // Trigger custom event so EmpLiquidation can refresh
+              window.dispatchEvent(new Event("liquidations-updated"));
+            }}
+          />
+        </div>
+      </Container>
+    </>
   );
 };
 

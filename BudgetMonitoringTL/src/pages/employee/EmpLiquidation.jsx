@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { Container } from "react-bootstrap";
 
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 import { columns } from "../../handlers/tableHeader";
@@ -63,19 +64,23 @@ const EmpLiquidation = () => {
   return (
     <>
       <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
-      <ToolBar
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        selectedCount={Object.values(selectedRows).filter(Boolean).length}
-      />
-      <DataTable
-        data={filteredData}
-        height="390px"
-        columns={columns}
-        onRowClick={() => {}}
-        selectedRows={selectedRows}
-        onSelectionChange={setSelectedRows}
-      />
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            selectedCount={Object.values(selectedRows).filter(Boolean).length}
+          />
+          <DataTable
+            data={filteredData}
+            height="360px"
+            columns={columns}
+            onRowClick={() => {}}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+          />
+        </div>
+      </Container>
     </>
   );
 };
