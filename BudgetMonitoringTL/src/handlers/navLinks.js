@@ -75,9 +75,8 @@ export const navConfig = {
       label: "Cash Flow",
       icon: GiMoneyStack,
       children: [
-        { label: "All Requests", path: "#" },
-        { label: "All Liquidations", path: "#" },
-        { label: "Pending Final Approval", path: "#" },
+        { label: "Pending Final Approval", path: "/final-approval" },
+        { label: "All Requests", path: "/all-request" },
       ],
     },
     {
@@ -98,6 +97,6 @@ export const navConfig = {
     },
     { label: "Archive", icon: MdOutlineArchive, path: "/admin-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/admin-important" },
-    { label: "Trash", icon: RxTrash, path: "#" },
+    { label: "Trash", icon: RxTrash, path: "/admin-trash" },
   ],
 };

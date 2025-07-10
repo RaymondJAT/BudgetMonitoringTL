@@ -76,7 +76,7 @@ const ToolBar = ({
         gap: "10px",
         marginBottom: "1rem",
         fontSize: "0.75rem",
-        marginTop: "1rem",
+        // marginTop: "1rem",
         position: "relative",
       }}
     >

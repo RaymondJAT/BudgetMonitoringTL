@@ -1,19 +1,20 @@
 import { useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
-import { expenseHeaders } from "../../handlers/columnHeaders";
+import { columns } from "../../handlers/tableHeader";
 import { deleteItems } from "../../utils/deleteItems";
 import { moveEntries } from "../../utils/entryActions";
 import { handleExportData } from "../../utils/exportItems";
+import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
+
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
-
 import DataTable from "../../components/layout/DataTable";
 import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
 import TotalCards from "../../components/TotalCards";
-import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 
 const MyExpenses = () => {
   const [tableData, setTableData] = useState([]);
@@ -25,7 +26,7 @@ const MyExpenses = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  // Load fresh data from localStorage once on mount
+  // Load fresh data from localStorage
   const loadActiveExpenses = () => {
     const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
 
@@ -99,7 +100,7 @@ const MyExpenses = () => {
 
     setTimeout(() => {
       loadActiveExpenses();
-    }, 100); // small delay ensures localStorage is updated
+    }, 100); // delay
   };
 
   const handleDeleteSelected = () => {
@@ -174,7 +175,7 @@ const MyExpenses = () => {
       <DataTable
         data={filteredData}
         height="390px"
-        columns={expenseHeaders}
+        columns={columns}
         onRowClick={handleRowClick}
         onDelete={handleDelete}
         onArchive={handleArchive}

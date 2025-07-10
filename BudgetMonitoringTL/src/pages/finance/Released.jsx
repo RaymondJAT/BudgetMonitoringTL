@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
-import { expenseHeaders } from "../../handlers/columnHeaders";
+import { columns } from "../../handlers/tableHeader";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
@@ -29,7 +29,7 @@ const Released = () => {
     <div>
       <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
       <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-      <DataTable data={filteredData} height="390px" columns={expenseHeaders} />
+      <DataTable data={filteredData} height="390px" columns={columns} />
     </div>
   );
 };

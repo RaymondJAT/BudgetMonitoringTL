@@ -23,9 +23,9 @@ const FnceExpenses = () => {
 
   const totalComputationData = useMemo(() => {
     const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
     const importantData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
     return [...tableData, ...archiveData, ...importantData];
   }, [tableData]);
 

@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
-import TotalCards from "../../components/TotalCards";
+
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
+import { columns } from "../../handlers/tableHeader";
 import { LOCAL_KEYS } from "../../constants/localKeys";
+
+import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
-import { expenseHeaders } from "../../handlers/columnHeaders";
 
 const EmpLiquidation = () => {
   const [tableData, setTableData] = useState([]);
@@ -69,7 +71,7 @@ const EmpLiquidation = () => {
       <DataTable
         data={filteredData}
         height="390px"
-        columns={expenseHeaders}
+        columns={columns}
         onRowClick={() => {}}
         selectedRows={selectedRows}
         onSelectionChange={setSelectedRows}
