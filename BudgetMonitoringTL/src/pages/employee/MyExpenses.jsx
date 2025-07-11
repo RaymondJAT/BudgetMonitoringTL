@@ -71,7 +71,7 @@ const MyExpenses = () => {
       .trim();
 
   const isMatch = (item, value) => {
-    const fields = [...expenseHeaders.map((col) => col.accessor), "formType"];
+    const fields = [...columns.map((col) => col.accessor), "formType"];
     return fields.some((key) =>
       normalize(item[key]).includes(normalize(value))
     );
