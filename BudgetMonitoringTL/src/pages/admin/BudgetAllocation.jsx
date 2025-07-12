@@ -3,15 +3,18 @@ import { Container } from "react-bootstrap";
 
 import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
-import { BudgetAllocationOverview } from "../../constants/totalList";
+import { BudgetOverview } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
 import BudgetTable from "../../components/layout/BudgetTable";
 import TotalCards from "../../components/TotalCards";
+import NewBudgetAllocation from "../../components/ui/modal/admin/NewBudgetAllocation";
+import AppButton from "../../components/ui/AppButton";
 
 const BudgetAllocation = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   const archiveData = useMemo(() => {
     return JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ARCHIVE)) || [];
@@ -28,11 +31,27 @@ const BudgetAllocation = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={BudgetAllocationOverview} />
+      <TotalCards data={totalComputationData} list={BudgetOverview} />
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-          <BudgetTable data={mockBudgets} height="275px" />
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            leftContent={
+              <AppButton
+                label="+ Allocate Budget"
+                variant="outline-dark"
+                size="sm"
+                onClick={() => setShowModal(true)}
+                className="custom-app-button"
+              />
+            }
+          />
+          <NewBudgetAllocation
+            show={showModal}
+            onHide={() => setShowModal(false)}
+          />
+          <BudgetTable data={mockBudgets} height="335px" />
         </div>
       </Container>
     </>
