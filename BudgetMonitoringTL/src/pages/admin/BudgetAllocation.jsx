@@ -3,7 +3,10 @@ import { Container } from "react-bootstrap";
 
 import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
-import { BudgetOverview } from "../../constants/totalList";
+import {
+  BudgetAllocationOverview,
+  BudgetOverview,
+} from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
 import BudgetTable from "../../components/layout/BudgetTable";
@@ -13,7 +16,7 @@ import AppButton from "../../components/ui/AppButton";
 
 const BudgetAllocation = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState(mockBudgets);
   const [showModal, setShowModal] = useState(false);
 
   const archiveData = useMemo(() => {
@@ -39,7 +42,7 @@ const BudgetAllocation = () => {
             onSearchChange={setSearchValue}
             leftContent={
               <AppButton
-                label="+ Allocate Budget"
+                label="+ Add Allocation"
                 variant="outline-dark"
                 size="sm"
                 onClick={() => setShowModal(true)}
@@ -51,7 +54,11 @@ const BudgetAllocation = () => {
             show={showModal}
             onHide={() => setShowModal(false)}
           />
-          <BudgetTable data={mockBudgets} height="335px" />
+          <BudgetTable
+            data={tableData}
+            height="335px"
+            onUpdate={(updated) => setTableData(updated)}
+          />
         </div>
       </Container>
     </>

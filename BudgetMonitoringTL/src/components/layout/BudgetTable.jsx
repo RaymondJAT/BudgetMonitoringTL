@@ -1,9 +1,42 @@
+import { useState } from "react";
 import { Table, Button } from "react-bootstrap";
-import { FaEdit, FaEye } from "react-icons/fa";
+import { FaEdit, FaEye, FaExchangeAlt } from "react-icons/fa";
+import EditBudgetAllocation from "../ui/modal/admin/EditBudgetAllocation";
+import TransferBudgetAllocation from "../ui/modal/admin/TransferBudgetAllocation";
 
-const BudgetTable = ({ data, height }) => {
+const BudgetTable = ({ data, height, onUpdate }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [tableData, setTableData] = useState(data);
+  const [transferFrom, setTransferFrom] = useState(null);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+
+  const handleTransfer = (item) => {
+    setTransferFrom(null);
+    setTimeout(() => {
+      setTransferFrom(item);
+      setShowTransferModal(true);
+    }, 0);
+  };
+
+  const handleEdit = (item) => {
+    setSelectedItem(null);
+    setTimeout(() => {
+      setSelectedItem(item);
+      setShowEditModal(true);
+    }, 0);
+  };
+
+  const handleSaveChanges = (updatedItem) => {
+    const updatedTable = data.map((entry) =>
+      entry.id === updatedItem.id ? updatedItem : entry
+    );
+    onUpdate(updatedTable);
+    setShowEditModal(false);
+  };
+
   const renderRows = () =>
-    data.map((item) => {
+    tableData.map((item) => {
       const remaining = item.allocated - item.used;
       const utilization = ((item.used / item.allocated) * 100).toFixed(2);
 
@@ -16,11 +49,21 @@ const BudgetTable = ({ data, height }) => {
           <td>{utilization}%</td>
           <td>
             <Button
-              variant="outline-success"
+              variant="outline-dark"
               size="sm"
               className="me-2"
               style={{ padding: "2px 6px", fontSize: "0.75rem" }}
-              onClick={() => console.log("Edit", item)}
+              onClick={() => handleTransfer(item)}
+              title="Transfer Funds"
+            >
+              <FaExchangeAlt />
+            </Button>
+            <Button
+              variant="outline-dark"
+              size="sm"
+              className="me-2"
+              style={{ padding: "2px 6px", fontSize: "0.75rem" }}
+              onClick={() => handleEdit(item)}
             >
               <FaEdit />
             </Button>
@@ -44,7 +87,7 @@ const BudgetTable = ({ data, height }) => {
         className="table-wrapper overflow-auto"
         style={{ maxHeight: height }}
       >
-        <Table hover responsive className="expense-table mb-0">
+        <Table hover className="expense-table mb-0">
           <thead>
             <tr>
               <th>Department</th>
@@ -56,7 +99,7 @@ const BudgetTable = ({ data, height }) => {
             </tr>
           </thead>
           <tbody>
-            {data.length > 0 ? (
+            {tableData.length > 0 ? (
               renderRows()
             ) : (
               <tr>
@@ -68,6 +111,24 @@ const BudgetTable = ({ data, height }) => {
           </tbody>
         </Table>
       </div>
+
+      <TransferBudgetAllocation
+        show={showTransferModal}
+        onHide={() => setShowTransferModal(false)}
+        fromDepartment={transferFrom}
+        departments={tableData}
+        onTransfer={(updatedTable) => {
+          onUpdate(updatedTable);
+          setShowTransferModal(false);
+        }}
+      />
+
+      <EditBudgetAllocation
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        budgetItem={selectedItem}
+        onSave={handleSaveChanges}
+      />
     </>
   );
 };
