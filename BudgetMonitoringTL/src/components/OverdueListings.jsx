@@ -22,7 +22,7 @@ const OverdueListings = ({ data, title, height }) => {
             <tbody>
               {data.length > 0 ? (
                 data.map((entry, index) => (
-                  <tr key={index}>
+                  <tr key={index} className="fw-bold">
                     <td>{entry.title}</td>
                     <td>{entry.department}</td>
                     <td>{entry.date}</td>

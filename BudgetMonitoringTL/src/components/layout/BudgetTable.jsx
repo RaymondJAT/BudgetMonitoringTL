@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
 import { FaEdit, FaEye, FaExchangeAlt } from "react-icons/fa";
 import EditBudgetAllocation from "../ui/modal/admin/EditBudgetAllocation";
 import TransferBudgetAllocation from "../ui/modal/admin/TransferBudgetAllocation";
+import ViewBudgetAllocation from "../ui/modal/admin/ViewBudgetAllocation";
 
 const BudgetTable = ({ data, height, onUpdate }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -10,6 +11,20 @@ const BudgetTable = ({ data, height, onUpdate }) => {
   const [tableData, setTableData] = useState(data);
   const [transferFrom, setTransferFrom] = useState(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewItem, setViewItem] = useState(null);
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
+  const handleView = (item) => {
+    setViewItem(null);
+    setTimeout(() => {
+      setViewItem(item.id);
+      setShowViewModal(true);
+    }, 0);
+  };
 
   const handleTransfer = (item) => {
     setTransferFrom(null);
@@ -71,7 +86,8 @@ const BudgetTable = ({ data, height, onUpdate }) => {
               variant="outline-dark"
               size="sm"
               style={{ padding: "2px 6px", fontSize: "0.75rem" }}
-              onClick={() => console.log("View", item)}
+              onClick={() => handleView(item)}
+              title="View Budget Details"
             >
               <FaEye />
             </Button>
@@ -128,6 +144,13 @@ const BudgetTable = ({ data, height, onUpdate }) => {
         onHide={() => setShowEditModal(false)}
         budgetItem={selectedItem}
         onSave={handleSaveChanges}
+      />
+
+      <ViewBudgetAllocation
+        show={showViewModal}
+        onHide={() => setShowViewModal(false)}
+        budgetId={viewItem}
+        tableData={tableData}
       />
     </>
   );

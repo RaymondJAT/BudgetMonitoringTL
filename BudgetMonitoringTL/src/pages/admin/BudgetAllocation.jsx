@@ -3,10 +3,7 @@ import { Container } from "react-bootstrap";
 
 import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
-import {
-  BudgetAllocationOverview,
-  BudgetOverview,
-} from "../../constants/totalList";
+import { BudgetOverview } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
 import BudgetTable from "../../components/layout/BudgetTable";

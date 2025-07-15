@@ -23,9 +23,9 @@ const AdmExpenses = () => {
           </Col>
           <Col lg={6} className="d-flex">
             <div className="flex-fill">
-              <LatestListings
-                data={latestListingsData}
-                title="🕒 Latest Listings"
+              <OverdueListings
+                data={overdueListings}
+                title="⚠️ Overdue Liquidations"
               />
             </div>
           </Col>
@@ -33,9 +33,9 @@ const AdmExpenses = () => {
 
         <Row>
           <Col className="d-flex">
-            <OverdueListings
-              data={overdueListings}
-              title="⚠️ Overdue Liquidations"
+            <LatestListings
+              data={latestListingsData}
+              title="🕒 Latest Listings"
               height="213px"
             />
           </Col>
