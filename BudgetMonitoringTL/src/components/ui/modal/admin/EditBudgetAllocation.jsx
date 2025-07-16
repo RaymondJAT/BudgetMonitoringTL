@@ -60,7 +60,7 @@ const EditBudgetAllocation = ({ show, onHide, budgetItem = {}, onSave }) => {
               <FloatingLabel
                 controlId="editBudget"
                 label="Allocated Budget"
-                className="mb-2 text-dark"
+                className="mb-2 text-dark small"
               >
                 <Form.Control
                   type="number"

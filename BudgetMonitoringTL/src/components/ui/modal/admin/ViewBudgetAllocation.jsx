@@ -1,4 +1,12 @@
-import { Modal, Form, Row, Col, Container, Table } from "react-bootstrap";
+import {
+  Modal,
+  Form,
+  Row,
+  Col,
+  Container,
+  Table,
+  FloatingLabel,
+} from "react-bootstrap";
 import {
   LineChart,
   Line,
@@ -118,15 +126,18 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
           <Container fluid>
             <Row>
               <Col md={12}>
-                <Form.Label style={{ fontSize: "0.75rem" }}>
-                  Department
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  value={department}
-                  disabled
-                  className="form-control-sm small-input fw-bold"
-                />
+                <FloatingLabel
+                  controlId="viewBudget"
+                  label="Department"
+                  className="text-dark small"
+                >
+                  <Form.Control
+                    type="text"
+                    value={department}
+                    disabled
+                    className="form-control-sm small-input fw-bold"
+                  />
+                </FloatingLabel>
               </Col>
             </Row>
           </Container>
@@ -145,7 +156,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
 
           {/* Charts */}
           <Container fluid>
-            <Row>
+            <Row className="g-3">
               {/* Wider Line Chart */}
               <Col md={7} className="mb-2">
                 <ChartCard
@@ -208,10 +219,13 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
             {/* Transactions List */}
             <Row>
               <Col>
-                <Form.Label style={{ fontSize: "0.75rem" }} className="mt-2">
-                  Transactions
-                </Form.Label>
-                <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column">
+                <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column mt-2">
+                  <Form.Label
+                    style={{ fontSize: "0.75rem", color: "black" }}
+                    className="fw-bold"
+                  >
+                    💸 Transactions
+                  </Form.Label>
                   <div
                     className="table-wrapper flex-grow-1 overflow-auto"
                     style={{ maxHeight: "180px" }}
