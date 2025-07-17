@@ -87,14 +87,14 @@ export const navConfig = {
         // { label: "User Management", path: "#" },
       ],
     },
-    {
-      label: "Reports & Logs",
-      icon: TbReport,
-      children: [
-        { label: "Budget Rerports", path: "#" },
-        { label: "Audit Logs", path: "#" },
-      ],
-    },
+    // {
+    //   label: "Reports & Logs",
+    //   icon: TbReport,
+    //   children: [
+    //     { label: "Budget Rerports", path: "/budget-report" },
+    //     { label: "Audit Logs", path: "#" },
+    //   ],
+    // },
     { label: "Archive", icon: MdOutlineArchive, path: "/admin-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/admin-important" },
     { label: "Trash", icon: RxTrash, path: "/admin-trash" },

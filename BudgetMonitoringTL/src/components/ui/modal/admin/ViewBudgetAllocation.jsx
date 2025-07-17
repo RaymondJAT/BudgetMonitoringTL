@@ -113,7 +113,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
           className="text-uppercase"
           style={{ letterSpacing: "4px" }}
         >
-          View Budget
+          {department}
         </Modal.Title>
       </Modal.Header>
 
