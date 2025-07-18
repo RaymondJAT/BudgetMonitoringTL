@@ -18,6 +18,7 @@ const ToolBar = ({
 }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateRange, setDateRange] = useState([null, null]);
+  const [selectedFilter, setSelectedFilter] = useState("");
   const [startDate, endDate] = dateRange;
 
   const datePickerRef = useRef(null);
@@ -27,6 +28,8 @@ const ToolBar = ({
   };
 
   const handleFilter = (type) => {
+    setSelectedFilter(type);
+
     if (type === "date-range") {
       setTimeout(() => setShowDatePicker(true), 0);
     } else {
@@ -111,15 +114,35 @@ const ToolBar = ({
               }
               variant="outline-dark"
               size="sm"
-              className="custom-app-button"
               dropdownItems={[
+                ...filterDropdownItems(handleFilter).map((item) => ({
+                  ...item,
+                  label: (
+                    <div className="d-flex align-items-center justify-content-between">
+                      <span>{item.label}</span>
+                      <input
+                        type="radio"
+                        name="filter"
+                        checked={selectedFilter === item.value}
+                        onChange={() => handleFilter(item.value)}
+                        style={{
+                          accentColor: "maroon",
+                          width: "14px",
+                          height: "14px",
+                          marginLeft: "10px",
+                        }}
+                      />
+                    </div>
+                  ),
+                  onClick: () => handleFilter(item.value),
+                })),
                 {
-                  label: "Date Range",
-                  icon: <FaCalendarAlt className="me-2" />,
+                  label: "Custom",
+                  icon: <FaCalendarAlt style={{ fontSize: "0.80rem" }} />,
                   onClick: () => handleFilter("date-range"),
                 },
-                ...filterDropdownItems(handleFilter),
               ]}
+              className="custom-app-button"
             />
 
             {showDatePicker && (

@@ -1,3 +1,5 @@
+import { useState, useMemo } from "react";
+
 import {
   Modal,
   Form,
@@ -29,12 +31,66 @@ import TotalCards from "../../../TotalCards";
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
 
 const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
-  if (!budgetId) return null;
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "asc",
+  });
+
+  const [filters, setFilters] = useState({
+    referenceId: "",
+    amount: "",
+    date: "",
+  });
 
   const budgetItem = tableData.find((item) => item.id === budgetId);
-  if (!budgetItem) return null;
+  const {
+    department,
+    allocated = 0,
+    used = 0,
+    transactions = [],
+  } = budgetItem || {};
 
-  const { department, allocated = 0, used = 0, transactions = [] } = budgetItem;
+  const filteredTransactions = useMemo(() => {
+    let filtered = transactions.filter((tx) => {
+      const matchesReference =
+        tx.referenceId
+          ?.toLowerCase()
+          .includes(filters.referenceId.toLowerCase()) ?? true;
+
+      const matchesAmount = filters.amount
+        ? parseFloat(tx.amount || 0) >= parseFloat(filters.amount)
+        : true;
+
+      const matchesDate = filters.date ? tx.date === filters.date : true;
+
+      return matchesReference && matchesAmount && matchesDate;
+    });
+
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return sortConfig.direction === "asc"
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortConfig.direction === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [filters, sortConfig, transactions]);
+
+  if (!budgetId || !budgetItem) return null;
 
   const remaining = allocated - used;
 
@@ -98,6 +154,23 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     );
+  };
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return {
+          key,
+          direction: prev.direction === "asc" ? "desc" : "asc",
+        };
+      }
+      return { key, direction: "asc" };
+    });
+  };
+
+  const renderSortIcon = (key) => {
+    if (sortConfig.key !== key) return "⇅";
+    return sortConfig.direction === "asc" ? "↑" : "↓";
   };
 
   return (
@@ -234,26 +307,37 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
                       <thead>
                         <tr>
                           <th>Type</th>
-                          <th>Reference ID</th>
+                          <th
+                            onClick={() => handleSort("referenceId")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            Reference ID {renderSortIcon("referenceId")}
+                          </th>
                           <th>Description</th>
-                          <th>Amount</th>
+                          <th
+                            onClick={() => handleSort("amount")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            Amount {renderSortIcon("amount")}
+                          </th>
                           <th>Status</th>
-                          <th>Date</th>
+                          <th
+                            onClick={() => handleSort("date")}
+                            style={{ cursor: "pointer" }}
+                          >
+                            Date {renderSortIcon("date")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {transactions.length > 0 ? (
-                          transactions.map((tx, idx) => (
+                        {filteredTransactions.length > 0 ? (
+                          filteredTransactions.map((tx, idx) => (
                             <tr key={idx}>
                               <td>{tx.type}</td>
                               <td>{tx.referenceId || "—"}</td>
                               <td
-                                style={{
-                                  maxWidth: "200px",
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                }}
+                                className="text-truncate"
+                                style={{ maxWidth: "200px" }}
                               >
                                 {tx.description || "—"}
                               </td>
@@ -282,7 +366,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
                         ) : (
                           <tr>
                             <td colSpan="6" className="text-center text-muted">
-                              No transactions available.
+                              No transactions found.
                             </td>
                           </tr>
                         )}

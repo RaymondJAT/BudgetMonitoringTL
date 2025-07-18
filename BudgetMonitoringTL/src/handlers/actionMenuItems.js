@@ -69,8 +69,19 @@ export const actionDropdownItems = ({ handleExport }) => [
 
 // filter dropdown menu
 export const filterDropdownItems = (handleFilter) => [
-  { type: "divider" },
-
-  { label: "Newest to Oldest", onClick: () => handleFilter("newest") },
-  { label: "Oldest to Newest", onClick: () => handleFilter("oldest") },
+  {
+    label: "Last Month",
+    value: "lastMonth",
+    onClick: () => handleFilter("latest"),
+  },
+  {
+    label: "This Week",
+    value: "thisWeek",
+    onClick: () => handleFilter("oldest"),
+  },
+  {
+    label: "This Quarter",
+    value: "thisQuarter",
+    onClick: () => handleFilter("approved"),
+  },
 ];

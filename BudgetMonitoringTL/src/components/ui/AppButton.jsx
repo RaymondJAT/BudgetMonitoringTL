@@ -25,6 +25,7 @@ const AppButton = ({
         <Dropdown.Menu className="custom-dropdown-menu">
           {dropdownItems.map((item, index) => (
             <Dropdown.Item key={index} onClick={item.onClick}>
+              {item.icon && <span className="me-2">{item.icon}</span>}
               {item.label}
             </Dropdown.Item>
           ))}
