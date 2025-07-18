@@ -37,6 +37,7 @@ const BudgetAllocation = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
+            showFilter={false}
             leftContent={
               <AppButton
                 label="+ Add Allocation"
