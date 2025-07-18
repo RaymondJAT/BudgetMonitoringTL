@@ -25,6 +25,7 @@ const AdmExpenses = () => {
             <div className="flex-fill">
               <OverdueListings
                 data={overdueListings}
+                height="430px"
                 title="⚠️ Overdue Liquidations"
               />
             </div>
@@ -36,7 +37,7 @@ const AdmExpenses = () => {
             <LatestListings
               data={latestListingsData}
               title="🕒 Latest Listings"
-              height="213px"
+              height="200px"
             />
           </Col>
         </Row>

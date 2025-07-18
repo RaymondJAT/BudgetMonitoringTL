@@ -6,26 +6,52 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import ChartCard from "../../ChartCard";
 
-const COLORS = ["#0d6efd", "#20c997", "#ffc107", "#dc3545", "#6f42c1"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#DC3545", "#6F42C1"];
+const RADIAN = Math.PI / 180;
+
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      fontSize={10}
+      textAnchor="middle"
+      dominantBaseline="central"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 const DepartmentBudgetChart = ({ data }) => {
   return (
-    <div className="custom-container rounded p-3 w-100 h-100">
-      <p className="mb-3 fw-bold">🏢 Budget Distribution by Department</p>
-      <ResponsiveContainer width="100%" height={250}>
+    <ChartCard
+      title="🏢 Budget Distribution by Department"
+      style={{ fontSize: "0.75rem" }}
+    >
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
             data={data}
             dataKey="used"
             nameKey="department"
-            cx="50%"
-            cy="50%"
-            outerRadius={60}
-            fill="#8884d8"
-            label={({ name, percent }) =>
-              `${name}: ${(percent * 100).toFixed(0)}%`
-            }
+            outerRadius="90%"
+            labelLine={false}
+            label={renderCustomizedLabel}
           >
             {data.map((_, index) => (
               <Cell key={index} fill={COLORS[index % COLORS.length]} />
@@ -35,10 +61,15 @@ const DepartmentBudgetChart = ({ data }) => {
             formatter={(value) => `₱${value.toLocaleString()}`}
             contentStyle={{ fontSize: "0.75rem" }}
           />
-          <Legend />
+          <Legend
+            wrapperStyle={{ fontSize: "0.75rem" }}
+            formatter={(value) => (
+              <span style={{ marginLeft: "6px" }}>{value}</span>
+            )}
+          />
         </PieChart>
       </ResponsiveContainer>
-    </div>
+    </ChartCard>
   );
 };
 
