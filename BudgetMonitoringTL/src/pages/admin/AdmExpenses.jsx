@@ -1,7 +1,7 @@
 import { Container, Row, Col } from "react-bootstrap";
 
 import { BudgetOverview } from "../../constants/totalList";
-import { latestListingsData } from "../../constants/latestListingsData";
+import { mockBudgets } from "../../constants/mockBudgets";
 import { overdueListings } from "../../constants/overdueListings";
 
 import TotalCards from "../../components/TotalCards";
@@ -10,6 +10,13 @@ import LatestListings from "../../components/LatestListings";
 import OverdueListings from "../../components/OverdueListings";
 
 const AdmExpenses = () => {
+  const flattenedData = mockBudgets.flatMap((budget) =>
+    budget.transactions.map((tx) => ({
+      ...tx,
+      department: budget.department,
+    }))
+  );
+
   return (
     <div className="mt-3">
       <TotalCards list={BudgetOverview} type="admin" />
@@ -31,17 +38,17 @@ const AdmExpenses = () => {
             </div>
           </Col>
         </Row>
-
-        <Row>
-          <Col className="d-flex">
-            <LatestListings
-              data={latestListingsData}
-              title="🕒 Latest Listings"
-              height="200px"
-            />
-          </Col>
-        </Row>
       </Container>
+
+      <Row>
+        <Col className="d-flex">
+          <LatestListings
+            data={flattenedData}
+            title="🕒 Latest Listings"
+            height="200px"
+          />
+        </Col>
+      </Row>
     </div>
   );
 };

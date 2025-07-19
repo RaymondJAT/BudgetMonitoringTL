@@ -164,68 +164,73 @@ const MyExpenses = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
-      <Container fluid>
-        <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            leftContent={newButton}
-            handleExport={handleExport}
-            selectedCount={selectedCount}
-          />
-
-          <DataTable
-            data={filteredData}
-            height="360px"
-            columns={columns}
-            onRowClick={handleRowClick}
-            onDelete={handleDelete}
-            onArchive={handleArchive}
-            onToggleImportant={handleToggleImportant}
-            selectedRows={selectedRows}
-            onSelectionChange={setSelectedRows}
-          />
-
-          {/* CASH REQUEST MODAL */}
-          <CashReqModal
-            show={showCashReqModal}
-            onHide={() => setShowCashReqModal(false)}
-            onSubmit={(newData) => {
-              const raw =
-                JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-              const updated = raw.filter(
-                (item) =>
-                  item.status !== STATUS.DELETED &&
-                  item.status !== STATUS.APPROVED &&
-                  item.status !== STATUS.REJECTED
-              );
-              const sorted = [...updated].sort(
-                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-              );
-              setTableData(sorted);
-            }}
-          />
-
-          {/* LIQUIDATION MODAL */}
-          <LiqFormModal
-            show={showLiqFormModal}
-            onHide={() => setShowLiqFormModal(false)}
-            onSubmit={(newForm) => {
-              const current =
-                JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
-              const updated = [newForm, ...current];
-              localStorage.setItem(
-                LOCAL_KEYS.LIQUIDATION,
-                JSON.stringify(updated)
-              );
-
-              // Trigger custom event so EmpLiquidation can refresh
-              window.dispatchEvent(new Event("liquidations-updated"));
-            }}
-          />
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
         </div>
-      </Container>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              leftContent={newButton}
+              handleExport={handleExport}
+              selectedCount={selectedCount}
+            />
+
+            <DataTable
+              data={filteredData}
+              height="355px"
+              columns={columns}
+              onRowClick={handleRowClick}
+              onDelete={handleDelete}
+              onArchive={handleArchive}
+              onToggleImportant={handleToggleImportant}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+            />
+
+            {/* CASH REQUEST MODAL */}
+            <CashReqModal
+              show={showCashReqModal}
+              onHide={() => setShowCashReqModal(false)}
+              onSubmit={(newData) => {
+                const raw =
+                  JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+                const updated = raw.filter(
+                  (item) =>
+                    item.status !== STATUS.DELETED &&
+                    item.status !== STATUS.APPROVED &&
+                    item.status !== STATUS.REJECTED
+                );
+                const sorted = [...updated].sort(
+                  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setTableData(sorted);
+              }}
+            />
+
+            {/* LIQUIDATION MODAL */}
+            <LiqFormModal
+              show={showLiqFormModal}
+              onHide={() => setShowLiqFormModal(false)}
+              onSubmit={(newForm) => {
+                const current =
+                  JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) ||
+                  [];
+                const updated = [newForm, ...current];
+                localStorage.setItem(
+                  LOCAL_KEYS.LIQUIDATION,
+                  JSON.stringify(updated)
+                );
+
+                // Trigger custom event so EmpLiquidation can refresh
+                window.dispatchEvent(new Event("liquidations-updated"));
+              }}
+            />
+          </div>
+        </Container>
+      </div>
     </>
   );
 };

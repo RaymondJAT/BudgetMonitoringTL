@@ -31,7 +31,9 @@ const BudgetAllocation = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={BudgetOverview} />
+      <div className="mt-3">
+        <TotalCards data={totalComputationData} list={BudgetOverview} />
+      </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
           <ToolBar
@@ -54,7 +56,7 @@ const BudgetAllocation = () => {
           />
           <BudgetTable
             data={tableData}
-            height="335px"
+            height="330px"
             onUpdate={(updated) => setTableData(updated)}
           />
         </div>

@@ -28,13 +28,20 @@ const Processing = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
-      <Container fluid>
-        <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-          <DataTable data={filteredData} height="360px" columns={columns} />
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
         </div>
-      </Container>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+            <DataTable data={filteredData} height="355px" columns={columns} />
+          </div>
+        </Container>
+      </div>
     </>
   );
 };

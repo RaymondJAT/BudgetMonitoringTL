@@ -154,55 +154,59 @@ const Approval = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-      <Container fluid>
-        <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            leftContent={
-              selectedCount > 0 && (
-                <>
-                  {selectedCount === 1 && (
-                    <>
-                      <PrintButton onClick={handlePrint} />
-                      <DeleteButton onClick={handleDeleteSelected} />
-                    </>
-                  )}
-                  {selectedCount > 1 && (
-                    <DeleteButton onClick={handleDeleteSelected} />
-                  )}
-                </>
-              )
-            }
-            handleExport={handleExport}
-            selectedCount={selectedCount}
-          />
-
-          <DataTable
-            data={filteredData}
-            height="460px"
-            columns={columns}
-            onRowClick={handleRowClick}
-            onDelete={(entry) =>
-              handleMoveEntry(entry, LOCAL_KEYS.TRASH, STATUS.DELETED)
-            }
-            onArchive={(entry) => handleMoveEntry(entry, LOCAL_KEYS.ARCHIVE)}
-            onToggleImportant={(entry) =>
-              handleMoveEntry(entry, LOCAL_KEYS.IMPORTANT)
-            }
-            selectedRows={selectedRows}
-            onSelectionChange={setSelectedRows}
-            downloadRef={downloadRef}
-            setPrintData={setPrintData}
-          />
-
-          <div className="d-none">
-            <ExpenseReport contentRef={contentRef} data={printData || {}} />
-            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
-          </div>
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
         </div>
-      </Container>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              leftContent={
+                selectedCount > 0 && (
+                  <>
+                    {selectedCount === 1 && (
+                      <>
+                        <PrintButton onClick={handlePrint} />
+                        <DeleteButton onClick={handleDeleteSelected} />
+                      </>
+                    )}
+                    {selectedCount > 1 && (
+                      <DeleteButton onClick={handleDeleteSelected} />
+                    )}
+                  </>
+                )
+              }
+              handleExport={handleExport}
+              selectedCount={selectedCount}
+            />
+
+            <DataTable
+              data={filteredData}
+              height="455px"
+              columns={columns}
+              onRowClick={handleRowClick}
+              onDelete={(entry) =>
+                handleMoveEntry(entry, LOCAL_KEYS.TRASH, STATUS.DELETED)
+              }
+              onArchive={(entry) => handleMoveEntry(entry, LOCAL_KEYS.ARCHIVE)}
+              onToggleImportant={(entry) =>
+                handleMoveEntry(entry, LOCAL_KEYS.IMPORTANT)
+              }
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
+            />
+
+            <div className="d-none">
+              <ExpenseReport contentRef={contentRef} data={printData || {}} />
+              <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            </div>
+          </div>
+        </Container>
+      </div>
     </>
   );
 };

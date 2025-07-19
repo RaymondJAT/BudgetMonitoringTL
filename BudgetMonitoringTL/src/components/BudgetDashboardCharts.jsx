@@ -8,7 +8,7 @@ import { statusBreakdownData } from "../constants/statusBreakdownData";
 
 const BudgetDashboardCharts = () => {
   return (
-    <div className="pb-3 w-100">
+    <div className=" w-100">
       {/* Top Line Chart */}
       <div className="mb-3">
         <BudgetUsageChart data={budgetUsageData} />

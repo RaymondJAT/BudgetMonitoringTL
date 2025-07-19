@@ -30,8 +30,10 @@ const FnceExpenses = () => {
   }, [tableData]);
 
   return (
-    <div>
-      <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
+    <>
+      <div className="mt-3">
+        <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
+      </div>
 
       <Container fluid className="pb-1">
         <div className="d-flex gap-3 mb-3">
@@ -58,7 +60,7 @@ const FnceExpenses = () => {
           height="220px"
         />
       </Container>
-    </div>
+    </>
   );
 };
 

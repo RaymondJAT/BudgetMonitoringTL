@@ -63,24 +63,28 @@ const EmpLiquidation = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
-      <Container fluid>
-        <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            selectedCount={Object.values(selectedRows).filter(Boolean).length}
-          />
-          <DataTable
-            data={filteredData}
-            height="360px"
-            columns={columns}
-            onRowClick={() => {}}
-            selectedRows={selectedRows}
-            onSelectionChange={setSelectedRows}
-          />
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
         </div>
-      </Container>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              selectedCount={Object.values(selectedRows).filter(Boolean).length}
+            />
+            <DataTable
+              data={filteredData}
+              height="355px"
+              columns={columns}
+              onRowClick={() => {}}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+            />
+          </div>
+        </Container>
+      </div>
     </>
   );
 };

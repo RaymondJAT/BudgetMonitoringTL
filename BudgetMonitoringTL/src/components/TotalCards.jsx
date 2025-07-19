@@ -103,7 +103,7 @@ const TotalCards = ({
 
   const currentStyle = sizeStyles[size] || sizeStyles.md;
   return (
-    <Container fluid className="total-container mt-3 mb-3">
+    <Container fluid className="total-container mb-3">
       {list.map(({ label, key }) => (
         <div
           className={`total-box ${currentStyle.box} rounded shadow-sm text-dark`}

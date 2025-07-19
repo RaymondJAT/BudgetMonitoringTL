@@ -8,6 +8,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-001",
+        employee: "Juan Dela Cruz",
         description: "Monthly internet allowance",
         amount: 10000,
         status: "Approved",
@@ -17,6 +18,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-002",
+        employee: "Maria Santos",
         description: "Equipment purchase",
         amount: 15000,
         status: "Pending",
@@ -26,6 +28,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-003",
+        employee: "Carlos Reyes",
         description: "Travel expenses",
         amount: 20000,
         status: "Approved",
@@ -35,6 +38,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-0026",
+        employee: "Anna Mendoza",
         description: "Monthly internet allowance",
         amount: 18000,
         status: "Approved",
@@ -44,6 +48,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-0072",
+        employee: "Jose Ramirez",
         description: "Equipment purchase",
         amount: 12000,
         status: "Pending",
@@ -53,6 +58,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-0083",
+        employee: "Liza Hernandez",
         description: "Travel expenses",
         amount: 27000,
         status: "Rejected",
@@ -70,6 +76,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-004",
+        employee: "Mark Gonzales",
         description: "Training materials",
         amount: 5000,
         status: "Approved",
@@ -79,6 +86,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-005",
+        employee: "Sofia Lopez",
         description: "Onboarding kits",
         amount: 10000,
         status: "Approved",
@@ -88,6 +96,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-006",
+        employee: "Daniel Cruz",
         description: "Recruitment meal expenses",
         amount: 10000,
         status: "Rejected",
@@ -105,6 +114,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-007",
+        employee: "Patricia Lim",
         description: "Petty cash fund",
         amount: 20000,
         status: "Approved",
@@ -114,6 +124,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-008",
+        employee: "Miguel Torres",
         description: "Software subscription",
         amount: 40000,
         status: "Approved",
@@ -123,6 +134,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-009",
+        employee: "Andrea Tan",
         description: "Client meeting refreshments",
         amount: 35000,
         status: "Pending",
@@ -140,6 +152,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-010",
+        employee: "Vincent Uy",
         description: "Fuel for deliveries",
         amount: 5000,
         status: "Approved",
@@ -149,6 +162,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-011",
+        employee: "Grace Villanueva",
         description: "Packaging supplies",
         amount: 7000,
         status: "Pending",
@@ -158,6 +172,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-012",
+        employee: "Leo Navarro",
         description: "Out-of-town delivery expenses",
         amount: 8000,
         status: "Approved",
@@ -175,6 +190,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-013",
+        employee: "Camille Bautista",
         description: "Office supplies",
         amount: 5000,
         status: "Approved",
@@ -184,6 +200,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-014",
+        employee: "Nathaniel Roque",
         description: "Coffee and pantry restock",
         amount: 35000,
         status: "Approved",
@@ -193,6 +210,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-015",
+        employee: "Bianca Gutierrez",
         description: "Parking reimbursements",
         amount: 20000,
         status: "Pending",
@@ -210,6 +228,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-016",
+        employee: "Elijah Ferrer",
         description: "Ad campaign boost",
         amount: 8000,
         status: "Approved",
@@ -219,6 +238,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-017",
+        employee: "Angela Velasco",
         description: "Social media tools",
         amount: 9000,
         status: "Approved",
@@ -228,6 +248,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-018",
+        employee: "Joshua Soriano",
         description: "Event hosting reimbursement",
         amount: 8000,
         status: "Rejected",
@@ -245,6 +266,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-019",
+        employee: "Kristine Yambao",
         description: "Site inspection funds",
         amount: 10000,
         status: "Approved",
@@ -254,6 +276,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-020",
+        employee: "Paolo Ramos",
         description: "Tools and equipment",
         amount: 15000,
         status: "Pending",
@@ -263,6 +286,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-021",
+        employee: "Clarisse Chua",
         description: "Emergency repairs",
         amount: 15000,
         status: "Approved",
@@ -280,6 +304,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-022",
+        employee: "Enzo dela Peña",
         description: "Project materials",
         amount: 15000,
         status: "Approved",
@@ -289,6 +314,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-023",
+        employee: "Rica Salazar",
         description: "Contractor payment",
         amount: 20000,
         status: "Pending",
@@ -298,6 +324,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-024",
+        employee: "Ethan Tolentino",
         description: "Engineering licenses",
         amount: 20000,
         status: "Approved",
@@ -315,6 +342,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-025",
+        employee: "Daphne Ong",
         description: "Client meeting funds",
         amount: 20000,
         status: "Approved",
@@ -324,6 +352,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-026",
+        employee: "Adrian Pascual",
         description: "Sales event materials",
         amount: 15000,
         status: "Pending",
@@ -333,6 +362,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-027",
+        employee: "Trisha Mercado",
         description: "Travel expenses",
         amount: 25000,
         status: "Approved",
@@ -350,6 +380,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-028",
+        employee: "Nico Alvarado",
         description: "Inventory restock",
         amount: 25000,
         status: "Approved",
@@ -359,6 +390,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-029",
+        employee: "Joyce Evangelista",
         description: "Supplier payment",
         amount: 20000,
         status: "Approved",
@@ -368,6 +400,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-030",
+        employee: "Marvin Cordero",
         description: "Courier service fees",
         amount: 25000,
         status: "Pending",
@@ -385,6 +418,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-031",
+        employee: "Hazel Abad",
         description: "Legal research materials",
         amount: 10000,
         status: "Approved",
@@ -394,6 +428,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-032",
+        employee: "Francis Imperial",
         description: "Contract review tools",
         amount: 10000,
         status: "Pending",
@@ -403,6 +438,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-033",
+        employee: "Denise Caballerol",
         description: "Bar membership fees",
         amount: 15000,
         status: "Approved",
@@ -420,6 +456,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-034",
+        employee: "Jericho Morales",
         description: "Lab equipment rental",
         amount: 10000,
         status: "Approved",
@@ -429,6 +466,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-035",
+        employee: "Faith Lorenzo",
         description: "Materials for experiment",
         amount: 10000,
         status: "Approved",
@@ -438,6 +476,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-036",
+        employee: "Kurt Sandoval",
         description: "Journal subscription",
         amount: 10000,
         status: "Pending",
@@ -455,6 +494,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-037",
+        employee: "Eliza Carreon",
         description: "Security gear",
         amount: 10000,
         status: "Approved",
@@ -464,6 +504,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-038",
+        employee: "Alfred Espiritu",
         description: "CCTV maintenance",
         amount: 7000,
         status: "Approved",
@@ -473,6 +514,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-039",
+        employee: "Nina de Guzman",
         description: "Uniform replacements",
         amount: 8000,
         status: "Pending",
@@ -490,6 +532,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-040",
+        employee: "Dominic Herrera",
         description: "Headset purchases",
         amount: 15000,
         status: "Approved",
@@ -499,6 +542,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-041",
+        employee: "Ivy Manalo",
         description: "CRM subscription",
         amount: 10000,
         status: "Pending",
@@ -508,6 +552,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-042",
+        employee: "Oliver Sarmiento",
         description: "Call center overtime meals",
         amount: 10000,
         status: "Approved",
@@ -525,6 +570,7 @@ export const mockBudgets = [
       {
         type: "Cash Request",
         referenceId: "CR-043",
+        employee: "Camille Dizon",
         description: "Executive travel fund",
         amount: 50000,
         status: "Approved",
@@ -534,6 +580,7 @@ export const mockBudgets = [
       {
         type: "Liquidation",
         referenceId: "LQ-044",
+        employee: "Tristan Padilla",
         description: "Board meeting expenses",
         amount: 40000,
         status: "Approved",
@@ -543,6 +590,7 @@ export const mockBudgets = [
       {
         type: "Reimbursement",
         referenceId: "RB-045",
+        employee: "Jeanette Agustin",
         description: "Policy review consultancy",
         amount: 30000,
         status: "Approved",

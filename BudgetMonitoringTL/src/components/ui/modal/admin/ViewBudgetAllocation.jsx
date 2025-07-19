@@ -98,7 +98,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
             {/* Transactions List */}
             <Row>
               <Col>
-                <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column mt-2 mb-3">
+                <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column mt-2">
                   <ToolBar
                     searchValue={filters.referenceId}
                     onSearchChange={(value) =>

@@ -22,8 +22,6 @@ const Liquidation = () => {
     return [...tableData, ...archiveData, ...importantData];
   });
 
-  const transactions = tableData || [];
-
   const isMatch = (item, value) => {
     const fieldsToSearch = [...columns.map((col) => col.accessor), "formType"];
     return fieldsToSearch.some((key) =>
@@ -44,13 +42,20 @@ const Liquidation = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-      <Container fluid>
-        <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-          <DataTable data={filteredData} height="460px" columns={columns} />
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
         </div>
-      </Container>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+            />
+            <DataTable data={filteredData} height="455px" columns={columns} />
+          </div>
+        </Container>
+      </div>
     </>
   );
 };

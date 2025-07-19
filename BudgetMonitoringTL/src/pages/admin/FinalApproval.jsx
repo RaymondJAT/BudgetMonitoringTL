@@ -49,21 +49,25 @@ const FinalApproval = () => {
 
   return (
     <>
-      <TotalCards data={totalComputationData} list={BudgetOverview} />
-      <Container fluid>
-        <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar
-            searchValue={searchValue}
-            onSearchChange={(e) => handleSearch(e.target.value)}
-          />
-
-          <DataTable
-            columns={filteredColumns}
-            height="360px"
-            data={filteredData}
-          />
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={BudgetOverview} />
         </div>
-      </Container>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={(e) => handleSearch(e.target.value)}
+            />
+
+            <DataTable
+              columns={filteredColumns}
+              height="355px"
+              data={filteredData}
+            />
+          </div>
+        </Container>
+      </div>
     </>
   );
 };
