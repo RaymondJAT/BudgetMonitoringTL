@@ -21,6 +21,7 @@ const ToolBar = ({
   const [dateRange, setDateRange] = useState([null, null]);
   const [selectedFilter, setSelectedFilter] = useState("");
   const [startDate, endDate] = dateRange;
+  const isMobile = window.innerWidth <= 576;
 
   const datePickerRef = useRef(null);
 
@@ -91,7 +92,8 @@ const ToolBar = ({
             <AppButton
               label={
                 <>
-                  <FaFileExport style={{ marginRight: "5px" }} /> Export
+                  <FaFileExport />
+                  <span className="d-none d-sm-inline ms-1">Export</span>
                 </>
               }
               variant="outline-dark"
@@ -104,61 +106,76 @@ const ToolBar = ({
 
         {/* Right Side */}
         <div className="d-flex align-items-center" style={{ gap: "10px" }}>
-          <div style={{ position: "relative" }} ref={datePickerRef}>
-            {showFilter && (
-              <AppButton
-                isDropdown
-                label={
-                  <>
-                    <FaFilter style={{ marginRight: "5px" }} />
-                    Filter
-                  </>
-                }
-                variant="outline-dark"
-                size="sm"
-                dropdownItems={[
-                  ...filterDropdownItems(handleFilter).map((item) => ({
-                    ...item,
-                    label: (
-                      <div className="d-flex align-items-center justify-content-between">
-                        <span>{item.label}</span>
-                        <input
-                          type="radio"
-                          name="filter"
-                          checked={selectedFilter === item.value}
-                          onChange={() => handleFilter(item.value)}
-                          style={{
-                            accentColor: "maroon",
-                            width: "14px",
-                            height: "14px",
-                            marginLeft: "10px",
-                          }}
-                        />
-                      </div>
-                    ),
-                    onClick: () => handleFilter(item.value),
-                  })),
-                  {
-                    label: "Custom",
-                    icon: <FaCalendarAlt style={{ fontSize: "0.80rem" }} />,
-                    onClick: () => handleFilter("date-range"),
-                  },
-                ]}
-                className="custom-app-button"
-              />
-            )}
+          {/* <div style={{ position: "relative" }} ref={datePickerRef}> */}
+          {showFilter && (
+            <AppButton
+              isDropdown
+              label={
+                <>
+                  <FaFilter />
+                  <span className="d-none d-sm-inline ms-1">Filter</span>
+                </>
+              }
+              variant="outline-dark"
+              size="sm"
+              dropdownItems={[
+                ...filterDropdownItems(handleFilter).map((item) => ({
+                  ...item,
+                  label: (
+                    <div className="d-flex align-items-center justify-content-between">
+                      <span>{item.label}</span>
+                      <input
+                        type="radio"
+                        name="filter"
+                        checked={selectedFilter === item.value}
+                        onChange={() => handleFilter(item.value)}
+                        style={{
+                          accentColor: "maroon",
+                          width: "14px",
+                          height: "14px",
+                          marginLeft: "10px",
+                        }}
+                      />
+                    </div>
+                  ),
+                  onClick: () => handleFilter(item.value),
+                })),
+                {
+                  label: "Custom",
+                  icon: <FaCalendarAlt style={{ fontSize: "0.80rem" }} />,
+                  onClick: () => handleFilter("date-range"),
+                },
+              ]}
+              className="custom-app-button"
+            />
+          )}
 
-            {showDatePicker && (
+          {showDatePicker && (
+            <div
+              className="datepicker-backdrop"
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.3)",
+                zIndex: 1050,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "1rem",
+              }}
+            >
               <div
+                ref={datePickerRef}
                 style={{
-                  position: "absolute",
-                  right: 0,
-                  top: "100%",
-                  zIndex: 1000,
                   backgroundColor: "white",
+                  borderRadius: "8px",
                   padding: "10px",
-                  borderRadius: "4px",
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                  width: "100%",
+                  maxWidth: "500px", // limit size for large screens
                 }}
               >
                 <DatePicker
@@ -168,6 +185,7 @@ const ToolBar = ({
                   onChange={handleDateChange}
                   isClearable
                   inline
+                  calendarClassName="w-100"
                 />
                 <div className="d-flex justify-content-end mt-2">
                   <AppButton
@@ -191,22 +209,23 @@ const ToolBar = ({
                   />
                 </div>
               </div>
-            )}
-          </div>
-
-          <SearchBar
-            value={searchValue}
-            onChange={onSearchChange}
-            size="sm"
-            width="425px"
-            className="custom-search-bar"
-            style={{
-              padding: "0.3rem 0.6rem",
-              fontSize: "0.75rem",
-            }}
-          />
+            </div>
+          )}
         </div>
+
+        <SearchBar
+          value={searchValue}
+          onChange={onSearchChange}
+          size="sm"
+          width="425px"
+          className="custom-search-bar"
+          style={{
+            padding: "0.3rem 0.6rem",
+            fontSize: "0.75rem",
+          }}
+        />
       </div>
+      {/* </div> */}
     </>
   );
 };

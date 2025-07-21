@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import { FaPlus } from "react-icons/fa";
 
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
@@ -154,10 +155,15 @@ const MyExpenses = () => {
 
   const newButton = (
     <AppButton
-      label="New Request"
-      onClick={() => setShowCashReqModal(true)}
+      label={
+        <>
+          <FaPlus />
+          <span className="d-none d-sm-inline ms-1">New Request</span>
+        </>
+      }
       size="sm"
       variant="outline-dark"
+      onClick={() => setShowCashReqModal(true)}
       className="custom-app-button"
     />
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,6 +18,20 @@ import FinanceRoutes from "./routes/FinanceRoutes";
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userRole, setUserRole] = useState(localStorage.getItem("role"));
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const renderRoutes = () => {
     switch (userRole) {

@@ -1,10 +1,8 @@
-import React from "react";
-
 const SearchBar = ({
   value,
   onChange,
   size = "md",
-  width = "250px",
+  width = "100%",
   style = {},
   className = "",
   placeholder = "Search...",
@@ -20,7 +18,7 @@ const SearchBar = ({
     <input
       type="text"
       className={`${sizeClass} ${className}`}
-      style={{ width, ...style }}
+      style={{ width: "100%", maxWidth: width, ...style }}
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}

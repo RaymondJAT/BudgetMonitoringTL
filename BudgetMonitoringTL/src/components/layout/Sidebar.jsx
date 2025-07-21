@@ -13,8 +13,11 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
 
   const navItems = navConfig[userRole] || [];
 
+  // const isMobileView = window.innerWidth <= 576;
+
   const toggleDropdown = (e, label) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const isMobileView = window.innerWidth <= 576;
 
     setDropdownPositions((prev) => ({
       ...prev,
@@ -22,15 +25,15 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
     }));
 
     if (isSidebarOpen) {
-      // Allow multiple dropdowns when sidebar is open
       setOpenDropdown((prev) =>
         prev.includes(label)
           ? prev.filter((item) => item !== label)
           : [...prev, label]
       );
     } else {
-      // Only one dropdown allowed when collapsed
-      setOpenDropdown((prev) => (prev === label ? null : label));
+      setOpenDropdown((prev) =>
+        isMobileView && prev === label ? null : label
+      );
     }
   };
 
@@ -119,11 +122,16 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
           <div key={item.label}>
             <div
               className="nav-item d-flex align-items-center justify-content-between px-3 py-2"
-              onClick={(e) =>
-                item.children
-                  ? toggleDropdown(e, item.label)
-                  : navigate(item.path)
-              }
+              onClick={(e) => {
+                if (item.children) {
+                  toggleDropdown(e, item.label);
+                } else {
+                  navigate(item.path);
+                  if (window.innerWidth <= 576) {
+                    setOpenDropdown(null);
+                  }
+                }
+              }}
               style={{ cursor: "pointer" }}
             >
               <div className="d-flex align-items-center">

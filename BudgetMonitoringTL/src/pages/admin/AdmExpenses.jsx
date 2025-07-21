@@ -38,17 +38,13 @@ const AdmExpenses = () => {
             </div>
           </Col>
         </Row>
-      </Container>
 
-      <Row>
-        <Col className="d-flex">
-          <LatestListings
-            data={flattenedData}
-            title="🕒 Latest Listings"
-            height="200px"
-          />
-        </Col>
-      </Row>
+        <LatestListings
+          data={flattenedData}
+          title="🕒 Latest Listings"
+          height="200px"
+        />
+      </Container>
     </div>
   );
 };

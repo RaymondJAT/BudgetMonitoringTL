@@ -217,6 +217,109 @@ const DataTable = ({
             )}
           </tbody>
         </Table>
+
+        {/* Mobile/Tablet View */}
+        <div className="d-md-none">
+          {data?.length > 0 ? (
+            data.map((entry, index) => (
+              <div key={entry.id || index} className="mobile-card">
+                <div className="mobile-card-header">
+                  <div>
+                    <span className="mobile-card-label">ID:</span> {entry.id}
+                  </div>
+
+                  <Dropdown
+                    align="end"
+                    show={openDropdownIndex === index}
+                    onToggle={(isOpen) =>
+                      setOpenDropdownIndex(isOpen ? index : null)
+                    }
+                  >
+                    <Dropdown.Toggle
+                      variant="link"
+                      bsPrefix="p-0 border-0 bg-transparent"
+                      style={{ boxShadow: "none" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenDropdownIndex(
+                          openDropdownIndex === index ? null : index
+                        );
+                      }}
+                    >
+                      <GoKebabHorizontal
+                        style={{
+                          cursor: "pointer",
+                          fontSize: "1rem",
+                          color: "black",
+                        }}
+                      />
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className="black-dropdown">
+                      {meatballItems.map((action, i) => (
+                        <Dropdown.Item
+                          key={i}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            action.onClick(entry);
+                          }}
+                          className="meat-dropdown"
+                        >
+                          {action.label}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+
+                {/* Main Details */}
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Employee:</span>{" "}
+                  <span className="mobile-card-value">{entry.employee}</span>
+                </div>
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Department:</span>{" "}
+                  <span className="mobile-card-value">{entry.department}</span>
+                </div>
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Description:</span>{" "}
+                  <span className="mobile-card-value">{entry.description}</span>
+                </div>
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Amount:</span>{" "}
+                  <span className="mobile-card-value">
+                    ₱{" "}
+                    {parseFloat(entry.total || 0).toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Status:</span>{" "}
+                  <span
+                    className={`mobile-card-value status-badge ${String(
+                      entry.status
+                    ).toLowerCase()}`}
+                  >
+                    {entry.status}
+                  </span>
+                </div>
+
+                {/* View Button */}
+                <div className="mobile-card-view-btn">
+                  <button
+                    className="custom-app-button"
+                    onClick={() => onRowClick(entry)}
+                  >
+                    👁 View
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center mt-4 ">No data available</div>
+          )}
+        </div>
       </div>
     </>
   );
