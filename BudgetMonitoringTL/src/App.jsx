@@ -17,6 +17,7 @@ import FinanceRoutes from "./routes/FinanceRoutes";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarHiddenMobile, setIsSidebarHiddenMobile] = useState(true);
   const [userRole, setUserRole] = useState(localStorage.getItem("role"));
 
   useEffect(() => {
@@ -32,6 +33,15 @@ const App = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const toggleSidebar = () => {
+    if (window.innerWidth <= 576) {
+      setIsSidebarHiddenMobile((prev) => !prev);
+      setIsSidebarOpen(false);
+    } else {
+      setIsSidebarOpen((prev) => !prev);
+    }
+  };
 
   const renderRoutes = () => {
     switch (userRole) {
@@ -62,13 +72,25 @@ const App = () => {
               element={
                 <>
                   <Header
-                    toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                    toggleSidebar={toggleSidebar}
                     isSidebarOpen={isSidebarOpen}
+                    isSidebarHiddenMobile={isSidebarHiddenMobile}
                     setUserRole={setUserRole}
                   />
-                  <Sidebar isSidebarOpen={isSidebarOpen} userRole={userRole} />
+                  <Sidebar
+                    isSidebarOpen={isSidebarOpen}
+                    isSidebarHiddenMobile={isSidebarHiddenMobile}
+                    userRole={userRole}
+                  />
+
                   <main
-                    style={{ marginLeft: isSidebarOpen ? "230px" : "60px" }}
+                    style={{
+                      marginLeft: isSidebarHiddenMobile
+                        ? 0
+                        : isSidebarOpen
+                        ? "230px"
+                        : "60px",
+                    }}
                   >
                     <ToastContainer position="top-right" autoClose={1000} />
                     {renderRoutes()}

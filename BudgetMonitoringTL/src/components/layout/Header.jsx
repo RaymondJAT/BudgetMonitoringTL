@@ -47,11 +47,20 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
     >
       <Container fluid>
         <div className="d-flex justify-content-between align-items-center w-100">
-          {/* Left: Sidebar Toggle & Page Title */}
+          {/*  Sidebar Toggle & Page Title */}
           <div className="d-flex align-items-center">
             <button
               onClick={toggleSidebar}
-              className="toggle-btn-header p-0 me-2 bg-transparent border-0 d-none d-md-block"
+              className="p-0 me-2 bg-transparent border-0 d-inline d-md-none"
+              style={{ fontSize: "1.2rem", color: "black" }}
+            >
+              <FaBars />
+            </button>
+
+            {/* Desktop toggle only for ≥768px (md) */}
+            <button
+              onClick={toggleSidebar}
+              className="p-0 me-2 bg-transparent border-0 d-none d-md-inline"
               style={{ fontSize: "1.2rem", color: "black" }}
             >
               <FaBars />
@@ -68,7 +77,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
             </span>
           </div>
 
-          {/* Right: Notification and User Menu */}
+          {/* Notification and User Menu */}
           <div className="d-flex align-items-center gap-3 ms-auto">
             <FaBell
               style={{ fontSize: "1.2rem", cursor: "pointer" }}
@@ -81,14 +90,14 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
                 id="dropdown-user"
               >
                 <FaUserCircle size={28} />
-                {/* Hide username on small screens */}
+                {/* hide username on small screens */}
                 <span
                   className="d-none d-md-inline"
                   style={{ fontWeight: 400, fontSize: "13px" }}
                 >
                   {username}
                 </span>
-                {/* Show dropdown arrow only on md and up */}
+                {/* show dropdown arrow only on md and up */}
                 <span className="d-none d-md-inline">▾</span>
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">

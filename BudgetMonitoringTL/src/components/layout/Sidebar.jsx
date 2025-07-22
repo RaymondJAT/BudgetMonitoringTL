@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { navConfig } from "../../handlers/navLinks";
 import { FaMoneyBillWave } from "react-icons/fa";
 
-const Sidebar = ({ isSidebarOpen, userRole }) => {
+const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -12,8 +12,6 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
   const [dropdownPositions, setDropdownPositions] = useState({});
 
   const navItems = navConfig[userRole] || [];
-
-  // const isMobileView = window.innerWidth <= 576;
 
   const toggleDropdown = (e, label) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -61,9 +59,9 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
   return (
     <div
       ref={sidebarRef}
-      className={`sidebar d-flex flex-column vh-100 py-2 border-end ${
-        isSidebarOpen ? "open" : "collapsed"
-      }`}
+      className={`sidebar d-flex flex-column vh-100 py-2 border-end 
+    ${isSidebarHiddenMobile ? "d-none d-sm-flex" : ""} 
+    ${isSidebarOpen ? "open" : "collapsed"}`}
     >
       {/* Floating Dropdown (collapsed sidebar only) */}
       {!isSidebarOpen &&

@@ -219,7 +219,7 @@ const DataTable = ({
         </Table>
 
         {/* Mobile/Tablet View */}
-        <div className="d-md-none">
+        <div className="d-lg-none">
           {data?.length > 0 ? (
             data.map((entry, index) => (
               <div key={entry.id || index} className="mobile-card">
