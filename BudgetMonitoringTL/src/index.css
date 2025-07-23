@@ -21,7 +21,6 @@ body {
 }
 
 /* SIDEBAR */
-
 .sidebar {
   position: fixed;
   top: 0;
@@ -229,6 +228,22 @@ body {
   }
 }
 
+.app-main {
+  transition: margin-left 0.3s ease;
+}
+
+.app-main.sidebar-open {
+  margin-left: 230px;
+}
+
+.app-main.sidebar-collapsed {
+  margin-left: 55px;
+}
+
+.app-main.mobile-hidden {
+  margin-left: 0 !important;
+}
+
 /* HEADER */
 .main-header {
   background-color: #efeeea;
@@ -248,11 +263,30 @@ body {
   margin-left: 55px;
 }
 
+.main-header.sidebar-hidden-mobile {
+  margin-left: 0;
+}
+
 .modal {
   z-index: 10000 !important;
 }
 .modal-backdrop {
   z-index: 9999 !important;
+}
+
+main.with-sidebar {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease;
+}
+
+main.with-collapsed-sidebar {
+  margin-left: 55px;
+  transition: margin-left 0.3s ease;
+}
+
+main.no-sidebar {
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
 }
 
 /* DROPDOWN ITEMS */

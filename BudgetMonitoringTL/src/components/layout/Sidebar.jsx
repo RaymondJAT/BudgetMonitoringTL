@@ -60,8 +60,8 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
     <div
       ref={sidebarRef}
       className={`sidebar d-flex flex-column vh-100 py-2 border-end 
-    ${isSidebarHiddenMobile ? "d-none d-sm-flex" : ""} 
-    ${isSidebarOpen ? "open" : "collapsed"}`}
+  ${isSidebarHiddenMobile ? "d-none d-sm-flex sidebar-hidden" : ""} 
+  ${isSidebarOpen ? "open" : "collapsed"}`}
     >
       {/* Floating Dropdown (collapsed sidebar only) */}
       {!isSidebarOpen &&

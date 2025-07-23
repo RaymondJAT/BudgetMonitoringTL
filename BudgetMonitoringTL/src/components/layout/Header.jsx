@@ -1,12 +1,32 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
-import { Container, Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Container, Dropdown } from "react-bootstrap";
+import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
 
-const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
+const Header = ({
+  toggleSidebar,
+  isSidebarOpen,
+  setUserRole,
+  isSidebarHiddenMobile,
+}) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const location = useLocation();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 576);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const headerClass = isMobile
+    ? isSidebarHiddenMobile
+      ? "sidebar-hidden-mobile"
+      : "sidebar-open"
+    : isSidebarOpen
+    ? "sidebar-open"
+    : "sidebar-collapsed";
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -40,9 +60,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
 
   return (
     <header
-      className={`main-header shadow-sm d-flex align-items-center px-3 ${
-        isSidebarOpen ? "sidebar-open" : "sidebar-collapsed"
-      }`}
+      className={`main-header shadow-sm d-flex align-items-center px-3 ${headerClass}`}
       style={{ height: "60px" }}
     >
       <Container fluid>
@@ -98,7 +116,6 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
                   {username}
                 </span>
                 {/* show dropdown arrow only on md and up */}
-                <span className="d-none d-md-inline">▾</span>
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">
                 <Dropdown.Item style={{ fontSize: "0.75rem" }}>
