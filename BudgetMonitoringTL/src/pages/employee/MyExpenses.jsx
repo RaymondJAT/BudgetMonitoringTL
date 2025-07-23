@@ -182,6 +182,7 @@ const MyExpenses = () => {
               leftContent={newButton}
               handleExport={handleExport}
               selectedCount={selectedCount}
+              searchBarWidth="300px"
             />
 
             <DataTable

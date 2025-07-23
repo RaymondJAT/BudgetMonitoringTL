@@ -2,7 +2,7 @@ const SearchBar = ({
   value,
   onChange,
   size = "md",
-  width = "100%",
+  width, // optional width
   style = {},
   className = "",
   placeholder = "Search...",
@@ -18,7 +18,10 @@ const SearchBar = ({
     <input
       type="text"
       className={`${sizeClass} ${className}`}
-      style={{ width: "100%", maxWidth: width, ...style }}
+      style={{
+        ...(width ? { width } : {}),
+        ...style,
+      }}
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}

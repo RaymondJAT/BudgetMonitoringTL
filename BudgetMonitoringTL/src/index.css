@@ -881,6 +881,26 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* responsiveness */
+
+/* Add this to your CSS */
+.responsive-searchbar {
+  width: 100%;
+  min-width: 250px;
+}
+
+@media (max-width: 576px) {
+  .responsive-searchbar {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .total-box {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
 /* @media (max-width: 1700px) {
 }
 @media (max-width: 1200px) {
