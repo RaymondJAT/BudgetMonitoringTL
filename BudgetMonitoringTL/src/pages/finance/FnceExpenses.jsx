@@ -36,21 +36,16 @@ const FnceExpenses = () => {
       </div>
 
       <Container fluid className="pb-1">
-        <div className="d-flex gap-3 mb-3">
-          {/* Pie Chart Box */}
-          <div
-            className="custom-container rounded p-3"
-            style={{ flex: "0 0 30%" }}
-          >
-            <LiquidationPieChart data={mockLiquidations} />
+        <div className="row g-3 mb-3">
+          <div className="col-12 col-lg-4">
+            <div className="custom-container rounded p-3 h-100">
+              <LiquidationPieChart data={mockLiquidations} />
+            </div>
           </div>
-
-          {/* Bar Chart Box */}
-          <div
-            className="custom-container rounded p-3"
-            style={{ flex: "1 1 70%" }}
-          >
-            <MonthlyCashChart data={monthlyUsageData} />
+          <div className="col-12 col-lg-8">
+            <div className="custom-container rounded p-3 h-100">
+              <MonthlyCashChart data={monthlyUsageData} />
+            </div>
           </div>
         </div>
 

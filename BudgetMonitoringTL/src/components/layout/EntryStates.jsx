@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { Table, Form } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Table, Form, Dropdown } from "react-bootstrap";
+import { GoKebabHorizontal } from "react-icons/go";
 import AppButton from "../ui/AppButton";
 
 const EntryStates = ({
@@ -15,6 +16,7 @@ const EntryStates = ({
   setSelectedItems = () => {},
 }) => {
   const [selectedRows, setSelectedRows] = useState({});
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
   useEffect(() => {
     const initialSelection = {};
@@ -43,7 +45,7 @@ const EntryStates = ({
   return (
     <>
       <div className="trash-wrapper" style={{ maxHeight: height }}>
-        <Table hover className="expense-table mb-0">
+        <Table hover className="expense-table mb-0 d-none d-lg-table">
           <thead>
             <tr>
               <th>
@@ -152,6 +154,112 @@ const EntryStates = ({
             )}
           </tbody>
         </Table>
+
+        {/* ✅ Mobile View */}
+        <div className="d-lg-none">
+          {items.length > 0 ? (
+            items.map((entry, index) => (
+              <div key={entry.id || index} className="mobile-card">
+                <div className="mobile-card-header d-flex justify-content-between align-items-center">
+                  <div>
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectedItems.includes(entry.id)}
+                      onChange={() => handleRowCheck(entry.id)}
+                      style={{ marginRight: "8px" }}
+                    />
+                    <span className="mobile-card-label">ID:</span> {entry.id}
+                  </div>
+                  {(showRestore || showDelete) && (
+                    <Dropdown
+                      align="end"
+                      show={openDropdownIndex === index}
+                      onToggle={(isOpen) =>
+                        setOpenDropdownIndex(isOpen ? index : null)
+                      }
+                    >
+                      <Dropdown.Toggle
+                        variant="link"
+                        bsPrefix="p-0 border-0 bg-transparent"
+                        style={{ boxShadow: "none" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDropdownIndex(
+                            openDropdownIndex === index ? null : index
+                          );
+                        }}
+                      >
+                        <GoKebabHorizontal
+                          style={{
+                            cursor: "pointer",
+                            fontSize: "1rem",
+                            color: "black",
+                          }}
+                        />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu className="black-dropdown">
+                        {showRestore && (
+                          <Dropdown.Item
+                            className="meat-dropdown"
+                            onClick={() => onRestore(entry)}
+                          >
+                            Restore
+                          </Dropdown.Item>
+                        )}
+                        {showDelete && (
+                          <Dropdown.Item
+                            className="meat-dropdown"
+                            onClick={() => onDelete(entry)}
+                          >
+                            Delete
+                          </Dropdown.Item>
+                        )}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  )}
+                </div>
+
+                {columns.map((col, i) => (
+                  <div key={i} className="mobile-card-item">
+                    <span className="mobile-card-label">{col.label}:</span>{" "}
+                    <span className="mobile-card-value">
+                      {col.accessor === "status" ? (
+                        <span
+                          className={`status-badge ${entry[col.accessor]
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
+                        >
+                          {entry[col.accessor]}
+                        </span>
+                      ) : col.accessor === "total" ? (
+                        `₱ ${parseFloat(entry[col.accessor] || 0).toLocaleString(
+                          "en-PH",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}`
+                      ) : (
+                        entry[col.accessor]
+                      )}
+                    </span>
+                  </div>
+                ))}
+
+                <div className="mobile-card-view-btn mt-2 text-end">
+                  <button
+                    className="custom-app-button"
+                    onClick={() => onRowClick(entry)}
+                  >
+                    👁 View
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center mt-4">No entries found.</div>
+          )}
+        </div>
       </div>
     </>
   );

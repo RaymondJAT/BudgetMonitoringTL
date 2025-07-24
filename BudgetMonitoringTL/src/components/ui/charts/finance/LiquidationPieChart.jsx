@@ -6,10 +6,39 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import ChartCard from "../../../ChartCard";
 
-const COLORS = ["#dc3545", "#198754"];
+const COLORS = ["#dc3545", "#198754"]; // Red and Green
+const RADIAN = Math.PI / 180;
 
-const LiquidationPieChart = ({ data, height = 160 }) => {
+// Same as DepartmentBudgetChart
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      fontSize={10}
+      textAnchor="middle"
+      dominantBaseline="central"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
+const LiquidationPieChart = ({ data }) => {
   const processedData = [
     {
       name: "Unreturned Funds",
@@ -22,33 +51,37 @@ const LiquidationPieChart = ({ data, height = 160 }) => {
   ];
 
   return (
-    <div className="w-100 h-100">
-      <p className="fw-bold mb-3">🧾 Liquidation vs Reimbursement</p>
-      <ResponsiveContainer width="100%" height={height}>
+    <ChartCard
+      title="🧾 Liquidation vs Reimbursement"
+      style={{ fontSize: "0.75rem" }}
+    >
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
             data={processedData}
-            cx="50%"
-            cy="50%"
-            outerRadius={40}
-            fill="#8884d8"
             dataKey="value"
-            label={({ name, percent }) =>
-              `${name} (${(percent * 100).toFixed(0)}%)`
-            }
+            nameKey="name"
+            outerRadius="90%"
+            labelLine={false}
+            label={renderCustomizedLabel}
           >
-            {processedData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
+            {processedData.map((_, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value) => `${value} item(s)`} />
-          <Legend />
+          <Tooltip
+            formatter={(value) => `${value} item(s)`}
+            contentStyle={{ fontSize: "0.75rem" }}
+          />
+          <Legend
+            wrapperStyle={{ fontSize: "0.75rem" }}
+            formatter={(value) => (
+              <span style={{ marginLeft: "6px" }}>{value}</span>
+            )}
+          />
         </PieChart>
       </ResponsiveContainer>
-    </div>
+    </ChartCard>
   );
 };
 

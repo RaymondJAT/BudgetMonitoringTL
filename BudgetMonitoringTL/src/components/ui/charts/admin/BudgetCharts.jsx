@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import ChartCard from "../../../ChartCard";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
+const COLORS = ["#0f3f69ff", "#014f28ff", "#ce6905ff"];
 const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({

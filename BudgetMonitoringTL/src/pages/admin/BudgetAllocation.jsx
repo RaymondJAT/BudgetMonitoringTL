@@ -34,6 +34,7 @@ const BudgetAllocation = () => {
       <div className="mt-3">
         <TotalCards data={totalComputationData} list={BudgetOverview} />
       </div>
+
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
           <ToolBar
@@ -42,7 +43,7 @@ const BudgetAllocation = () => {
             showFilter={false}
             leftContent={
               <AppButton
-                label="+ Add Allocation"
+                label="+ Allocation"
                 variant="outline-dark"
                 size="sm"
                 onClick={() => setShowModal(true)}
@@ -50,10 +51,12 @@ const BudgetAllocation = () => {
               />
             }
           />
+
           <NewBudgetAllocation
             show={showModal}
             onHide={() => setShowModal(false)}
           />
+
           <BudgetTable
             data={tableData}
             height="330px"

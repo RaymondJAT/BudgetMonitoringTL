@@ -12,10 +12,13 @@ import {
 
 const MonthlyCashChart = ({ data }) => {
   return (
-    <Container fluid>
-      <div className="w-100">
-        <p className="mb-3 fw-bold">💰 Monthly Cash Released</p>
-        <ResponsiveContainer width="100%" height={160}>
+    <Container fluid className="h-100">
+      <div
+        className="w-100 h-100 d-flex flex-column justify-content-center"
+        style={{ minHeight: "100%", padding: "1rem 0" }}
+      >
+        <p className="mb-3 fw-bold text-center">💰 Monthly Cash Released</p>
+        <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
