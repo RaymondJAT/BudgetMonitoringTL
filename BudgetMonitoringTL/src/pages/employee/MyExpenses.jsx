@@ -1,19 +1,22 @@
 import { useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Container } from "react-bootstrap";
+import { FaPlus } from "react-icons/fa";
+
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
-import { expenseHeaders } from "../../handlers/columnHeaders";
+import { columns } from "../../handlers/tableHeader";
 import { deleteItems } from "../../utils/deleteItems";
 import { moveEntries } from "../../utils/entryActions";
 import { handleExportData } from "../../utils/exportItems";
+import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
+
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
-
 import DataTable from "../../components/layout/DataTable";
 import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
 import TotalCards from "../../components/TotalCards";
-import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 
 const MyExpenses = () => {
   const [tableData, setTableData] = useState([]);
@@ -25,9 +28,9 @@ const MyExpenses = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  // Load fresh data from localStorage once on mount
+  // Load fresh data from localStorage
   const loadActiveExpenses = () => {
-    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.EMP_ACTIVE)) || [];
+    const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
 
     const filtered = raw.filter((item) => item.status !== STATUS.DELETED);
 
@@ -69,7 +72,7 @@ const MyExpenses = () => {
       .trim();
 
   const isMatch = (item, value) => {
-    const fields = [...expenseHeaders.map((col) => col.accessor), "formType"];
+    const fields = [...columns.map((col) => col.accessor), "formType"];
     return fields.some((key) =>
       normalize(item[key]).includes(normalize(value))
     );
@@ -99,7 +102,7 @@ const MyExpenses = () => {
 
     setTimeout(() => {
       loadActiveExpenses();
-    }, 100); // small delay ensures localStorage is updated
+    }, 100); // delay
   };
 
   const handleDeleteSelected = () => {
@@ -150,74 +153,92 @@ const MyExpenses = () => {
     setSelectedRows(reset);
   };
 
-  const dropdownItems = [
-    {
-      label: "Cash Request Form",
-      onClick: () => setShowCashReqModal(true),
-    },
-    {
-      label: "Liquidation Form",
-      onClick: () => setShowLiqFormModal(true),
-    },
-  ];
-
   const newButton = (
     <AppButton
-      label="Create Request"
-      isDropdown
-      dropdownItems={dropdownItems}
+      label={
+        <>
+          <FaPlus />
+          <span className="d-none d-sm-inline ms-1">Request</span>
+        </>
+      }
       size="sm"
       variant="outline-dark"
+      onClick={() => setShowCashReqModal(true)}
       className="custom-app-button"
     />
   );
 
   return (
-    <div>
-      <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
-      <ToolBar
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        leftContent={newButton}
-        handleExport={handleExport}
-        selectedCount={selectedCount}
-      />
-      <DataTable
-        data={filteredData}
-        columns={expenseHeaders}
-        onRowClick={handleRowClick}
-        onDelete={handleDelete}
-        onArchive={handleArchive}
-        onToggleImportant={handleToggleImportant}
-        selectedRows={selectedRows}
-        onSelectionChange={setSelectedRows}
-      />
+    <>
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
+        </div>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              leftContent={newButton}
+              handleExport={handleExport}
+              selectedCount={selectedCount}
+              searchBarWidth="300px"
+            />
 
-      {/* CASH REQUEST MODAL */}
-      <CashReqModal
-        show={showCashReqModal}
-        onHide={() => setShowCashReqModal(false)}
-        onSubmit={(newData) => {
-          const raw = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-          const updated = raw.filter(
-            (item) =>
-              item.status !== STATUS.DELETED &&
-              item.status !== STATUS.APPROVED &&
-              item.status !== STATUS.REJECTED
-          );
-          const sorted = [...updated].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          setTableData(sorted);
-        }}
-      />
+            <DataTable
+              data={filteredData}
+              height="355px"
+              columns={columns}
+              onRowClick={handleRowClick}
+              onDelete={handleDelete}
+              onArchive={handleArchive}
+              onToggleImportant={handleToggleImportant}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+            />
 
-      {/* LIQUIDATION MODAL */}
-      <LiqFormModal
-        show={showLiqFormModal}
-        onHide={() => setShowLiqFormModal(false)}
-      />
-    </div>
+            {/* CASH REQUEST MODAL */}
+            <CashReqModal
+              show={showCashReqModal}
+              onHide={() => setShowCashReqModal(false)}
+              onSubmit={(newData) => {
+                const raw =
+                  JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
+                const updated = raw.filter(
+                  (item) =>
+                    item.status !== STATUS.DELETED &&
+                    item.status !== STATUS.APPROVED &&
+                    item.status !== STATUS.REJECTED
+                );
+                const sorted = [...updated].sort(
+                  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setTableData(sorted);
+              }}
+            />
+
+            {/* LIQUIDATION MODAL */}
+            <LiqFormModal
+              show={showLiqFormModal}
+              onHide={() => setShowLiqFormModal(false)}
+              onSubmit={(newForm) => {
+                const current =
+                  JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) ||
+                  [];
+                const updated = [newForm, ...current];
+                localStorage.setItem(
+                  LOCAL_KEYS.LIQUIDATION,
+                  JSON.stringify(updated)
+                );
+
+                // Trigger custom event so EmpLiquidation can refresh
+                window.dispatchEvent(new Event("liquidations-updated"));
+              }}
+            />
+          </div>
+        </Container>
+      </div>
+    </>
   );
 };
 

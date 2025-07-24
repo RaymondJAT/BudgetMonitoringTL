@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { navConfig } from "../../handlers/navLinks";
 import { FaMoneyBillWave } from "react-icons/fa";
 
-const Sidebar = ({ isSidebarOpen, userRole }) => {
+const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -15,6 +15,7 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
 
   const toggleDropdown = (e, label) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const isMobileView = window.innerWidth <= 576;
 
     setDropdownPositions((prev) => ({
       ...prev,
@@ -22,15 +23,15 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
     }));
 
     if (isSidebarOpen) {
-      // Allow multiple dropdowns when sidebar is open
       setOpenDropdown((prev) =>
         prev.includes(label)
           ? prev.filter((item) => item !== label)
           : [...prev, label]
       );
     } else {
-      // Only one dropdown allowed when collapsed
-      setOpenDropdown((prev) => (prev === label ? null : label));
+      setOpenDropdown((prev) =>
+        isMobileView && prev === label ? null : label
+      );
     }
   };
 
@@ -58,9 +59,9 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
   return (
     <div
       ref={sidebarRef}
-      className={`sidebar d-flex flex-column vh-100 py-2 border-end ${
-        isSidebarOpen ? "open" : "collapsed"
-      }`}
+      className={`sidebar d-flex flex-column vh-100 py-2 border-end 
+  ${isSidebarHiddenMobile ? "d-none d-sm-flex sidebar-hidden" : ""} 
+  ${isSidebarOpen ? "open" : "collapsed"}`}
     >
       {/* Floating Dropdown (collapsed sidebar only) */}
       {!isSidebarOpen &&
@@ -119,11 +120,16 @@ const Sidebar = ({ isSidebarOpen, userRole }) => {
           <div key={item.label}>
             <div
               className="nav-item d-flex align-items-center justify-content-between px-3 py-2"
-              onClick={(e) =>
-                item.children
-                  ? toggleDropdown(e, item.label)
-                  : navigate(item.path)
-              }
+              onClick={(e) => {
+                if (item.children) {
+                  toggleDropdown(e, item.label);
+                } else {
+                  navigate(item.path);
+                  if (window.innerWidth <= 576) {
+                    setOpenDropdown(null);
+                  }
+                }
+              }}
               style={{ cursor: "pointer" }}
             >
               <div className="d-flex align-items-center">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,7 +17,34 @@ import FinanceRoutes from "./routes/FinanceRoutes";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarHiddenMobile, setIsSidebarHiddenMobile] = useState(true);
   const [userRole, setUserRole] = useState(localStorage.getItem("role"));
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 576);
+      if (window.innerWidth <= 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setIsMobileSidebarOpen((prev) => !prev);
+      setIsSidebarHiddenMobile((prev) => !prev);
+    } else {
+      setIsSidebarOpen((prev) => !prev);
+    }
+  };
 
   const renderRoutes = () => {
     switch (userRole) {
@@ -48,13 +75,28 @@ const App = () => {
               element={
                 <>
                   <Header
-                    toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                    toggleSidebar={toggleSidebar}
                     isSidebarOpen={isSidebarOpen}
+                    isSidebarHiddenMobile={isSidebarHiddenMobile}
                     setUserRole={setUserRole}
                   />
-                  <Sidebar isSidebarOpen={isSidebarOpen} userRole={userRole} />
+                  <Sidebar
+                    isSidebarOpen={isSidebarOpen}
+                    isSidebarHiddenMobile={isSidebarHiddenMobile}
+                    userRole={userRole}
+                  />
+
                   <main
-                    style={{ marginLeft: isSidebarOpen ? "230px" : "60px" }}
+                    style={{
+                      transition: "margin-left 0.3s ease",
+                      marginLeft: isMobile
+                        ? isMobileSidebarOpen
+                          ? "55px"
+                          : "0"
+                        : isSidebarOpen
+                        ? "230px"
+                        : "55px",
+                    }}
                   >
                     <ToastContainer position="top-right" autoClose={1000} />
                     {renderRoutes()}

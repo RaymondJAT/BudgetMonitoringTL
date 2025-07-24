@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { columns } from "../../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
-import { moveEntries } from "../../utils/entryActions";
+import { Container } from "react-bootstrap";
+
 import { useReactToPrint } from "react-to-print";
+
+import { columns } from "../../handlers/tableHeader";
+import { moveEntries } from "../../utils/entryActions";
 import { formatPrintData } from "../../utils/formatPrintData";
 import { deleteItems } from "../../utils/deleteItems";
 import { handleExportData } from "../../utils/exportItems";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
+
 import DataTable from "../../components/layout/DataTable";
-import Total from "../../components/layout/TotalTeamLead";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
@@ -53,7 +56,6 @@ const Expenses = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [particulars, setParticulars] = useState([]);
   const [printData, setPrintData] = useState(null);
-  const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
@@ -184,48 +186,56 @@ const Expenses = () => {
   };
 
   return (
-    <div>
-      {/* <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} /> */}
-      <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-      <ToolBar
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        leftContent={
-          selectedCount > 0 && (
-            <>
-              {selectedCount === 1 && (
-                <>
-                  <PrintButton onClick={handlePrint} />
-                  <DeleteButton onClick={handleDeleteSelected} />
-                </>
-              )}
-              {selectedCount > 1 && (
-                <DeleteButton onClick={handleDeleteSelected} />
-              )}
-            </>
-          )
-        }
-        handleExport={handleExport}
-        selectedCount={selectedCount}
-      />
-      <DataTable
-        data={filteredData}
-        columns={columns}
-        onRowClick={handleRowClick}
-        onDelete={handleDelete}
-        onArchive={handleArchive}
-        onToggleImportant={handleToggleImportant}
-        selectedRows={selectedRows}
-        onSelectionChange={setSelectedRows}
-        downloadRef={downloadRef}
-        setPrintData={setPrintData}
-      />
+    <>
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
+        </div>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              leftContent={
+                selectedCount > 0 && (
+                  <>
+                    {selectedCount === 1 && (
+                      <>
+                        <PrintButton onClick={handlePrint} />
+                        <DeleteButton onClick={handleDeleteSelected} />
+                      </>
+                    )}
+                    {selectedCount > 1 && (
+                      <DeleteButton onClick={handleDeleteSelected} />
+                    )}
+                  </>
+                )
+              }
+              handleExport={handleExport}
+              selectedCount={selectedCount}
+            />
+            <DataTable
+              data={filteredData}
+              height="455px"
+              columns={columns}
+              onRowClick={handleRowClick}
+              onDelete={handleDelete}
+              onArchive={handleArchive}
+              onToggleImportant={handleToggleImportant}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
+            />
 
-      <div className="d-none">
-        <ExpenseReport contentRef={contentRef} data={printData || {}} />
-        <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            <div className="d-none">
+              <ExpenseReport contentRef={contentRef} data={printData || {}} />
+              <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            </div>
+          </div>
+        </Container>
       </div>
-    </div>
+    </>
   );
 };
 

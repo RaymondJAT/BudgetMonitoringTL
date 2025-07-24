@@ -1,16 +1,19 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { mockData } from "../../handlers/mockData";
-import { columns } from "../../handlers/tableHeader";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
+import { Container } from "react-bootstrap";
+
+import { mockData } from "../../handlers/mockData";
+import { columns } from "../../handlers/tableHeader";
 import { moveEntries } from "../../utils/entryActions";
 import { deleteItems } from "../../utils/deleteItems";
 import { handleExportData } from "../../utils/exportItems";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
-import Total from "../../components/layout/TotalTeamLead";
+
+import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import useExpenseDataLoader from "../../hooks/useExpenseDataLoader";
@@ -150,52 +153,61 @@ const Approval = () => {
   }, [tableData]);
 
   return (
-    <div>
-      <Total data={totalComputationData} statusList={TEAMLEAD_STATUS_LIST} />
-      <ToolBar
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        leftContent={
-          selectedCount > 0 && (
-            <>
-              {selectedCount === 1 && (
-                <>
-                  <PrintButton onClick={handlePrint} />
-                  <DeleteButton onClick={handleDeleteSelected} />
-                </>
-              )}
-              {selectedCount > 1 && (
-                <DeleteButton onClick={handleDeleteSelected} />
-              )}
-            </>
-          )
-        }
-        handleExport={handleExport}
-        selectedCount={selectedCount}
-      />
+    <>
+      <div className="pb-3">
+        <div className="mt-3">
+          <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
+        </div>
+        <Container fluid>
+          <div className="custom-container shadow-sm rounded p-3">
+            <ToolBar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              leftContent={
+                selectedCount > 0 && (
+                  <>
+                    {selectedCount === 1 && (
+                      <>
+                        <PrintButton onClick={handlePrint} />
+                        <DeleteButton onClick={handleDeleteSelected} />
+                      </>
+                    )}
+                    {selectedCount > 1 && (
+                      <DeleteButton onClick={handleDeleteSelected} />
+                    )}
+                  </>
+                )
+              }
+              handleExport={handleExport}
+              selectedCount={selectedCount}
+            />
 
-      <DataTable
-        data={filteredData}
-        columns={columns}
-        onRowClick={handleRowClick}
-        onDelete={(entry) =>
-          handleMoveEntry(entry, LOCAL_KEYS.TRASH, STATUS.DELETED)
-        }
-        onArchive={(entry) => handleMoveEntry(entry, LOCAL_KEYS.ARCHIVE)}
-        onToggleImportant={(entry) =>
-          handleMoveEntry(entry, LOCAL_KEYS.IMPORTANT)
-        }
-        selectedRows={selectedRows}
-        onSelectionChange={setSelectedRows}
-        downloadRef={downloadRef}
-        setPrintData={setPrintData}
-      />
+            <DataTable
+              data={filteredData}
+              height="455px"
+              columns={columns}
+              onRowClick={handleRowClick}
+              onDelete={(entry) =>
+                handleMoveEntry(entry, LOCAL_KEYS.TRASH, STATUS.DELETED)
+              }
+              onArchive={(entry) => handleMoveEntry(entry, LOCAL_KEYS.ARCHIVE)}
+              onToggleImportant={(entry) =>
+                handleMoveEntry(entry, LOCAL_KEYS.IMPORTANT)
+              }
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
+            />
 
-      <div className="d-none">
-        <ExpenseReport contentRef={contentRef} data={printData || {}} />
-        <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            <div className="d-none">
+              <ExpenseReport contentRef={contentRef} data={printData || {}} />
+              <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            </div>
+          </div>
+        </Container>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,13 +1,23 @@
-export const TEAMLEAD_STATUS_LIST = [
-  { label: "To Approve", key: "pending" },
-  { label: "For Reimbursement", key: "approved" },
-  { label: "In Payment", key: "inPayment" },
+export const EMPLOYEE_STATUS_LIST = [
+  { label: "Pending Approval", key: "pending" },
+  { label: "Approved Requests", key: "approved" },
+  { label: "Awaiting Liquidation", key: "awaiting_liquidation" },
+  { label: "Liquidation under Review", key: "liq_under_review" },
+  { label: "For Reimbursement", key: "for_reimbursement" },
 ];
 
-export const EMPLOYEE_STATUS_LIST = [
-  // { label: "To Submit", key: "pending" },
-  { label: "Waiting Approval", key: "pending" },
-  { label: "Waiting Reimbursement", key: "approved" },
+export const TEAMLEAD_STATUS_LIST = [
+  { label: "Requests to Approve", key: "pending" },
+  { label: "Liquidations to Review", key: "liqToNote" },
+  { label: "Approved Requests", key: "approvedRequest" },
+];
+
+export const FINANCE_STATUS_LIST = [
+  { label: "Pending Fund Releases", key: "pending" },
+  { label: "Liquidations to Verify", key: "approved" },
+  { label: "Reimbursements to Process", key: "reimbursed" },
+  { label: "Verified Transactions", key: "verified" },
+  { label: "Total Funds Released", key: "total" },
 ];
 
 export const BudgetOverview = [
@@ -15,4 +25,12 @@ export const BudgetOverview = [
   { label: "Budget Used", key: "budgetUsed" },
   { label: "Remaining Budget", key: "remainingBudget" },
   { label: "Total Request", key: "totalRequest" },
+  { label: "Total Liquidations", key: "totalLiquidations" },
+  { label: "Final Approvals Needed", key: "finalApprovals" },
+];
+
+export const BudgetAllocationOverview = [
+  { label: "Total Budget", key: "totalBudget" },
+  { label: "Budget Used", key: "budgetUsed" },
+  { label: "Remaining Budget", key: "remainingBudget" },
 ];

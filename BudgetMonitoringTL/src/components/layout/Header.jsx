@@ -1,12 +1,32 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
-import { Container, Row, Col, Button, Dropdown } from "react-bootstrap";
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Container, Dropdown } from "react-bootstrap";
+import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
 
-const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
+const Header = ({
+  toggleSidebar,
+  isSidebarOpen,
+  setUserRole,
+  isSidebarHiddenMobile,
+}) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const location = useLocation();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 576);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const headerClass = isMobile
+    ? isSidebarHiddenMobile
+      ? "sidebar-hidden-mobile"
+      : "sidebar-open"
+    : isSidebarOpen
+    ? "sidebar-open"
+    : "sidebar-collapsed";
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -22,17 +42,13 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
     "/archive": "Archive",
     "/important": "Importants",
     "/trash": "Trash",
-
-    // employee
+    "/employee-liquidation": "Expenses",
     "/employee-archive": "Archive",
     "/employee-important": "Importants",
     "/employee-trash": "Trash",
   };
 
-  const getPageTitle = () => {
-    const path = location.pathname;
-    return pageTitles[path] || "";
-  };
+  const getPageTitle = () => pageTitles[location.pathname] || "";
 
   const handleLogout = () => {
     localStorage.removeItem("role");
@@ -42,81 +58,80 @@ const Header = ({ toggleSidebar, isSidebarOpen, setUserRole }) => {
     window.location.reload();
   };
 
-  const pageTitle = getPageTitle();
-
   return (
     <header
-      className={`main-header shadow-sm d-flex align-items-center ${
-        isSidebarOpen ? "sidebar-open" : "sidebar-collapsed"
-      }`}
+      className={`main-header shadow-sm d-flex align-items-center px-3 ${headerClass}`}
+      style={{ height: "60px" }}
     >
       <Container fluid>
-        <Row className="align-items-center">
-          <Col xs="auto" className="d-flex align-items-center">
-            <Button
+        <div className="d-flex justify-content-between align-items-center w-100">
+          {/*  Sidebar Toggle & Page Title */}
+          <div className="d-flex align-items-center">
+            <button
               onClick={toggleSidebar}
-              className="toggle-btn-header p-0"
-              style={{
-                fontSize: "1.2rem",
-                color: "black",
-                background: "none",
-                border: "none",
-              }}
+              className="p-0 me-2 bg-transparent border-0 d-inline d-md-none"
+              style={{ fontSize: "1.2rem", color: "black" }}
             >
               <FaBars />
-            </Button>
+            </button>
+
+            {/* Desktop toggle only for ≥768px (md) */}
+            <button
+              onClick={toggleSidebar}
+              className="p-0 me-2 bg-transparent border-0 d-none d-md-inline"
+              style={{ fontSize: "1.2rem", color: "black" }}
+            >
+              <FaBars />
+            </button>
             <span
-              className="page-title ms-2 fw-semibold"
+              className="page-title fw-semibold text-uppercase"
               style={{
                 fontSize: "1rem",
-                whiteSpace: "nowrap",
                 position: "relative",
-                top: "3px",
-                textTransform: "uppercase",
+                top: "2px",
               }}
             >
-              {pageTitle}
+              {getPageTitle()}
             </span>
-          </Col>
-          <Col />
+          </div>
 
-          <Col xs="auto">
-            <div className="d-flex align-items-center gap-3">
-              <FaBell
-                style={{
-                  fontSize: "1.2rem",
-                  cursor: "pointer",
-                  marginRight: "15px",
-                }}
-              />
-              <Dropdown align="end">
-                <Dropdown.Toggle
-                  variant="light"
-                  className="d-flex align-items-center gap-2 p-0 border-0 bg-transparent"
-                  id="dropdown-user"
+          {/* Notification and User Menu */}
+          <div className="d-flex align-items-center gap-3 ms-auto">
+            <FaBell
+              style={{ fontSize: "1.2rem", cursor: "pointer" }}
+              title="Notifications"
+            />
+            <Dropdown align="end">
+              <Dropdown.Toggle
+                variant="light"
+                className="d-flex align-items-center gap-2 p-0 border-0 bg-transparent"
+                id="dropdown-user"
+              >
+                <FaUserCircle size={28} />
+                {/* hide username on small screens */}
+                <span
+                  className="d-none d-md-inline"
+                  style={{ fontWeight: 400, fontSize: "13px" }}
                 >
-                  <FaUserCircle size={30} />
-                  <span style={{ fontWeight: 400, fontSize: "13px" }}>
-                    {username}
-                  </span>
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  <Dropdown.Item href="#" style={{ fontSize: "0.75rem" }}>
-                    Settings
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item
-                    onClick={handleLogout}
-                    style={{ fontSize: "0.75rem" }}
-                  >
-                    Logout
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </Col>
-        </Row>
+                  {username}
+                </span>
+                {/* show dropdown arrow only on md and up */}
+              </Dropdown.Toggle>
+              <Dropdown.Menu align="end">
+                <Dropdown.Item style={{ fontSize: "0.75rem" }}>
+                  Settings
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item
+                  onClick={handleLogout}
+                  style={{ fontSize: "0.75rem" }}
+                >
+                  Logout
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+        </div>
       </Container>
     </header>
   );

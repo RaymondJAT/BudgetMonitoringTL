@@ -7,12 +7,11 @@ import {
 } from "../handlers/columnHeaders";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../utils/numberToWords";
-import { FaArrowLeft, FaStar, FaTrash } from "react-icons/fa";
 import PrintableCashRequest from "./print/PrintableCashRequest";
 import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
 import SignatureUpload from "./SignatureUpload";
-import AppButton from "./ui/AppButton";
 import CashReqActionButtons from "./CashReqActionButtons";
+import LiqFormModal from "./ui/modal/employee/LiqFormModal";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -28,6 +27,7 @@ const ViewCashRequestForm = () => {
   );
 
   const [showModal, setShowModal] = useState(false);
+  const [showLiqFormModal, setShowLiqFormModal] = useState(false);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -110,6 +110,31 @@ const ViewCashRequestForm = () => {
           onBack={() => navigate(-1)}
           onView={handleOpenModal}
           onPrint={reactToPrintFn}
+          onShowLiqFormModal={() => setShowLiqFormModal(true)}
+        />
+
+        <LiqFormModal
+          show={showLiqFormModal}
+          onHide={() => setShowLiqFormModal(false)}
+          onSubmit={(liqData) => {
+            const existing =
+              JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
+
+            const newEntry = {
+              ...liqData,
+              formType: "Liquidation",
+              createdAt: new Date().toISOString(),
+            };
+
+            localStorage.setItem(
+              LOCAL_KEYS.LIQUIDATION,
+              JSON.stringify([newEntry, ...existing])
+            );
+
+            // Optional: Notify other pages
+            window.dispatchEvent(new Event("liquidations-updated"));
+            setShowLiqFormModal(false); // close the modal after submit
+          }}
         />
 
         {/* Request Info */}

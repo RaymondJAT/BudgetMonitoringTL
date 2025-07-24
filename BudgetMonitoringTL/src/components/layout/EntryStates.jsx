@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Form } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import AppButton from "../ui/AppButton";
 
 const EntryStates = ({
   columns,
+  height,
   items,
   onRowClick,
   showRestore = false,
@@ -40,8 +41,8 @@ const EntryStates = ({
   };
 
   return (
-    <Container fluid>
-      <div className="trash-wrapper">
+    <>
+      <div className="trash-wrapper" style={{ maxHeight: height }}>
         <Table hover className="expense-table mb-0">
           <thead>
             <tr>
@@ -55,7 +56,7 @@ const EntryStates = ({
                 />
               </th>
               {columns.map((col, index) => (
-                <th key={index}>{col.header}</th>
+                <th key={index}>{col.label}</th>
               ))}
               {(showRestore || showDelete) && <th></th>}
             </tr>
@@ -152,7 +153,7 @@ const EntryStates = ({
           </tbody>
         </Table>
       </div>
-    </Container>
+    </>
   );
 };
 
