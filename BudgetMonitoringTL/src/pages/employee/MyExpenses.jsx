@@ -158,7 +158,7 @@ const MyExpenses = () => {
       label={
         <>
           <FaPlus />
-          <span className="d-none d-sm-inline ms-1">New Request</span>
+          <span className="d-none d-sm-inline ms-1">Request</span>
         </>
       }
       size="sm"

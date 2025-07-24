@@ -20,6 +20,7 @@ const App = () => {
   const [isSidebarHiddenMobile, setIsSidebarHiddenMobile] = useState(true);
   const [userRole, setUserRole] = useState(localStorage.getItem("role"));
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,7 +38,8 @@ const App = () => {
   }, []);
 
   const toggleSidebar = () => {
-    if (window.innerWidth <= 576) {
+    if (isMobile) {
+      setIsMobileSidebarOpen((prev) => !prev);
       setIsSidebarHiddenMobile((prev) => !prev);
     } else {
       setIsSidebarOpen((prev) => !prev);
@@ -88,10 +90,12 @@ const App = () => {
                     style={{
                       transition: "margin-left 0.3s ease",
                       marginLeft: isMobile
-                        ? 0
+                        ? isMobileSidebarOpen
+                          ? "55px"
+                          : "0"
                         : isSidebarOpen
                         ? "230px"
-                        : "60px",
+                        : "55px",
                     }}
                   >
                     <ToastContainer position="top-right" autoClose={1000} />

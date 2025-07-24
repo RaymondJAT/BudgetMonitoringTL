@@ -166,6 +166,67 @@ const ToolBar = ({
           </div>
         </div>
       </div>
+      {showDatePicker && (
+        <div
+          className="datepicker-backdrop"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            zIndex: 2000,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "1rem",
+          }}
+        >
+          <div
+            ref={datePickerRef}
+            style={{
+              backgroundColor: "white",
+              borderRadius: "8px",
+              padding: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+              width: "100%",
+              maxWidth: "500px",
+            }}
+          >
+            <DatePicker
+              selectsRange
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateChange}
+              isClearable
+              inline
+              calendarClassName="w-100"
+            />
+            <div className="d-flex justify-content-end mt-2">
+              <AppButton
+                label="Close"
+                size="sm"
+                variant="outline-danger"
+                onClick={handleClose}
+                className="custom-app-button me-2"
+              />
+              <AppButton
+                label="Apply"
+                size="sm"
+                variant="outline-success"
+                onClick={() => {
+                  if (startDate && endDate) {
+                    onDateRangeChange([startDate, endDate]);
+                  }
+                  setShowDatePicker(false);
+                }}
+                className="custom-app-button"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
