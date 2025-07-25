@@ -5,7 +5,6 @@ import AppButton from "../ui/AppButton";
 
 const EntryStates = ({
   columns,
-  height,
   items,
   onRowClick,
   showRestore = false,
@@ -44,7 +43,7 @@ const EntryStates = ({
 
   return (
     <>
-      <div className="trash-wrapper" style={{ maxHeight: height }}>
+      <div className="table-wrapper">
         <Table hover className="expense-table mb-0 d-none d-lg-table">
           <thead>
             <tr>
@@ -156,7 +155,7 @@ const EntryStates = ({
         </Table>
 
         {/* ✅ Mobile View */}
-        <div className="d-lg-none">
+        <div className="d-lg-noner">
           {items.length > 0 ? (
             items.map((entry, index) => (
               <div key={entry.id || index} className="mobile-card">
@@ -232,13 +231,12 @@ const EntryStates = ({
                           {entry[col.accessor]}
                         </span>
                       ) : col.accessor === "total" ? (
-                        `₱ ${parseFloat(entry[col.accessor] || 0).toLocaleString(
-                          "en-PH",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }
-                        )}`
+                        `₱ ${parseFloat(
+                          entry[col.accessor] || 0
+                        ).toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
                       ) : (
                         entry[col.accessor]
                       )}

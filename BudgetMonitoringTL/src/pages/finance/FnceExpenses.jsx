@@ -51,7 +51,7 @@ const FnceExpenses = () => {
 
         <LatestListings
           data={latestListingsData}
-          title="📋 Recent Transactions List"
+          title="🕒 Latest Listings"
           height="220px"
         />
       </Container>

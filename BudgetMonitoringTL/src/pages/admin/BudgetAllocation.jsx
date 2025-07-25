@@ -35,7 +35,7 @@ const BudgetAllocation = () => {
         <TotalCards data={totalComputationData} list={BudgetOverview} />
       </div>
 
-      <Container fluid>
+      <Container fluid className="pb-3">
         <div className="custom-container shadow-sm rounded p-3">
           <ToolBar
             searchValue={searchValue}

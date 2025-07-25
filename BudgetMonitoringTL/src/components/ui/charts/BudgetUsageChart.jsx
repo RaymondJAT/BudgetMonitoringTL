@@ -23,7 +23,7 @@ const BudgetUsageChart = ({ data }) => {
           <Line
             type="monotone"
             dataKey="allocated"
-            stroke="#008000"
+            stroke="#0e733bff"
             strokeDasharray="5 5"
             strokeWidth={2}
             dot={{ r: 3 }}
@@ -33,7 +33,7 @@ const BudgetUsageChart = ({ data }) => {
           <Line
             type="monotone"
             dataKey="used"
-            stroke="#0d6efd"
+            stroke="#0243c7ff"
             strokeWidth={3}
             dot={{ r: 4 }}
             activeDot={{ r: 6 }}

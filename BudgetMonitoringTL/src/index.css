@@ -301,7 +301,7 @@ main.no-sidebar {
 .table-wrapper {
   position: relative;
   /* margin-top: 15px; */
-  height: 490px;
+  height: 495px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -372,9 +372,9 @@ main.no-sidebar {
 }
 
 .status-badge.pending {
-  background-color: rgb(253, 157, 54);
+  background-color: rgb(235, 136, 30);
   color: white;
-  border: 1px solid rgb(208, 119, 9);
+  border: 1px solid rgb(154, 89, 10);
 }
 
 .status-badge.approved {
@@ -888,7 +888,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 @media (max-width: 576px) {
   .responsive-searchbar {
-    min-width: 180px;
+    min-width: 145px;
   }
 
   .main-header.sidebar-open {
@@ -944,7 +944,17 @@ input[type="number"]::-webkit-outer-spin-button {
     flex: 0 0 100%;
     max-width: 100%;
   }
+
+  .table-wrapper {
+    height: 75vh;
+  }
 }
+
+/* @media (min-width: 1024px) {
+  .table-wrapper {
+    min-height: 590px;
+  }
+} */
 
 /* @media (max-width: 1700px) {
 }

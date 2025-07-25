@@ -1,4 +1,11 @@
-import { FaArrowLeft, FaTrash, FaBookmark } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaTrash,
+  FaBookmark,
+  FaPlus,
+  FaEye,
+  FaPrint,
+} from "react-icons/fa";
 import AppButton from "./ui/AppButton";
 
 const CashReqActionButtons = ({
@@ -8,7 +15,7 @@ const CashReqActionButtons = ({
   onShowLiqFormModal,
 }) => {
   return (
-    <div className="custom-btn d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-3">
+    <div className="custom-btn d-flex flex-wrap justify-content-between align-items-center pt-3 pb-3">
       <div className="d-flex">
         {/* Back Button */}
         <AppButton
@@ -22,16 +29,25 @@ const CashReqActionButtons = ({
 
         {/* Create Liquidation Form Button */}
         <AppButton
-          label="Create Liquidation Form"
-          variant="success"
+          label={
+            <>
+              <FaPlus />
+              <span className="d-sm-inline ms-1">Liquidation</span>
+            </>
+          }
           size="sm"
-          onClick={onShowLiqFormModal}
-          className="custom-app-button btn-responsive ms-2"
+          variant="outline-success"
+          onClick={() => onShowLiqFormModal(true)}
+          className="custom-app-button ms-2"
         />
 
         {/* View Button */}
         <AppButton
-          label="View"
+          label={
+            <>
+              <FaEye />
+            </>
+          }
           variant="outline-dark"
           size="sm"
           onClick={onView}
@@ -40,7 +56,11 @@ const CashReqActionButtons = ({
 
         {/* Print Button */}
         <AppButton
-          label="Print"
+          label={
+            <>
+              <FaPrint />
+            </>
+          }
           variant="outline-secondary"
           size="sm"
           onClick={onPrint}
@@ -49,21 +69,28 @@ const CashReqActionButtons = ({
       </div>
 
       {/* Bookmark + Trash */}
-      <div className="d-flex gap-2 ms-md-auto mt-2 mt-md-0">
+      <div className="d-flex ms-md-auto mt-md-0">
         <AppButton
-          variant="outline-warning"
+          label={
+            <>
+              <FaBookmark />
+            </>
+          }
+          variant="outline-info"
           size="sm"
-          className="custom-app-button btn-responsive d-flex align-items-center justify-content-center"
-        >
-          <FaBookmark size="0.75rem" />
-        </AppButton>
+          className="custom-app-button btn-responsive ms-2"
+        />
+
         <AppButton
-          variant="outline-dark"
+          label={
+            <>
+              <FaTrash />
+            </>
+          }
+          variant="outline-danger"
           size="sm"
-          className="custom-app-button btn-responsive d-flex align-items-center justify-content-center"
-        >
-          <FaTrash size="0.75rem" />
-        </AppButton>
+          className="custom-app-button btn-responsive ms-2"
+        />
       </div>
     </div>
   );

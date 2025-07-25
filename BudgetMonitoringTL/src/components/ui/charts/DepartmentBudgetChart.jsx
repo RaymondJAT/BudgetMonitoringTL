@@ -8,7 +8,7 @@ import {
 } from "recharts";
 import ChartCard from "../../ChartCard";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#DC3545", "#6F42C1"];
+const COLORS = ["#0243c7ff", "#0e733bff", "#FFBB28", "#c10e20ff", "#5f39a7ff"];
 const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({

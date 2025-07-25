@@ -9,11 +9,11 @@ import {
 import ChartCard from "../../ChartCard";
 
 const STATUS_COLORS = {
-  Approved: "#198754",
+  Approved: "#0e733bff",
   Pending: "#ffc107",
-  Rejected: "#dc3545",
-  Reimbursed: "#0d6efd",
-  Returned: "#6f42c1",
+  Rejected: "#c10e20ff",
+  Reimbursed: "#0243c7ff",
+  Returned: "#5f39a7ff",
 };
 
 const RADIAN = Math.PI / 180;

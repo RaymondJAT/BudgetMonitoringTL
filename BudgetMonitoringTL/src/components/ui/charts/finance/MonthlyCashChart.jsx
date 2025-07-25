@@ -27,7 +27,7 @@ const MonthlyCashChart = ({ data }) => {
             <Legend />
             <Bar
               dataKey="cashReleased"
-              fill="#0d6efd"
+              fill="#0243c7ff"
               name="Cash Released"
               barSize={40}
               radius={[4, 4, 0, 0]}

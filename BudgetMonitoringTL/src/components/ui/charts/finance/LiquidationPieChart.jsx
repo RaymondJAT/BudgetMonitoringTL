@@ -8,7 +8,7 @@ import {
 } from "recharts";
 import ChartCard from "../../../ChartCard";
 
-const COLORS = ["#dc3545", "#198754"]; // Red and Green
+const COLORS = ["#c10e20ff", "#014f28ff"]; // Red and Green
 const RADIAN = Math.PI / 180;
 
 // Same as DepartmentBudgetChart
