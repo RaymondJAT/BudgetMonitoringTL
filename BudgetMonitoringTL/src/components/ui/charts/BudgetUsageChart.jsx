@@ -13,7 +13,7 @@ const BudgetUsageChart = ({ data }) => {
   return (
     <div className="custom-container rounded p-3 w-100">
       <p className="mb-3 fw-bold">📊 Budget Usage Over Time</p>
-      <ResponsiveContainer width="100%" height={160}>
+      <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />

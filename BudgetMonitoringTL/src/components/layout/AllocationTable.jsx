@@ -70,7 +70,7 @@ const AllocationTable = ({
 
   return (
     <div
-      className="table-wrapper flex-grow-1 overflow-auto"
+      className="trash-wrapper flex-grow-1 overflow-auto"
       style={{ maxHeight: "200px" }}
     >
       <Table hover className="expense-table mb-0">

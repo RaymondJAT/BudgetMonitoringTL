@@ -3,11 +3,12 @@ import { Table } from "react-bootstrap";
 const OverdueListings = ({ data, title, height }) => {
   return (
     <div className="flex-fill d-flex flex-column mb-3">
-      <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column">
-        <p className="mb-3 fw-bold">{title}</p>
+      <div className="custom-container rounded p-3 shadow-sm d-flex flex-column">
+        <p className="mb-2 fw-bold">{title}</p>
+
         <div
-          className="table-wrapper flex-grow-1 overflow-auto"
-          style={{ maxHeight: height }}
+          className="trash-wrapper"
+          style={{ maxHeight: height, overflowY: "auto" }}
         >
           <Table hover className="expense-table mb-0">
             <thead>
@@ -51,6 +52,51 @@ const OverdueListings = ({ data, title, height }) => {
               )}
             </tbody>
           </Table>
+
+          {/* ✅ Mobile View */}
+          <div className="d-lg-none">
+            {data.length > 0 ? (
+              data.map((entry, index) => (
+                <div key={index} className="mobile-card">
+                  <div className="mobile-card-header d-flex justify-content-between">
+                    <span className="fw-bold">{entry.title}</span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Department:</span>{" "}
+                    <span className="mobile-card-value">
+                      {entry.department}
+                    </span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Date:</span>{" "}
+                    <span className="mobile-card-value">{entry.date}</span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Amount:</span>{" "}
+                    <span className="mobile-card-value">
+                      ₱{" "}
+                      {parseFloat(entry.amount || 0).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Status:</span>{" "}
+                    <span
+                      className={`mobile-card-value status-badge ${entry.status.toLowerCase()}`}
+                    >
+                      {entry.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center mt-4">
+                No overdue liquidations found.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -126,6 +126,78 @@ const BudgetTable = ({ data, height, onUpdate }) => {
             )}
           </tbody>
         </Table>
+
+        {/* Mobile View */}
+        <div className="d-lg-none">
+          {tableData.length > 0 ? (
+            tableData.map((item, index) => {
+              const remaining = item.allocated - item.used;
+              const utilization = ((item.used / item.allocated) * 100).toFixed(
+                2
+              );
+
+              return (
+                <div key={item.id || index} className="mobile-card">
+                  <div className="mobile-card-header">
+                    <span className="fw-bold">{item.department}</span>
+                  </div>
+
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Allocated:</span>{" "}
+                    <span className="mobile-card-value">
+                      ₱ {item.allocated.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Used:</span>{" "}
+                    <span className="mobile-card-value">
+                      ₱ {item.used.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Remaining:</span>{" "}
+                    <span className="mobile-card-value">
+                      ₱ {remaining.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mobile-card-item">
+                    <span className="mobile-card-label">Utilization:</span>{" "}
+                    <span className="mobile-card-value">{utilization}%</span>
+                  </div>
+
+                  <div className="mobile-card-item d-flex gap-2 mt-2">
+                    <Button
+                      variant="outline-dark"
+                      size="sm"
+                      onClick={() => handleTransfer(item)}
+                      title="Transfer Funds"
+                    >
+                      <FaExchangeAlt />
+                    </Button>
+                    <Button
+                      variant="outline-dark"
+                      size="sm"
+                      onClick={() => handleEdit(item)}
+                      title="Edit Budget"
+                    >
+                      <FaEdit />
+                    </Button>
+                    <Button
+                      variant="outline-dark"
+                      size="sm"
+                      onClick={() => handleView(item)}
+                      title="View Budget"
+                    >
+                      <FaEye />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-center mt-4">No budget data available.</div>
+          )}
+        </div>
       </div>
 
       <TransferBudgetAllocation

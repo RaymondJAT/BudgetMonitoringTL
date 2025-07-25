@@ -527,11 +527,22 @@ input[type="checkbox"]:checked {
   overflow: hidden;
 }
 
+/* .table-wrapper {
+  position: relative;
+  margin-top: 15px;
+  height: 495px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #efeeea;
+} */
+
 /* TRASH TABLE */
 .trash-wrapper {
   position: relative;
   margin-top: 15px;
-  height: 595px;
+  height: 495px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -936,7 +947,8 @@ input[type="number"]::-webkit-outer-spin-button {
     margin-top: 1rem;
   }
 
-  .table-wrapper .expense-table {
+  .table-wrapper .expense-table,
+  .trash-wrapper .expense-table {
     display: none !important;
   }
 
@@ -950,11 +962,15 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-/* @media (min-width: 1024px) {
+@media (min-width: 1600px) {
   .table-wrapper {
     min-height: 590px;
   }
-} */
+
+  .trash-wrapper {
+    min-height: 310px;
+  }
+}
 
 /* @media (max-width: 1700px) {
 }
