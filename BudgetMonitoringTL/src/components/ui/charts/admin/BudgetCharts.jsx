@@ -70,7 +70,7 @@ const BudgetCharts = ({ transactions }) => {
     <>
       <div className="row g-3">
         {/* Line Chart */}
-        <div className="col-md-7 mb-2">
+        <div className="col-md-7">
           <ChartCard
             title="📈 Monthly Spending Trend"
             style={{ fontSize: "0.75rem" }}
@@ -93,7 +93,7 @@ const BudgetCharts = ({ transactions }) => {
         </div>
 
         {/* Pie Chart */}
-        <div className="col-md-5 mb-2">
+        <div className="col-md-5 ">
           <ChartCard
             title="🥧 Spending by Type"
             style={{ fontSize: "0.75rem" }}

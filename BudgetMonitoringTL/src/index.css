@@ -541,7 +541,7 @@ input[type="checkbox"]:checked {
 /* TRASH TABLE */
 .trash-wrapper {
   position: relative;
-  margin-top: 15px;
+  /* margin-top: 15px; */
   height: 495px;
   overflow-y: auto;
   border: 1px solid #ddd;
@@ -897,6 +897,7 @@ input[type="number"]::-webkit-outer-spin-button {
   min-width: 280px;
 }
 
+/* 576px */
 @media (max-width: 576px) {
   .responsive-searchbar {
     min-width: 145px;
@@ -907,6 +908,7 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
+/* 768px */
 @media (max-width: 768px) {
   .mobile-card {
     background-color: #fff;
@@ -962,6 +964,80 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
+/* 968px */
+@media (max-width: 968px) {
+  .mobile-card {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-card-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-card-label {
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #000000;
+  }
+
+  .mobile-card-value {
+    font-size: 0.75rem;
+    color: #000000;
+  }
+
+  .mobile-card-view-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .table-wrapper .expense-table,
+  .trash-wrapper .expense-table {
+    display: none !important;
+  }
+
+  .total-box {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .table-wrapper {
+    height: 75vh;
+  }
+}
+
+/* ODD RESPONSIVE */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .total-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .total-container .total-box {
+    flex: 0 0 calc(50% - 0.5rem);
+  }
+
+  .total-container .total-box:nth-last-child(1):nth-child(odd) {
+    flex: 0 0 100%;
+  }
+}
+
+/* 1600px */
 @media (min-width: 1600px) {
   .table-wrapper {
     min-height: 590px;

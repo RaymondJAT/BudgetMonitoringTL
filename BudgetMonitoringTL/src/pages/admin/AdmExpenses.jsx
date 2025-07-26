@@ -32,7 +32,7 @@ const AdmExpenses = () => {
             <div className="flex-fill">
               <OverdueListings
                 data={overdueListings}
-                height="465px"
+                height="478px"
                 title="⚠️ Overdue Liquidations"
               />
             </div>

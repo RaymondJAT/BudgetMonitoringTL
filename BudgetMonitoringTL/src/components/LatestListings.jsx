@@ -5,7 +5,7 @@ const LatestListings = ({ data, title, height }) => {
     <>
       <div className="flex-fill d-flex flex-column pb-3">
         <div className="custom-container rounded p-3 shadow-sm d-flex flex-column">
-          <p className="mb-0 fw-bold">{title}</p>
+          <p className="mb-2 fw-bold">{title}</p>
 
           <div
             className="trash-wrapper"
