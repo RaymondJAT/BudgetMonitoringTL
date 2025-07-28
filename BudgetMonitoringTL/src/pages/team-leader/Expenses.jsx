@@ -216,7 +216,7 @@ const Expenses = () => {
             />
             <DataTable
               data={filteredData}
-              height="455px"
+              height="450px"
               columns={columns}
               onRowClick={handleRowClick}
               onDelete={handleDelete}

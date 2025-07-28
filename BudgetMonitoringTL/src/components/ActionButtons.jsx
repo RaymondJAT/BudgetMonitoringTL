@@ -1,4 +1,11 @@
-import { FaArrowLeft, FaTrash, FaBookmark } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaTrash,
+  FaBookmark,
+  FaPrint,
+  FaCheck,
+} from "react-icons/fa";
+import { ImCross } from "react-icons/im";
 import AppButton from "./ui/AppButton";
 
 const ActionButtons = ({
@@ -10,55 +17,78 @@ const ActionButtons = ({
   onDelete,
 }) => {
   return (
-    <div className="custom-btn d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-3">
-      <div className="d-flex gap-1">
+    <div className="custom-btn d-flex flex-wrap justify-content-between align-items-center pt-3 pb-3">
+      <div className="d-flex">
         <AppButton
+          label={
+            <>
+              <FaArrowLeft />
+            </>
+          }
           variant="outline-dark"
           size="sm"
           onClick={onBack}
           className="custom-app-button btn-responsive"
-        >
-          <FaArrowLeft />
-        </AppButton>
+        />
+
         <AppButton
-          label="Approve"
+          label={
+            <>
+              <FaCheck />
+            </>
+          }
           variant="outline-success"
           size="sm"
           onClick={onApprove}
-          className="custom-app-button btn-responsive"
+          className="custom-app-button btn-responsive ms-2"
         />
         <AppButton
-          label="Reject"
+          label={
+            <>
+              <ImCross />
+            </>
+          }
           variant="outline-danger"
           size="sm"
           onClick={onReject}
-          className="custom-app-button btn-responsive"
+          className="custom-app-button btn-responsive ms-2"
         />
         <AppButton
-          label="Print"
+          label={
+            <>
+              <FaPrint />
+            </>
+          }
           variant="outline-secondary"
           size="sm"
           onClick={onPrint}
-          className="custom-app-button btn-responsive"
+          className="custom-app-button btn-responsive ms-2"
         />
       </div>
-      <div className="d-flex gap-2 ms-md-auto mt-2 mt-md-0">
+      <div className="d-flex ms-md-auto mt-md-0">
         <AppButton
-          variant="outline-warning"
-          size="sm"
-          onClick={onImportant}
-          className="custom-app-button btn-responsive d-flex align-items-center justify-content-center"
-        >
-          <FaBookmark size="1rem" />
-        </AppButton>
-        <AppButton
+          label={
+            <>
+              <FaBookmark />
+            </>
+          }
           variant="outline-dark"
           size="sm"
+          onClick={onImportant}
+          className="custom-app-button btn-responsive ms-2"
+        />
+
+        <AppButton
+          label={
+            <>
+              <FaTrash />
+            </>
+          }
+          variant="outline-danger"
+          size="sm"
           onClick={onDelete}
-          className="custom-app-button btn-responsive d-flex align-items-center justify-content-center"
-        >
-          <FaTrash size="1rem" />
-        </AppButton>
+          className="custom-app-button btn-responsive ms-2"
+        />
       </div>
     </div>
   );

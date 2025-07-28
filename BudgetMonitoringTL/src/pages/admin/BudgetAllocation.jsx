@@ -59,7 +59,7 @@ const BudgetAllocation = () => {
 
           <BudgetTable
             data={tableData}
-            height="330px"
+            height="325px"
             onUpdate={(updated) => setTableData(updated)}
           />
         </div>

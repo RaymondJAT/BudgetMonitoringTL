@@ -118,12 +118,16 @@ const Header = ({
                 {/* show dropdown arrow only on md and up */}
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">
-                <Dropdown.Item style={{ fontSize: "0.75rem" }}>
+                <Dropdown.Item
+                  className="dropdown-red-highlight"
+                  style={{ fontSize: "0.75rem" }}
+                >
                   Settings
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item
                   onClick={handleLogout}
+                  className="dropdown-red-highlight"
                   style={{ fontSize: "0.75rem" }}
                 >
                   Logout

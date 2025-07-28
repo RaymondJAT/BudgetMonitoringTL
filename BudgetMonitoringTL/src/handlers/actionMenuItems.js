@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import downloadPDF from "../utils/downloadAsPdf";
+import { FaFileDownload, FaTrash, FaArchive, FaBookmark } from "react-icons/fa";
 
-// meatball menu
 export const meatballActions = ({
   onDelete,
   onArchive,
@@ -11,9 +11,10 @@ export const meatballActions = ({
 }) => [
   {
     label: "Download",
+    Icon: FaFileDownload,
+    iconProps: { className: "me-2" },
     onClick: async (entry) => {
       setPrintData(entry);
-
       setTimeout(async () => {
         await downloadPDF(downloadRef, `entry-${"download"}.pdf`);
       }, 200);
@@ -21,6 +22,8 @@ export const meatballActions = ({
   },
   {
     label: "Delete",
+    Icon: FaTrash,
+    iconProps: { className: "me-2" },
     onClick: (entry) => {
       Swal.fire({
         title: "Are you sure?",
@@ -40,6 +43,8 @@ export const meatballActions = ({
   },
   {
     label: "Archive",
+    Icon: FaArchive,
+    iconProps: { className: "me-2" },
     onClick: (entry) => {
       onArchive(entry);
       Swal.fire("Archived!", "The entry has been archived.", "success");
@@ -47,6 +52,8 @@ export const meatballActions = ({
   },
   {
     label: "Mark as Important",
+    Icon: FaBookmark,
+    iconProps: { className: "me-2" },
     onClick: (entry) => {
       const isNowImportant = !entry.important;
       onToggleImportant({ ...entry, important: isNowImportant });

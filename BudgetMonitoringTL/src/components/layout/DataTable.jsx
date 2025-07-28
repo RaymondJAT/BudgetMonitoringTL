@@ -3,6 +3,8 @@ import { Table, Form, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
 
 import { meatballActions } from "../../handlers/actionMenuItems";
+import { FaEye } from "react-icons/fa";
+import AppButton from "../ui/AppButton";
 
 const DataTable = ({
   data,
@@ -200,6 +202,7 @@ const DataTable = ({
                             }}
                             className="meat-dropdown"
                           >
+                            <action.Icon {...action.iconProps} />
                             {action.label}
                           </Dropdown.Item>
                         ))}
@@ -222,10 +225,20 @@ const DataTable = ({
         <div className="d-lg-none">
           {data?.length > 0 ? (
             data.map((entry, index) => (
-              <div key={entry.id || index} className="mobile-card">
-                <div className="mobile-card-header">
-                  <div>
-                    <span className="mobile-card-label">ID:</span> {entry.id}
+              <div
+                key={entry.id || index}
+                className={`mobile-card ${
+                  selectedRows[entry.id] ? "highlighted-row" : ""
+                }`}
+              >
+                <div className="mobile-card-header d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectedRows[entry.id] || false}
+                      onChange={() => handleRowCheck(entry.id)}
+                      style={{ marginRight: "0.5rem" }}
+                    />
                   </div>
 
                   <Dropdown
@@ -264,6 +277,7 @@ const DataTable = ({
                           }}
                           className="meat-dropdown"
                         >
+                          <action.Icon {...action.iconProps} />
                           {action.label}
                         </Dropdown.Item>
                       ))}
@@ -272,6 +286,9 @@ const DataTable = ({
                 </div>
 
                 {/* Main Details */}
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">ID:</span> {entry.id}
+                </div>
                 <div className="mobile-card-item">
                   <span className="mobile-card-label">Employee:</span>{" "}
                   <span className="mobile-card-value">{entry.employee}</span>
@@ -307,17 +324,24 @@ const DataTable = ({
 
                 {/* View Button */}
                 <div className="mobile-card-view-btn">
-                  <button
-                    className="custom-app-button"
+                  <AppButton
+                    label={
+                      <>
+                        <FaEye />
+                      </>
+                    }
+                    size="sm"
+                    variant="outline-dark"
                     onClick={() => onRowClick(entry)}
-                  >
-                    👁 View
-                  </button>
+                    className="custom-app-button btn-responsive"
+                  />
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center mt-4 ">No data available</div>
+            <div className="text-center mt-4 d-block d-lg-none">
+              No data available
+            </div>
           )}
         </div>
       </div>

@@ -118,7 +118,7 @@ const CashApprovalForm = () => {
     });
 
   return (
-    <>
+    <div className="pb-3">
       <Container fluid>
         {/* ACTION BUTTON */}
         <ActionButtons
@@ -181,7 +181,7 @@ const CashApprovalForm = () => {
           signatures={signatures}
         />
       </div>
-    </>
+    </div>
   );
 };
 

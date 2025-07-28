@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container } from "react-bootstrap";
+import { Container, Form } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
 import { LOCAL_KEYS } from "../../constants/localKeys";
@@ -153,19 +153,43 @@ const MyExpenses = () => {
     setSelectedRows(reset);
   };
 
-  const newButton = (
-    <AppButton
-      label={
-        <>
-          <FaPlus />
-          <span className="d-none d-sm-inline ms-1">Request</span>
-        </>
+  const selectAllCheckbox = (
+    <Form.Check
+      type="checkbox"
+      checked={
+        filteredData.length > 0 &&
+        filteredData.every((entry) => selectedRows[entry.id])
       }
-      size="sm"
-      variant="outline-dark"
-      onClick={() => setShowCashReqModal(true)}
-      className="custom-app-button"
+      onChange={(e) => {
+        const checked = e.target.checked;
+        const newSelection = {};
+        filteredData.forEach((entry) => {
+          newSelection[entry.id] = checked;
+        });
+        setSelectedRows(newSelection);
+      }}
+      className="d-lg-none"
+      style={{ marginTop: "3px" }}
+      title="Select All"
     />
+  );
+
+  const leftContent = (
+    <div className="d-flex align-items-center gap-2">
+      {selectAllCheckbox}
+      <AppButton
+        label={
+          <>
+            <FaPlus />
+            <span className="d-none d-sm-inline ms-1">Request</span>
+          </>
+        }
+        size="sm"
+        variant="outline-dark"
+        onClick={() => setShowCashReqModal(true)}
+        className="custom-app-button"
+      />
+    </div>
   );
 
   return (
@@ -179,7 +203,7 @@ const MyExpenses = () => {
             <ToolBar
               searchValue={searchValue}
               onSearchChange={setSearchValue}
-              leftContent={newButton}
+              leftContent={leftContent}
               handleExport={handleExport}
               selectedCount={selectedCount}
               searchBarWidth="300px"
@@ -187,7 +211,7 @@ const MyExpenses = () => {
 
             <DataTable
               data={filteredData}
-              height="355px"
+              height="350px"
               columns={columns}
               onRowClick={handleRowClick}
               onDelete={handleDelete}

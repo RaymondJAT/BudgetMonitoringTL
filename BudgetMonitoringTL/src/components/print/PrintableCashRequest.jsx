@@ -40,7 +40,7 @@ const PrintableCashRequest = ({
           <Col xs={12} md={6} className="mb-2 text-md-end">
             <div className="d-flex justify-content-md-end align-items-center mb-2">
               <strong className="title">Date Filed:</strong>
-              <p className="ms-2 mb-0">{dateFiled}</p>
+              <p className="ms-2 mb-0">{data?.expenseDate || " "}</p>
             </div>
             <div className="d-flex justify-content-md-end align-items-center">
               <strong className="title">Department:</strong>

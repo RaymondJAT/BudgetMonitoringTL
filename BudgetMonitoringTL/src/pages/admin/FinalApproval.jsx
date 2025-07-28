@@ -62,7 +62,7 @@ const FinalApproval = () => {
 
             <DataTable
               columns={filteredColumns}
-              height="355px"
+              height="350px"
               data={filteredData}
             />
           </div>

@@ -245,17 +245,24 @@ const EntryStates = ({
                 ))}
 
                 <div className="mobile-card-view-btn mt-2 text-end">
-                  <button
-                    className="custom-app-button"
+                  <AppButton
+                    label={
+                      <>
+                        <FaEye /> View
+                      </>
+                    }
+                    size="sm"
+                    variant="outline-dark"
                     onClick={() => onRowClick(entry)}
-                  >
-                    👁 View
-                  </button>
+                    className="custom-app-button btn-responsive"
+                  />
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center mt-4">No entries found.</div>
+            <div className="text-center mt-4 d-block d-lg-none">
+              No entries found.
+            </div>
           )}
         </div>
       </div>

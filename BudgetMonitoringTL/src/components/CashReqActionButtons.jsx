@@ -19,13 +19,16 @@ const CashReqActionButtons = ({
       <div className="d-flex">
         {/* Back Button */}
         <AppButton
+          label={
+            <>
+              <FaArrowLeft />
+            </>
+          }
           variant="outline-dark"
           size="sm"
           onClick={onBack}
           className="custom-app-button btn-responsive"
-        >
-          <FaArrowLeft />
-        </AppButton>
+        />
 
         {/* Create Liquidation Form Button */}
         <AppButton
@@ -76,7 +79,7 @@ const CashReqActionButtons = ({
               <FaBookmark />
             </>
           }
-          variant="outline-info"
+          variant="outline-dark"
           size="sm"
           className="custom-app-button btn-responsive ms-2"
         />

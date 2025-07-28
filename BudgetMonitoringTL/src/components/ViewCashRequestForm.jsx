@@ -104,7 +104,7 @@ const ViewCashRequestForm = () => {
     });
 
   return (
-    <div className="">
+    <div className="pb-3">
       <Container fluid>
         <CashReqActionButtons
           onBack={() => navigate(-1)}
