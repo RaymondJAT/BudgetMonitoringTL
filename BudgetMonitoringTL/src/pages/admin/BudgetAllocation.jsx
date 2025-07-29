@@ -3,7 +3,7 @@ import { Container } from "react-bootstrap";
 
 import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
-import { BudgetOverview } from "../../constants/totalList";
+import { BudgetOverview, FINANCE_STATUS_LIST } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
 import BudgetTable from "../../components/layout/BudgetTable";
@@ -32,7 +32,7 @@ const BudgetAllocation = () => {
   return (
     <>
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={BudgetOverview} />
+        <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
       </div>
 
       <Container fluid className="pb-3">

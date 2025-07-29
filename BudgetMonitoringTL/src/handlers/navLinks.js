@@ -64,6 +64,17 @@ export const navConfig = {
         { label: "Verified", path: "/finance-verified" },
       ],
     },
+    {
+      label: "Management",
+      icon: MdOutlineManageHistory,
+      children: [
+        { label: "Budget Allocation", path: "/budget-allocation" },
+        { label: "Revolving Fund" },
+        { label: "Cash Disbursement" },
+        { label: "History" },
+        // { label: "User Management", path: "#" },
+      ],
+    },
     { label: "Archive", icon: MdOutlineArchive, path: "/finance-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/finance-important" },
     { label: "Trash", icon: RxTrash, path: "/finance-trash" },
@@ -79,22 +90,22 @@ export const navConfig = {
         { label: "All Requests", path: "/all-request" },
       ],
     },
-    {
-      label: "Management",
-      icon: MdOutlineManageHistory,
-      children: [
-        { label: "Budget Allocation", path: "/budget-allocation" },
-        // { label: "User Management", path: "#" },
-      ],
-    },
     // {
-    //   label: "Reports & Logs",
-    //   icon: TbReport,
+    //   label: "Management",
+    //   icon: MdOutlineManageHistory,
     //   children: [
-    //     { label: "Budget Rerports", path: "/budget-report" },
-    //     { label: "Audit Logs", path: "#" },
+    //     { label: "Budget Allocation", path: "/budget-allocation" },
+    //     // { label: "User Management", path: "#" },
     //   ],
     // },
+    {
+      label: "Reports & Logs",
+      icon: TbReport,
+      children: [
+        { label: "Budget Rerports", path: "/budget-report" },
+        { label: "Audit Logs", path: "#" },
+      ],
+    },
     { label: "Archive", icon: MdOutlineArchive, path: "/admin-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/admin-important" },
     { label: "Trash", icon: RxTrash, path: "/admin-trash" },
