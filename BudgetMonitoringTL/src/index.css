@@ -244,6 +244,13 @@ body {
   margin-left: 0 !important;
 }
 
+.active-nav {
+  background-color: #f8d7da !important;
+  color: #800000 !important;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
 /* HEADER */
 .main-header {
   background-color: #efeeea;

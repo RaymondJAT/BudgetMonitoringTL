@@ -1,6 +1,6 @@
-import { Container, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 
-const LatestListings = ({ data, title, height }) => {
+const LatestListingsTable = ({ data, title, height }) => {
   return (
     <>
       <div className="flex-fill d-flex flex-column pb-3">
@@ -25,7 +25,7 @@ const LatestListings = ({ data, title, height }) => {
                 {data.length > 0 ? (
                   data.map((entry, index) => (
                     <tr key={index} className="fw-bold">
-                      <td>{entry.title}</td>
+                      <td>{entry.employee}</td>
                       <td>{entry.department}</td>
                       <td>{entry.date}</td>
                       <td>
@@ -59,8 +59,11 @@ const LatestListings = ({ data, title, height }) => {
               {data.length > 0 ? (
                 data.map((entry, index) => (
                   <div key={index} className="mobile-card">
-                    <div className="mobile-card-header d-flex justify-content-between">
-                      <span className="fw-bold">{entry.title}</span>
+                    <div className="mobile-card-item">
+                      <span className="mobile-card-label">Name:</span>{" "}
+                      <span className="mobile-card-value">
+                        {entry.employee}
+                      </span>
                     </div>
                     <div className="mobile-card-item">
                       <span className="mobile-card-label">Department:</span>{" "}
@@ -105,4 +108,4 @@ const LatestListings = ({ data, title, height }) => {
   );
 };
 
-export default LatestListings;
+export default LatestListingsTable;

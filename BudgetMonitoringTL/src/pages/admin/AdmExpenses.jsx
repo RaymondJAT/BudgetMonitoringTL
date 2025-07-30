@@ -6,8 +6,8 @@ import { overdueListings } from "../../constants/overdueListings";
 
 import TotalCards from "../../components/TotalCards";
 import BudgetDashboardCharts from "../../components/BudgetDashboardCharts";
-import LatestListings from "../../components/LatestListings";
-import OverdueListings from "../../components/OverdueListings";
+import LatestListingsTable from "../../components/LatestListingsTable";
+import OverdueListingsTable from "../../components/OverdueListingsTable";
 
 const AdmExpenses = () => {
   const flattenedData = mockBudgets.flatMap((budget) =>
@@ -30,7 +30,7 @@ const AdmExpenses = () => {
           </Col>
           <Col lg={6} className="d-flex">
             <div className="flex-fill">
-              <OverdueListings
+              <OverdueListingsTable
                 data={overdueListings}
                 height="478px"
                 title="⚠️ Overdue Liquidations"
@@ -39,7 +39,7 @@ const AdmExpenses = () => {
           </Col>
         </Row>
 
-        <LatestListings
+        <LatestListingsTable
           data={flattenedData}
           title="🕒 Latest Listings"
           height="200px"

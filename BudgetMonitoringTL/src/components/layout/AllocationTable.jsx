@@ -78,13 +78,15 @@ const AllocationTable = ({
         <Table hover className="expense-table mb-0">
           <thead>
             <tr>
-              <th>Type</th>
+              {/* <th>Type</th> */}
               <th
                 onClick={() => handleSort("referenceId")}
                 style={{ cursor: "pointer" }}
               >
                 Reference ID {renderSortIcon("referenceId")}
               </th>
+              <th>Employee</th>
+              <th>Department</th>
               <th>Description</th>
               <th
                 onClick={() => handleSort("amount")}
@@ -105,8 +107,10 @@ const AllocationTable = ({
             {filteredTransactions.length > 0 ? (
               filteredTransactions.map((tx, idx) => (
                 <tr key={idx}>
-                  <td>{tx.type}</td>
+                  {/* <td>{tx.type}</td> */}
                   <td>{tx.referenceId || "—"}</td>
+                  <td>{tx.employee || "—"}</td>
+                  <td>{tx.department || "—"}</td>
                   <td className="text-truncate" style={{ maxWidth: "200px" }}>
                     {tx.description || "—"}
                   </td>
@@ -144,12 +148,21 @@ const AllocationTable = ({
           {filteredTransactions.length > 0 ? (
             filteredTransactions.map((tx, idx) => (
               <div key={idx} className="mobile-card">
-                <div className="mobile-card-header">
-                  <span className="fw-bold">{tx.referenceId || "—"}</span>
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Reference ID:</span>{" "}
+                  <span className="mobile-card-value">{tx.referenceId}</span>
                 </div>
                 <div className="mobile-card-item">
-                  <span className="mobile-card-label">Type:</span>{" "}
-                  <span className="mobile-card-value">{tx.type}</span>
+                  <span className="mobile-card-label">Employee:</span>{" "}
+                  <span className="mobile-card-value">
+                    {tx.employee || "—"}
+                  </span>
+                </div>
+                <div className="mobile-card-item">
+                  <span className="mobile-card-label">Department:</span>{" "}
+                  <span className="mobile-card-value">
+                    {tx.department || "—"}
+                  </span>
                 </div>
                 <div className="mobile-card-item">
                   <span className="mobile-card-label">Amount:</span>{" "}

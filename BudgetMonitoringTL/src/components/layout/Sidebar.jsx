@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { navConfig } from "../../handlers/navLinks";
 import { FaMoneyBillWave } from "react-icons/fa";
 
 const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const sidebarRef = useRef(null);
   const dropdownRef = useRef(null);
 
@@ -119,7 +120,9 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
         {navItems.map((item) => (
           <div key={item.label}>
             <div
-              className="nav-item d-flex align-items-center justify-content-between px-3 py-2"
+              className={`nav-item d-flex align-items-center justify-content-between px-3 py-2 ${
+                location.pathname === item.path ? "active-nav" : ""
+              }`}
               onClick={(e) => {
                 if (item.children) {
                   toggleDropdown(e, item.label);
@@ -165,7 +168,9 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
                   {item.children.map((child) => (
                     <div
                       key={child.label}
-                      className="dropmenu-item py-1 px-2 rounded hover-bg"
+                      className={`dropmenu-item py-1 px-2 rounded hover-bg ${
+                        location.pathname === child.path ? "active-nav" : ""
+                      }`}
                       onClick={() => navigate(child.path)}
                       style={{ cursor: "pointer" }}
                     >

@@ -10,7 +10,7 @@ import { mockLiquidations } from "../../constants/mockLiquidation";
 import TotalCards from "../../components/TotalCards";
 import MonthlyCashChart from "../../components/ui/charts/finance/MonthlyCashChart";
 import LiquidationPieChart from "../../components/ui/charts/finance/LiquidationPieChart";
-import LatestListings from "../../components/LatestListings";
+import LatestListingsTable from "../../components/LatestListingsTable";
 
 const FnceExpenses = () => {
   const [tableData, setTableData] = useState([]);
@@ -49,7 +49,7 @@ const FnceExpenses = () => {
           </div>
         </div>
 
-        <LatestListings
+        <LatestListingsTable
           data={latestListingsData}
           title="🕒 Latest Listings"
           height="220px"

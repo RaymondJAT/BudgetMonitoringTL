@@ -90,14 +90,14 @@ export const navConfig = {
         { label: "All Requests", path: "/all-request" },
       ],
     },
-    // {
-    //   label: "Management",
-    //   icon: MdOutlineManageHistory,
-    //   children: [
-    //     { label: "Budget Allocation", path: "/budget-allocation" },
-    //     // { label: "User Management", path: "#" },
-    //   ],
-    // },
+    {
+      label: "Management",
+      icon: MdOutlineManageHistory,
+      children: [
+        { label: "Budget Allocation", path: "/budget-allocation" },
+        // { label: "User Management", path: "#" },
+      ],
+    },
     {
       label: "Reports & Logs",
       icon: TbReport,
