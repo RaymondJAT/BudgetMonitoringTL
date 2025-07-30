@@ -41,7 +41,7 @@ const SignatureUpload = ({
   };
 
   return (
-    <div>
+    <div className="signature-upload-container">
       <div
         className="request-container border p-3"
         style={{ borderRadius: "6px" }}

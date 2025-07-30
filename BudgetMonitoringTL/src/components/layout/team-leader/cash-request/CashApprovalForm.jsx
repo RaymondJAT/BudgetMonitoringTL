@@ -13,6 +13,7 @@ import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "./CashApprovalTable";
 import ActionButtons from "../../../ActionButtons";
 import SignatureUpload from "../../../SignatureUpload";
+import Reference from "../../../Reference";
 
 const CashApprovalForm = () => {
   const contentRef = useRef(null);
@@ -29,10 +30,6 @@ const CashApprovalForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // const employeeData = mockData.find((e) => e.employee === data?.employee) || {
-  //   transactions: [],
-  // };
-  // const transactions = employeeData.transactions;
   const transactions = useMemo(() => data?.transactions || [], [data]);
 
   const total = useMemo(() => {
@@ -140,37 +137,48 @@ const CashApprovalForm = () => {
             toast.success("Entry moved to trash.");
           }}
         />
-        {/* Info Fields */}
-        <div className="custom-container border p-3 ">
-          <Row className="mb-2">
-            <Col xs={12} className="d-flex flex-column flex-md-row">
-              <strong className="title text-start">Description:</strong>
-              <p className="ms-md-2 mb-0 text-start">
-                {data?.description || "N/A"}
-              </p>
-            </Col>
-          </Row>
 
-          {renderPartnerFields()}
-          {renderEmployeeFields()}
+        <Row>
+          <Col md={9} className="d-flex flex-column pe-md-2">
+            {/* Info Fields */}
+            <div className="custom-container border p-3">
+              <Row className="mb-2">
+                <Col xs={12} className="d-flex flex-column flex-md-row">
+                  <strong className="title text-start">Description:</strong>
+                  <p className="ms-md-2 mb-0 text-start">
+                    {data?.description || "N/A"}
+                  </p>
+                </Col>
+              </Row>
 
-          <Row className="mb-2">
-            <Col xs={12} className="d-flex flex-column flex-md-row">
-              <strong className="title text-start">Amount in Words:</strong>
-              <p className="ms-md-2 mb-0 text-start">{amountInWords}</p>
-            </Col>
-          </Row>
-        </div>
-        {/* TABLE */}
-        <CashApprovalTable transactions={transactions} total={total} />
-        {/* SIGNATURE UPLOAD */}
-        <SignatureUpload
-          label="Approved by"
-          nameKey="approvedName"
-          signatureKey="approved"
-          signatures={signatures}
-          setSignatures={setSignatures}
-        />
+              {renderPartnerFields()}
+              {renderEmployeeFields()}
+
+              <Row className="mb-2">
+                <Col xs={12} className="d-flex flex-column flex-md-row">
+                  <strong className="title text-start">Amount in Words:</strong>
+                  <p className="ms-md-2 mb-0 text-start">{amountInWords}</p>
+                </Col>
+              </Row>
+            </div>
+
+            {/* Table */}
+            <CashApprovalTable transactions={transactions} total={total} />
+
+            {/* Signature Upload */}
+            <SignatureUpload
+              label="Approved by"
+              nameKey="approvedName"
+              signatureKey="approved"
+              signatures={signatures}
+              setSignatures={setSignatures}
+            />
+          </Col>
+
+          <Col md={3} className="ps-md-2">
+            <Reference data={data} />
+          </Col>
+        </Row>
       </Container>
       {/* HIDDEN PRINTABLE */}
       <div className="d-none">
