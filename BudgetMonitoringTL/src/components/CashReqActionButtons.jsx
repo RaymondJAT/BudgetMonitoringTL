@@ -48,7 +48,7 @@ const CashReqActionButtons = ({
         <AppButton
           label={
             <>
-              <FaEye />
+              <FaEye /> <span className="d-sm-inline ms-1">View</span>
             </>
           }
           variant="outline-dark"
@@ -61,7 +61,7 @@ const CashReqActionButtons = ({
         <AppButton
           label={
             <>
-              <FaPrint />
+              <FaPrint /> <span className="d-sm-inline ms-1">Print</span>
             </>
           }
           variant="outline-secondary"
@@ -76,7 +76,7 @@ const CashReqActionButtons = ({
         <AppButton
           label={
             <>
-              <FaBookmark />
+              <FaBookmark /> <span className="d-sm-inline ms-1">Important</span>
             </>
           }
           variant="outline-dark"
@@ -87,7 +87,7 @@ const CashReqActionButtons = ({
         <AppButton
           label={
             <>
-              <FaTrash />
+              <FaTrash /> <span className="d-sm-inline ms-1">Delete</span>
             </>
           }
           variant="outline-danger"

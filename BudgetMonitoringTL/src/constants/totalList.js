@@ -24,7 +24,7 @@ export const BudgetOverview = [
   { label: "Total Budget", key: "totalBudget" },
   { label: "Budget Used", key: "budgetUsed" },
   { label: "Remaining Budget", key: "remainingBudget" },
-  { label: "Total Request", key: "totalRequest" },
+  { label: "Total Department Funded", key: "totalRequest" },
   { label: "Total Liquidations", key: "totalLiquidations" },
   { label: "Final Approvals Needed", key: "finalApprovals" },
 ];

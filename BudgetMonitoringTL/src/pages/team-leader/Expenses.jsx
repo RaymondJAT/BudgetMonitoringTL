@@ -30,7 +30,7 @@ const PrintButton = ({ onClick }) => (
     }
     size="sm"
     className="custom-app-button"
-    variant="outline-dark"
+    variant="outline-secondary"
     onClick={onClick}
   />
 );

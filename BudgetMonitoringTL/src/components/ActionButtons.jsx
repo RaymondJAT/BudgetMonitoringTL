@@ -35,6 +35,7 @@ const ActionButtons = ({
           label={
             <>
               <FaCheck />
+              <span className="d-sm-inline ms-1">Approve</span>
             </>
           }
           variant="outline-success"
@@ -45,7 +46,7 @@ const ActionButtons = ({
         <AppButton
           label={
             <>
-              <ImCross />
+              <ImCross /> <span className="d-sm-inline ms-1">Reject</span>
             </>
           }
           variant="outline-danger"
@@ -56,7 +57,7 @@ const ActionButtons = ({
         <AppButton
           label={
             <>
-              <FaPrint />
+              <FaPrint /> <span className="d-sm-inline ms-1">Print</span>
             </>
           }
           variant="outline-secondary"
@@ -69,7 +70,7 @@ const ActionButtons = ({
         <AppButton
           label={
             <>
-              <FaBookmark />
+              <FaBookmark /> <span className="d-sm-inline ms-1">Important</span>
             </>
           }
           variant="outline-dark"
@@ -81,7 +82,7 @@ const ActionButtons = ({
         <AppButton
           label={
             <>
-              <FaTrash />
+              <FaTrash /> <span className="d-sm-inline ms-1">Delete</span>
             </>
           }
           variant="outline-danger"
