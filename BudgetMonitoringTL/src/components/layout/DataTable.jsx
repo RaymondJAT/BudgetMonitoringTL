@@ -58,7 +58,7 @@ const DataTable = ({
         <Table hover className="expense-table mb-0">
           <thead>
             <tr>
-              <th>
+              <th style={{ textAlign: "center", verticalAlign: "middle" }}>
                 <Form.Check
                   type="checkbox"
                   checked={allSelected}
@@ -68,7 +68,11 @@ const DataTable = ({
               {columns.map((col, index) => (
                 <th
                   key={index}
-                  style={{ width: col.width || "auto" }}
+                  style={{
+                    width: col.width || "auto",
+                    textAlign: "center", // <-- Center horizontally
+                    verticalAlign: "middle", // <-- Center vertically
+                  }}
                   className={
                     col.accessor === "price" || col.accessor === "quantity"
                       ? "d-none"

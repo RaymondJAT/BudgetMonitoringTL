@@ -1,0 +1,18 @@
+export const revolvingFundColumns = [
+  { label: "ID", accessor: "id" },
+  { label: "Budget Name", accessor: "budgetName" },
+  { label: "Start Date", accessor: "startDate" },
+  { label: "End Date", accessor: "endDate" },
+  { label: "Beginning", accessor: "beginning" },
+  { label: "Added", accessor: "added" },
+  { label: "Total Fund", accessor: "totalFund" },
+  { label: "Issued", accessor: "issued" },
+  { label: "Returned", accessor: "returned" },
+  { label: "Outstanding", accessor: "outstanding" },
+  { label: "Amount Expended", accessor: "amountExpended" },
+  { label: "Ended", accessor: "ended" },
+  { label: "Liquidated", accessor: "liquidated" },
+  { label: "Unliquidated", accessor: "unliquidated" },
+  { label: "Balance", accessor: "balance" },
+  { label: "Status", accessor: "status" },
+];

@@ -4,6 +4,7 @@ import Processing from "../pages/finance/Processing";
 import Released from "../pages/finance/Released";
 import Verify from "../pages/finance/Verify";
 import Verified from "../pages/finance/Verified";
+import RevolvingFund from "../pages/finance/RevolvingFund";
 import BudgetAllocation from "../pages/admin/BudgetAllocation";
 import FnceArchive from "../pages/finance/FnceArchive";
 import FnceImportant from "../pages/finance/FnceImportant";
@@ -18,6 +19,7 @@ const FinanceRoutes = () => {
       <Route path="/finance-verify" element={<Verify />} />
       <Route path="/finance-verified" element={<Verified />} />
       <Route path="/budget-allocation" element={<BudgetAllocation />} />
+      <Route path="/revolving-fund" element={<RevolvingFund />} />
       <Route path="/finance-archive" element={<FnceArchive />} />
       <Route path="/finance-important" element={<FnceImportant />} />
       <Route path="/finance-trash" element={<FnceTrash />} />

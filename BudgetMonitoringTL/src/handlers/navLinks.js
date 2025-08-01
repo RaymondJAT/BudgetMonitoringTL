@@ -69,7 +69,7 @@ export const navConfig = {
       icon: MdOutlineManageHistory,
       children: [
         { label: "Budget Allocation", path: "/budget-allocation" },
-        { label: "Revolving Fund" },
+        { label: "Revolving Fund", path: "/revolving-fund" },
         { label: "Cash Disbursement" },
         { label: "History" },
         // { label: "User Management", path: "#" },

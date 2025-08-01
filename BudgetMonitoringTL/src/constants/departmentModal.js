@@ -7,3 +7,7 @@ export const departments = [
   "Operations",
   "Logistics Department",
 ];
+
+export const bankAccounts = ["BPI Main", "BPI Payroll", "Metrobank", "BDO"];
+export const types = ["Cash", "GCash"];
+
