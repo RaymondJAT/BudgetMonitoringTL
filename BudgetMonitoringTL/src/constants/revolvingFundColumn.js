@@ -15,4 +15,5 @@ export const revolvingFundColumns = [
   { label: "Unliquidated", accessor: "unliquidated" },
   { label: "Balance", accessor: "balance" },
   { label: "Status", accessor: "status" },
+  { label: "Actions", accessor: "actions" },
 ];

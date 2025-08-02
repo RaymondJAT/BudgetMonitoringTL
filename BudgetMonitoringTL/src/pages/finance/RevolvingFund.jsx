@@ -12,11 +12,13 @@ import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import AppButton from "../../components/ui/AppButton";
+import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
 
 const RevolvingFund = () => {
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedRows, setSelectedRows] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -104,7 +106,7 @@ const RevolvingFund = () => {
         }
         size="sm"
         variant="outline-dark"
-        onClick={() => setShowCashReqModal(true)}
+        onClick={() => setShowModal(true)}
         className="custom-app-button"
       />
     </div>
@@ -125,6 +127,11 @@ const RevolvingFund = () => {
             handleExport={handleExport}
             selectedCount={selectedCount}
             searchBarWidth="300px"
+          />
+
+          <NewRevolvingFund
+            show={showModal}
+            onHide={() => setShowModal(false)}
           />
 
           <DataTable

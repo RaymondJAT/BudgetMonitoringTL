@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Container } from "react-bootstrap";
+import { FaPlus } from "react-icons/fa";
 
 import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
@@ -43,7 +44,12 @@ const BudgetAllocation = () => {
             showFilter={false}
             leftContent={
               <AppButton
-                label="+ Allocation"
+                label={
+                  <>
+                    <FaPlus />
+                    <span className="d-none d-sm-inline ms-1">Allocation</span>
+                  </>
+                }
                 variant="outline-dark"
                 size="sm"
                 onClick={() => setShowModal(true)}
