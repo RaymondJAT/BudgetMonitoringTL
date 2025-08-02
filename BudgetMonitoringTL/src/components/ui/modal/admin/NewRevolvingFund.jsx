@@ -1,25 +1,23 @@
 import { useState } from "react";
-import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
+import { Modal, Form, Row, Col } from "react-bootstrap";
 import Select from "react-select";
-
 import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../AppButton";
 
 const NewRevolvingFund = ({ show, onHide }) => {
   const [selectedBudget, setSelectedBudget] = useState(null);
+  const [selectedBankAccount, setSelectedBankAccount] = useState(null);
   const [amount, setAmount] = useState("");
   const [beginningAmount, setBeginningAmount] = useState("");
+  const [addedAmount, setAddedAmount] = useState("");
 
   const handleClose = () => {
     setSelectedBudget(null);
     setAmount("");
     setBeginningAmount("");
+    setSelectedBankAccount(null);
+    setAddedAmount("");
     onHide();
-  };
-
-  const handleNumberInput = (e) => {
-    const value = e.target.value;
-    setAmount(parseFloat(value) < 0 ? "0" : value);
   };
 
   const preventInvalidKeys = (e) => {
@@ -30,18 +28,17 @@ const NewRevolvingFund = ({ show, onHide }) => {
 
   const handleSelectBudget = (selected) => {
     setSelectedBudget(selected);
-
-    // Example logic: fetch or assign beginning amount based on selected budget
     const budgetBeginningMap = {
       BUDGET001: "10,000.00",
       BUDGET002: "5,000.00",
     };
-
     setBeginningAmount(budgetBeginningMap[selected.value] || "0.00");
   };
 
   const handleSubmit = () => {
     console.log("Budget:", selectedBudget);
+    console.log("Beginning Amount:", beginningAmount);
+    console.log("Added Amount:", addedAmount);
     console.log("Amount:", amount);
   };
 
@@ -58,7 +55,7 @@ const NewRevolvingFund = ({ show, onHide }) => {
 
       <Modal.Body style={{ backgroundColor: "#800000" }}>
         <Form className="text-white">
-          <Row className="mb-2">
+          <Row className="mb-2 g-2">
             <Col md={8}>
               <Form.Label style={{ fontSize: "0.75rem" }}>
                 Select Budget ID
@@ -86,8 +83,44 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 style={{
                   fontSize: "0.75rem",
                   height: "38px",
-                  backgroundColor: "#e9ecef",
-                  color: "#495057",
+                  padding: "0.375rem 0.75rem",
+                  borderRadius: "4px",
+                  border: "1px solid #ced4da",
+                }}
+              />
+            </Col>
+          </Row>
+
+          <Row className="mb-2 g-2">
+            <Col md={8}>
+              <Form.Label style={{ fontSize: "0.75rem" }}>
+                Select Bank Account
+              </Form.Label>
+              <Select
+                value={selectedBankAccount}
+                onChange={setSelectedBankAccount}
+                styles={customStyles}
+                placeholder="Select..."
+                options={[
+                  { value: "BANK001", label: "Bank Account 001" },
+                  { value: "BANK002", label: "Bank Account 002" },
+                ]}
+              />
+            </Col>
+
+            <Col md={4}>
+              <Form.Label style={{ fontSize: "0.75rem" }}>
+                Added Amount
+              </Form.Label>
+              <Form.Control
+                type="number"
+                value={addedAmount}
+                onChange={(e) => setAddedAmount(e.target.value)}
+                onKeyDown={preventInvalidKeys}
+                min="0"
+                style={{
+                  fontSize: "0.75rem",
+                  height: "38px",
                   padding: "0.375rem 0.75rem",
                   borderRadius: "4px",
                   border: "1px solid #ced4da",
