@@ -3,7 +3,7 @@ import { Container, Form } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
-import { revolvingFundColumns } from "../../constants/BudgetingColumn";
+import { cashDisbursementColumns } from "../../constants/BudgetingColumn";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 
 import { handleExportData } from "../../utils/exportItems";
@@ -12,9 +12,9 @@ import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import AppButton from "../../components/ui/AppButton";
-import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
+import NewCashDisbursement from "../../components/ui/modal/admin/NewCashDisbursement";
 
-const RevolvingFund = () => {
+const CashDisbursement = () => {
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedRows, setSelectedRows] = useState({});
@@ -47,30 +47,13 @@ const RevolvingFund = () => {
     [tableData, searchValue]
   );
 
-  const handleRowClick = (entry) => {
-    console.log("View", entry);
-  };
-
-  const handleDelete = (entry) => {
-    console.log("Delete", entry);
-  };
-
-  const handleArchive = (entry) => {
-    console.log("Archive", entry);
-  };
-
-  const handleToggleImportant = (entry) => {
-    console.log("Toggle Important", entry);
-  };
-
   const handleExport = () => {
     const reset = handleExportData({
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "RevolvingFund",
+      filename: "CashDisbursement",
     });
-    setSelectedRows(reset);
   };
 
   const selectAllCheckbox = (
@@ -101,7 +84,7 @@ const RevolvingFund = () => {
         label={
           <>
             <FaPlus />
-            <span className="d-none d-sm-inline ms-1">Revolving Fund</span>
+            <span className="d-none d-sm-inline ms-1">Cash Disbursement</span>
           </>
         }
         size="sm"
@@ -129,19 +112,15 @@ const RevolvingFund = () => {
             searchBarWidth="300px"
           />
 
-          <NewRevolvingFund
+          <NewCashDisbursement
             show={showModal}
             onHide={() => setShowModal(false)}
           />
 
           <DataTable
             data={tableData}
-            columns={revolvingFundColumns}
+            columns={cashDisbursementColumns}
             height="350px"
-            onRowClick={handleRowClick}
-            onDelete={handleDelete}
-            onArchive={handleArchive}
-            onToggleImportant={handleToggleImportant}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
           />
@@ -151,4 +130,4 @@ const RevolvingFund = () => {
   );
 };
 
-export default RevolvingFund;
+export default CashDisbursement;

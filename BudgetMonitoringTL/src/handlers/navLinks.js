@@ -8,6 +8,7 @@ import {
 import { GiMoneyStack } from "react-icons/gi";
 
 export const navConfig = {
+  // REQUESTER
   employee: [
     {
       label: "Cash Requests",
@@ -22,6 +23,7 @@ export const navConfig = {
     { label: "Trash", icon: RxTrash, path: "/employee-trash" },
   ],
 
+  // TEAM-LEADER
   teamlead: [
     {
       label: "Cash Requests",
@@ -46,6 +48,7 @@ export const navConfig = {
     { label: "Trash", icon: RxTrash, path: "/trash" },
   ],
 
+  // FINANCE
   finance: [
     { label: "Dashboard", icon: RxDashboard, path: "/" },
     {
@@ -70,7 +73,7 @@ export const navConfig = {
       children: [
         { label: "Budget Allocation", path: "/budget-allocation" },
         { label: "Revolving Fund", path: "/revolving-fund" },
-        { label: "Cash Disbursement" },
+        { label: "Cash Disbursement", path: "/cash-disbursement" },
         { label: "History" },
         // { label: "User Management", path: "#" },
       ],
@@ -80,6 +83,7 @@ export const navConfig = {
     { label: "Trash", icon: RxTrash, path: "/finance-trash" },
   ],
 
+  // ADMIN
   admin: [
     { label: "Dashboard", icon: RxDashboard, path: "/" },
     {

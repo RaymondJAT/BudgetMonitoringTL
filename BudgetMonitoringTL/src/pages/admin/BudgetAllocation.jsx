@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa";
 
 import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
-import { BudgetOverview, FINANCE_STATUS_LIST } from "../../constants/totalList";
+import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
 import BudgetTable from "../../components/layout/BudgetTable";
@@ -29,6 +29,10 @@ const BudgetAllocation = () => {
     () => [...tableData, ...archiveData, ...importantData],
     [tableData, archiveData, importantData]
   );
+
+  const handleAddBudgetItem = (newItem) => {
+    setTableData((prev) => [...prev, newItem]);
+  };
 
   return (
     <>
@@ -61,6 +65,7 @@ const BudgetAllocation = () => {
           <NewBudgetAllocation
             show={showModal}
             onHide={() => setShowModal(false)}
+            onSubmit={handleAddBudgetItem}
           />
 
           <BudgetTable

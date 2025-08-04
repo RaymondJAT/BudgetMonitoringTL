@@ -17,3 +17,20 @@ export const revolvingFundColumns = [
   { label: "Status", accessor: "status" },
   { label: "Actions", accessor: "actions" },
 ];
+
+export const cashDisbursementColumns = [
+  { label: "ID", accessor: "id" },
+  { label: "Revolving Fund", accessor: "revolvingFund" },
+  { label: "Date Issue", accessor: "dateIssue" },
+  { label: "Received By", accessor: "receivedBy" },
+  { label: "Department", accessor: "department" },
+  { label: "Particulars", accessor: "particulars" },
+  { label: "Cash Voucher", accessor: "cashVoucher" },
+  { label: "Amount Issue", accessor: "amountIssue" },
+  { label: "Amount Return", accessor: "amountReturn" },
+  { label: "Amount Expended", accessor: "amountExpended" },
+  { label: "Outstanding Amount", accessor: "outstandingAmount" },
+  { label: "Status", accessor: "status" },
+  { label: "Date Liquidated", accessor: "dateLiquidated" },
+  { label: "Actions", accessor: "actions" },
+];
