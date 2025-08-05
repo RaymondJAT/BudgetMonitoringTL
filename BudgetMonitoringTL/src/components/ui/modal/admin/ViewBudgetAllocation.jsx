@@ -25,18 +25,18 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
   const budgetItem = tableData.find((item) => item.id === budgetId);
   const {
     department,
-    allocated = 0,
+    amount = 0,
     used = 0,
     transactions = [],
   } = budgetItem || {};
 
   if (!budgetId || !budgetItem) return null;
 
-  const remaining = allocated - used;
+  const remaining = amount - used;
 
   const totalsData = [
     {
-      totalBudget: allocated,
+      totalBudget: amount,
       budgetUsed: used,
       remainingBudget: remaining,
     },

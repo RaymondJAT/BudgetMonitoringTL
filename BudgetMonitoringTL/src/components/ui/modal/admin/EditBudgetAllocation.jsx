@@ -9,7 +9,7 @@ const EditBudgetAllocation = ({ show, onHide, budgetItem = {}, onSave }) => {
   useEffect(() => {
     if (budgetItem) {
       setDepartment(budgetItem.department || "");
-      setBudget(budgetItem.allocated || "");
+      setBudget(budgetItem.amount || "");
     }
   }, [budgetItem]);
 
@@ -20,7 +20,7 @@ const EditBudgetAllocation = ({ show, onHide, budgetItem = {}, onSave }) => {
   };
 
   const handleSave = () => {
-    const updated = { ...budgetItem, department, allocated: Number(budget) };
+    const updated = { ...budgetItem, department, amount: Number(budget) };
     onSave(updated);
     handleClose();
   };

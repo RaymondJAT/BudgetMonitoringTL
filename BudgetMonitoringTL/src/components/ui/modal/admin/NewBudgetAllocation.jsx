@@ -1,58 +1,161 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
 import AppButton from "../../AppButton";
-import useFetch from "../../../../hooks/useFetch";
 
 import { departments, types } from "../../../../constants/departmentModal";
 import { customStyles } from "../../../../constants/customStyles";
 
-const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
+const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
+  const navigate = useNavigate();
+
   const [bank, setBank] = useState(null);
   const [department, setDepartment] = useState(null);
   const [type, setType] = useState(null);
   const [budget, setBudget] = useState("");
   const [description, setDescription] = useState("");
+  const [bankData, setBankData] = useState([]);
+  const [allocatedPerBank, setAllocatedPerBank] = useState({});
 
-  // 🔽 Fetch bank accounts from API
-  const {
-    data: bankData,
-    loading: loadingBankAccounts,
-    error: bankError,
-  } = useFetch("/api/bank_accounts/getbank_accounts", { method: "GET" });
+  const [bankBalance, setBankBalance] = useState(null);
+  const [bankError, setBankError] = useState(null);
+  const [balanceError, setBalanceError] = useState("");
+  const [loadingBankAccounts, setLoadingBankAccounts] = useState(false);
 
-  // 🔁 Form options
+  // FETCH BANK ACCOUNTS
+  useEffect(() => {
+    const fetchBankAccounts = async () => {
+      setLoadingBankAccounts(true);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found. Please log in.");
+
+        const res = await fetch("/api/bank_accounts/activebank_accounts", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 401) {
+          localStorage.clear();
+          navigate("/login");
+          return;
+        }
+
+        if (!res.ok) throw new Error("Failed to fetch bank accounts");
+
+        const result = await res.json();
+        setBankData(result.data || []);
+      } catch (error) {
+        console.error("Bank Fetch Error:", error);
+        setBankError(error.message);
+      } finally {
+        setLoadingBankAccounts(false);
+      }
+    };
+
+    fetchBankAccounts();
+  }, [navigate]);
+
+  // FETCH BANK BALANCE
+  const fetchBankBalance = async (bankId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. Please log in.");
+
+      const res = await fetch(
+        `/api/bank_balances/getbank_balance_by_id?id=${bankId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.status === 401) {
+        localStorage.clear();
+        navigate("/login");
+        return;
+      }
+
+      if (!res.ok) throw new Error("Failed to fetch bank balance.");
+
+      const result = await res.json();
+      setBankBalance(result.data?.[0]?.bb_current_amount || 0);
+    } catch (error) {
+      console.error("Bank Balance Fetch Error:", error);
+      setBankBalance(0);
+      setBalanceError("Failed to fetch bank balance.");
+    }
+  };
+
+  // OPTIONS
   const departmentOptions = useMemo(
-    () => departments.map((dept) => ({ value: dept, label: dept })),
+    () => departments.map((d) => ({ value: d, label: d })),
     []
   );
-
   const typeOptions = useMemo(
     () => types.map((t) => ({ value: t, label: t })),
     []
   );
+  const bankOptions = useMemo(
+    () =>
+      bankData.map((b) => ({
+        value: b.mba_id,
+        label: `${b.mba_bank_type} - ${b.mba_account_name} (${b.mba_account_number})`,
+      })),
+    [bankData]
+  );
 
-  const bankOptions = useMemo(() => {
-    if (!bankData?.data || !Array.isArray(bankData.data)) return [];
-
-    return bankData.data
-      .filter((item) => item.status === "active")
-      .map((bank) => ({
-        value: bank.id,
-        label: `${bank.bank_type} - ${bank.account_name} (${bank.account_number})`,
-      }));
-  }, [bankData]);
-
-  console.log("Fetched bank accounts:", bankData);
-  console.log("error", bankError);
-
+  // HANDLERS
   const handleClose = () => {
     setBank(null);
     setDepartment(null);
     setType(null);
     setBudget("");
     setDescription("");
+    setBankBalance(null);
+    setBalanceError("");
     onHide();
+  };
+
+  const handleConfirm = () => {
+    if (!budget || !department || !type || !!balanceError) return;
+
+    const payload = {
+      bank_id: bank.value,
+      department: department.value,
+      type: type.value,
+      amount: parseFloat(budget),
+      description,
+    };
+
+    const fakeId = Date.now();
+
+    onAdd({
+      id: fakeId,
+      department: payload.department,
+      type: payload.type,
+      allocated: payload.amount,
+      used: 0,
+      description: payload.description,
+      bank: bank.label,
+    });
+
+    setAllocatedPerBank((prev) => {
+      const current = prev[bank.value] || 0;
+      return {
+        ...prev,
+        [bank.value]: current + parseFloat(budget),
+      };
+    });
+
+    handleClose();
   };
 
   const preventInvalidKeys = (e) => {
@@ -63,44 +166,16 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
 
   const handleNumberInput = (e) => {
     const value = e.target.value;
-    if (parseFloat(value) < 0) {
-      e.target.value = "0";
-    }
-    setBudget(e.target.value);
-  };
+    setBudget(value);
 
-  const { loading, triggerFetch } = useFetch("/api/budget/createbudget", {
-    method: "POST",
-    triggerFetch: false,
-  });
+    const totalAllocated = allocatedPerBank[bank?.value] || 0;
+    const remaining = bankBalance - totalAllocated;
 
-  const handleSubmit = async () => {
-    const payload = {
-      bankAccount: bank?.value,
-      department: department?.value,
-      type: type?.value,
-      budget: parseFloat(budget),
-      description,
-    };
-
-    const res = await triggerFetch(payload);
-
-    if (!res.error) {
-      const newItem = {
-        id: Date.now(),
-        bank: bank?.label,
-        department: department?.label,
-        type: type?.label,
-        allocated: parseFloat(budget),
-        used: 0,
-        description,
-      };
-
-      if (onSubmit) onSubmit(newItem);
-      handleClose();
-    } else {
-      console.error(res.error);
-    }
+    setBalanceError(
+      parseFloat(value) > remaining
+        ? "Allocated budget exceeds remaining available balance."
+        : ""
+    );
   };
 
   return (
@@ -116,6 +191,7 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
 
       <Modal.Body style={{ backgroundColor: "#800000" }}>
         <Form className="text-white">
+          {/* BANK ACCOUNT */}
           <Row className="mb-2">
             <Col md={12}>
               <Form.Label style={{ fontSize: "0.75rem" }}>
@@ -124,7 +200,10 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
               <Select
                 isLoading={loadingBankAccounts}
                 value={bank}
-                onChange={setBank}
+                onChange={(b) => {
+                  setBank(b);
+                  fetchBankBalance(b.value);
+                }}
                 options={bankOptions}
                 placeholder={
                   bankError
@@ -136,6 +215,7 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
             </Col>
           </Row>
 
+          {/* DEPARTMENT & TYPE */}
           <Row className="mb-3 g-2">
             <Col xs={8}>
               <Form.Label style={{ fontSize: "0.75rem" }}>
@@ -161,6 +241,7 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
             </Col>
           </Row>
 
+          {/* ALLOCATE BUDGET */}
           <Row className="mb-3">
             <Col md={12}>
               <FloatingLabel
@@ -179,9 +260,39 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
                   className="form-control-sm small-input"
                 />
               </FloatingLabel>
+
+              {bankBalance !== null && (
+                <div
+                  className={`mt-1 ${
+                    balanceError ? "text-danger" : "text-info"
+                  }`}
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  Remaining Balance: ₱
+                  {(() => {
+                    const totalAllocated = allocatedPerBank[bank?.value] || 0;
+                    const remaining =
+                      bankBalance - totalAllocated - parseFloat(budget || 0);
+                    return Math.max(0, remaining).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    });
+                  })()}
+                </div>
+              )}
+
+              {balanceError && (
+                <div
+                  className="text-danger mt-1"
+                  style={{ fontSize: "0.7rem" }}
+                >
+                  {balanceError}
+                </div>
+              )}
             </Col>
           </Row>
 
+          {/* DESCRIPTION */}
           <Row>
             <Col md={12}>
               <FloatingLabel
@@ -206,6 +317,7 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
       </Modal.Body>
 
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>
+        {/* BUTTONS */}
         <AppButton
           label="Close"
           variant="outline-danger"
@@ -213,11 +325,11 @@ const NewBudgetAllocation = ({ show, onHide, onSubmit }) => {
           className="custom-app-button"
         />
         <AppButton
-          label={loading ? "Saving..." : "Confirm"}
+          label="Confirm"
           variant="outline-success"
-          onClick={handleSubmit}
+          onClick={handleConfirm}
+          disabled={!!balanceError || !budget || !bank || !department || !type}
           className="custom-app-button"
-          disabled={loading}
         />
       </Modal.Footer>
     </Modal>

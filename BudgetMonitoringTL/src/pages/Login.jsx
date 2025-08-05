@@ -16,32 +16,75 @@ const Login = ({ setUserRole }) => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // authentication
-    if (username === "employee" && password === "pass") {
-      localStorage.setItem("role", "employee");
-      localStorage.setItem("username", "Employee");
-      setUserRole("employee");
-      navigate("/");
-    } else if (username === "teamlead" && password === "pass") {
-      localStorage.setItem("role", "teamlead");
-      localStorage.setItem("username", "Team Lead");
-      setUserRole("teamlead");
-      navigate("/");
-    } else if (username === "admin" && password === "pass") {
-      localStorage.setItem("role", "admin");
-      localStorage.setItem("username", "Admin");
-      setUserRole("admin");
-      navigate("/");
-    } else if (username === "finance" && password === "pass") {
-      localStorage.setItem("role", "finance");
-      localStorage.setItem("username", "Finance");
-      setUserRole("finance");
-      navigate("/");
-    } else {
-      setError("Invalid username or password");
+    try {
+      const response = await fetch("api/login/check-credentials", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const { token, data } = result;
+
+        // Optional: Save JWT token for future requests
+        localStorage.setItem("token", token);
+
+        // Save user info
+        localStorage.setItem("username", data.fullname || data.username);
+
+        // Convert access level to role name
+        let role = "";
+        switch (data.position) {
+          case "admin":
+            role = "admin";
+            break;
+          case "employee":
+            role = "employee";
+            break;
+          case "teamlead":
+            role = "teamlead";
+            break;
+          case "finance":
+            role = "finance";
+            break;
+          default:
+            role = "employee";
+        }
+
+        localStorage.setItem("role", role);
+        setUserRole(role);
+
+        // Redirect to proper path
+        switch (role) {
+          case "admin":
+            navigate("/admin");
+            break;
+          case "finance":
+            navigate("/");
+            break;
+          case "employee":
+            navigate("/employee");
+            break;
+
+          case "teamlead":
+            navigate("/teamlead");
+            break;
+          default:
+            navigate("/login");
+        }
+      } else {
+        setError(result.message || "Invalid username or password");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("Login failed. Please try again.");
     }
   };
 

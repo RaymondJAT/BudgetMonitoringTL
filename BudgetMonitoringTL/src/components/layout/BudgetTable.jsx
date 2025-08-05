@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { FaEdit, FaEye, FaExchangeAlt } from "react-icons/fa";
 import EditBudgetAllocation from "../ui/modal/admin/EditBudgetAllocation";
@@ -8,15 +8,10 @@ import ViewBudgetAllocation from "../ui/modal/admin/ViewBudgetAllocation";
 const BudgetTable = ({ data, height, onUpdate }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [tableData, setTableData] = useState(data);
   const [transferFrom, setTransferFrom] = useState(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewItem, setViewItem] = useState(null);
-
-  useEffect(() => {
-    setTableData(data);
-  }, [data]);
 
   const handleView = (item) => {
     setViewItem(null);
@@ -51,15 +46,18 @@ const BudgetTable = ({ data, height, onUpdate }) => {
   };
 
   const renderRows = () =>
-    tableData.map((item) => {
-      const remaining = item.allocated - item.used;
-      const utilization = ((item.used / item.allocated) * 100).toFixed(2);
+    data.map((item) => {
+      const amount = Number(item.amount) || 0;
+      const used = Number(item.used) || 0;
+      const remaining = amount - used;
+      const utilization =
+        amount > 0 ? ((used / amount) * 100).toFixed(2) : "0.00";
 
       return (
         <tr key={item.id}>
           <td>{item.department}</td>
-          <td>₱ {item.allocated.toLocaleString()}</td>
-          <td>₱ {item.used.toLocaleString()}</td>
+          <td>₱ {amount.toLocaleString()}</td>
+          <td>₱ {used.toLocaleString()}</td>
           <td>₱ {remaining.toLocaleString()}</td>
           <td>{utilization}%</td>
           <td>
@@ -115,7 +113,7 @@ const BudgetTable = ({ data, height, onUpdate }) => {
             </tr>
           </thead>
           <tbody>
-            {tableData.length > 0 ? (
+            {data.length > 0 ? (
               renderRows()
             ) : (
               <tr>
@@ -129,12 +127,13 @@ const BudgetTable = ({ data, height, onUpdate }) => {
 
         {/* Mobile View */}
         <div className="d-lg-none">
-          {tableData.length > 0 ? (
-            tableData.map((item, index) => {
-              const remaining = item.allocated - item.used;
-              const utilization = ((item.used / item.allocated) * 100).toFixed(
-                2
-              );
+          {data.length > 0 ? (
+            data.map((item, index) => {
+              const amount = Number(item.amount) || 0;
+              const used = Number(item.used) || 0;
+              const remaining = amount - used;
+              const utilization =
+                amount > 0 ? ((used / amount) * 100).toFixed(2) : "0.00";
 
               return (
                 <div key={item.id || index} className="mobile-card">
@@ -145,13 +144,13 @@ const BudgetTable = ({ data, height, onUpdate }) => {
                   <div className="mobile-card-item">
                     <span className="mobile-card-label">Allocated:</span>{" "}
                     <span className="mobile-card-value">
-                      ₱ {item.allocated.toLocaleString()}
+                      ₱ {amount.toLocaleString()}
                     </span>
                   </div>
                   <div className="mobile-card-item">
                     <span className="mobile-card-label">Used:</span>{" "}
                     <span className="mobile-card-value">
-                      ₱ {item.used.toLocaleString()}
+                      ₱ {used.toLocaleString()}
                     </span>
                   </div>
                   <div className="mobile-card-item">
@@ -204,7 +203,7 @@ const BudgetTable = ({ data, height, onUpdate }) => {
         show={showTransferModal}
         onHide={() => setShowTransferModal(false)}
         fromDepartment={transferFrom}
-        departments={tableData}
+        departments={data}
         onTransfer={(updatedTable) => {
           onUpdate(updatedTable);
           setShowTransferModal(false);
@@ -222,7 +221,7 @@ const BudgetTable = ({ data, height, onUpdate }) => {
         show={showViewModal}
         onHide={() => setShowViewModal(false)}
         budgetId={viewItem}
-        tableData={tableData}
+        tableData={data}
       />
     </>
   );

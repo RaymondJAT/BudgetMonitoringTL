@@ -1,8 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Container } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
-import { mockBudgets } from "../../constants/mockBudgets";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 
@@ -14,8 +13,47 @@ import AppButton from "../../components/ui/AppButton";
 
 const BudgetAllocation = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [tableData, setTableData] = useState(mockBudgets);
   const [showModal, setShowModal] = useState(false);
+  const [budgetData, setBudgetData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Fetch data on first load
+  const fetchBudgetData = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.error("No token found.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/budget/getbudget", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        console.error("Server responded with:", res.status);
+        throw new Error("Failed to fetch budget data");
+      }
+
+      const result = await res.json();
+      const budgetArray = result.data || [];
+      setBudgetData(budgetArray);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setBudgetData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBudgetData();
+  }, []);
 
   const archiveData = useMemo(() => {
     return JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ARCHIVE)) || [];
@@ -26,12 +64,21 @@ const BudgetAllocation = () => {
   }, []);
 
   const totalComputationData = useMemo(
-    () => [...tableData, ...archiveData, ...importantData],
-    [tableData, archiveData, importantData]
+    () => [...budgetData, ...archiveData, ...importantData],
+    [budgetData, archiveData, importantData]
   );
 
   const handleAddBudgetItem = (newItem) => {
-    setTableData((prev) => [...prev, newItem]);
+    // Option 1: Re-fetch from server (recommended)
+    fetchBudgetData();
+
+    // Option 2: OR just add locally if backend already saved it
+    // setBudgetData((prev) => [...prev, newItem]);
+  };
+
+  const handleUpdateBudget = (updatedTable) => {
+    setBudgetData(updatedTable);
+    // Optionally send update to API here
   };
 
   return (
@@ -65,14 +112,18 @@ const BudgetAllocation = () => {
           <NewBudgetAllocation
             show={showModal}
             onHide={() => setShowModal(false)}
-            onSubmit={handleAddBudgetItem}
+            onAdd={handleAddBudgetItem}
           />
 
-          <BudgetTable
-            data={tableData}
-            height="325px"
-            onUpdate={(updated) => setTableData(updated)}
-          />
+          {loading ? (
+            <p className="text-muted">Loading budget data...</p>
+          ) : (
+            <BudgetTable
+              data={budgetData}
+              height="325px"
+              onUpdate={handleUpdateBudget}
+            />
+          )}
         </div>
       </Container>
     </>
