@@ -1,16 +1,11 @@
 import { useState } from "react";
-import { Table, Button } from "react-bootstrap";
-import { FaEdit, FaEye, FaExchangeAlt } from "react-icons/fa";
-import EditBudgetAllocation from "../ui/modal/admin/EditBudgetAllocation";
-import TransferBudgetAllocation from "../ui/modal/admin/TransferBudgetAllocation";
+import { Table } from "react-bootstrap";
+import { FaEye } from "react-icons/fa";
+
 import ViewBudgetAllocation from "../ui/modal/admin/ViewBudgetAllocation";
 import AppButton from "../ui/AppButton";
 
-const BudgetTable = ({ data, height, onUpdate }) => {
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [transferFrom, setTransferFrom] = useState(null);
-  const [showTransferModal, setShowTransferModal] = useState(false);
+const BudgetTable = ({ data, height }) => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewItem, setViewItem] = useState(null);
 
@@ -22,34 +17,8 @@ const BudgetTable = ({ data, height, onUpdate }) => {
     }, 0);
   };
 
-  const handleTransfer = (item) => {
-    setTransferFrom(null);
-    setTimeout(() => {
-      const latestItem = data.find((entry) => entry.id === item.id);
-      setTransferFrom(latestItem);
-
-      setShowTransferModal(true);
-    }, 0);
-  };
-
-  const handleEdit = (item) => {
-    setSelectedItem(null);
-    setTimeout(() => {
-      setSelectedItem(item);
-      setShowEditModal(true);
-    }, 0);
-  };
-
-  const handleSaveChanges = (updatedItem) => {
-    const updatedTable = data.map((entry) =>
-      entry.id === updatedItem.id ? updatedItem : entry
-    );
-    onUpdate(updatedTable);
-    setShowEditModal(false);
-  };
-
   const renderRows = () =>
-    data.map((item) => {
+    data.map((item, index) => {
       const amount = Number(item.amount) || 0;
       const used = Number(item.used) || 0;
       const remaining = amount - used;
@@ -57,32 +26,13 @@ const BudgetTable = ({ data, height, onUpdate }) => {
         amount > 0 ? ((used / amount) * 100).toFixed(2) : "0.00";
 
       return (
-        <tr key={item.id}>
+        <tr key={item.id || index}>
           <td>{item.department}</td>
           <td>₱ {amount.toLocaleString()}</td>
           <td>₱ {used.toLocaleString()}</td>
           <td>₱ {remaining.toLocaleString()}</td>
           <td>{utilization}%</td>
           <td>
-            {/* <Button
-              variant="outline-dark"
-              size="sm"
-              className="me-2"
-              style={{ padding: "2px 6px", fontSize: "0.75rem" }}
-              onClick={() => handleTransfer(item)}
-              title="Transfer Funds"
-            >
-              <FaExchangeAlt />
-            </Button>
-            <Button
-              variant="outline-dark"
-              size="sm"
-              className="me-2"
-              style={{ padding: "2px 6px", fontSize: "0.75rem" }}
-              onClick={() => handleEdit(item)}
-            >
-              <FaEdit />
-            </Button> */}
             <AppButton
               label={
                 <>
@@ -172,22 +122,6 @@ const BudgetTable = ({ data, height, onUpdate }) => {
                   </div>
 
                   <div className="mobile-card-item d-flex gap-2 mt-2">
-                    {/* <Button
-                      variant="outline-dark"
-                      size="sm"
-                      onClick={() => handleTransfer(item)}
-                      title="Transfer Funds"
-                    >
-                      <FaExchangeAlt />
-                    </Button>
-                    <Button
-                      variant="outline-dark"
-                      size="sm"
-                      onClick={() => handleEdit(item)}
-                      title="Edit Budget"
-                    >
-                      <FaEdit />
-                    </Button> */}
                     <AppButton
                       label={
                         <>
@@ -208,39 +142,6 @@ const BudgetTable = ({ data, height, onUpdate }) => {
           )}
         </div>
       </div>
-      {/* 
-      <TransferBudgetAllocation
-        show={showTransferModal}
-        onHide={() => setShowTransferModal(false)}
-        fromDepartment={transferFrom}
-        departments={data}
-        onTransfer={(from, to, amount) => {
-          const updated = data.map((entry) => {
-            if (entry.department === from.department) {
-              return {
-                ...entry,
-                amount: entry.amount - amount,
-              };
-            } else if (entry.department === to) {
-              return {
-                ...entry,
-                amount: entry.amount + amount,
-              };
-            }
-            return entry;
-          });
-
-          onUpdate(updated);
-          setShowTransferModal(false);
-        }}
-      />
-
-      <EditBudgetAllocation
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        budgetItem={selectedItem}
-        onSave={handleSaveChanges}
-      /> */}
 
       <ViewBudgetAllocation
         show={showViewModal}

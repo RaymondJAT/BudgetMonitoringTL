@@ -1,15 +1,71 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Form, Row, Col } from "react-bootstrap";
 import Select from "react-select";
+
 import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../AppButton";
 
 const NewRevolvingFund = ({ show, onHide }) => {
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [selectedBankAccount, setSelectedBankAccount] = useState(null);
+
   const [amount, setAmount] = useState("");
   const [beginningAmount, setBeginningAmount] = useState("");
   const [addedAmount, setAddedAmount] = useState("");
+
+  const [budgetOptions, setBudgetOptions] = useState([]);
+  const [bankOptions, setBankOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchBudgets = async () => {
+      try {
+        const response = await fetch("/api/budget/getbudget");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch budget list");
+        }
+
+        const result = await response.json();
+
+        const formatted = result.data.map((budget) => ({
+          value: budget.id,
+          label: budget.budget_name || budget.code || `${budget.department}`,
+          beginningAmount: budget.beginning_amount || `${budget.amount}`,
+        }));
+
+        setBudgetOptions(formatted);
+      } catch (error) {
+        console.error("Budget fetch error:", error);
+      }
+    };
+
+    const fetchBankAccounts = async () => {
+      try {
+        const response = await fetch("/api/bank_accounts/activebank_accounts");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch bank accounts");
+        }
+
+        const result = await response.json();
+
+        const formatted = result.data.map((bank) => ({
+          value: bank.id,
+          label:
+            bank.account_name ||
+            bank.bank_name ||
+            `${bank.mba_bank_type} - ${bank.mba_account_name}`,
+        }));
+
+        setBankOptions(formatted);
+      } catch (error) {
+        console.error("Bank fetch error:", error);
+      }
+    };
+
+    fetchBudgets();
+    fetchBankAccounts();
+  }, []);
 
   const handleClose = () => {
     setSelectedBudget(null);
@@ -28,11 +84,15 @@ const NewRevolvingFund = ({ show, onHide }) => {
 
   const handleSelectBudget = (selected) => {
     setSelectedBudget(selected);
-    const budgetBeginningMap = {
-      BUDGET001: "10,000.00",
-      BUDGET002: "5,000.00",
-    };
-    setBeginningAmount(budgetBeginningMap[selected.value] || "0.00");
+
+    const formattedAmount = `₱ ${Number(
+      selected.beginningAmount
+    ).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
+    setBeginningAmount(formattedAmount);
   };
 
   const handleSubmit = () => {
@@ -65,10 +125,7 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 onChange={handleSelectBudget}
                 styles={customStyles}
                 placeholder="Select..."
-                options={[
-                  { value: "BUDGET001", label: "Budget 001" },
-                  { value: "BUDGET002", label: "Budget 002" },
-                ]}
+                options={budgetOptions}
               />
             </Col>
 
@@ -101,10 +158,7 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 onChange={setSelectedBankAccount}
                 styles={customStyles}
                 placeholder="Select..."
-                options={[
-                  { value: "BANK001", label: "Bank Account 001" },
-                  { value: "BANK002", label: "Bank Account 002" },
-                ]}
+                options={bankOptions}
               />
             </Col>
 

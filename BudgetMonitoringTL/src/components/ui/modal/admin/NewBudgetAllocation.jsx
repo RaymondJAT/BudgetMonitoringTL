@@ -154,7 +154,7 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
     () =>
       bankData.map((b) => ({
         value: b.mba_id,
-        label: `${b.mba_bank_type} - ${b.mba_account_name} (${b.mba_account_number})`,
+        label: `${b.mba_bank_type} - ${b.mba_account_name}`,
       })),
     [bankData]
   );
@@ -334,26 +334,6 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
                   className="form-control-sm small-input"
                 />
               </FloatingLabel>
-
-              {bankBalance !== null && (
-                <div
-                  className={`mt-1 ${
-                    balanceError ? "text-danger" : "text-info"
-                  }`}
-                  style={{ fontSize: "0.7rem" }}
-                >
-                  Remaining Balance: ₱
-                  {(() => {
-                    const totalAllocated = allocatedPerBank[bank?.value] || 0;
-                    const remaining =
-                      bankBalance - totalAllocated - parseFloat(budget || 0);
-                    return Math.max(0, remaining).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    });
-                  })()}
-                </div>
-              )}
 
               {balanceError && (
                 <div
