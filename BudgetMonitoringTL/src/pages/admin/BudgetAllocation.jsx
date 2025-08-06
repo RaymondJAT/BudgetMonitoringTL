@@ -17,7 +17,7 @@ const BudgetAllocation = () => {
   const [budgetData, setBudgetData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch data on first load
+  // FETCH DATA ON FIRST LOAD
   const fetchBudgetData = async () => {
     const token = localStorage.getItem("token");
 
@@ -64,21 +64,16 @@ const BudgetAllocation = () => {
   }, []);
 
   const totalComputationData = useMemo(
-    () => [...budgetData, ...archiveData, ...importantData],
-    [budgetData, archiveData, importantData]
+    () => [...archiveData, ...importantData],
+    [archiveData, importantData]
   );
 
   const handleAddBudgetItem = (newItem) => {
-    // Option 1: Re-fetch from server (recommended)
-    fetchBudgetData();
-
-    // Option 2: OR just add locally if backend already saved it
-    // setBudgetData((prev) => [...prev, newItem]);
+    setBudgetData((prev) => [newItem, ...prev]);
   };
 
   const handleUpdateBudget = (updatedTable) => {
     setBudgetData(updatedTable);
-    // Optionally send update to API here
   };
 
   return (

@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
-import AppButton from "../../AppButton";
 
-import { departments, types } from "../../../../constants/departmentModal";
+import { types } from "../../../../constants/departmentModal";
 import { customStyles } from "../../../../constants/customStyles";
+
+import AppButton from "../../AppButton";
 
 const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
   const navigate = useNavigate();
@@ -22,6 +23,10 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
   const [bankError, setBankError] = useState(null);
   const [balanceError, setBalanceError] = useState("");
   const [loadingBankAccounts, setLoadingBankAccounts] = useState(false);
+
+  const [departmentList, setDepartmentList] = useState([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [departmentError, setDepartmentError] = useState(null);
 
   // FETCH BANK ACCOUNTS
   useEffect(() => {
@@ -60,6 +65,43 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
     fetchBankAccounts();
   }, [navigate]);
 
+  // FETCH DEPARTMENTS
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      setLoadingDepartments(true);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found. Please log in.");
+
+        const res = await fetch("/api/departments/getdepartments", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 401) {
+          localStorage.clear();
+          navigate("/login");
+          return;
+        }
+
+        if (!res.ok) throw new Error("Failed to fetch departments");
+
+        const result = await res.json();
+        setDepartmentList(result.data || []);
+      } catch (error) {
+        console.error("Department Fetch Error:", error);
+        setDepartmentError(error.message);
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchDepartments();
+  }, [navigate]);
+
   // FETCH BANK BALANCE
   const fetchBankBalance = async (bankId) => {
     try {
@@ -96,9 +138,14 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
 
   // OPTIONS
   const departmentOptions = useMemo(
-    () => departments.map((d) => ({ value: d, label: d })),
-    []
+    () =>
+      departmentList.map((d) => ({
+        value: d.id,
+        label: d.description,
+      })),
+    [departmentList]
   );
+
   const typeOptions = useMemo(
     () => types.map((t) => ({ value: t, label: t })),
     []
@@ -124,38 +171,60 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
     onHide();
   };
 
-  const handleConfirm = () => {
-    if (!budget || !department || !type || !!balanceError) return;
+  const handleConfirm = async () => {
+    if (!budget || !department || !type || !!balanceError || !bank) return;
 
     const payload = {
-      bank_id: bank.value,
-      department: department.value,
+      bank_account_id: bank.value,
+      department_id: department.value,
       type: type.value,
       amount: parseFloat(budget),
-      description,
     };
 
-    const fakeId = Date.now();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. Please log in.");
 
-    onAdd({
-      id: fakeId,
-      department: payload.department,
-      type: payload.type,
-      allocated: payload.amount,
-      used: 0,
-      description: payload.description,
-      bank: bank.label,
-    });
+      const res = await fetch("/api/budget/createbudget", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-    setAllocatedPerBank((prev) => {
-      const current = prev[bank.value] || 0;
-      return {
-        ...prev,
-        [bank.value]: current + parseFloat(budget),
+      const result = await res.json();
+
+      if (!res.ok) {
+        console.error("API Error Response:", result);
+        throw new Error(result.message || "Failed to allocate budget.");
+      }
+
+      const newItem = {
+        ...result.data,
+        amount: parseFloat(budget),
+        department: department.label,
+        bank_account: bank.label,
+        type: type.label,
+        description: description,
+        createdAt: new Date().toISOString(),
       };
-    });
+      onAdd?.(newItem);
 
-    handleClose();
+      setAllocatedPerBank((prev) => {
+        const current = prev[bank.value] || 0;
+        return {
+          ...prev,
+          [bank.value]: current + parseFloat(budget),
+        };
+      });
+
+      handleClose();
+    } catch (error) {
+      console.error("Create Budget Error:", error);
+      alert(error.message || "Failed to create budget.");
+    }
   };
 
   const preventInvalidKeys = (e) => {
@@ -222,10 +291,15 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
                 Select Department
               </Form.Label>
               <Select
+                isLoading={loadingDepartments}
                 value={department}
                 onChange={setDepartment}
                 options={departmentOptions}
-                placeholder="Select Department"
+                placeholder={
+                  departmentError
+                    ? "Failed to load departments"
+                    : "Select Department"
+                }
                 styles={customStyles}
               />
             </Col>

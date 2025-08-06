@@ -4,6 +4,7 @@ import { FaEdit, FaEye, FaExchangeAlt } from "react-icons/fa";
 import EditBudgetAllocation from "../ui/modal/admin/EditBudgetAllocation";
 import TransferBudgetAllocation from "../ui/modal/admin/TransferBudgetAllocation";
 import ViewBudgetAllocation from "../ui/modal/admin/ViewBudgetAllocation";
+import AppButton from "../ui/AppButton";
 
 const BudgetTable = ({ data, height, onUpdate }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -24,7 +25,9 @@ const BudgetTable = ({ data, height, onUpdate }) => {
   const handleTransfer = (item) => {
     setTransferFrom(null);
     setTimeout(() => {
-      setTransferFrom(item);
+      const latestItem = data.find((entry) => entry.id === item.id);
+      setTransferFrom(latestItem);
+
       setShowTransferModal(true);
     }, 0);
   };
@@ -61,7 +64,7 @@ const BudgetTable = ({ data, height, onUpdate }) => {
           <td>₱ {remaining.toLocaleString()}</td>
           <td>{utilization}%</td>
           <td>
-            <Button
+            {/* <Button
               variant="outline-dark"
               size="sm"
               className="me-2"
@@ -79,16 +82,20 @@ const BudgetTable = ({ data, height, onUpdate }) => {
               onClick={() => handleEdit(item)}
             >
               <FaEdit />
-            </Button>
-            <Button
+            </Button> */}
+            <AppButton
+              label={
+                <>
+                  <FaEye />
+                </>
+              }
               variant="outline-dark"
               size="sm"
               style={{ padding: "2px 6px", fontSize: "0.75rem" }}
               onClick={() => handleView(item)}
               title="View Budget Details"
-            >
-              <FaEye />
-            </Button>
+              className="custom-app-button"
+            />
           </td>
         </tr>
       );
@@ -165,7 +172,7 @@ const BudgetTable = ({ data, height, onUpdate }) => {
                   </div>
 
                   <div className="mobile-card-item d-flex gap-2 mt-2">
-                    <Button
+                    {/* <Button
                       variant="outline-dark"
                       size="sm"
                       onClick={() => handleTransfer(item)}
@@ -180,15 +187,18 @@ const BudgetTable = ({ data, height, onUpdate }) => {
                       title="Edit Budget"
                     >
                       <FaEdit />
-                    </Button>
-                    <Button
+                    </Button> */}
+                    <AppButton
+                      label={
+                        <>
+                          <FaEye />
+                        </>
+                      }
                       variant="outline-dark"
                       size="sm"
                       onClick={() => handleView(item)}
                       title="View Budget"
-                    >
-                      <FaEye />
-                    </Button>
+                    />
                   </div>
                 </div>
               );
@@ -198,14 +208,29 @@ const BudgetTable = ({ data, height, onUpdate }) => {
           )}
         </div>
       </div>
-
+      {/* 
       <TransferBudgetAllocation
         show={showTransferModal}
         onHide={() => setShowTransferModal(false)}
         fromDepartment={transferFrom}
         departments={data}
-        onTransfer={(updatedTable) => {
-          onUpdate(updatedTable);
+        onTransfer={(from, to, amount) => {
+          const updated = data.map((entry) => {
+            if (entry.department === from.department) {
+              return {
+                ...entry,
+                amount: entry.amount - amount,
+              };
+            } else if (entry.department === to) {
+              return {
+                ...entry,
+                amount: entry.amount + amount,
+              };
+            }
+            return entry;
+          });
+
+          onUpdate(updated);
           setShowTransferModal(false);
         }}
       />
@@ -215,7 +240,7 @@ const BudgetTable = ({ data, height, onUpdate }) => {
         onHide={() => setShowEditModal(false)}
         budgetItem={selectedItem}
         onSave={handleSaveChanges}
-      />
+      /> */}
 
       <ViewBudgetAllocation
         show={showViewModal}

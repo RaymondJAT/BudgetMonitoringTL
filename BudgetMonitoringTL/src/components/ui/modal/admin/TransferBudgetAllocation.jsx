@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
-
 import Select from "react-select";
 
 import AppButton from "../../AppButton";
@@ -13,14 +12,18 @@ const TransferBudgetAllocation = ({
   onTransfer,
 }) => {
   const [toDept, setToDept] = useState(null);
-  const [amount, setAmount] = useState("");
+  const [amounts, setAmount] = useState("");
 
   const remaining = fromDepartment
-    ? fromDepartment.allocated - fromDepartment.used
+    ? Math.max(
+        0,
+        (Number(fromDepartment.amount) || 0) -
+          (Number(fromDepartment.used) || 0)
+      )
     : 0;
 
   const handleTransfer = () => {
-    const transferAmt = Number(amount);
+    const transferAmt = Number(amounts);
     if (
       transferAmt > 0 &&
       toDept &&
@@ -122,7 +125,7 @@ const TransferBudgetAllocation = ({
               >
                 <Form.Control
                   type="number"
-                  value={amount}
+                  value={amounts}
                   onChange={(e) => setAmount(e.target.value)}
                   onKeyDown={(e) => {
                     if (

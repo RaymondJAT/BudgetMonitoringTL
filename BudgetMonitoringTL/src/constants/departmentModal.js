@@ -9,4 +9,4 @@ export const departments = [
 ];
 
 export const bankAccounts = ["BPI Main", "BPI Payroll", "Metrobank", "BDO"];
-export const types = ["Cash", "GCash"];
+export const types = ["CASH", "GCASH", "ETC"];
