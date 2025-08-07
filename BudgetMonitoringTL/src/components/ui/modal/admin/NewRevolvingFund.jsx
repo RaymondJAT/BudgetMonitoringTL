@@ -1,80 +1,32 @@
 import { useState, useEffect } from "react";
 import { Modal, Form, Row, Col } from "react-bootstrap";
 import Select from "react-select";
-
 import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../AppButton";
 
-const NewRevolvingFund = ({ show, onHide }) => {
+const NewRevolvingFund = ({ show, onHide, onCreated }) => {
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [selectedBankAccount, setSelectedBankAccount] = useState(null);
 
-  const [amount, setAmount] = useState("");
   const [beginningAmount, setBeginningAmount] = useState("");
   const [addedAmount, setAddedAmount] = useState("");
 
   const [budgetOptions, setBudgetOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
+  const [bankError, setBankError] = useState(null);
 
-  useEffect(() => {
-    const fetchBudgets = async () => {
-      try {
-        const response = await fetch("/api/budget/getbudget");
+  const [loadingBudgets, setLoadingBudgets] = useState(false);
+  const [loadingBankAccounts, setLoadingBankAccounts] = useState(false);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch budget list");
-        }
+  // UTILITIES
+  const formatCurrency = (amount) =>
+    `₱ ${Number(amount).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
-        const result = await response.json();
-
-        const formatted = result.data.map((budget) => ({
-          value: budget.id,
-          label: budget.budget_name || budget.code || `${budget.department}`,
-          beginningAmount: budget.beginning_amount || `${budget.amount}`,
-        }));
-
-        setBudgetOptions(formatted);
-      } catch (error) {
-        console.error("Budget fetch error:", error);
-      }
-    };
-
-    const fetchBankAccounts = async () => {
-      try {
-        const response = await fetch("/api/bank_accounts/activebank_accounts");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch bank accounts");
-        }
-
-        const result = await response.json();
-
-        const formatted = result.data.map((bank) => ({
-          value: bank.id,
-          label:
-            bank.account_name ||
-            bank.bank_name ||
-            `${bank.mba_bank_type} - ${bank.mba_account_name}`,
-        }));
-
-        setBankOptions(formatted);
-      } catch (error) {
-        console.error("Bank fetch error:", error);
-      }
-    };
-
-    fetchBudgets();
-    fetchBankAccounts();
-  }, []);
-
-  const handleClose = () => {
-    setSelectedBudget(null);
-    setAmount("");
-    setBeginningAmount("");
-    setSelectedBankAccount(null);
-    setAddedAmount("");
-    onHide();
-  };
+  const sanitizeAmount = (value) =>
+    parseFloat((value || "").replace(/[₱, ]/g, "")) || 0;
 
   const preventInvalidKeys = (e) => {
     if (["e", "E", "+", "-"].includes(e.key) || (e.ctrlKey && e.key === "v")) {
@@ -82,24 +34,132 @@ const NewRevolvingFund = ({ show, onHide }) => {
     }
   };
 
+  // FETCH BUDGETS
+  useEffect(() => {
+    const fetchBudgets = async () => {
+      setLoadingBudgets(true);
+      try {
+        const response = await fetch("/api/budget/getbudget");
+        if (!response.ok) throw new Error("Failed to fetch budget list");
+
+        const result = await response.json();
+        const options = result.data.map((b) => ({
+          value: b.id,
+          label: b.budget_name || b.code || b.department,
+          beginningAmount: b.beginning_amount || b.amount || 0,
+        }));
+
+        setBudgetOptions(options);
+      } catch (error) {
+        console.error("Budget fetch error:", error);
+      } finally {
+        setLoadingBudgets(false);
+      }
+    };
+
+    fetchBudgets();
+  }, []);
+
+  // FETCH BANK ACCOUNTS
+  useEffect(() => {
+    const fetchBankAccounts = async () => {
+      setLoadingBankAccounts(true);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found. Please log in.");
+
+        const res = await fetch("/api/bank_accounts/activebank_accounts", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 401) {
+          localStorage.clear();
+          return;
+        }
+
+        if (!res.ok) throw new Error("Failed to fetch bank accounts");
+
+        const result = await res.json();
+        const options = result.data.map((b) => ({
+          value: b.mba_id,
+          label: `${b.mba_bank_type} - ${b.mba_account_name}`,
+        }));
+
+        setBankOptions(options);
+      } catch (error) {
+        console.error("Bank Fetch Error:", error);
+        setBankError(error.message);
+      } finally {
+        setLoadingBankAccounts(false);
+      }
+    };
+
+    fetchBankAccounts();
+  }, []);
+
+  // HANDLERS
   const handleSelectBudget = (selected) => {
     setSelectedBudget(selected);
-
-    const formattedAmount = `₱ ${Number(
-      selected.beginningAmount
-    ).toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-
-    setBeginningAmount(formattedAmount);
+    setBeginningAmount(formatCurrency(selected.beginningAmount));
   };
 
-  const handleSubmit = () => {
-    console.log("Budget:", selectedBudget);
-    console.log("Beginning Amount:", beginningAmount);
-    console.log("Added Amount:", addedAmount);
-    console.log("Amount:", amount);
+  const handleClose = () => {
+    setSelectedBudget(null);
+    setSelectedBankAccount(null);
+    setBeginningAmount("");
+    setAddedAmount("");
+    setBankError(null);
+    onHide();
+  };
+
+  const handleConfirm = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. Please log in.");
+
+      if (!selectedBudget) {
+        console.warn("No budget selected.");
+        return;
+      }
+
+      const beginning = sanitizeAmount(beginningAmount);
+      const added = parseFloat(addedAmount || "0");
+
+      const payload = {
+        budget_id: selectedBudget.value,
+        beginning,
+        added,
+        ...(selectedBankAccount?.value && {
+          bank_account_id: selectedBankAccount.value,
+        }),
+      };
+
+      console.log("Submitting Payload:", payload);
+
+      const res = await fetch("/api/revolving_fund/createrevolving_fund", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+      console.log("Create Response:", result);
+
+      if (!res.ok || result.message !== "SUCCESS") {
+        throw new Error(result?.message || "Failed to create fund.");
+      }
+
+      onCreated?.();
+      handleClose();
+    } catch (error) {
+      console.error("Submit Error:", error);
+    }
   };
 
   return (
@@ -121,11 +181,12 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 Select Budget ID
               </Form.Label>
               <Select
+                isLoading={loadingBudgets}
                 value={selectedBudget}
                 onChange={handleSelectBudget}
-                styles={customStyles}
-                placeholder="Select..."
                 options={budgetOptions}
+                styles={customStyles}
+                placeholder="Select Budget"
               />
             </Col>
 
@@ -137,13 +198,7 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 type="text"
                 value={beginningAmount}
                 disabled
-                style={{
-                  fontSize: "0.75rem",
-                  height: "38px",
-                  padding: "0.375rem 0.75rem",
-                  borderRadius: "4px",
-                  border: "1px solid #ced4da",
-                }}
+                style={{ fontSize: "0.75rem", height: "38px" }}
               />
             </Col>
           </Row>
@@ -154,11 +209,16 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 Select Bank Account
               </Form.Label>
               <Select
+                isLoading={loadingBankAccounts}
                 value={selectedBankAccount}
                 onChange={setSelectedBankAccount}
-                styles={customStyles}
-                placeholder="Select..."
                 options={bankOptions}
+                placeholder={
+                  bankError
+                    ? "Failed to load bank accounts"
+                    : "Select Bank Account"
+                }
+                styles={customStyles}
               />
             </Col>
 
@@ -172,13 +232,7 @@ const NewRevolvingFund = ({ show, onHide }) => {
                 onChange={(e) => setAddedAmount(e.target.value)}
                 onKeyDown={preventInvalidKeys}
                 min="0"
-                style={{
-                  fontSize: "0.75rem",
-                  height: "38px",
-                  padding: "0.375rem 0.75rem",
-                  borderRadius: "4px",
-                  border: "1px solid #ced4da",
-                }}
+                style={{ fontSize: "0.75rem", height: "38px" }}
               />
             </Col>
           </Row>
@@ -193,9 +247,9 @@ const NewRevolvingFund = ({ show, onHide }) => {
           className="custom-app-button"
         />
         <AppButton
-          label="Submit"
+          label="Confirm"
           variant="outline-success"
-          onClick={handleSubmit}
+          onClick={handleConfirm}
           className="custom-app-button"
         />
       </Modal.Footer>

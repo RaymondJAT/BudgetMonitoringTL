@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
+
+import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../AppButton";
 
 const NewCashDisbursement = ({ show, onHide, fundOptions = [] }) => {
@@ -68,15 +70,8 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [] }) => {
               value={formData.revolvingFundId}
               onChange={handleFundSelect}
               options={fundOptions}
-              placeholder="Select..."
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  fontSize: "0.75rem",
-                  minHeight: "38px",
-                }),
-                menu: (base) => ({ ...base, fontSize: "0.75rem" }),
-              }}
+              placeholder="Select Revolving Fund"
+              styles={customStyles}
             />
           </Form.Group>
 

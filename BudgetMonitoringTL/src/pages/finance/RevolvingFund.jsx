@@ -1,66 +1,82 @@
-import { useState, useMemo } from "react";
-import { Container, Form } from "react-bootstrap";
+import { useEffect, useMemo, useState } from "react";
+import { Container } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
+import { LOCAL_KEYS } from "../../constants/localKeys";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { revolvingFundColumns } from "../../constants/BudgetingColumn";
-import { LOCAL_KEYS } from "../../constants/localKeys";
 
 import { handleExportData } from "../../utils/exportItems";
 
-import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
-import AppButton from "../../components/ui/AppButton";
+import TotalCards from "../../components/TotalCards";
 import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
+import AppButton from "../../components/ui/AppButton";
 
 const RevolvingFund = () => {
-  const [tableData, setTableData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [revolvingData, setRevolvingData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
+
+  const [searchValue, setSearchValue] = useState("");
+
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  const totalComputationData = useMemo(() => {
-    const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
-    const importantData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
-    return [...tableData, ...archiveData, ...importantData];
-  }, [tableData]);
+  /** FETCH API */
+  const fetchRevolvingFund = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found.");
+      setLoading(false);
+      return;
+    }
 
+    try {
+      const response = await fetch("/api/revolving_fund/getrevolving_fund", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data. Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const data = Array.isArray(result?.data) ? result.data : [];
+      setRevolvingData(data);
+    } catch (error) {
+      console.error("Error fetching revolving fund data:", error);
+      setRevolvingData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // NORMALIZE TEXT FOR SEARCH
   const normalize = (value) =>
     String(value || "")
       .toLowerCase()
       .trim();
 
   const isMatch = (item, value) => {
-    const fields = [...columns.map((col) => col.accessor), "formType"];
+    const fields = [
+      ...revolvingFundColumns.map((col) => col.accessor),
+      "formType",
+    ];
     return fields.some((key) =>
-      normalize(item[key]).includes(normalize(value))
+      normalize(item?.[key]).includes(normalize(value))
     );
   };
 
-  const filteredData = useMemo(
-    () => tableData.filter((item) => isMatch(item, searchValue)),
-    [tableData, searchValue]
-  );
-
-  const handleRowClick = (entry) => {
-    console.log("View", entry);
-  };
-
-  const handleDelete = (entry) => {
-    console.log("Delete", entry);
-  };
-
-  const handleArchive = (entry) => {
-    console.log("Archive", entry);
-  };
-
-  const handleToggleImportant = (entry) => {
-    console.log("Toggle Important", entry);
+  const handleNewFundCreated = (newFund) => {
+    if (!newFund) return;
+    setRevolvingData((prev) => [newFund, ...prev]);
+    setSearchValue("");
   };
 
   const handleExport = () => {
@@ -73,44 +89,37 @@ const RevolvingFund = () => {
     setSelectedRows(reset);
   };
 
-  const selectAllCheckbox = (
-    <Form.Check
-      type="checkbox"
-      checked={
-        filteredData.length > 0 &&
-        filteredData.every((entry) => selectedRows[entry.id])
+  const leftContent = (
+    <AppButton
+      label={
+        <>
+          <FaPlus />
+          <span className="d-none d-sm-inline ms-1">Revolving Fund</span>
+        </>
       }
-      onChange={(e) => {
-        const checked = e.target.checked;
-        const newSelection = {};
-        filteredData.forEach((entry) => {
-          newSelection[entry.id] = checked;
-        });
-        setSelectedRows(newSelection);
-      }}
-      className="d-lg-none"
-      style={{ marginTop: "3px" }}
-      title="Select All"
+      size="sm"
+      variant="outline-dark"
+      onClick={() => setShowModal(true)}
+      className="custom-app-button"
     />
   );
 
-  const leftContent = (
-    <div className="d-flex align-items-center gap-2">
-      {selectAllCheckbox}
-      <AppButton
-        label={
-          <>
-            <FaPlus />
-            <span className="d-none d-sm-inline ms-1">Revolving Fund</span>
-          </>
-        }
-        size="sm"
-        variant="outline-dark"
-        onClick={() => setShowModal(true)}
-        className="custom-app-button"
-      />
-    </div>
-  );
+  const totalComputationData = useMemo(() => {
+    const archive =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
+    const important =
+      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
+    return [...archive, ...important];
+  }, []);
+
+  /** FILTER AND SORT BASED ON SEARCH*/
+  const filteredData = useMemo(() => {
+    return revolvingData.filter((item) => isMatch(item, searchValue));
+  }, [revolvingData, searchValue]);
+
+  useEffect(() => {
+    fetchRevolvingFund();
+  }, []);
 
   return (
     <>
@@ -125,26 +134,28 @@ const RevolvingFund = () => {
             onSearchChange={setSearchValue}
             leftContent={leftContent}
             handleExport={handleExport}
-            selectedCount={selectedCount}
             searchBarWidth="300px"
           />
 
           <NewRevolvingFund
             show={showModal}
             onHide={() => setShowModal(false)}
+            onCreated={handleNewFundCreated}
           />
 
-          <DataTable
-            data={tableData}
-            columns={revolvingFundColumns}
-            height="350px"
-            onRowClick={handleRowClick}
-            onDelete={handleDelete}
-            onArchive={handleArchive}
-            onToggleImportant={handleToggleImportant}
-            selectedRows={selectedRows}
-            onSelectionChange={setSelectedRows}
-          />
+          {loading ? (
+            <p className="text-muted">Loading revolving fund data...</p>
+          ) : (
+            <DataTable
+              data={filteredData}
+              columns={revolvingFundColumns}
+              height="350px"
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              showCheckbox={false}
+              showActions={false}
+            />
+          )}
         </div>
       </Container>
     </>

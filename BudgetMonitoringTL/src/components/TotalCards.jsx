@@ -18,13 +18,13 @@ const TotalCards = ({
   let totalRequest = 0;
 
   data.forEach((item) => {
-    const status = item.status?.toLowerCase().trim();
-    const amount = Number(item.total);
-    const paidBy = item.paidBy;
-
-    if (isNaN(amount)) return;
+    if (!item || typeof item !== "object") return;
 
     if (type === "admin") {
+      const status = item.status?.toLowerCase().trim();
+      const amount = Number(item.total);
+      if (isNaN(amount)) return;
+
       if (["approved", "inpayment"].includes(status)) {
         budgetUsed += amount;
       }
@@ -35,6 +35,12 @@ const TotalCards = ({
     }
 
     if (type === "employee") {
+      const status = item.status?.toLowerCase().trim();
+      const amount = Number(item.total);
+      const paidBy = item.paidBy;
+
+      if (isNaN(amount)) return;
+
       if (
         (status === "pending" || status === "approved") &&
         paidBy === "Employee"
@@ -44,7 +50,12 @@ const TotalCards = ({
     }
 
     if (type === "teamlead") {
+      const status = item.status?.toLowerCase().trim();
+      const amount = Number(item.total);
+      const paidBy = item.paidBy;
       const isEmployeePaid = paidBy === "Employee";
+
+      if (isNaN(amount)) return;
 
       if ((status === "pending" || status === "approved") && isEmployeePaid) {
         totals[status] += amount;

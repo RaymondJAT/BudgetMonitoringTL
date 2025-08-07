@@ -1,20 +1,76 @@
+const pesoFormatter = new Intl.NumberFormat("en-PH", {
+  style: "currency",
+  currency: "PHP",
+  minimumFractionDigits: 2,
+});
+
 export const revolvingFundColumns = [
   { label: "ID", accessor: "id" },
-  { label: "Budget Name", accessor: "budgetName" },
-  { label: "Start Date", accessor: "startDate" },
-  { label: "End Date", accessor: "endDate" },
-  { label: "Beginning", accessor: "beginning" },
-  { label: "Added", accessor: "added" },
-  { label: "Total Fund", accessor: "totalFund" },
-  { label: "Issued", accessor: "issued" },
-  { label: "Returned", accessor: "returned" },
-  { label: "Reimbursed", accessor: "reimbursed" },
-  { label: "Outstanding", accessor: "outstanding" },
-  { label: "Amount Expended", accessor: "amountExpended" },
-  { label: "Ended", accessor: "ended" },
-  { label: "Liquidated", accessor: "liquidated" },
-  { label: "Unliquidated", accessor: "unliquidated" },
-  { label: "Balance", accessor: "balance" },
+  { label: "Budget Name", accessor: "name" },
+  { label: "Start Date", accessor: "start_date" },
+  { label: "End Date", accessor: "end_date" },
+
+  {
+    label: "Beginning",
+    accessor: "beginning",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Added",
+    accessor: "added",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Total Fund",
+    accessor: "total_fund",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Issued",
+    accessor: "issued",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Returned",
+    accessor: "returned",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Reimbursed",
+    accessor: "reimbursed",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Outstanding",
+    accessor: "outstanding",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Amount Expended",
+    accessor: "amount_expended",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Ended",
+    accessor: "ending",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Liquidated",
+    accessor: "liquidated",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Unliquidated",
+    accessor: "unliquidated",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Balance",
+    accessor: "balance",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+
   { label: "Status", accessor: "status" },
   { label: "Actions", accessor: "actions" },
 ];
