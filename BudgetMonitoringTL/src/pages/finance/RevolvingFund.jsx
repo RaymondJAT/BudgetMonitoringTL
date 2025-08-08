@@ -6,8 +6,6 @@ import { LOCAL_KEYS } from "../../constants/localKeys";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { revolvingFundColumns } from "../../constants/BudgetingColumn";
 
-import { handleExportData } from "../../utils/exportItems";
-
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import TotalCards from "../../components/TotalCards";
@@ -16,94 +14,50 @@ import AppButton from "../../components/ui/AppButton";
 
 const RevolvingFund = () => {
   const [revolvingData, setRevolvingData] = useState([]);
-  const [selectedRows, setSelectedRows] = useState({});
-
   const [searchValue, setSearchValue] = useState("");
-
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const selectedCount = Object.values(selectedRows).filter(Boolean).length;
-
-  /** FETCH API */
+  // Fetch revolving funds
   const fetchRevolvingFund = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch("/api/revolving_fund/getrevolving_fund", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const res = await fetch("/api/revolving_fund/getrevolving_fund", {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch data. Status: ${response.status}`);
-      }
+      if (!res.ok) throw new Error("Failed to fetch data");
 
-      const result = await response.json();
-      const data = Array.isArray(result?.data) ? result.data : [];
-      setRevolvingData(data);
+      const result = await res.json();
+      setRevolvingData(result.data || []);
     } catch (error) {
-      console.error("Error fetching revolving fund data:", error);
+      console.error("Fetch error:", error);
       setRevolvingData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // NORMALIZE TEXT FOR SEARCH
-  const normalize = (value) =>
-    String(value || "")
-      .toLowerCase()
-      .trim();
-
-  const isMatch = (item, value) => {
-    const fields = [
-      ...revolvingFundColumns.map((col) => col.accessor),
-      "formType",
-    ];
-    return fields.some((key) =>
-      normalize(item?.[key]).includes(normalize(value))
-    );
-  };
-
-  const handleNewFundCreated = (newFund) => {
+  // Add new fund
+  const handleAddFund = (newFund) => {
     if (!newFund) return;
     setRevolvingData((prev) => [newFund, ...prev]);
-    setSearchValue("");
+    setSearchValue(""); // Reset search to show new item
   };
 
-  const handleExport = () => {
-    const reset = handleExportData({
-      filteredData,
-      selectedRows,
-      selectedCount,
-      filename: "RevolvingFund",
-    });
-    setSelectedRows(reset);
-  };
+  // Filter data based on search
+  const filteredData = useMemo(() => {
+    const searchTerm = searchValue.toLowerCase();
+    return revolvingData.filter((item) =>
+      Object.values(item).some((val) =>
+        String(val).toLowerCase().includes(searchTerm)
+      )
+    );
+  }, [revolvingData, searchValue]);
 
-  const leftContent = (
-    <AppButton
-      label={
-        <>
-          <FaPlus />
-          <span className="d-none d-sm-inline ms-1">Revolving Fund</span>
-        </>
-      }
-      size="sm"
-      variant="outline-dark"
-      onClick={() => setShowModal(true)}
-      className="custom-app-button"
-    />
-  );
-
+  // Get totals for cards
   const totalComputationData = useMemo(() => {
     const archive =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
@@ -111,11 +65,6 @@ const RevolvingFund = () => {
       JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
     return [...archive, ...important];
   }, []);
-
-  /** FILTER AND SORT BASED ON SEARCH*/
-  const filteredData = useMemo(() => {
-    return revolvingData.filter((item) => isMatch(item, searchValue));
-  }, [revolvingData, searchValue]);
 
   useEffect(() => {
     fetchRevolvingFund();
@@ -132,28 +81,37 @@ const RevolvingFund = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            leftContent={leftContent}
-            handleExport={handleExport}
-            searchBarWidth="300px"
+            leftContent={
+              <AppButton
+                label={
+                  <>
+                    <FaPlus />
+                    <span className="d-none d-sm-inline ms-1">
+                      Revolving Fund
+                    </span>
+                  </>
+                }
+                size="sm"
+                variant="outline-dark"
+                onClick={() => setShowModal(true)}
+                className="custom-app-button"
+              />
+            }
           />
 
           <NewRevolvingFund
             show={showModal}
             onHide={() => setShowModal(false)}
-            onCreated={handleNewFundCreated}
+            onAdd={handleAddFund}
           />
 
           {loading ? (
-            <p className="text-muted">Loading revolving fund data...</p>
+            <p className="text-muted">Loading data...</p>
           ) : (
             <DataTable
               data={filteredData}
               columns={revolvingFundColumns}
               height="350px"
-              selectedRows={selectedRows}
-              onSelectionChange={setSelectedRows}
-              showCheckbox={false}
-              showActions={false}
             />
           )}
         </div>
