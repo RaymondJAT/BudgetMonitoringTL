@@ -1,25 +1,27 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Modal, Form, Row, Col } from "react-bootstrap";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../AppButton";
 
 const NewRevolvingFund = ({ show, onHide, onAdd }) => {
+  const navigate = useNavigate();
+
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
   const [beginningAmount, setBeginningAmount] = useState("");
   const [addedAmount, setAddedAmount] = useState("");
+  const [balanceError, setBalanceError] = useState("");
+
   const [budgetOptions, setBudgetOptions] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
-  const [bankBalance, setBankBalance] = useState(null);
 
-  const [bankError, setBankError] = useState(null);
-  const [balanceError, setBalanceError] = useState("");
-  const [loadingBudgets, setLoadingBudgets] = useState(false);
-  const [loadingBanks, setLoadingBanks] = useState(false);
+  const [loadingBudget, setLoadingBudget] = useState(false);
+  const [loadingBank, setLoadingBank] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Format currency
+  // HELPERS
   const formatCurrency = (amount) =>
     `₱ ${Number(amount).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
@@ -35,139 +37,120 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
     }
   };
 
-  // Fetch Budgets
+  const authFetch = useCallback(
+    async (url) => {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        localStorage.clear();
+        navigate("/login");
+      }
+
+      if (!res.ok) {
+        const errMsg = await res.text();
+        throw new Error(errMsg || "API request failed");
+      }
+
+      return res.json();
+    },
+    [navigate]
+  );
+
+  // FETCH BUDGET
   useEffect(() => {
+    if (!show) return;
     const fetchBudgets = async () => {
-      setLoadingBudgets(true);
+      setLoadingBudget(true);
       try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found");
-
-        const res = await fetch("/api/budget/getbudget", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch budget list");
-
-        const result = await res.json();
+        const result = await authFetch("/api/budget/getbudget");
         const options = (result.data || []).map((b) => ({
           value: b.id,
-          label: b.budget_name || b.code || b.department,
-          beginningAmount: b.beginning_amount || b.amount || 0,
+          label: b.department,
+          beginningAmount: b.amount || 0,
         }));
         setBudgetOptions(options);
-      } catch (err) {
-        console.error("Budget fetch error:", err);
+      } catch (error) {
+        console.error("Budget fetch error:", error);
       } finally {
-        setLoadingBudgets(false);
+        setLoadingBudget(false);
       }
     };
 
     fetchBudgets();
-  }, []);
+  }, [show, authFetch]);
 
-  // Fetch Banks
+  // FETCH BANK
   useEffect(() => {
+    if (!show) return;
     const fetchBanks = async () => {
-      setLoadingBanks(true);
+      setLoadingBank(true);
       try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found");
-
-        const res = await fetch("/api/bank_accounts/activebank_accounts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch bank accounts");
-
-        const result = await res.json();
-        const options = (result.data || []).map((b) => ({
-          value: b.mba_id,
-          label: `${b.mba_bank_type} - ${b.mba_account_name}`,
+        const result = await authFetch(
+          "/api/bank_accounts/activebank_accounts"
+        );
+        const options = (result.data || []).map((bank) => ({
+          value: bank.mba_id,
+          label: `${bank.mba_account_name}`,
         }));
         setBankOptions(options);
-      } catch (err) {
-        console.error("Bank fetch error:", err);
-        setBankError(err.message);
+      } catch (error) {
+        console.error("Bank fetch error:", error);
       } finally {
-        setLoadingBanks(false);
+        setLoadingBank(false);
       }
     };
 
     fetchBanks();
-  }, []);
+  }, [show, authFetch]);
 
-  // Fetch Bank Balance
-  const fetchBankBalance = async (bankId) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
-
-      const res = await fetch(
-        `/api/bank_balances/getbank_balance_by_id?id=${bankId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch bank balance");
-
-      const result = await res.json();
-      setBankBalance(result.data?.[0]?.bb_current_amount || 0);
-    } catch (err) {
-      console.error("Bank balance fetch error:", err);
-      setBankBalance(0);
-      setBalanceError("Failed to fetch bank balance.");
-    }
-  };
-
-  // Handle Select Budget
   const handleSelectBudget = (budget) => {
     setSelectedBudget(budget);
     setBeginningAmount(formatCurrency(budget.beginningAmount));
   };
 
-  // Handle Added Amount Validation
   const handleAddedChange = (e) => {
     const value = e.target.value;
     setAddedAmount(value);
 
-    if (bankBalance !== null) {
-      const remaining = bankBalance;
-      setBalanceError(
-        parseFloat(value) > remaining
-          ? "Added amount exceeds available bank balance."
-          : ""
-      );
+    // VALIDATION
+    if (value && parseFloat(value) > 100000) {
+      setBalanceError("Added amount exceeds maximum limit");
+    } else {
+      setBalanceError("");
     }
   };
 
-  // Close modal
   const handleClose = () => {
     setSelectedBudget(null);
     setSelectedBank(null);
     setBeginningAmount("");
     setAddedAmount("");
-    setBankBalance(null);
     setBalanceError("");
     onHide();
   };
 
   const handleConfirm = async () => {
-    if (!selectedBudget) return;
-    if (selectedBank && (!addedAmount || !!balanceError)) return;
+    if (!selectedBudget || balanceError) return;
 
-    const beginning = sanitizeAmount(beginningAmount);
-    const added = parseFloat(addedAmount) || 0;
-
-    const payload = {
-      budget_id: selectedBudget.value,
-      beginning,
-      added,
-    };
-
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found. Please log in.");
+      const payload = {
+        budget_id: selectedBudget.value,
+        bank_account_id: selectedBank?.value || null,
+        beginning: sanitizeAmount(beginningAmount),
+        added: selectedBank ? parseFloat(addedAmount) || 0 : 0,
+      };
 
+      const token = localStorage.getItem("token");
       const res = await fetch("/api/revolving_fund/createrevolving_fund", {
         method: "POST",
         headers: {
@@ -177,15 +160,16 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
         body: JSON.stringify(payload),
       });
 
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Failed to create fund");
+      if (!res.ok) throw new Error(await res.text());
 
-      // Pass full object to table
-      onAdd?.();
+      const savedFund = await res.json();
+      console.log("Saved fund:", savedFund);
+      onAdd?.(savedFund.data);
+
       handleClose();
     } catch (error) {
-      console.error("Create Fund Error:", error);
-      alert(error.message);
+      console.error("Create fund error:", error);
+      alert(error.message || "Failed to create fund");
     } finally {
       setSubmitting(false);
     }
@@ -210,7 +194,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
                 Select Budget
               </Form.Label>
               <Select
-                isLoading={loadingBudgets}
+                isLoading={loadingBudget}
                 value={selectedBudget}
                 onChange={handleSelectBudget}
                 options={budgetOptions}
@@ -235,18 +219,11 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
                 Select Bank Account
               </Form.Label>
               <Select
-                isLoading={loadingBanks}
+                isLoading={loadingBank}
                 value={selectedBank}
-                onChange={(b) => {
-                  setSelectedBank(b);
-                  fetchBankBalance(b.value);
-                }}
+                onChange={setSelectedBank}
                 options={bankOptions}
-                placeholder={
-                  bankError
-                    ? "Failed to load bank accounts"
-                    : "Select Bank Account"
-                }
+                placeholder="Select Bank Account"
                 styles={customStyles}
               />
             </Col>
@@ -287,7 +264,9 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
           disabled={
             submitting ||
             !selectedBudget ||
-            (selectedBank && (!addedAmount || !!balanceError))
+            !selectedBank ||
+            !addedAmount ||
+            !!balanceError
           }
           className="custom-app-button"
         />

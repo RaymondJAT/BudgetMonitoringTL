@@ -130,9 +130,9 @@ const DataTable = ({
   );
 
   const renderTableRows = () =>
-    data.map((entry, index) => (
+    data.filter(Boolean).map((entry, index) => (
       <tr
-        key={entry.id || index}
+        key={entry.id ?? index}
         className={`clickable-row ${
           selectedRows[entry.id] ? "highlighted-row" : ""
         }`}

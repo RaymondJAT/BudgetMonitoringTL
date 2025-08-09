@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
-import { LOCAL_KEYS } from "../../constants/localKeys";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { revolvingFundColumns } from "../../constants/BudgetingColumn";
 
@@ -13,67 +12,62 @@ import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
 import AppButton from "../../components/ui/AppButton";
 
 const RevolvingFund = () => {
-  const [revolvingData, setRevolvingData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [fundData, setFundData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Fetch revolving funds
-  const fetchRevolvingFund = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
+  // FETCH DATA ON FIRST LOAD
+  const fetchFundData = async () => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      console.error("No token found.");
+      setLoading(false);
+      return;
+    }
+
+    try {
       const res = await fetch("/api/revolving_fund/getrevolving_fund", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch data");
+      if (!res.ok) {
+        console.error("Server responded with:", res.status);
+        throw new Error("Failed to fetch revolving fund data");
+      }
 
       const result = await res.json();
-      setRevolvingData(result.data || []);
+      const fundArray = result.data || [];
+
+      const sortedFunds = [...fundArray].sort((a, b) => b.id - a.id);
+
+      setFundData(sortedFunds);
     } catch (error) {
       console.error("Fetch error:", error);
-      setRevolvingData([]);
+      setFundData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Add new fund
-  const handleAddFund = (newFund) => {
-    if (!newFund) return;
-    setRevolvingData((prev) => [newFund, ...prev]);
-    setSearchValue(""); // Reset search to show new item
-  };
-
-  // Filter data based on search
-  const filteredData = useMemo(() => {
-    const searchTerm = searchValue.toLowerCase();
-    return revolvingData.filter((item) =>
-      Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(searchTerm)
-      )
-    );
-  }, [revolvingData, searchValue]);
-
-  // Get totals for cards
-  const totalComputationData = useMemo(() => {
-    const archive =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
-    const important =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
-    return [...archive, ...important];
-  }, []);
-
   useEffect(() => {
-    fetchRevolvingFund();
+    fetchFundData();
   }, []);
+
+  // Add new item instantly at top
+  const handleAddFundItem = () => {
+    fetchFundData(); // reload data from API
+  };
 
   return (
     <>
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
+        <TotalCards data={fundData} list={FINANCE_STATUS_LIST} />
       </div>
 
       <Container fluid className="pb-3">
@@ -81,6 +75,7 @@ const RevolvingFund = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
+            showFilter={false}
             leftContent={
               <AppButton
                 label={
@@ -91,8 +86,8 @@ const RevolvingFund = () => {
                     </span>
                   </>
                 }
-                size="sm"
                 variant="outline-dark"
+                size="sm"
                 onClick={() => setShowModal(true)}
                 className="custom-app-button"
               />
@@ -102,16 +97,19 @@ const RevolvingFund = () => {
           <NewRevolvingFund
             show={showModal}
             onHide={() => setShowModal(false)}
-            onAdd={handleAddFund}
+            onAdd={handleAddFundItem}
           />
 
           {loading ? (
-            <p className="text-muted">Loading data...</p>
+            <p className="text-muted">Loading revolving fund data...</p>
           ) : (
             <DataTable
-              data={filteredData}
+              data={fundData}
               columns={revolvingFundColumns}
-              height="350px"
+              height="325px"
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              showActions={false}
             />
           )}
         </div>
