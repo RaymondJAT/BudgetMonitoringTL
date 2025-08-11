@@ -59,7 +59,6 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
         const errMsg = await res.text();
         throw new Error(errMsg || "API request failed");
       }
-
       return res.json();
     },
     [navigate]

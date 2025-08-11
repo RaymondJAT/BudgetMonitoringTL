@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Container, Form } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
@@ -20,6 +20,8 @@ const CashDisbursement = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [showModal, setShowModal] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
   const totalComputationData = useMemo(() => {
@@ -36,7 +38,10 @@ const CashDisbursement = () => {
       .trim();
 
   const isMatch = (item, value) => {
-    const fields = [...columns.map((col) => col.accessor), "formType"];
+    const fields = [
+      ...cashDisbursementColumns.map((col) => col.accessor),
+      "formType",
+    ];
     return fields.some((key) =>
       normalize(item[key]).includes(normalize(value))
     );
@@ -46,6 +51,41 @@ const CashDisbursement = () => {
     () => tableData.filter((item) => isMatch(item, searchValue)),
     [tableData, searchValue]
   );
+
+  const fetchCashDisbursements = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found.");
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch("/api/cash_disbursement/getcash_disbursement", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch cash disbursement data");
+
+      const result = await res.json();
+      const sorted = [...(result.data || [])].sort((a, b) => b.id - a.id);
+      setTableData(sorted);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setTableData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCashDisbursements();
+  }, []);
+
+  const handleAddDisbursementItem = () => {
+    fetchCashDisbursements();
+  };
 
   const handleExport = () => {
     const reset = handleExportData({
@@ -115,15 +155,22 @@ const CashDisbursement = () => {
           <NewCashDisbursement
             show={showModal}
             onHide={() => setShowModal(false)}
+            onAdd={handleAddDisbursementItem}
           />
 
-          <DataTable
-            data={tableData}
-            columns={cashDisbursementColumns}
-            height="350px"
-            selectedRows={selectedRows}
-            onSelectionChange={setSelectedRows}
-          />
+          {loading ? (
+            <p className="text-muted">Loading cash disbursement data...</p>
+          ) : (
+            <DataTable
+              data={filteredData}
+              columns={cashDisbursementColumns}
+              height="350px"
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              showActions={false}
+              showCheckbox={false}
+            />
+          )}
         </div>
       </Container>
     </>
