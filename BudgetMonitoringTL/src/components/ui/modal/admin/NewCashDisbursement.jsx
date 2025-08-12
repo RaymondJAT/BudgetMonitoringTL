@@ -145,35 +145,46 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
       return;
     }
 
-    const payload = {
-      received_by: selectedEmployee.label, // Or ID if required
-      department_id: employeeDepartment?.value || 0, // This was missing
-      amount_issue: parseFloat(formData.amount_issue) || 0,
-      cash_voucher: parseInt(formData.cash_voucher) || 0,
-      amount_return: parseFloat(formData.amount_return) || 0,
-    };
-
     try {
+      setSubmitting(true);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const payload = {
+        revolving_fund_id: selectedFund.value,
+        received_by: selectedEmployee.value,
+        department_id: selectedEmployee.department_id,
+        particulars: formData.particulars,
+        cash_voucher: formData.cash_voucher,
+        amount_issue: parseFloat(formData.amount_issue) || 0,
+        amount_return: parseFloat(formData.amount_return) || 0,
+      };
+
       const response = await fetch(
         "/api/cash_disbursement/createcash_disbursement",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
         }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create disbursement");
       }
 
-      onHide();
-      onAdd();
+      const result = await response.json();
+      onAdd(result.data);
+      handleClose();
     } catch (error) {
       console.error("Create disbursement error:", error);
-      alert("Failed to create cash disbursement.");
+      alert(error.message || "Failed to create cash disbursement");
+    } finally {
+      setSubmitting(false);
     }
   };
 

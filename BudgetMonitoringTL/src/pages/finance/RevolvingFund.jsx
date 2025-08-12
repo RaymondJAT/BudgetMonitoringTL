@@ -75,7 +75,6 @@ const RevolvingFund = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            showFilter={false}
             leftContent={
               <AppButton
                 label={
