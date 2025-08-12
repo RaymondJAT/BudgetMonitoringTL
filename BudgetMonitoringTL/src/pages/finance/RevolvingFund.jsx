@@ -59,9 +59,8 @@ const RevolvingFund = () => {
     fetchFundData();
   }, []);
 
-  // Add new item instantly at top
   const handleAddFundItem = () => {
-    fetchFundData(); // reload data from API
+    fetchFundData();
   };
 
   return (
@@ -109,6 +108,7 @@ const RevolvingFund = () => {
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
               showActions={false}
+              showCheckbox={false}
             />
           )}
         </div>

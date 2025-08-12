@@ -372,7 +372,7 @@ main.no-sidebar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 65px;
+  width: 80px;
   height: 18px;
   border-radius: 999px;
   font-size: 0.6rem;
@@ -404,6 +404,30 @@ main.no-sidebar {
   background-color: #282828;
   color: white;
   border: 1px solid darkslategrey;
+}
+
+.status-badge.review {
+  background-color: rgb(235, 136, 30);
+  color: white;
+  border: 1px solid rgb(154, 89, 10);
+}
+
+.status-badge.liquidated {
+  background-color: rgb(66, 138, 239);
+  color: white;
+  border: 1px solid rgb(22, 25, 177);
+}
+
+.status-badge.unliquidated {
+  background-color: rgb(66, 138, 239);
+  color: white;
+  border: 1px solid rgb(22, 25, 177);
+}
+
+.status-badge.open {
+  background-color: rgb(109, 8, 153);
+  color: white;
+  border: 1px solid rgb(46, 4, 74);
 }
 
 /* TOTAL BOX */

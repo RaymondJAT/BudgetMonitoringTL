@@ -20,6 +20,8 @@ const DataTable = ({
   setPrintData,
   showCheckbox = true,
   showActions = true,
+  actionType = "meatball", // NEW PROP (default for backwards compatibility)
+  renderActionButton, // Optional custom button renderer for flexibility
 }) => {
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
@@ -56,7 +58,7 @@ const DataTable = ({
     });
   };
 
-  // Renderers
+  // Cell rendering
   const renderCell = useCallback((entry, col) => {
     const value = entry[col.accessor];
 
@@ -93,6 +95,7 @@ const DataTable = ({
       maximumFractionDigits: 2,
     })}`;
 
+  // Meatball dropdown actions
   const ActionMenu = ({ entry, index }) => (
     <Dropdown
       align="end"
@@ -129,6 +132,23 @@ const DataTable = ({
     </Dropdown>
   );
 
+  // Action button (alternative)
+  const ActionButton = ({ entry }) =>
+    renderActionButton ? (
+      renderActionButton(entry)
+    ) : (
+      <AppButton
+        label={<FaEye />}
+        size="sm"
+        variant="outline-dark"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRowClick?.(entry);
+        }}
+      />
+    );
+
+  // Render rows
   const renderTableRows = () =>
     data.filter(Boolean).map((entry, index) => (
       <tr
@@ -176,12 +196,17 @@ const DataTable = ({
 
         {showActions && (
           <td onClick={(e) => e.stopPropagation()}>
-            <ActionMenu entry={entry} index={index} />
+            {actionType === "meatball" ? (
+              <ActionMenu entry={entry} index={index} />
+            ) : (
+              <ActionButton entry={entry} />
+            )}
           </td>
         )}
       </tr>
     ));
 
+  // Render mobile cards
   const renderMobileCards = () =>
     data.map((entry, index) => (
       <div
@@ -199,37 +224,12 @@ const DataTable = ({
               style={{ marginRight: "0.5rem" }}
             />
           )}
-          {showActions && <ActionMenu entry={entry} index={index} />}
-        </div>
-
-        {[
-          ["ID", entry.id],
-          ["Employee", entry.employee],
-          ["Department", entry.department],
-          ["Description", entry.description],
-          ["Amount", formatCurrency(entry.total)],
-          [
-            "Status",
-            <span
-              className={`status-badge ${String(entry.status).toLowerCase()}`}
-            >
-              {entry.status}
-            </span>,
-          ],
-        ].map(([label, value], i) => (
-          <div className="mobile-card-item" key={i}>
-            <strong>{label}:</strong> {value}
-          </div>
-        ))}
-
-        <div className="mobile-card-view-btn">
-          <AppButton
-            label={<FaEye />}
-            size="sm"
-            variant="outline-dark"
-            onClick={() => onRowClick(entry)}
-            className="custom-app-button btn-responsive"
-          />
+          {showActions &&
+            (actionType === "meatball" ? (
+              <ActionMenu entry={entry} index={index} />
+            ) : (
+              <ActionButton entry={entry} />
+            ))}
         </div>
       </div>
     ));

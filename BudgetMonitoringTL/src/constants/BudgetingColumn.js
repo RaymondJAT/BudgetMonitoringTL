@@ -1,3 +1,9 @@
+import React from "react";
+import { FaEye, FaEdit } from "react-icons/fa";
+import { LuFolderCheck } from "react-icons/lu";
+import { TbReportAnalytics } from "react-icons/tb";
+import AppButton from "../components/ui/AppButton";
+
 const pesoFormatter = new Intl.NumberFormat("en-PH", {
   style: "currency",
   currency: "PHP",
@@ -72,7 +78,35 @@ export const revolvingFundColumns = [
   },
 
   { label: "Status", accessor: "status" },
-  { label: "Actions", accessor: "actions" },
+  {
+    label: "Actions",
+    accessor: "actions",
+    Cell: ({ row }) =>
+      React.createElement(
+        "div",
+        { className: "d-flex gap-1" },
+        React.createElement(AppButton, {
+          key: "view",
+          label: React.createElement(FaEye),
+          variant: "outline-dark",
+          className: "custom-app-button",
+          onClick: () => console.log("Viewing", row.original),
+        }),
+        React.createElement(AppButton, {
+          key: "submit",
+          label: React.createElement(LuFolderCheck),
+          variant: "outline-success",
+          className: "custom-app-button",
+          onClick: () => console.log("Submitting", row.original),
+        }),
+        React.createElement(AppButton, {
+          key: "report",
+          label: React.createElement(TbReportAnalytics),
+          variant: "outline-dark",
+          className: "custom-app-button",
+        })
+      ),
+  },
 ];
 
 export const cashDisbursementColumns = [
@@ -90,5 +124,27 @@ export const cashDisbursementColumns = [
   { label: "Outstanding Amount", accessor: "outstanding_amount" },
   { label: "Status", accessor: "status" },
   { label: "Date Liquidated", accessor: "date_liquidated" },
-  { label: "Actions", accessor: "actions" },
+  {
+    label: "Actions",
+    accessor: "actions",
+    Cell: ({ row }) =>
+      React.createElement(
+        "div",
+        { className: "d-flex gap-1" },
+        React.createElement(AppButton, {
+          key: "edit",
+          label: React.createElement(FaEdit),
+          variant: "outline-dark",
+          className: "custom-app-button",
+          onClick: () => console.log("Viewing", row.original),
+        }),
+        React.createElement(AppButton, {
+          key: "submit",
+          label: React.createElement(LuFolderCheck),
+          variant: "outline-success",
+          className: "custom-app-button",
+          onClick: () => console.log("Submitting", row.original),
+        })
+      ),
+  },
 ];
