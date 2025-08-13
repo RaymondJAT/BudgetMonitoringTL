@@ -41,10 +41,6 @@ const ToolBar = ({
 
   const handleDateChange = (dates) => {
     setDateRange(dates);
-    if (dates[0] && dates[1]) {
-      onDateRangeChange(dates);
-      setShowDatePicker(false);
-    }
   };
 
   useEffect(() => {
@@ -81,7 +77,7 @@ const ToolBar = ({
         style={{
           gap: "10px",
           marginBottom: "1rem",
-          fontSize: "0.75rem",
+          fontSize: "0.8rem",
           position: "relative",
         }}
       >
@@ -160,7 +156,7 @@ const ToolBar = ({
               className="custom-search-bar responsive-searchbar"
               style={{
                 padding: "0.3rem 0.6rem",
-                fontSize: "0.75rem",
+                fontSize: "0.8rem",
               }}
             />
           </div>

@@ -18,10 +18,9 @@ const RevolvingFund = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // FETCH DATA ON FIRST LOAD
-  const fetchFundData = async () => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
+  const fetchFundData = async () => {
     if (!token) {
       console.error("No token found.");
       setLoading(false);
@@ -29,6 +28,7 @@ const RevolvingFund = () => {
     }
 
     try {
+      setLoading(true);
       const res = await fetch("/api/revolving_fund/getrevolving_fund", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -36,22 +36,60 @@ const RevolvingFund = () => {
         },
       });
 
-      if (!res.ok) {
-        console.error("Server responded with:", res.status);
-        throw new Error("Failed to fetch revolving fund data");
-      }
+      if (!res.ok) throw new Error("Failed to fetch revolving fund data");
 
       const result = await res.json();
       const fundArray = result.data || [];
-
       const sortedFunds = [...fundArray].sort((a, b) => b.id - a.id);
-
       setFundData(sortedFunds);
     } catch (error) {
       console.error("Fetch error:", error);
       setFundData([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // FETCH DATE RANGE
+  const fetchFundDataByDate = async (startDate, endDate) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const formatDate = (date) => {
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    try {
+      const start = startDate ? formatDate(startDate) : "";
+      let end = endDate ? formatDate(endDate) : "";
+
+      if (endDate) {
+        const adjustedEnd = new Date(endDate);
+        adjustedEnd.setHours(23, 59, 59, 999);
+        end = formatDate(adjustedEnd);
+      }
+
+      const res = await fetch(
+        `/api/revolving_fund/getrevolving-fund-target/${start}/${end}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+
+      const result = await res.json();
+      setFundData(result.data || []);
+    } catch (error) {
+      console.error("Error fetching by date range:", error);
+      setFundData([]);
     }
   };
 
@@ -90,6 +128,7 @@ const RevolvingFund = () => {
                 className="custom-app-button"
               />
             }
+            onDateRangeChange={fetchFundDataByDate}
           />
 
           <NewRevolvingFund

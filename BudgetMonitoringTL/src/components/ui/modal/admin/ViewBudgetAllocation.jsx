@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Modal, Form, Row, Col, Container } from "react-bootstrap";
+import { Modal, Row, Col, Container } from "react-bootstrap";
 
 import { BudgetAllocationOverview } from "../../../../constants/totalList";
 import BudgetCharts from "../../charts/admin/BudgetCharts";
@@ -79,7 +79,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
         className="cashreq-scroll"
         style={{ backgroundColor: "#800000" }}
       >
-        <Form className="text-white">
+        <div className="text-white">
           {/* Total Cards */}
           <Row>
             <Col>
@@ -130,7 +130,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
               </Col>
             </Row>
           </Container>
-        </Form>
+        </div>
       </Modal.Body>
 
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>

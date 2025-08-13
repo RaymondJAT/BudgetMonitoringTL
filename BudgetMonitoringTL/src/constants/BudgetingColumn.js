@@ -10,8 +10,9 @@ const pesoFormatter = new Intl.NumberFormat("en-PH", {
   minimumFractionDigits: 2,
 });
 
+// REVOLVING FUND
 export const revolvingFundColumns = [
-  { label: "ID", accessor: "id" },
+  // { label: "ID", accessor: "id" },
   { label: "Budget Name", accessor: "name" },
   { label: "Start Date", accessor: "start_date" },
   { label: "End Date", accessor: "end_date" },
@@ -39,11 +40,6 @@ export const revolvingFundColumns = [
   {
     label: "Returned",
     accessor: "returned",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
-  },
-  {
-    label: "Reimbursed",
-    accessor: "reimbursed",
     Cell: ({ value }) => pesoFormatter.format(value || 0),
   },
   {
@@ -109,6 +105,7 @@ export const revolvingFundColumns = [
   },
 ];
 
+// CASH DISBURSEMENT
 export const cashDisbursementColumns = [
   { label: "ID", accessor: "id" },
   { label: "Revolving Fund", accessor: "revolving_fund_label" },
@@ -117,11 +114,26 @@ export const cashDisbursementColumns = [
   { label: "Department", accessor: "description" },
   { label: "Particulars", accessor: "particulars" },
   { label: "Cash Voucher", accessor: "cash_voucher" },
-  { label: "Amount Issue", accessor: "amount_issue" },
-  { label: "Amount Return", accessor: "amount_return" },
-  { label: "Amount Reimburse", accessor: "amount_reimburse" },
-  { label: "Amount Expended", accessor: "amount_expend" },
-  { label: "Outstanding Amount", accessor: "outstanding_amount" },
+  {
+    label: "Amount Issue",
+    accessor: "amount_issue",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Amount Return",
+    accessor: "amount_return",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Amount Expended",
+    accessor: "amount_expend",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
+  {
+    label: "Outstanding Amount",
+    accessor: "outstanding_amount",
+    Cell: ({ value }) => pesoFormatter.format(value || 0),
+  },
   { label: "Status", accessor: "status" },
   { label: "Date Liquidated", accessor: "date_liquidated" },
   {
@@ -132,18 +144,18 @@ export const cashDisbursementColumns = [
         "div",
         { className: "d-flex gap-1" },
         React.createElement(AppButton, {
-          key: "edit",
-          label: React.createElement(FaEdit),
-          variant: "outline-dark",
-          className: "custom-app-button",
-          onClick: () => console.log("Viewing", row.original),
-        }),
-        React.createElement(AppButton, {
           key: "submit",
           label: React.createElement(LuFolderCheck),
           variant: "outline-success",
           className: "custom-app-button",
           onClick: () => console.log("Submitting", row.original),
+        }),
+        React.createElement(AppButton, {
+          key: "edit",
+          label: React.createElement(FaEdit),
+          variant: "outline-dark",
+          className: "custom-app-button",
+          onClick: () => console.log("Viewing", row.original),
         })
       ),
   },
