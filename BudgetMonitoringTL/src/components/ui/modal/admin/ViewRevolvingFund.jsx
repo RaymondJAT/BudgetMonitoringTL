@@ -35,23 +35,7 @@ const ViewRevolvingFund = ({ show, onHide, budgetId }) => {
 
         const json = await res.json();
 
-        setTransactions(
-          (Array.isArray(json.data) ? json.data : []).map((item) => ({
-            id: item.id ?? item.ID ?? "—",
-            date_issue: item.date_issue ?? item.dateIssued ?? "—",
-            received_by: item.received_by ?? item.receiver ?? "—",
-            description: item.description ?? "—",
-            particulars: item.particulars ?? "—",
-            amount_issue: item.amount_issue ?? item.amountIssued ?? 0,
-            cash_voucher: item.cash_voucher ?? item.cashVoucher ?? "—",
-            amount_return: item.amount_return ?? item.amountReturned ?? 0,
-            outstanding_amount:
-              item.outstanding_amount ?? item.outstandingAmount ?? 0,
-            amount_expend: item.amount_expend ?? item.amountExpended ?? 0,
-            status: item.status ?? "—",
-            date_liquidated: item.date_liquidated ?? item.dateLiquidated ?? "—",
-          }))
-        );
+        setTransactions(Array.isArray(json.data) ? json.data : []);
       } catch (err) {
         setError(err.message);
         setTransactions([]);
