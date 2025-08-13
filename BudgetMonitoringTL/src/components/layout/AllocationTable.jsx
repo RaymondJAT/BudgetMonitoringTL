@@ -2,31 +2,13 @@ import { useMemo } from "react";
 import { Table } from "react-bootstrap";
 
 const AllocationTable = ({
-  budgetId,
-  tableData = [],
-  sortConfig,
-  setSortConfig,
-  filters,
-  height = "200px", // default height if not provided
+  transactions = [],
+  sortConfig = { key: null, direction: "asc" },
+  setSortConfig = () => {},
+  height = "200px",
 }) => {
-  const transactions =
-    tableData.find((item) => item.id === budgetId)?.transactions || [];
-
   const filteredTransactions = useMemo(() => {
-    let filtered = transactions.filter((tx) => {
-      const matchesReference =
-        tx.referenceId
-          ?.toLowerCase()
-          .includes(filters.referenceId.toLowerCase()) ?? true;
-
-      const matchesAmount = filters.amount
-        ? parseFloat(tx.amount || 0) >= parseFloat(filters.amount)
-        : true;
-
-      const matchesDate = filters.date ? tx.date === filters.date : true;
-
-      return matchesReference && matchesAmount && matchesDate;
-    });
+    let filtered = [...transactions];
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
@@ -50,156 +32,116 @@ const AllocationTable = ({
     }
 
     return filtered;
-  }, [filters, sortConfig, transactions]);
+  }, [transactions, sortConfig]);
 
   const handleSort = (key) => {
     setSortConfig((prev) => {
       if (prev.key === key) {
-        return {
-          key,
-          direction: prev.direction === "asc" ? "desc" : "asc",
-        };
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
       }
       return { key, direction: "asc" };
     });
   };
 
-  const renderSortIcon = (key) => {
-    if (sortConfig.key !== key) return "⇅";
-    return sortConfig.direction === "asc" ? "↑" : "↓";
-  };
-
   return (
-    <>
-      <div
-        className="trash-wrapper overflow-auto"
-        style={{ maxHeight: height }}
-      >
-        <Table hover className="expense-table mb-0">
-          <thead>
-            <tr>
-              {/* <th>Type</th> */}
-              <th
-                onClick={() => handleSort("referenceId")}
-                style={{ cursor: "pointer" }}
-              >
-                Reference ID {renderSortIcon("referenceId")}
-              </th>
-              <th>Employee</th>
-              <th>Department</th>
-              <th>Description</th>
-              <th
-                onClick={() => handleSort("amount")}
-                style={{ cursor: "pointer" }}
-              >
-                Amount {renderSortIcon("amount")}
-              </th>
-              <th>Status</th>
-              <th
-                onClick={() => handleSort("date")}
-                style={{ cursor: "pointer" }}
-              >
-                Date {renderSortIcon("date")}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTransactions.length > 0 ? (
-              filteredTransactions.map((tx, idx) => (
-                <tr key={idx}>
-                  {/* <td>{tx.type}</td> */}
-                  <td>{tx.referenceId || "—"}</td>
-                  <td>{tx.employee || "—"}</td>
-                  <td>{tx.department || "—"}</td>
-                  <td className="text-truncate" style={{ maxWidth: "200px" }}>
-                    {tx.description || "—"}
-                  </td>
-                  <td>
-                    ₱{" "}
-                    {parseFloat(tx.amount || 0).toLocaleString("en-PH", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td>
-                    <span
-                      className={`status-badge ${String(
-                        tx.status
-                      ).toLowerCase()}`}
-                    >
-                      {tx.status}
-                    </span>
-                  </td>
-                  <td>{tx.date || "—"}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center text-muted">
-                  No transactions found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-
-        {/* Mobile View */}
-        <div className="d-lg-none">
+    <div className="trash-wrapper overflow-auto" style={{ maxHeight: height }}>
+      <Table hover className="expense-table mb-0">
+        <thead>
+          <tr>
+            <th onClick={() => handleSort("id")} style={{ cursor: "pointer" }}>
+              ID
+            </th>
+            <th
+              onClick={() => handleSort("date_issue")}
+              style={{ cursor: "pointer" }}
+            >
+              Date Issued
+            </th>
+            <th
+              onClick={() => handleSort("received_by")}
+              style={{ cursor: "pointer" }}
+            >
+              Received By
+            </th>
+            <th>Description</th>
+            <th>Particulars</th>
+            <th
+              onClick={() => handleSort("amount_issue")}
+              style={{ cursor: "pointer" }}
+            >
+              Amount Issued
+            </th>
+            <th>Cash Voucher</th>
+            <th>Amount Returned</th>
+            <th>Outstanding Amount</th>
+            <th>Amount Expended</th>
+            <th>Status</th>
+            <th>Date Liquidated</th>
+          </tr>
+        </thead>
+        <tbody>
           {filteredTransactions.length > 0 ? (
-            filteredTransactions.map((tx, idx) => (
-              <div key={idx} className="mobile-card">
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Reference ID:</span>{" "}
-                  <span className="mobile-card-value">{tx.referenceId}</span>
-                </div>
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Employee:</span>{" "}
-                  <span className="mobile-card-value">
-                    {tx.employee || "—"}
-                  </span>
-                </div>
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Department:</span>{" "}
-                  <span className="mobile-card-value">
-                    {tx.department || "—"}
-                  </span>
-                </div>
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Amount:</span>{" "}
-                  <span className="mobile-card-value">
-                    ₱{" "}
-                    {parseFloat(tx.amount || 0).toLocaleString("en-PH", {
+            filteredTransactions.map((tx) => (
+              <tr key={tx.id}>
+                <td>{tx.id}</td>
+                <td>{tx.date_issue || "—"}</td>
+                <td>{tx.received_by || "—"}</td>
+                <td>{tx.description || "—"}</td>
+                <td>{tx.particulars || "—"}</td>
+                <td>
+                  ₱{" "}
+                  {parseFloat(tx.amount_issue || 0).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </td>
+                <td>{tx.cash_voucher || "—"}</td>
+                <td>
+                  ₱{" "}
+                  {parseFloat(tx.amount_return || 0).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </td>
+                <td>
+                  ₱{" "}
+                  {parseFloat(tx.outstanding_amount || 0).toLocaleString(
+                    "en-PH",
+                    {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Status:</span>{" "}
+                    }
+                  )}
+                </td>
+                <td>
+                  ₱{" "}
+                  {parseFloat(tx.amount_expend || 0).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </td>
+                <td>
                   <span
-                    className={`mobile-card-value status-badge ${tx.status.toLowerCase()}`}
+                    className={`status-badge ${String(
+                      tx.status
+                    ).toLowerCase()}`}
                   >
                     {tx.status}
                   </span>
-                </div>
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Date:</span>{" "}
-                  <span className="mobile-card-value">{tx.date || "—"}</span>
-                </div>
-                <div className="mobile-card-item">
-                  <span className="mobile-card-label">Description:</span>{" "}
-                  <span className="mobile-card-value">
-                    {tx.description || "—"}
-                  </span>
-                </div>
-              </div>
+                </td>
+                <td>{tx.date_liquidated || "—"}</td>
+              </tr>
             ))
           ) : (
-            <div className="text-center mt-4">No transactions found.</div>
+            <tr>
+              <td colSpan="13" className="text-center text-muted">
+                No transactions found.
+              </td>
+            </tr>
           )}
-        </div>
-      </div>
-    </>
+        </tbody>
+      </Table>
+    </div>
   );
 };
 

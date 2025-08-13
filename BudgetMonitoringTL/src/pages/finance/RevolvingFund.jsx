@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaEye } from "react-icons/fa";
+import { LuFolderCheck } from "react-icons/lu";
+import { TbReportAnalytics } from "react-icons/tb";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
-import { revolvingFundColumns } from "../../constants/BudgetingColumn";
+import { revolvingFundColumns as baseColumns } from "../../constants/BudgetingColumn";
 
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import TotalCards from "../../components/TotalCards";
 import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
 import AppButton from "../../components/ui/AppButton";
+import ViewRevolvingFund from "../../components/ui/modal/admin/ViewRevolvingFund";
 
 const RevolvingFund = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -17,6 +20,10 @@ const RevolvingFund = () => {
   const [fundData, setFundData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
   const [loading, setLoading] = useState(true);
+
+  // State for viewing modal
+  const [viewBudgetId, setViewBudgetId] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -101,6 +108,43 @@ const RevolvingFund = () => {
     fetchFundData();
   };
 
+  // ✅ Inject buttons into the "Actions" column
+  const columns = baseColumns.map((col) => {
+    if (col.accessor === "actions") {
+      return {
+        ...col,
+        Cell: ({ row }) => {
+          const rowData = row.original || row;
+          return (
+            <div className="d-flex gap-1">
+              <AppButton
+                label={<FaEye />}
+                variant="outline-dark"
+                className="custom-app-button"
+                onClick={() => {
+                  setViewBudgetId(rowData.id);
+                  setShowViewModal(true);
+                }}
+              />
+              <AppButton
+                label={<LuFolderCheck />}
+                variant="outline-success"
+                className="custom-app-button"
+                onClick={() => console.log("Submitting", rowData)}
+              />
+              <AppButton
+                label={<TbReportAnalytics />}
+                variant="outline-dark"
+                className="custom-app-button"
+              />
+            </div>
+          );
+        },
+      };
+    }
+    return col;
+  });
+
   return (
     <>
       <div className="mt-3">
@@ -142,7 +186,7 @@ const RevolvingFund = () => {
           ) : (
             <DataTable
               data={fundData}
-              columns={revolvingFundColumns}
+              columns={columns}
               height="325px"
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
@@ -152,6 +196,16 @@ const RevolvingFund = () => {
           )}
         </div>
       </Container>
+
+      {/* ✅ ViewRevolvingFund Modal */}
+      {showViewModal && (
+        <ViewRevolvingFund
+          show={showViewModal}
+          onHide={() => setShowViewModal(false)}
+          budgetId={viewBudgetId}
+          tableData={fundData}
+        />
+      )}
     </>
   );
 };

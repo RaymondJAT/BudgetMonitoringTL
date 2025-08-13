@@ -77,31 +77,34 @@ export const revolvingFundColumns = [
   {
     label: "Actions",
     accessor: "actions",
-    Cell: ({ row }) =>
-      React.createElement(
-        "div",
-        { className: "d-flex gap-1" },
-        React.createElement(AppButton, {
-          key: "view",
-          label: React.createElement(FaEye),
-          variant: "outline-dark",
-          className: "custom-app-button",
-          onClick: () => console.log("Viewing", row.original),
-        }),
-        React.createElement(AppButton, {
-          key: "submit",
-          label: React.createElement(LuFolderCheck),
-          variant: "outline-success",
-          className: "custom-app-button",
-          onClick: () => console.log("Submitting", row.original),
-        }),
-        React.createElement(AppButton, {
-          key: "report",
-          label: React.createElement(TbReportAnalytics),
-          variant: "outline-dark",
-          className: "custom-app-button",
-        })
-      ),
+    // Cell: ({ row }) =>
+    //   React.createElement(
+    //     "div",
+    //     { className: "d-flex gap-1" },
+    //     React.createElement(AppButton, {
+    //       key: "view",
+    //       label: React.createElement(FaEye),
+    //       variant: "outline-dark",
+    //       className: "custom-app-button",
+    //       onClick: () => {
+    //         setSelectedBudgetId(row.original.id); // store budget ID in parent state
+    //         setShowViewModal(true); // open modal
+    //       },
+    //     }),
+    //     React.createElement(AppButton, {
+    //       key: "submit",
+    //       label: React.createElement(LuFolderCheck),
+    //       variant: "outline-success",
+    //       className: "custom-app-button",
+    //       onClick: () => console.log("Submitting", row.original),
+    //     }),
+    //     React.createElement(AppButton, {
+    //       key: "report",
+    //       label: React.createElement(TbReportAnalytics),
+    //       variant: "outline-dark",
+    //       className: "custom-app-button",
+    //     })
+    //   ),
   },
 ];
 

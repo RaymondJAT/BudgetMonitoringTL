@@ -419,9 +419,9 @@ main.no-sidebar {
 }
 
 .status-badge.unliquidated {
-  background-color: rgb(66, 138, 239);
+  background-color: rgb(239, 66, 66);
   color: white;
-  border: 1px solid rgb(22, 25, 177);
+  border: 1px solid rgb(132, 6, 6);
 }
 
 .status-badge.open {
