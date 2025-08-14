@@ -47,7 +47,7 @@ const AllocationTable = ({
     <div className="trash-wrapper overflow-auto" style={{ maxHeight: height }}>
       <Table hover className="expense-table mb-0">
         <thead>
-          <tr>
+          <tr className="align-middle">
             <th onClick={() => handleSort("id")} style={{ cursor: "pointer" }}>
               ID
             </th>

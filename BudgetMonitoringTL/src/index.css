@@ -307,7 +307,6 @@ main.no-sidebar {
 /* TABLE STYLING */
 .table-wrapper {
   position: relative;
-  /* margin-top: 15px; */
   height: 495px;
   overflow-y: auto;
   border: 1px solid #ddd;
@@ -372,10 +371,10 @@ main.no-sidebar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
+  width: 75px;
   height: 18px;
   border-radius: 999px;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 600;
   white-space: nowrap;
   text-transform: capitalize;
@@ -425,9 +424,15 @@ main.no-sidebar {
 }
 
 .status-badge.open {
-  background-color: rgb(109, 8, 153);
+  background-color: rgb(66, 138, 239);
   color: white;
-  border: 1px solid rgb(46, 4, 74);
+  border: 1px solid rgb(22, 25, 177);
+}
+
+.status-badge.closed {
+  background-color: green;
+  color: white;
+  border: 1px solid darkgreen;
 }
 
 /* TOTAL BOX */
@@ -562,21 +567,9 @@ input[type="checkbox"]:checked {
   overflow: hidden;
 }
 
-/* .table-wrapper {
-  position: relative;
-  margin-top: 15px;
-  height: 495px;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background-color: #efeeea;
-} */
-
 /* TRASH TABLE */
 .trash-wrapper {
   position: relative;
-  /* margin-top: 15px; */
   height: 495px;
   overflow-y: auto;
   border: 1px solid #ddd;
@@ -769,8 +762,8 @@ input[type="number"]::-webkit-outer-spin-button {
 /* SCROLLBAR */
 .table-wrapper::-webkit-scrollbar,
 .trash-wrapper::-webkit-scrollbar {
-  width: 3px; /* vertical scrollbar thickness */
-  height: 3px; /* horizontal scrollbar thickness */
+  width: 3px;
+  height: 3px;
 }
 
 /* Scrollbar Track */

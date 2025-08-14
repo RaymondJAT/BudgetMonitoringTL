@@ -198,6 +198,7 @@ const ToolBar = ({
               isClearable
               inline
               calendarClassName="w-100"
+              dateFormat="yyyy-MM-dd"
             />
             <div className="d-flex justify-content-end mt-2">
               <AppButton
@@ -213,7 +214,7 @@ const ToolBar = ({
                 variant="outline-success"
                 onClick={() => {
                   if (startDate && endDate) {
-                    onDateRangeChange([startDate, endDate]);
+                    onDateRangeChange(startDate, endDate);
                   }
                   setShowDatePicker(false);
                 }}

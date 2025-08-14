@@ -21,7 +21,6 @@ const RevolvingFund = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // State for viewing modal
   const [viewBudgetId, setViewBudgetId] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
@@ -58,12 +57,16 @@ const RevolvingFund = () => {
   };
 
   // FETCH DATE RANGE
-  const fetchFundDataByDate = async (startDate, endDate) => {
+  const fetchFundDataByDate = async (startDate, endDate, status = "") => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     const formatDate = (date) => {
       const d = new Date(date);
+      if (isNaN(d.getTime())) {
+        console.warn("Invalid date passed to formatDate:", date);
+        return "";
+      }
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, "0");
       const day = String(d.getDate()).padStart(2, "0");
@@ -80,19 +83,23 @@ const RevolvingFund = () => {
         end = formatDate(adjustedEnd);
       }
 
-      const res = await fetch(
-        `/api/revolving_fund/getrevolving-fund-target/${start}/${end}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      let url = `/api/revolving_fund/getrevolving-fund-target`;
+      if (start) url += `/${start}`;
+      if (end) url += `/${end}`;
+      if (status) url += `/${status}`;
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
       const result = await res.json();
+      console.log("API Response:", result);
+
       setFundData(result.data || []);
     } catch (error) {
       console.error("Error fetching by date range:", error);
@@ -108,7 +115,7 @@ const RevolvingFund = () => {
     fetchFundData();
   };
 
-  // ✅ Inject buttons into the "Actions" column
+  // Inject buttons into the "Actions" column
   const columns = baseColumns.map((col) => {
     if (col.accessor === "actions") {
       return {
@@ -172,7 +179,7 @@ const RevolvingFund = () => {
                 className="custom-app-button"
               />
             }
-            onDateRangeChange={fetchFundDataByDate}
+            onDateRangeChange={(start, end) => fetchFundDataByDate(start, end)}
           />
 
           <NewRevolvingFund
@@ -197,7 +204,7 @@ const RevolvingFund = () => {
         </div>
       </Container>
 
-      {/* ✅ ViewRevolvingFund Modal */}
+      {/* ViewRevolvingFund */}
       {showViewModal && (
         <ViewRevolvingFund
           show={showViewModal}

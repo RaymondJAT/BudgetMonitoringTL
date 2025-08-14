@@ -82,7 +82,7 @@ const ViewRevolvingFund = ({ show, onHide, budgetId }) => {
         )}
 
         {!loading && !error && (
-          <AllocationTable transactions={transactions} height="500px" />
+          <AllocationTable transactions={transactions} height="425px" />
         )}
       </Modal.Body>
 
