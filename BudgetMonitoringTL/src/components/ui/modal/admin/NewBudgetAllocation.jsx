@@ -202,11 +202,15 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
       }
 
       const newItem = {
-        ...result.data,
-        amount: parseFloat(budget),
-        department: department.label,
+        id: result.data?.id,
+        department: `${department.label}-${type.label}`,
+        total_fund: parseFloat(budget),
+        remaining_budget: parseFloat(budget),
+        issued_amount: 0,
+        remaining_amount: parseFloat(budget),
+        utilization: 0,
         bank_account: bank.label,
-        type: type.label,
+
         description: description,
         createdAt: new Date().toISOString(),
       };

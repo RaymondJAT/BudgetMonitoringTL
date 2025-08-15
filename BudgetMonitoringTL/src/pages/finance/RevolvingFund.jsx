@@ -13,10 +13,13 @@ import TotalCards from "../../components/TotalCards";
 import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
 import AppButton from "../../components/ui/AppButton";
 import ViewRevolvingFund from "../../components/ui/modal/admin/ViewRevolvingFund";
+import SubmitRevolvingFund from "../../components/ui/modal/admin/SubmitRevolvingFund";
 
 const RevolvingFund = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [selectedFund, setSelectedFund] = useState(null);
   const [fundData, setFundData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
   const [loading, setLoading] = useState(true);
@@ -137,8 +140,12 @@ const RevolvingFund = () => {
                 label={<LuFolderCheck />}
                 variant="outline-success"
                 className="custom-app-button"
-                onClick={() => console.log("Submitting", rowData)}
+                onClick={() => {
+                  setSelectedFund(rowData);
+                  setShowSubmitModal(true);
+                }}
               />
+
               <AppButton
                 label={<TbReportAnalytics />}
                 variant="outline-dark"
@@ -211,6 +218,14 @@ const RevolvingFund = () => {
           onHide={() => setShowViewModal(false)}
           budgetId={viewBudgetId}
           tableData={fundData}
+        />
+      )}
+
+      {showSubmitModal && (
+        <SubmitRevolvingFund
+          show={showSubmitModal}
+          onHide={() => setShowSubmitModal(false)}
+          fundData={selectedFund}
         />
       )}
     </>

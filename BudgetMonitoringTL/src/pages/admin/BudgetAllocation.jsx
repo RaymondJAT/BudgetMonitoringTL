@@ -28,7 +28,7 @@ const BudgetAllocation = () => {
     }
 
     try {
-      const res = await fetch("/api/budget/getbudget", {
+      const res = await fetch("/api/budget/getbudget_allocation", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 import React from "react";
-import { FaEye, FaEdit } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { LuFolderCheck } from "react-icons/lu";
-import { TbReportAnalytics } from "react-icons/tb";
+
 import AppButton from "../components/ui/AppButton";
 
 const pesoFormatter = new Intl.NumberFormat("en-PH", {
@@ -77,34 +77,6 @@ export const revolvingFundColumns = [
   {
     label: "Actions",
     accessor: "actions",
-    // Cell: ({ row }) =>
-    //   React.createElement(
-    //     "div",
-    //     { className: "d-flex gap-1" },
-    //     React.createElement(AppButton, {
-    //       key: "view",
-    //       label: React.createElement(FaEye),
-    //       variant: "outline-dark",
-    //       className: "custom-app-button",
-    //       onClick: () => {
-    //         setSelectedBudgetId(row.original.id); // store budget ID in parent state
-    //         setShowViewModal(true); // open modal
-    //       },
-    //     }),
-    //     React.createElement(AppButton, {
-    //       key: "submit",
-    //       label: React.createElement(LuFolderCheck),
-    //       variant: "outline-success",
-    //       className: "custom-app-button",
-    //       onClick: () => console.log("Submitting", row.original),
-    //     }),
-    //     React.createElement(AppButton, {
-    //       key: "report",
-    //       label: React.createElement(TbReportAnalytics),
-    //       variant: "outline-dark",
-    //       className: "custom-app-button",
-    //     })
-    //   ),
   },
 ];
 
@@ -162,4 +134,15 @@ export const cashDisbursementColumns = [
         })
       ),
   },
+];
+
+// revolvingfundsubmit
+export const columns = [
+  { label: "Status", accessor: "status" },
+  { label: "Date Issue", accessor: "date_issue" },
+  { label: "Received By", accessor: "received_by" },
+  { label: "Department", accessor: "department" },
+  { label: "Particulars", accessor: "particulars" },
+  { label: "Amount Return", accessor: "amount_return" },
+  { label: "Amount Expended", accessor: "amount_expended" },
 ];

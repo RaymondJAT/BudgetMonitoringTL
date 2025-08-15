@@ -19,11 +19,10 @@ const BudgetTable = ({ data, height }) => {
 
   const renderRows = () =>
     data.map((item, index) => {
-      const amount = Number(item.amount) || 0;
-      const used = Number(item.used) || 0;
+      const amount = Number(item.remaining_budget) || 0;
+      const used = Number(item.issued_amount) || 0;
       const remaining = amount - used;
-      const utilization =
-        amount > 0 ? ((used / amount) * 100).toFixed(2) : "0.00";
+      const utilization = amount > 0 ? ((used / amount) * 100).toFixed(2) : 0;
 
       return (
         <tr key={item.id || index}>

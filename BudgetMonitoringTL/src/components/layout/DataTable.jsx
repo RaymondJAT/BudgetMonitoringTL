@@ -20,13 +20,13 @@ const DataTable = ({
   setPrintData,
   showCheckbox = true,
   showActions = true,
-  actionType = "meatball", // NEW PROP (default for backwards compatibility)
-  renderActionButton, // Optional custom button renderer for flexibility
+  actionType = "meatball",
+  renderActionButton,
 }) => {
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
-  // Generate action menu items
+  // GENERATE ACTION MENU ITEMS
   const meatballItems = meatballActions({
     onDelete,
     onArchive,
@@ -35,14 +35,14 @@ const DataTable = ({
     setPrintData,
   });
 
-  // Update select all state
+  // UPDATE SELECT ALL STATE
   useEffect(() => {
     setAllSelected(
       data.length > 0 && data.every((entry) => selectedRows[entry?.id])
     );
   }, [data, selectedRows]);
 
-  // Selection handlers
+  // SELECTION HANDLERS
   const handleSelectAll = (checked) => {
     const newSelection = {};
     data.forEach((entry) => {
@@ -58,7 +58,7 @@ const DataTable = ({
     });
   };
 
-  // Cell rendering
+  // CELL RENDERING
   const renderCell = useCallback((entry, col) => {
     const value = entry[col.accessor];
 
@@ -95,7 +95,7 @@ const DataTable = ({
       maximumFractionDigits: 2,
     })}`;
 
-  // Meatball dropdown actions
+  // MEATBALL DROPDOWN ACTIONS
   const ActionMenu = ({ entry, index }) => (
     <Dropdown
       align="end"
@@ -132,7 +132,7 @@ const DataTable = ({
     </Dropdown>
   );
 
-  // Action button (alternative)
+  // ACTION BUTTON (ALTERNATIVE)
   const ActionButton = ({ entry }) =>
     renderActionButton ? (
       renderActionButton(entry)
@@ -148,7 +148,7 @@ const DataTable = ({
       />
     );
 
-  // Render rows
+  // RENDER ROWS
   const renderTableRows = () =>
     data.filter(Boolean).map((entry, index) => (
       <tr
@@ -206,7 +206,7 @@ const DataTable = ({
       </tr>
     ));
 
-  // Render mobile cards
+  // RENDER MOBILE CARDS
   const renderMobileCards = () =>
     data.map((entry, index) => (
       <div
@@ -236,7 +236,7 @@ const DataTable = ({
 
   return (
     <div className="table-wrapper" style={{ maxHeight: height }}>
-      {/* Desktop Table */}
+      {/* DESKTOP VIEW */}
       <Table hover className="expense-table mb-0 d-none d-lg-table">
         <thead>
           <tr>
@@ -289,7 +289,7 @@ const DataTable = ({
         </tbody>
       </Table>
 
-      {/* Mobile View */}
+      {/* MOBILE VIEW */}
       <div className="d-lg-none">
         {data.length > 0 ? (
           renderMobileCards()
