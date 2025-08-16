@@ -21,11 +21,12 @@ const BudgetTable = ({ data, height }) => {
     data.map((item, index) => {
       const amount = Number(item.remaining_budget) || 0;
       const used = Number(item.issued_amount) || 0;
-      const remaining = amount - used;
+      const remaining = Number(item.remaining_amount) || 0;
       const utilization = amount > 0 ? ((used / amount) * 100).toFixed(2) : 0;
 
       return (
         <tr key={item.id || index}>
+          <td>{item.date}</td>
           <td>{item.department}</td>
           <td>₱ {amount.toLocaleString()}</td>
           <td>₱ {used.toLocaleString()}</td>
@@ -60,6 +61,7 @@ const BudgetTable = ({ data, height }) => {
         <Table hover className="expense-table mb-0">
           <thead>
             <tr>
+              <th>Date</th>
               <th>Department</th>
               <th>Allocated Budget</th>
               <th>Used Amount</th>

@@ -51,6 +51,56 @@ const BudgetAllocation = () => {
     }
   };
 
+  const fetchBudgetDataByDate = async (startDate, endDate, status = "") => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const formDate = (date) => {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) {
+        console.warn("Invalid date passed to formDate:", date);
+        return "";
+      }
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    try {
+      const start = startDate ? formDate(startDate) : "";
+      let end = endDate ? formDate(endDate) : "";
+
+      if (endDate) {
+        const adjustedEnd = new Date(endDate);
+        adjustedEnd.setHours(23, 59, 59, 999);
+        end = formDate(adjustedEnd);
+      }
+
+      let url = `/api/budget/getbudget_allocation`;
+      if (start) url += `/${start}`;
+      if (end) url += `/${end}`;
+      if (status) url += `/${status}`;
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+
+      const result = await res.json();
+      console.log("API response:", result);
+
+      setBudgetData(result.data || []);
+    } catch (error) {
+      console.error("Error fetching by date range:", error);
+      setBudgetData([]);
+    }
+  };
+
   useEffect(() => {
     fetchBudgetData();
   }, []);
@@ -87,7 +137,6 @@ const BudgetAllocation = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            showFilter={false}
             leftContent={
               <AppButton
                 label={
@@ -101,6 +150,9 @@ const BudgetAllocation = () => {
                 onClick={() => setShowModal(true)}
                 className="custom-app-button"
               />
+            }
+            onDateRangeChange={(start, end) =>
+              fetchBudgetDataByDate(start, end)
             }
           />
 
