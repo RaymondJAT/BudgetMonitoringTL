@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import { Modal, Spinner } from "react-bootstrap";
-
+import { Modal, Spinner, InputGroup, FormControl } from "react-bootstrap";
 import { columns } from "../../../../constants/BudgetingColumn";
 import DataTable from "../../../layout/DataTable";
 import AppButton from "../../AppButton";
 
-const SubmitRevolvingFund = ({ show, onHide, fundData }) => {
+const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [report, setReport] = useState(null);
+  const [amount, setAmount] = useState("");
+  const [budgetType, setBudgetType] = useState("");
 
   const token = localStorage.getItem("token");
 
+  // Fetch transactions + summary + budget type
   useEffect(() => {
     if (!show || !fundData?.id) return;
 
@@ -31,19 +34,11 @@ const SubmitRevolvingFund = ({ show, onHide, fundData }) => {
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         const data = await res.json();
 
-        // Set table data
         setTransactions(data.cash_disbursement || []);
-
-        // Set summary data
-        if (Array.isArray(data.total) && data.total.length > 0) {
-          setSummary(data.total[0]);
-        } else {
-          setSummary(null);
-        }
+        setSummary(data.total?.[0] || null);
+        setBudgetType(data.type?.[0]?.budget_type || "CASH");
       } catch (err) {
         console.error("Failed to fetch transactions:", err);
-        setTransactions([]);
-        setSummary(null);
       } finally {
         setLoading(false);
       }
@@ -51,6 +46,74 @@ const SubmitRevolvingFund = ({ show, onHide, fundData }) => {
 
     fetchTransactions();
   }, [show, fundData?.id, token]);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const numAmount = parseFloat(amount) || 0;
+
+      const payload = {
+        id: fundData.id,
+        beginning: summary?.beginning_amount || 0,
+        cash_inflows: summary?.total_amount_return || 0,
+        cash_outflows: summary?.total_amount_expended || 0,
+        ending: summary?.ending_amount || 0,
+        cash_on_hand: budgetType === "CASH" ? numAmount : 0,
+        gcash: budgetType === "GCASH" ? numAmount : 0,
+      };
+
+      payload.total_cash = payload.cash_on_hand + payload.gcash;
+      payload.sub_total = (summary?.ending_amount || 0) - payload.total_cash;
+
+      if (numAmount === (summary?.ending_amount || 0)) {
+        payload.status = "BALANCED";
+      } else if (numAmount > (summary?.ending_amount || 0)) {
+        payload.status = "OVER";
+      } else {
+        payload.status = "SHORT";
+      }
+
+      const res = await fetch("/api/revolving_fund/close-revolving-fund", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Error: ${res.status}`);
+      const data = await res.json();
+
+      setReport(data);
+      onHide();
+
+      // 🔥 trigger parent refresh
+      if (typeof onSuccess === "function") {
+        onSuccess();
+      }
+    } catch (err) {
+      console.error("Failed to close revolving fund:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const computedStatus = (() => {
+    const ending = summary?.ending_amount || 0;
+    const numAmount = parseFloat(amount) || 0;
+
+    if (!amount) return "SHORT";
+    if (numAmount === ending) return "BALANCED";
+    if (numAmount > ending) return "OVER";
+    return "SHORT";
+  })();
+
+  const formatCurrency = (val) =>
+    `₱ ${Number(val || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
   return (
     <Modal
@@ -79,45 +142,122 @@ const SubmitRevolvingFund = ({ show, onHide, fundData }) => {
 
         <div className="row g-3">
           {/* Left Column */}
-          <div className="col-lg-4 d-flex flex-column gap-3">
-            <div className="custom-container border rounded p-3 shadow-sm">
-              {/* SUMMARY */}
-              <h6 className="fw-bold mb-2">Summary</h6>
-              <div className="mb-1">
-                Beginning Amount: ₱
-                {summary?.beginning_amount?.toLocaleString() || 0}
-              </div>
-              <div className="mb-1">
-                Added Amount: ₱{summary?.added_amount?.toLocaleString() || 0}
-              </div>
-              <div className="mb-1">
-                Total Amount Return: ₱
-                {summary?.total_amount_return?.toLocaleString() || 0}
-              </div>
-              <div className="mb-1">
-                Total Amount Expended: ₱
-                {summary?.total_amount_expended?.toLocaleString() || 0}
-              </div>
-              <div className="mb-1">
-                Ending Amount: ₱{summary?.ending_amount?.toLocaleString() || 0}
-              </div>
-            </div>
-
-            <div className="custom-container border rounded p-3 shadow-sm flex-fill">
-              {/* CASH REPORT */}
-              <h6 className="fw-bold mb-2">Cash Report</h6>
-            </div>
-          </div>
-
-          {/* Right Column */}
           <div className="col-lg-8">
             <DataTable
               data={transactions}
               columns={columns}
-              height="400px"
+              height="430px"
               showCheckbox={false}
               showActions={false}
             />
+          </div>
+
+          {/* Right Column */}
+          <div className="col-lg-4 d-flex flex-column gap-3">
+            {/* Summary */}
+            <div className="custom-container border rounded p-3 shadow-sm">
+              <h6 className="fw-bold mb-3">Summary</h6>
+
+              <InputGroup className="mb-2">
+                <InputGroup.Text className="small-input fw-semibold">
+                  Beginning Amount
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  readOnly
+                  value={formatCurrency(summary?.beginning_amount)}
+                  className="small-input"
+                />
+              </InputGroup>
+
+              <InputGroup className="mb-2">
+                <InputGroup.Text className="small-input fw-semibold">
+                  Added Amount
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  readOnly
+                  value={formatCurrency(summary?.added_amount)}
+                  className="small-input"
+                />
+              </InputGroup>
+
+              <InputGroup className="mb-2">
+                <InputGroup.Text className="small-input fw-semibold">
+                  Total Amount Return
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  readOnly
+                  value={formatCurrency(summary?.total_amount_return)}
+                  className="small-input"
+                />
+              </InputGroup>
+
+              <InputGroup className="mb-2">
+                <InputGroup.Text className="small-input fw-semibold">
+                  Total Amount Expended
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  readOnly
+                  value={formatCurrency(summary?.total_amount_expended)}
+                  className="small-input"
+                />
+              </InputGroup>
+
+              <InputGroup>
+                <InputGroup.Text className="small-input fw-semibold">
+                  Ending Amount
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  readOnly
+                  value={formatCurrency(summary?.ending_amount)}
+                  className="small-input"
+                />
+              </InputGroup>
+            </div>
+
+            {/* Cash Report */}
+            <div className="custom-container border rounded p-3 shadow-sm flex-fill">
+              <h6 className="fw-bold mb-3">Cash Report</h6>
+
+              <InputGroup className="mb-2">
+                <InputGroup.Text className="small-input fw-semibold">
+                  {budgetType}
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) =>
+                    setAmount(e.target.value.replace(/[^0-9.]/g, ""))
+                  }
+                  className="small-input"
+                />
+              </InputGroup>
+
+              <InputGroup>
+                <InputGroup.Text
+                  className={`small-input fw-semibold ${
+                    computedStatus === "OVER"
+                      ? "text-danger"
+                      : computedStatus === "BALANCED"
+                      ? "text-success"
+                      : "text-warning"
+                  }`}
+                >
+                  {computedStatus}
+                </InputGroup.Text>
+                <FormControl
+                  type="text"
+                  readOnly
+                  value={formatCurrency(summary?.ending_amount)}
+                  className="small-input"
+                />
+              </InputGroup>
+            </div>
           </div>
         </div>
       </Modal.Body>
@@ -132,6 +272,8 @@ const SubmitRevolvingFund = ({ show, onHide, fundData }) => {
         <AppButton
           label="Submit"
           variant="outline-success"
+          onClick={handleSubmit}
+          disabled={loading}
           className="custom-app-button"
         />
       </Modal.Footer>

@@ -75,7 +75,7 @@ const BudgetTable = ({ data, height }) => {
               renderRows()
             ) : (
               <tr>
-                <td colSpan="6" className="text-center text-muted">
+                <td colSpan="7" className="text-center text-muted">
                   No budget data available.
                 </td>
               </tr>

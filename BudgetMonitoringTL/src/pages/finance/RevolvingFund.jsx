@@ -226,6 +226,7 @@ const RevolvingFund = () => {
           show={showSubmitModal}
           onHide={() => setShowSubmitModal(false)}
           fundData={selectedFund}
+          onSuccess={fetchFundData}
         />
       )}
     </>

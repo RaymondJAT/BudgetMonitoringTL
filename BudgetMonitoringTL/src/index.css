@@ -435,6 +435,12 @@ main.no-sidebar {
   border: 1px solid darkgreen;
 }
 
+.status-badge.cleared {
+  background-color: rgb(171, 151, 3);
+  color: white;
+  border: 1px solid rgb(78, 79, 8);
+}
+
 /* TOTAL BOX */
 .total-container {
   display: flex;
