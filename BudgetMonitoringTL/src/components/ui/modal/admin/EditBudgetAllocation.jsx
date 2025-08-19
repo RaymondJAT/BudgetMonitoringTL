@@ -38,7 +38,7 @@ const EditBudgetAllocation = ({ show, onHide, budgetItem = {}, onSave }) => {
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body style={{ backgroundColor: "#800000" }}>
+      <Modal.Body  className="cashreq-scroll" style={{ backgroundColor: "#800000" }}>
         <Form className="text-white">
           <Row className="mb-3">
             <Col md={12}>

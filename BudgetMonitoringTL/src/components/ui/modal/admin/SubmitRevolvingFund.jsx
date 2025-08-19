@@ -132,7 +132,10 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body style={{ backgroundColor: "#800000" }}>
+      <Modal.Body
+        className="cashreq-scroll"
+        style={{ backgroundColor: "#800000" }}
+      >
         {loading && (
           <div className="text-center my-4">
             <Spinner animation="border" variant="light" />
@@ -159,7 +162,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               <h6 className="fw-bold mb-3">Summary</h6>
 
               <InputGroup className="mb-2">
-                <InputGroup.Text className="small-input fw-semibold">
+                <InputGroup.Text className="small-input fw-semibold fixed-label">
                   Beginning Amount
                 </InputGroup.Text>
                 <FormControl
@@ -171,7 +174,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               </InputGroup>
 
               <InputGroup className="mb-2">
-                <InputGroup.Text className="small-input fw-semibold">
+                <InputGroup.Text className="small-input fw-semibold fixed-label">
                   Added Amount
                 </InputGroup.Text>
                 <FormControl
@@ -183,7 +186,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               </InputGroup>
 
               <InputGroup className="mb-2">
-                <InputGroup.Text className="small-input fw-semibold">
+                <InputGroup.Text className="small-input fw-semibold fixed-label">
                   Total Amount Return
                 </InputGroup.Text>
                 <FormControl
@@ -195,7 +198,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               </InputGroup>
 
               <InputGroup className="mb-2">
-                <InputGroup.Text className="small-input fw-semibold">
+                <InputGroup.Text className="small-input fw-semibold fixed-label">
                   Total Amount Expended
                 </InputGroup.Text>
                 <FormControl
@@ -207,7 +210,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               </InputGroup>
 
               <InputGroup>
-                <InputGroup.Text className="small-input fw-semibold">
+                <InputGroup.Text className="small-input fw-semibold fixed-label">
                   Ending Amount
                 </InputGroup.Text>
                 <FormControl
@@ -224,7 +227,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               <h6 className="fw-bold mb-3">Cash Report</h6>
 
               <InputGroup className="mb-2">
-                <InputGroup.Text className="small-input fw-semibold">
+                <InputGroup.Text className="small-input fw-semibold fixed-label">
                   {budgetType}
                 </InputGroup.Text>
                 <FormControl
@@ -240,7 +243,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
 
               <InputGroup>
                 <InputGroup.Text
-                  className={`small-input fw-semibold ${
+                  className={`small-input fw-semibold fixed-label ${
                     computedStatus === "OVER"
                       ? "text-danger"
                       : computedStatus === "BALANCED"

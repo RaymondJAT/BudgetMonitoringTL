@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { Container, Form } from "react-bootstrap";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaEdit } from "react-icons/fa";
+import { LuFolderCheck } from "react-icons/lu";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
-import { cashDisbursementColumns } from "../../constants/BudgetingColumn";
+import { cashDisbursementColumns as baseColumns } from "../../constants/BudgetingColumn";
 import { LOCAL_KEYS } from "../../constants/localKeys";
 
 import { handleExportData } from "../../utils/exportItems";
@@ -13,6 +14,7 @@ import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import AppButton from "../../components/ui/AppButton";
 import NewCashDisbursement from "../../components/ui/modal/admin/NewCashDisbursement";
+import SubmitCashDisbursement from "../../components/ui/modal/admin/SubmitCashDisbursement";
 
 const CashDisbursement = () => {
   const [tableData, setTableData] = useState([]);
@@ -21,6 +23,9 @@ const CashDisbursement = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [loading, setLoading] = useState(true);
+
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [selectedDisbursement, setSelectedDisbursement] = useState(null);
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -38,10 +43,7 @@ const CashDisbursement = () => {
       .trim();
 
   const isMatch = (item, value) => {
-    const fields = [
-      ...cashDisbursementColumns.map((col) => col.accessor),
-      "formType",
-    ];
+    const fields = [...baseColumns.map((col) => col.accessor), "formType"];
     return fields.some((key) =>
       normalize(item[key]).includes(normalize(value))
     );
@@ -135,6 +137,39 @@ const CashDisbursement = () => {
     </div>
   );
 
+  const columns = baseColumns.map((col) => {
+    if (col.accessor === "actions") {
+      return {
+        ...col,
+        Cell: ({ row }) => {
+          const rowData = row.original || row;
+          return (
+            <div className="d-flex gap-1">
+              <AppButton
+                key="submit"
+                label={<LuFolderCheck />}
+                variant="outline-success"
+                className="custom-app-button"
+                onClick={() => {
+                  setSelectedDisbursement(rowData);
+                  setShowSubmitModal(true);
+                }}
+              />
+              <AppButton
+                key="edit"
+                label={<FaEdit />}
+                variant="outline-dark"
+                className="custom-app-button"
+                onClick={() => console.log("Editing", rowData)}
+              />
+            </div>
+          );
+        },
+      };
+    }
+    return col;
+  });
+
   return (
     <>
       <div className="mt-3">
@@ -163,7 +198,7 @@ const CashDisbursement = () => {
           ) : (
             <DataTable
               data={filteredData}
-              columns={cashDisbursementColumns}
+              columns={columns}
               height="350px"
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
@@ -171,6 +206,12 @@ const CashDisbursement = () => {
               showCheckbox={false}
             />
           )}
+
+          <SubmitCashDisbursement
+            show={showSubmitModal}
+            onHide={() => setShowSubmitModal(false)}
+            disbursement={selectedDisbursement}
+          />
         </div>
       </Container>
     </>

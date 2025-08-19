@@ -735,6 +735,10 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: #ffe5e5 !important;
 }
 
+.fixed-label {
+  width: 165px;
+}
+
 /* REACT-TO-PRINT */
 @media print {
   @page {

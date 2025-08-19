@@ -199,7 +199,10 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body style={{ backgroundColor: "#800000" }}>
+      <Modal.Body
+        className="cashreq-scroll"
+        style={{ backgroundColor: "#800000" }}
+      >
         <Form className="text-white">
           {/* Revolving Fund ID - as Select */}
           <Row className="g-1">
