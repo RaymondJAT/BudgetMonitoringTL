@@ -15,16 +15,19 @@ import DataTable from "../../components/layout/DataTable";
 import AppButton from "../../components/ui/AppButton";
 import NewCashDisbursement from "../../components/ui/modal/admin/NewCashDisbursement";
 import SubmitCashDisbursement from "../../components/ui/modal/admin/SubmitCashDisbursement";
+import EditCashDisbursement from "../../components/ui/modal/admin/EditCashDisbursement";
 
 const CashDisbursement = () => {
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedRows, setSelectedRows] = useState({});
   const [showModal, setShowModal] = useState(false);
+  const [disbursementData, setDisbursementData] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedDisbursement, setSelectedDisbursement] = useState(null);
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
@@ -78,6 +81,63 @@ const CashDisbursement = () => {
       setTableData([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // DATE RANGE
+  const fetchDisbursementDataByDate = async (
+    startDate,
+    endDate,
+    status = ""
+  ) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const formatDate = (date) => {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) {
+        console.warn("Invalid date passed to formatDate:", date);
+        return "";
+      }
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    try {
+      const start = startDate ? formatDate(startDate) : "";
+      let end = endDate ? formatDate(endDate) : "";
+
+      if (endDate) {
+        const adjustedEnd = new Date(endDate);
+        adjustedEnd.setHours(23, 59, 59, 999);
+        end = formatDate(adjustedEnd);
+      }
+
+      let url = `/api/cash_disbursement/getcash-disbursement-target`;
+      if (start) url += `/${start}`;
+      if (end) url += `/${end}`;
+      if (status) url += `/${status}`;
+
+      console.log("📡 Fetching:", url);
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+
+      const result = await res.json();
+      console.log("API response:", result);
+
+      setDisbursementData(result.data || []);
+    } catch (error) {
+      console.error("Error fetching by date range:", error);
+      setDisbursementData([]);
     }
   };
 
@@ -160,7 +220,10 @@ const CashDisbursement = () => {
                 label={<FaEdit />}
                 variant="outline-dark"
                 className="custom-app-button"
-                onClick={() => console.log("Editing", rowData)}
+                onClick={() => {
+                  setSelectedDisbursement(rowData);
+                  setShowEditModal(true);
+                }}
               />
             </div>
           );
@@ -185,6 +248,9 @@ const CashDisbursement = () => {
             handleExport={handleExport}
             selectedCount={selectedCount}
             searchBarWidth="300px"
+            onDateRangeChange={(start, end) =>
+              fetchDisbursementDataByDate(start, end)
+            }
           />
 
           <NewCashDisbursement
@@ -211,6 +277,13 @@ const CashDisbursement = () => {
             show={showSubmitModal}
             onHide={() => setShowSubmitModal(false)}
             disbursement={selectedDisbursement}
+          />
+
+          <EditCashDisbursement
+            show={showEditModal}
+            onHide={() => setShowEditModal(false)}
+            disbursement={selectedDisbursement}
+            onSuccess={fetchCashDisbursements} 
           />
         </div>
       </Container>
