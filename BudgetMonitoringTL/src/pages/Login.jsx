@@ -19,12 +19,41 @@ const Login = ({ setUserRole }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const demoUsers = {
+      admin: { username: "admin", password: "admin", role: "admin" },
+      employee: { username: "employee", password: "emp", role: "employee" },
+      teamlead: { username: "teamlead", password: "lead", role: "teamlead" },
+    };
+
+    const demoUser = Object.values(demoUsers).find(
+      (u) => u.username === username && u.password === password
+    );
+
+    if (demoUser) {
+      localStorage.setItem("username", demoUser.username);
+      localStorage.setItem("role", demoUser.role);
+      setUserRole(demoUser.role);
+
+      switch (demoUser.role) {
+        case "admin":
+          navigate("/");
+          break;
+        case "employee":
+          navigate("/");
+          break;
+        case "teamlead":
+          navigate("/");
+          break;
+        default:
+          navigate("/login");
+      }
+      return;
+    }
+
     try {
       const response = await fetch("api/login/check-credentials", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
 
@@ -33,48 +62,16 @@ const Login = ({ setUserRole }) => {
       if (result.success) {
         const { token, data } = result;
 
-        // Optional: Save JWT token for future requests
         localStorage.setItem("token", token);
-
-        // Save user info
         localStorage.setItem("username", data.fullname || data.username);
 
-        // Convert access level to role name
-        let role = "";
-        switch (data.position) {
-          case "admin":
-            role = "admin";
-            break;
-          case "employee":
-            role = "employee";
-            break;
-          case "teamlead":
-            role = "teamlead";
-            break;
-          case "finance":
-            role = "finance";
-            break;
-          default:
-            role = "employee";
-        }
-
+        let role = data.position || "finance";
         localStorage.setItem("role", role);
         setUserRole(role);
 
-        // Redirect to proper path
         switch (role) {
-          case "admin":
-            navigate("/admin");
-            break;
           case "finance":
             navigate("/");
-            break;
-          case "employee":
-            navigate("/employee");
-            break;
-
-          case "teamlead":
-            navigate("/teamlead");
             break;
           default:
             navigate("/login");

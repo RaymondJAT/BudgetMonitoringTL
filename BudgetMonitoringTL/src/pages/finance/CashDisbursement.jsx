@@ -21,11 +21,9 @@ const CashDisbursement = () => {
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedRows, setSelectedRows] = useState({});
-  const [showModal, setShowModal] = useState(false);
-  const [disbursementData, setDisbursementData] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
+  const [showNewModal, setShowNewModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedDisbursement, setSelectedDisbursement] = useState(null);
@@ -33,15 +31,15 @@ const CashDisbursement = () => {
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
   const totalComputationData = useMemo(() => {
-    const archiveData =
+    const archive =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
-    const importantData =
+    const important =
       JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
-    return [...tableData, ...archiveData, ...importantData];
+    return [...tableData, ...archive, ...important];
   }, [tableData]);
 
-  const normalize = (value) =>
-    String(value || "")
+  const normalize = (val) =>
+    String(val || "")
       .toLowerCase()
       .trim();
 
@@ -59,11 +57,8 @@ const CashDisbursement = () => {
 
   const fetchCashDisbursements = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found.");
-      setLoading(false);
-      return;
-    }
+    if (!token) return setLoading(false);
+
     try {
       const res = await fetch("/api/cash_disbursement/getcash_disbursement", {
         headers: {
@@ -71,20 +66,20 @@ const CashDisbursement = () => {
           "Content-Type": "application/json",
         },
       });
-      if (!res.ok) throw new Error("Failed to fetch cash disbursement data");
+
+      if (!res.ok) throw new Error("Failed to fetch disbursement data");
 
       const result = await res.json();
       const sorted = [...(result.data || [])].sort((a, b) => b.id - a.id);
       setTableData(sorted);
-    } catch (error) {
-      console.error("Fetch error:", error);
+    } catch (err) {
+      console.error("Fetch error:", err);
       setTableData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // DATE RANGE
   const fetchDisbursementDataByDate = async (
     startDate,
     endDate,
@@ -95,25 +90,18 @@ const CashDisbursement = () => {
 
     const formatDate = (date) => {
       const d = new Date(date);
-      if (isNaN(d.getTime())) {
-        console.warn("Invalid date passed to formatDate:", date);
-        return "";
-      }
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      if (isNaN(d.getTime())) return "";
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(d.getDate()).padStart(2, "0")}`;
     };
 
     try {
       const start = startDate ? formatDate(startDate) : "";
-      let end = endDate ? formatDate(endDate) : "";
-
-      if (endDate) {
-        const adjustedEnd = new Date(endDate);
-        adjustedEnd.setHours(23, 59, 59, 999);
-        end = formatDate(adjustedEnd);
-      }
+      let end = endDate
+        ? formatDate(new Date(endDate).setHours(23, 59, 59, 999))
+        : "";
 
       let url = `/api/cash_disbursement/getcash-disbursement-target`;
       if (start) url += `/${start}`;
@@ -132,12 +120,10 @@ const CashDisbursement = () => {
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
       const result = await res.json();
-      console.log("API response:", result);
-
-      setDisbursementData(result.data || []);
-    } catch (error) {
-      console.error("Error fetching by date range:", error);
-      setDisbursementData([]);
+      setTableData(result.data || []);
+    } catch (err) {
+      console.error("Error fetching by date:", err);
+      setTableData([]);
     }
   };
 
@@ -145,17 +131,18 @@ const CashDisbursement = () => {
     fetchCashDisbursements();
   }, []);
 
-  const handleAddDisbursementItem = () => {
-    fetchCashDisbursements();
-  };
-
-  const handleExport = () => {
-    const reset = handleExportData({
+  const handleExport = () =>
+    handleExportData({
       filteredData,
       selectedRows,
       selectedCount,
       filename: "CashDisbursement",
     });
+
+  const handleSelectAll = (checked) => {
+    const selection = {};
+    filteredData.forEach((entry) => (selection[entry.id] = checked));
+    setSelectedRows(selection);
   };
 
   const selectAllCheckbox = (
@@ -165,14 +152,7 @@ const CashDisbursement = () => {
         filteredData.length > 0 &&
         filteredData.every((entry) => selectedRows[entry.id])
       }
-      onChange={(e) => {
-        const checked = e.target.checked;
-        const newSelection = {};
-        filteredData.forEach((entry) => {
-          newSelection[entry.id] = checked;
-        });
-        setSelectedRows(newSelection);
-      }}
+      onChange={(e) => handleSelectAll(e.target.checked)}
       className="d-lg-none"
       style={{ marginTop: "3px" }}
       title="Select All"
@@ -191,47 +171,46 @@ const CashDisbursement = () => {
         }
         size="sm"
         variant="outline-dark"
-        onClick={() => setShowModal(true)}
         className="custom-app-button"
+        onClick={() => setShowNewModal(true)}
       />
     </div>
   );
 
-  const columns = baseColumns.map((col) => {
-    if (col.accessor === "actions") {
-      return {
-        ...col,
-        Cell: ({ row }) => {
-          const rowData = row.original || row;
-          return (
-            <div className="d-flex gap-1">
-              <AppButton
-                key="submit"
-                label={<LuFolderCheck />}
-                variant="outline-success"
-                className="custom-app-button"
-                onClick={() => {
-                  setSelectedDisbursement(rowData);
-                  setShowSubmitModal(true);
-                }}
-              />
-              <AppButton
-                key="edit"
-                label={<FaEdit />}
-                variant="outline-dark"
-                className="custom-app-button"
-                onClick={() => {
-                  setSelectedDisbursement(rowData);
-                  setShowEditModal(true);
-                }}
-              />
-            </div>
-          );
-        },
-      };
-    }
-    return col;
-  });
+  const columns = baseColumns.map((col) =>
+    col.accessor === "actions"
+      ? {
+          ...col,
+          Cell: ({ row }) => {
+            const rowData = row.original || row;
+            return (
+              <div className="d-flex gap-1">
+                <AppButton
+                  key="submit"
+                  label={<LuFolderCheck />}
+                  variant="outline-success"
+                  className="custom-app-button"
+                  onClick={() => {
+                    setSelectedDisbursement(rowData);
+                    setShowSubmitModal(true);
+                  }}
+                />
+                <AppButton
+                  key="edit"
+                  label={<FaEdit />}
+                  variant="outline-dark"
+                  className="custom-app-button"
+                  onClick={() => {
+                    setSelectedDisbursement(rowData);
+                    setShowEditModal(true);
+                  }}
+                />
+              </div>
+            );
+          },
+        }
+      : col
+  );
 
   return (
     <>
@@ -254,9 +233,9 @@ const CashDisbursement = () => {
           />
 
           <NewCashDisbursement
-            show={showModal}
-            onHide={() => setShowModal(false)}
-            onAdd={handleAddDisbursementItem}
+            show={showNewModal}
+            onHide={() => setShowNewModal(false)}
+            onAdd={fetchCashDisbursements}
           />
 
           {loading ? (
@@ -283,7 +262,7 @@ const CashDisbursement = () => {
             show={showEditModal}
             onHide={() => setShowEditModal(false)}
             disbursement={selectedDisbursement}
-            onSuccess={fetchCashDisbursements} 
+            onSuccess={fetchCashDisbursements}
           />
         </div>
       </Container>

@@ -20,6 +20,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
 
   const [revolvingFundOptions, setRevolvingFundOptions] = useState([]);
   const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [status, setStatus] = useState("");
 
   const [formData, setFormData] = useState({
     particulars: "",
@@ -142,7 +143,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
         cash_voucher: disbursement.cash_voucher || "",
         amount_issue: disbursement.amount_issue || "",
         amount_return: disbursement.amount_return || "",
-        amount_expended: disbursement.amount_expended || "",
+        amount_expended: disbursement.amount_expend || "",
       });
     }
   }, [show, disbursement]);
@@ -175,7 +176,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
 
       const payload = {
         id: disbursement?.id,
-        rf_id: selectedFund.value,
+        revolving_fund_id: selectedFund.value,
         received_by: selectedEmployee.value,
         department_id: selectedEmployee.department_id,
         particulars: formData.particulars,
@@ -204,7 +205,6 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
 
       await response.json();
 
-      // 🔑 NEW: refresh parent then close modal
       if (onSuccess) onSuccess();
       onHide();
     } catch (error) {

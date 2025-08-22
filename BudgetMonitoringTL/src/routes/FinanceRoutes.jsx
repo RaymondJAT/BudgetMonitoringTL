@@ -10,6 +10,7 @@ import CashDisbursement from "../pages/finance/CashDisbursement";
 import FnceArchive from "../pages/finance/FnceArchive";
 import FnceImportant from "../pages/finance/FnceImportant";
 import FnceTrash from "../pages/finance/FnceTrash";
+import History from "../pages/finance/History";
 
 const FinanceRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const FinanceRoutes = () => {
       <Route path="/finance-archive" element={<FnceArchive />} />
       <Route path="/finance-important" element={<FnceImportant />} />
       <Route path="/finance-trash" element={<FnceTrash />} />
+      <Route path="/history" element={<History />} />
     </Routes>
   );
 };

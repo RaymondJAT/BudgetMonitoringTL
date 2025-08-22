@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { FaFilter, FaFileExport, FaCalendarAlt } from "react-icons/fa";
+import { FaFilter, FaFileExport } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-import { filterDropdownItems } from "../../handlers/actionMenuItems";
 
 import SearchBar from "../ui/SearchBar";
 import AppButton from "../ui/AppButton";
@@ -20,23 +18,12 @@ const ToolBar = ({
 }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateRange, setDateRange] = useState([null, null]);
-  const [selectedFilter, setSelectedFilter] = useState("");
   const [startDate, endDate] = dateRange;
 
   const datePickerRef = useRef(null);
 
   const handleClose = () => {
     setShowDatePicker(false);
-  };
-
-  const handleFilter = (type) => {
-    setSelectedFilter(type);
-
-    if (type === "date-range") {
-      setTimeout(() => setShowDatePicker(true), 0);
-    } else {
-      console.log("Filter by:", type);
-    }
   };
 
   const handleDateChange = (dates) => {
@@ -109,43 +96,15 @@ const ToolBar = ({
           <div className="d-flex align-items-center" style={{ gap: "10px" }}>
             {showFilter && (
               <AppButton
-                isDropdown
                 label={
-                  <>
-                    <FaFilter />
-                    <span className="d-none d-sm-inline ms-1">Filter</span>
-                  </>
+                  <span className="d-flex align-items-center">
+                    <FaFilter className="me-1" />
+                    <span>Filter</span>
+                  </span>
                 }
                 variant="outline-dark"
                 size="sm"
-                dropdownItems={[
-                  ...filterDropdownItems(handleFilter).map((item) => ({
-                    ...item,
-                    label: (
-                      <div className="d-flex align-items-center justify-content-between">
-                        <span>{item.label}</span>
-                        <input
-                          type="radio"
-                          name="filter"
-                          checked={selectedFilter === item.value}
-                          onChange={() => handleFilter(item.value)}
-                          style={{
-                            accentColor: "maroon",
-                            width: "14px",
-                            height: "14px",
-                            marginLeft: "10px",
-                          }}
-                        />
-                      </div>
-                    ),
-                    onClick: () => handleFilter(item.value),
-                  })),
-                  {
-                    label: "Custom",
-                    icon: <FaCalendarAlt style={{ fontSize: "0.80rem" }} />,
-                    onClick: () => handleFilter("date-range"),
-                  },
-                ]}
+                onClick={() => setShowDatePicker(true)}
                 className="custom-app-button"
               />
             )}

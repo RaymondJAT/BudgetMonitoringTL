@@ -73,22 +73,3 @@ export const meatballActions = ({
 export const actionDropdownItems = ({ handleExport }) => [
   { label: "Export", onClick: handleExport },
 ];
-
-// filter dropdown menu
-export const filterDropdownItems = (handleFilter) => [
-  {
-    label: "Last Month",
-    value: "lastMonth",
-    onClick: () => handleFilter("latest"),
-  },
-  {
-    label: "This Week",
-    value: "thisWeek",
-    onClick: () => handleFilter("oldest"),
-  },
-  {
-    label: "This Quarter",
-    value: "thisQuarter",
-    onClick: () => handleFilter("approved"),
-  },
-];
