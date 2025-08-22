@@ -183,18 +183,30 @@ const CashDisbursement = () => {
           ...col,
           Cell: ({ row }) => {
             const rowData = row.original || row;
-            return (
-              <div className="d-flex gap-1">
-                <AppButton
-                  key="submit"
-                  label={<LuFolderCheck />}
-                  variant="outline-success"
-                  className="custom-app-button"
-                  onClick={() => {
-                    setSelectedDisbursement(rowData);
-                    setShowSubmitModal(true);
-                  }}
-                />
+
+            const isLocked = ["RETURN", "REIMBURSE"].includes(
+              String(rowData.particulars).toUpperCase()
+            );
+
+            const buttons = [];
+
+            if (!isLocked) {
+              if (String(rowData.status).toUpperCase() === "UNLIQUIDATED") {
+                buttons.push(
+                  <AppButton
+                    key="submit"
+                    label={<LuFolderCheck />}
+                    variant="outline-success"
+                    className="custom-app-button"
+                    onClick={() => {
+                      setSelectedDisbursement(rowData);
+                      setShowSubmitModal(true);
+                    }}
+                  />
+                );
+              }
+
+              buttons.push(
                 <AppButton
                   key="edit"
                   label={<FaEdit />}
@@ -205,6 +217,16 @@ const CashDisbursement = () => {
                     setShowEditModal(true);
                   }}
                 />
+              );
+            }
+
+            return (
+              <div
+                className={`d-flex gap-1 ${
+                  buttons.length === 1 ? "justify-content-center" : ""
+                }`}
+              >
+                {buttons}
               </div>
             );
           },
