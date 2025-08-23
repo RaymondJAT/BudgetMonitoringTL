@@ -184,13 +184,28 @@ const CashDisbursement = () => {
           Cell: ({ row }) => {
             const rowData = row.original || row;
 
-            const isLocked = ["RETURN", "REIMBURSE"].includes(
+            const isReturnOrReimburse = ["RETURN", "REIMBURSE"].includes(
               String(rowData.particulars).toUpperCase()
             );
 
             const buttons = [];
 
-            if (!isLocked) {
+            if (isReturnOrReimburse) {
+              // ✅ Always show only Edit for RETURN / REIMBURSE
+              buttons.push(
+                <AppButton
+                  key="edit"
+                  label={<FaEdit />}
+                  variant="outline-dark"
+                  className="custom-app-button"
+                  onClick={() => {
+                    setSelectedDisbursement(rowData);
+                    setShowEditModal(true);
+                  }}
+                />
+              );
+            } else {
+              // ✅ Normal flow
               if (String(rowData.status).toUpperCase() === "UNLIQUIDATED") {
                 buttons.push(
                   <AppButton

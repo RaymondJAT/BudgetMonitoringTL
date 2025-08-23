@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Modal, Row, Col, Container } from "react-bootstrap";
 
 import { BudgetAllocationOverview } from "../../../../constants/totalList";
@@ -10,35 +10,97 @@ import TotalCards from "../../../TotalCards";
 import ToolBar from "../../../layout/ToolBar";
 import DataTable from "../../../layout/DataTable";
 
+const limit = 50;
+const offset = 0;
+
 const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
   const [filters, setFilters] = useState({ referenceId: "" });
   const [budgetHistory, setBudgetHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState({});
 
-  // ✅ Fetch Budget History
-  useEffect(() => {
+  const fetchBudgetHistory = useCallback(async () => {
     if (!budgetId) return;
-    const fetchBudgetHistory = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `/api/budget_history/getbudget_history?budget_id=${budgetId}`
-        );
-        const data = await res.json();
-        setBudgetHistory(data || []);
-      } catch (err) {
-        console.error("Error fetching budget history:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBudgetHistory();
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `/api/cash_disbursement/getcash_disbursement/${budgetId}/${limit}/${offset}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error(`Failed to fetch (${res.status})`);
+
+      const json = await res.json();
+      console.log("🔹 API Raw Response:", json);
+
+      const mappedHistory = (Array.isArray(json.data) ? json.data : []).map(
+        (item) => ({
+          id: item.id,
+          date_issue: item.date_issue,
+          received_by: item.received_by,
+          amount_issue: item.amount_issue,
+          status: item.status,
+          date_liquidated: item.date_liquidated,
+        })
+      );
+      console.log("📌 Fetching history for budgetId:", budgetId);
+      console.log("🔹 Mapped History:", mappedHistory);
+      setBudgetHistory(mappedHistory);
+    } catch (err) {
+      console.error("❌ Error fetching budget history:", err);
+      setBudgetHistory([]);
+    } finally {
+      setLoading(false);
+    }
   }, [budgetId]);
 
-  // ✅ Safely compute after hooks
-  const budgetItem = tableData.find((item) => item.id === budgetId);
-  if (!budgetId || !budgetItem) {
+  useEffect(() => {
+    fetchBudgetHistory();
+  }, [fetchBudgetHistory]);
+
+  const budgetItem = useMemo(
+    () => tableData.find((item) => item.id === budgetId),
+    [budgetId, tableData]
+  );
+
+  const noBudget = !budgetId || !budgetItem;
+
+  const {
+    department,
+    remaining_budget = 0,
+    issued_amount = 0,
+    transactions = [],
+  } = budgetItem || {};
+
+  const totalBudget = Number(remaining_budget) || 0;
+  const budgetUsed = Number(issued_amount) || 0;
+  const remainingBudget = totalBudget - budgetUsed;
+
+  const totalsData = [{ totalBudget, budgetUsed, remainingBudget }];
+
+  const filteredHistory = useMemo(() => {
+    if (!filters.referenceId) return budgetHistory;
+
+    const search = filters.referenceId.toLowerCase();
+    return budgetHistory.filter((item) =>
+      [item.id, item.received_by, item.status]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(search))
+    );
+  }, [filters.referenceId, budgetHistory]);
+
+  console.log("🔹 Budget History Data:", budgetHistory);
+  console.log("🔹 Filtered Data:", filteredHistory);
+
+  if (noBudget) {
     return (
       <Modal show={show} onHide={onHide} centered>
         <Modal.Body className="text-center p-5">
@@ -47,21 +109,6 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
       </Modal>
     );
   }
-
-  const {
-    department,
-    remaining_budget = 0,
-    issued_amount = 0,
-    transactions = [],
-  } = budgetItem;
-
-  const amount = Number(remaining_budget) || 0;
-  const used = Number(issued_amount) || 0;
-  const remaining = amount - used;
-
-  const totalsData = [
-    { totalBudget: amount, budgetUsed: used, remainingBudget: remaining },
-  ];
 
   return (
     <Modal
@@ -85,7 +132,6 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
         style={{ backgroundColor: "#800000" }}
       >
         <div className="text-white">
-          {/* Total Cards */}
           <Row>
             <Col>
               <TotalCards
@@ -98,10 +144,8 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
           </Row>
 
           <Container fluid>
-            {/* Charts */}
             <BudgetCharts transactions={transactions} />
 
-            {/* ✅ Budget History Table */}
             <Row>
               <Col>
                 <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column mt-3">
@@ -123,7 +167,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
                   />
 
                   <DataTable
-                    data={budgetHistory}
+                    data={filteredHistory}
                     columns={allocateHistory}
                     height="230px"
                     selectedRows={selectedRows}
@@ -131,6 +175,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
                     showActions={false}
                     showCheckbox={false}
                   />
+
                   {loading && (
                     <div className="text-center mt-2">Loading...</div>
                   )}
@@ -141,6 +186,7 @@ const ViewBudgetAllocation = ({ show, onHide, budgetId, tableData = [] }) => {
         </div>
       </Modal.Body>
 
+      {/* 🔹 Footer */}
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>
         <AppButton
           label="Download PDF"

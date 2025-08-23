@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Container } from "react-bootstrap";
 
 import DataTable from "../../components/layout/DataTable";
 import {
@@ -41,37 +41,42 @@ const History = () => {
   }, []);
 
   return (
-    <div className="p-3">
-      {/*  CASH DISBURSEMENT HISTORY */}
-      <Row className="mb-4">
-        <Col>
-          <h5 className="fw-bold mb-2">📑 Cash Disbursement History</h5>
-          <DataTable
-            data={cashDisbursementData}
-            columns={disbursementHistory}
-            height="300px"
-            showActions={false}
-            showCheckbox={false}
-          />
-          {loading && <div className="text-center mt-2">Loading...</div>}
-        </Col>
-      </Row>
+    <>
+      <Container fluid className="pb-3">
+        {/*  CASH DISBURSEMENT HISTORY */}
+        <div className="custom-container shadow-sm rounded p-3 mt-3">
+          <Row>
+            <Col>
+              <p className="fw-bold mb-2">💰 Revolving Fund History</p>
+              <DataTable
+                data={revolvingFundData}
+                columns={revolvingHistory}
+                height="350px"
+                showActions={false}
+                showCheckbox={false}
+              />
+              {loading && <div className="text-center mt-2">Loading...</div>}
+            </Col>
+          </Row>
+        </div>
 
-      {/*  REVOLVING FUND HISTORY */}
-      <Row>
-        <Col>
-          <h5 className="fw-bold mb-2">💰 Revolving Fund History</h5>
-          <DataTable
-            data={revolvingFundData}
-            columns={revolvingHistory}
-            height="300px"
-            showActions={false}
-            showCheckbox={false}
-          />
-          {loading && <div className="text-center mt-2">Loading...</div>}
-        </Col>
-      </Row>
-    </div>
+        {/*  REVOLVING FUND HISTORY */}
+        <div className="custom-container shadow-sm rounded p-3 mt-3">
+          <Row>
+            <Col>
+              <p className="fw-bold mb-2">📑 Cash Disbursement History</p>
+              <DataTable
+                data={cashDisbursementData}
+                columns={disbursementHistory}
+                height="350px"
+                showActions={false}
+                showCheckbox={false}
+              />
+            </Col>
+          </Row>
+        </div>
+      </Container>
+    </>
   );
 };
 
