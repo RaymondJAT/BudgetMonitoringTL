@@ -12,7 +12,7 @@ const BudgetTable = ({ data, height }) => {
   const handleView = (item) => {
     setViewItem(null);
     setTimeout(() => {
-      setViewItem(item.id);
+      setViewItem(item.rf_id);
       setShowViewModal(true);
     }, 0);
   };
@@ -147,7 +147,7 @@ const BudgetTable = ({ data, height }) => {
       <ViewBudgetAllocation
         show={showViewModal}
         onHide={() => setShowViewModal(false)}
-        budgetId={viewItem}
+        rf_id={viewItem}
         tableData={data}
       />
     </>

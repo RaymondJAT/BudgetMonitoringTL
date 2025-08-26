@@ -1,15 +1,31 @@
 import { useState, useEffect } from "react";
 import { Modal, Spinner, Alert } from "react-bootstrap";
 import AppButton from "../../AppButton";
-import AllocationTable from "../../../layout/AllocationTable";
+import DataTable from "../../../layout/DataTable";
+import { viewFunds } from "../../../../constants/BudgetingColumn";
+
+const normalizeTransaction = (item) => ({
+  id: item.id ?? item.ID ?? "—",
+  date_issue: item.date_issue ?? item.dateIssued ?? "—",
+  received_by: item.received_by ?? item.receiver ?? "—",
+  description: item.description ?? "—",
+  particulars: item.particulars ?? "—",
+  amount_issue: Number(item.amount_issue ?? item.amountIssued ?? 0),
+  amount_return: Number(item.amount_return ?? 0),
+  amount_expend: Number(item.amount_expend ?? 0),
+  outstanding_amount: Number(item.outstanding_amount ?? 0),
+  cash_voucher: item.cash_voucher ?? item.cashVoucher ?? "—",
+  status: item.status ?? "—",
+  date_liquidated: item.date_liquidated ?? item.dateLiquidated ?? "-",
+});
 
 const ViewRevolvingFund = ({ show, onHide, budgetId }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const limit = 50;
-  const offset = 10;
+  const limit = 100;
+  const offset = 0;
 
   useEffect(() => {
     if (!show || !budgetId) return;
@@ -34,8 +50,11 @@ const ViewRevolvingFund = ({ show, onHide, budgetId }) => {
           throw new Error(`Failed to fetch transactions (${res.status})`);
 
         const json = await res.json();
+        const normalized = (Array.isArray(json.data) ? json.data : []).map(
+          normalizeTransaction
+        );
 
-        setTransactions(Array.isArray(json.data) ? json.data : []);
+        setTransactions(normalized);
       } catch (err) {
         setError(err.message);
         setTransactions([]);
@@ -82,7 +101,13 @@ const ViewRevolvingFund = ({ show, onHide, budgetId }) => {
         )}
 
         {!loading && !error && (
-          <AllocationTable transactions={transactions} height="425px" />
+          <DataTable
+            data={transactions}
+            columns={viewFunds}
+            showCheckbox={false}
+            showActions={false}
+            height="425px"
+          />
         )}
       </Modal.Body>
 

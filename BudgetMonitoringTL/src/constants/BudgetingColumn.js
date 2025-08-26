@@ -146,3 +146,19 @@ export const columns = [
   { label: "Amount Return", accessor: "amount_return" },
   { label: "Amount Expended", accessor: "amount_expended" },
 ];
+
+// VIEW REVOLVING FUND
+export const viewFunds = [
+  { label: "ID", accessor: "id" },
+  { label: "Date Issued", accessor: "date_issue" },
+  { label: "Received By", accessor: "received_by" },
+  { label: "Deparment", accessor: "description" },
+  { label: "Particulars", accessor: "particulars" },
+  { label: "Amount Issued", accessor: "amount_issue" },
+  { label: "Cash Voucher", accessor: "cash_voucher" },
+  { label: "Amount Returned", accessor: "amount_return" },
+  { label: "Outstanding Amount", accessor: "outstanding_amount" },
+  { label: "Amount Expended", accessor: "amount_expend" },
+  { label: "Status", accessor: "status" },
+  { label: "Date Liquidated", accessor: "date_liquidated" },
+];
