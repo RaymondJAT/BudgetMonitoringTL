@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Table, Form, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
+import { FaEye } from "react-icons/fa";
 import AppButton from "../ui/AppButton";
 
 const EntryStates = ({
@@ -155,7 +156,7 @@ const EntryStates = ({
         </Table>
 
         {/* ✅ Mobile View */}
-        <div className="d-lg-noner">
+        <div className="d-lg-none">
           {items.length > 0 ? (
             items.map((entry, index) => (
               <div key={entry.id || index} className="mobile-card">

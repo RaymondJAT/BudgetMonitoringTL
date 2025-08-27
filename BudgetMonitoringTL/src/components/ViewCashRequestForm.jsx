@@ -161,9 +161,10 @@ const ViewCashRequestForm = () => {
         />
 
         {/* PROGRESS BAR  */}
-        <div className="request-container border p-3 mb-3">
-          <Row className="align-items-center justify-content-between">
-            <Col className="flex-grow-1 pe-2">
+        <div className="request-container border p-2 mb-3">
+          <Row className="align-items-center d-flex justify-content-between">
+            {/* ProgressBar */}
+            <Col className="d-flex">
               <ProgressBar
                 steps={progressSteps}
                 currentStep={currentStep}
@@ -171,7 +172,8 @@ const ViewCashRequestForm = () => {
               />
             </Col>
 
-            <Col xs="auto" className="ps-3">
+            {/* Button */}
+            <Col className="d-flex">
               <AppButton
                 label="Mark"
                 variant="outline-dark"

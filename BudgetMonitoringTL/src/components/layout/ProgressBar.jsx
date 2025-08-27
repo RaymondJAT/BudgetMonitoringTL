@@ -8,10 +8,10 @@ const ProgressBar = ({ steps, currentStep, onStepClick }) => {
   };
 
   return (
-    <Container fluid>
-      <Row className="justify-content-center">
-        <Col>
-          <div className="d-flex justify-content-center">
+    <Container fluid className="progress-bar-container">
+      <Row className="justify-content-center g-0">
+        <Col className="p-0">
+          <div className="progress-wrapper">
             {steps.map((step, index) => {
               const status = getStepStatus(index);
 
@@ -22,10 +22,8 @@ const ProgressBar = ({ steps, currentStep, onStepClick }) => {
                   onClick={() => onStepClick?.(index, step)}
                   style={{ cursor: onStepClick ? "pointer" : "default" }}
                 >
-                  <div className="step-arrow-body d-flex align-items-center justify-content-center px-3">
-                    <small className="step-label text-truncate">
-                      {step.label}
-                    </small>
+                  <div className="step-arrow-body">
+                    <span className="step-label">{step.label}</span>
                   </div>
                 </div>
               );
