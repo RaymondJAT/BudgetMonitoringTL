@@ -12,6 +12,8 @@ import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTab
 import SignatureUpload from "./SignatureUpload";
 import CashReqActionButtons from "./CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
+import ProgressBar from "./layout/ProgressBar";
+import AppButton from "./ui/AppButton";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -103,6 +105,28 @@ const ViewCashRequestForm = () => {
       );
     });
 
+  const progressSteps = [
+    { label: "Submitted", value: "submitted" },
+    { label: "Under Review", value: "review" },
+    { label: "Approved", value: "approved" },
+    { label: "Processed", value: "processed" },
+    { label: "Completed", value: "completed" },
+  ];
+
+  const getCurrentStep = () => {
+    if (data?.status === "completed") return 4;
+    if (data?.status === "processed") return 3;
+    if (data?.status === "approved") return 2;
+    if (data?.status === "review") return 1;
+    return 0; // submitted
+  };
+
+  const currentStep = getCurrentStep();
+
+  const handleStepClick = (index, step) => {
+    console.log("Clicked step:", step.label);
+  };
+
   return (
     <div className="pb-3">
       <Container fluid>
@@ -131,11 +155,32 @@ const ViewCashRequestForm = () => {
               JSON.stringify([newEntry, ...existing])
             );
 
-            // Optional: Notify other pages
             window.dispatchEvent(new Event("liquidations-updated"));
-            setShowLiqFormModal(false); // close the modal after submit
+            setShowLiqFormModal(false);
           }}
         />
+
+        {/* PROGRESS BAR  */}
+        <div className="request-container border p-3 mb-3">
+          <Row className="align-items-center justify-content-between">
+            <Col className="flex-grow-1 pe-2">
+              <ProgressBar
+                steps={progressSteps}
+                currentStep={currentStep}
+                onStepClick={handleStepClick}
+              />
+            </Col>
+
+            <Col xs="auto" className="ps-3">
+              <AppButton
+                label="Mark"
+                variant="outline-dark"
+                className="custom-app-button"
+                style={{ minWidth: "100px" }}
+              />
+            </Col>
+          </Row>
+        </div>
 
         {/* Request Info */}
         <div className="custom-container border p-3">
