@@ -14,6 +14,7 @@ import CashReqActionButtons from "./CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
 import ProgressBar from "./layout/ProgressBar";
 import AppButton from "./ui/AppButton";
+import { progressSteps } from "../handlers/actionMenuItems";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -104,14 +105,6 @@ const ViewCashRequestForm = () => {
         </Row>
       );
     });
-
-  const progressSteps = [
-    { label: "Submitted", value: "submitted" },
-    { label: "Under Review", value: "review" },
-    { label: "Approved", value: "approved" },
-    { label: "Processed", value: "processed" },
-    { label: "Completed", value: "completed" },
-  ];
 
   const getCurrentStep = () => {
     if (data?.status === "completed") return 4;

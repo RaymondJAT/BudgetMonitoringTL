@@ -1,4 +1,4 @@
-import { RxDashboard, RxTrash } from "react-icons/rx";
+import { RxDashboard } from "react-icons/rx";
 import { TbReport } from "react-icons/tb";
 import {
   MdOutlineManageHistory,
@@ -20,7 +20,6 @@ export const navConfig = {
     },
     { label: "Archive", icon: MdOutlineArchive, path: "/employee-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/employee-important" },
-    { label: "Trash", icon: RxTrash, path: "/employee-trash" },
   ],
 
   // TEAM-LEADER
@@ -42,10 +41,8 @@ export const navConfig = {
         { label: "History", path: "/lead-history" },
       ],
     },
-    // { label: "Reports", icon: TbReport, path: "#" },
     { label: "Archive", icon: MdOutlineArchive, path: "/archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/important" },
-    { label: "Trash", icon: RxTrash, path: "/trash" },
   ],
 
   // FINANCE
@@ -79,7 +76,6 @@ export const navConfig = {
     },
     { label: "Archive", icon: MdOutlineArchive, path: "/finance-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/finance-important" },
-    { label: "Trash", icon: RxTrash, path: "/finance-trash" },
   ],
 
   // ADMIN
@@ -96,10 +92,7 @@ export const navConfig = {
     {
       label: "Management",
       icon: MdOutlineManageHistory,
-      children: [
-        { label: "Budget Allocation", path: "/budget-allocation" },
-        // { label: "User Management", path: "#" },
-      ],
+      children: [{ label: "Budget Allocation", path: "/budget-allocation" }],
     },
     {
       label: "Reports & Logs",
@@ -111,6 +104,5 @@ export const navConfig = {
     },
     { label: "Archive", icon: MdOutlineArchive, path: "/admin-archive" },
     { label: "Important", icon: MdBookmarkBorder, path: "/admin-important" },
-    { label: "Trash", icon: RxTrash, path: "/admin-trash" },
   ],
 };

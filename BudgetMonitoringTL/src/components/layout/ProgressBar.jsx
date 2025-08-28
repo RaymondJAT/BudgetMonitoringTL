@@ -1,4 +1,4 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 
 const ProgressBar = ({ steps, currentStep, onStepClick }) => {
   const getStepStatus = (index) => {
@@ -8,7 +8,7 @@ const ProgressBar = ({ steps, currentStep, onStepClick }) => {
   };
 
   return (
-    <Container fluid className="progress-bar-container">
+    <div className="progress-bar-container">
       <Row className="justify-content-center g-0">
         <Col className="p-0">
           <div className="progress-wrapper">
@@ -31,7 +31,7 @@ const ProgressBar = ({ steps, currentStep, onStepClick }) => {
           </div>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 };
 
