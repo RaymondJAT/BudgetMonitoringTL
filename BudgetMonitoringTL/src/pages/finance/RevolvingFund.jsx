@@ -38,7 +38,7 @@ const RevolvingFund = () => {
 
     try {
       setLoading(true);
-      const res = await fetch("/api/revolving_fund/getrevolving_fund", {
+      const res = await fetch("/api5001/revolving_fund/getrevolving_fund", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ const RevolvingFund = () => {
         end = formatDate(adjustedEnd);
       }
 
-      let url = `/api/revolving_fund/getrevolving-fund-target`;
+      let url = `/api5001/revolving_fund/getrevolving-fund-target`;
       if (start) url += `/${start}`;
       if (end) url += `/${end}`;
       if (status) url += `/${status}`;

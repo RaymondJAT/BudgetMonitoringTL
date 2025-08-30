@@ -70,7 +70,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
     const fetchBudgets = async () => {
       setLoadingBudget(true);
       try {
-        const result = await authFetch("/api/budget/getbudget");
+        const result = await authFetch("/api5001/budget/getbudget");
         const options = (result.data || []).map((b) => ({
           value: b.id,
           label: b.department,
@@ -94,7 +94,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
       setLoadingBank(true);
       try {
         const result = await authFetch(
-          "/api/bank_accounts/activebank_accounts"
+          "/api5001/bank_accounts/activebank_accounts"
         );
         const options = (result.data || []).map((bank) => ({
           value: bank.mba_id,
@@ -150,7 +150,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
       };
 
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/revolving_fund/createrevolving_fund", {
+      const res = await fetch("/api5001/revolving_fund/createrevolving_fund", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

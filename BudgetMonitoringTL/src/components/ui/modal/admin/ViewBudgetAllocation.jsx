@@ -44,7 +44,7 @@ const ViewBudgetAllocation = ({ show, onHide, rf_id }) => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `/api/cash_disbursement/getcash_disbursement/${rf_id}/${limit}/${offset}`,
+          `/api5001/cash_disbursement/getcash_disbursement/${rf_id}/${limit}/${offset}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

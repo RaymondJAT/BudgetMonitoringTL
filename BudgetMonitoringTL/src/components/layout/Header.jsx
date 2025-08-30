@@ -3,12 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Dropdown } from "react-bootstrap";
 import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
 
-const Header = ({
-  toggleSidebar,
-  isSidebarOpen,
-  setUserRole,
-  isSidebarHiddenMobile,
-}) => {
+const Header = ({ toggleSidebar, isSidebarOpen, isSidebarHiddenMobile }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,10 +46,8 @@ const Header = ({
   const getPageTitle = () => pageTitles[location.pathname] || "";
 
   const handleLogout = () => {
-    localStorage.removeItem("role");
-    localStorage.removeItem("username");
-    setUserRole(null);
-    navigate("/login");
+    localStorage.clear();
+    navigate("/login", { replace: true });
     window.location.reload();
   };
 

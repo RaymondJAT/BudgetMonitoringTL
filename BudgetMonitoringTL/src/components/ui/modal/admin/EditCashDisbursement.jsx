@@ -71,7 +71,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
     const fetchRevolvingFund = async () => {
       setLoadingFundBudget(true);
       try {
-        const result = await authFetch("/api/revolving_fund/getrevolving_fund");
+        const result = await authFetch("/api5001/revolving_fund/getrevolving_fund");
         const options = (result.data || []).map((fund) => ({
           value: fund.id,
           label: fund.name,
@@ -95,7 +95,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
     const fetchEmployee = async () => {
       setLoadingEmployee(true);
       try {
-        const result = await authFetch("/api/employee/getemployee/");
+        const result = await authFetch("/api5001/employee/getemployee/");
         const options = (result.data || []).map((emp) => ({
           value: emp.employee_id,
           label: emp.fullname,
@@ -187,7 +187,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
       };
 
       const response = await fetch(
-        "/api/cash_disbursement/updatecash_disbursement_id",
+        "/api5001/cash_disbursement/updatecash_disbursement_id",
         {
           method: "PUT",
           headers: {

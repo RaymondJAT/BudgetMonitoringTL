@@ -9,16 +9,11 @@ import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
 import Login from "./pages/Login";
 
-// Role-based routes
-import TeamLeadRoutes from "./routes/TeamLeadRoutes";
-import AdminRoutes from "./routes/AdminRoutes";
-import EmployeeRoutes from "./routes/EmployeeRoutes";
-import FinanceRoutes from "./routes/FinanceRoutes";
+import Routing from "./routes/Routing";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSidebarHiddenMobile, setIsSidebarHiddenMobile] = useState(true);
-  const [userRole, setUserRole] = useState(localStorage.getItem("role"));
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -46,66 +41,44 @@ const App = () => {
     }
   };
 
-  const renderRoutes = () => {
-    switch (userRole) {
-      case "employee":
-        return <EmployeeRoutes />;
-      case "admin":
-        return <AdminRoutes />;
-      case "teamlead":
-        return <TeamLeadRoutes />;
-      case "finance":
-        return <FinanceRoutes />;
-      default:
-        return <Login setUserRole={setUserRole} />;
-    }
-  };
-
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login setUserRole={setUserRole} />} />
+        <Route path="/login" element={<Login />} />
 
-        {!userRole ? (
-          <Route path="*" element={<Login setUserRole={setUserRole} />} />
-        ) : (
-          <>
-            <Route
-              path="/*"
-              element={
-                <>
-                  <Header
-                    toggleSidebar={toggleSidebar}
-                    isSidebarOpen={isSidebarOpen}
-                    isSidebarHiddenMobile={isSidebarHiddenMobile}
-                    setUserRole={setUserRole}
-                  />
-                  <Sidebar
-                    isSidebarOpen={isSidebarOpen}
-                    isSidebarHiddenMobile={isSidebarHiddenMobile}
-                    userRole={userRole}
-                  />
+        <Route
+          path="/*"
+          element={
+            <>
+              <Header
+                toggleSidebar={toggleSidebar}
+                isSidebarOpen={isSidebarOpen}
+                isSidebarHiddenMobile={isSidebarHiddenMobile}
+              />
+              <Sidebar
+                isSidebarOpen={isSidebarOpen}
+                isSidebarHiddenMobile={isSidebarHiddenMobile}
+                userRole="finance"
+              />
 
-                  <main
-                    style={{
-                      transition: "margin-left 0.3s ease",
-                      marginLeft: isMobile
-                        ? isMobileSidebarOpen
-                          ? "55px"
-                          : "0"
-                        : isSidebarOpen
-                        ? "230px"
-                        : "55px",
-                    }}
-                  >
-                    <ToastContainer position="top-right" autoClose={1000} />
-                    {renderRoutes()}
-                  </main>
-                </>
-              }
-            />
-          </>
-        )}
+              <main
+                style={{
+                  transition: "margin-left 0.3s ease",
+                  marginLeft: isMobile
+                    ? isMobileSidebarOpen
+                      ? "70px"
+                      : "0"
+                    : isSidebarOpen
+                    ? "230px"
+                    : "70px",
+                }}
+              >
+                <ToastContainer position="top-right" autoClose={1000} />
+                <Routing />
+              </main>
+            </>
+          }
+        />
       </Routes>
     </Router>
   );

@@ -20,9 +20,9 @@ const History = () => {
 
         const [disbursementRes, revolvingRes] = await Promise.all([
           fetch(
-            "/api/cash_disbursement_activity/getcash_disbursement_activity"
+            "/api5001/cash_disbursement_activity/getcash_disbursement_activity"
           ),
-          fetch("/api/revolving_fund_activity/getrevolving_fund_activity"),
+          fetch("/api5001/revolving_fund_activity/getrevolving_fund_activity"),
         ]);
 
         const disbursementJson = await disbursementRes.json();

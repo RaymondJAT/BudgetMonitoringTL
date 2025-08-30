@@ -40,7 +40,7 @@ body {
   font-weight: bold;
   font-size: 1rem;
   border-bottom: 1px solid #ddd;
-  height: 52.5px;
+  height: 55px;
 }
 
 .sidebar.open {
@@ -49,7 +49,7 @@ body {
 }
 
 .sidebar.collapsed {
-  width: 55px;
+  width: 70px;
   transition: width 0.3s ease;
 }
 
@@ -97,7 +97,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-right: 10px;
-  min-width: 20px;
+  width: 20px;
   text-align: center;
 }
 
@@ -178,26 +178,29 @@ body {
   padding: 4px 10px;
 }
 
-/* Center icons inside oblong items when collapsed */
 .sidebar.collapsed .nav-item {
-  justify-content: center !important;
-  padding: 12px;
-  width: 45px;
-  height: 45px;
-  margin: 8px auto;
+  justify-content: center;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  margin: 10px auto;
   display: flex;
   align-items: center;
-  border-radius: 50px;
+  border-radius: 50%;
+  background-color: #f8f9fa;
 }
 
-/* Hide text label when collapsed */
+/* Hide text labels when collapsed */
 .sidebar.collapsed .nav-label {
   display: none !important;
 }
 
-/* Remove margin on icon for proper centering */
+/* Center icons inside collapsed state */
 .sidebar.collapsed .nav-icon {
   margin-right: 0;
+  font-size: 1.4rem; /* slightly larger for visibility */
+  width: 100%;
+  text-align: center;
 }
 
 /* FLOATING MENU */
@@ -262,12 +265,13 @@ body {
   transition: margin-left 0.3s ease;
 }
 
+/* Header spacing */
 .main-header.sidebar-open {
   margin-left: 230px;
 }
 
 .main-header.sidebar-collapsed {
-  margin-left: 55px;
+  margin-left: 70px;
 }
 
 .main-header.sidebar-hidden-mobile {

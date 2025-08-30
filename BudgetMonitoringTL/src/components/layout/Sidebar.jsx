@@ -116,7 +116,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
       </div>
 
       {/* Nav Items */}
-      <div className="nav-links flex-grow-1 overflow-y-auto">
+      <div className="cashreq-scroll nav-links flex-grow-1 overflow-y-auto">
         {navItems.map((item) => (
           <div key={item.label}>
             <div
@@ -135,11 +135,13 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
               }}
               style={{ cursor: "pointer" }}
             >
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center w-100">
                 <span className="nav-icon">{<item.icon />}</span>
                 {isSidebarOpen && (
-                  <span className="nav-label ms-2 d-flex align-items-center gap-4">
-                    {item.label}
+                  <>
+                    <span className="nav-label ms-2 flex-grow-1">
+                      {item.label}
+                    </span>
                     {item.children && (
                       <span className="dropdown-arrow">
                         {(Array.isArray(openDropdown) &&
@@ -149,7 +151,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
                           : "▸"}
                       </span>
                     )}
-                  </span>
+                  </>
                 )}
               </div>
             </div>

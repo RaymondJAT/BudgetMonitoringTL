@@ -7,7 +7,6 @@ import {
 } from "../../../../handlers/columnHeaders";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../../../utils/numberToWords";
-import { mockData } from "../../../../handlers/mockData";
 import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "./CashApprovalTable";

@@ -22,7 +22,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
       try {
         setLoading(true);
         const res = await fetch(
-          `/api/revolving_fund/generaterevolving-fund/${fundData.id}`,
+          `/api5001/revolving_fund/generaterevolving-fund/${fundData.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
         payload.status = "SHORT";
       }
 
-      const res = await fetch("/api/revolving_fund/close-revolving-fund", {
+      const res = await fetch("/api5001/revolving_fund/close-revolving-fund", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

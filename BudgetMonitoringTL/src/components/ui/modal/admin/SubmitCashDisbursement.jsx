@@ -31,7 +31,7 @@ const SubmitCashDisbursement = ({ show, onHide, disbursement }) => {
       }
       try {
         const res = await fetch(
-          "/api/revolving_fund/getrevolving_fund_currently",
+          "/api5001/revolving_fund/getrevolving_fund_currently",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -83,7 +83,7 @@ const SubmitCashDisbursement = ({ show, onHide, disbursement }) => {
       };
 
       const res = await fetch(
-        "/api/cash_disbursement/updatecash_disbursement",
+        "/api5001/cash_disbursement/updatecash_disbursement",
         {
           method: "PUT",
           headers: {

@@ -36,7 +36,7 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found. Please log in.");
 
-        const res = await fetch("/api/bank_accounts/activebank_accounts", {
+        const res = await fetch("/api5001/bank_accounts/activebank_accounts", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found. Please log in.");
 
-        const res = await fetch("/api/departments/getdepartments", {
+        const res = await fetch("/api5001/departments/getdepartments", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -109,7 +109,7 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
       if (!token) throw new Error("No token found. Please log in.");
 
       const res = await fetch(
-        `/api/bank_balances/getbank_balance_by_id?id=${bankId}`,
+        `/api5001/bank_balances/getbank_balance_by_id?id=${bankId}`,
         {
           method: "GET",
           headers: {
@@ -185,7 +185,7 @@ const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found. Please log in.");
 
-      const res = await fetch("/api/budget/createbudget", {
+      const res = await fetch("/api5001/budget/createbudget", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

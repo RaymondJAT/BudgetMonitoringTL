@@ -10,6 +10,7 @@ createRoot(document.getElementById("root")).render(
         backgroundColor: "#800000",
         minHeight: "100vh",
       }}
+      className="table-wrapper"
     >
       <App />
     </div>

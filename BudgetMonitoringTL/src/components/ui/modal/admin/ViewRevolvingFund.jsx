@@ -37,7 +37,7 @@ const ViewRevolvingFund = ({ show, onHide, budgetId }) => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `/api/cash_disbursement/getcash_disbursement/${budgetId}/${limit}/${offset}`,
+          `/api5001/cash_disbursement/getcash_disbursement/${budgetId}/${limit}/${offset}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

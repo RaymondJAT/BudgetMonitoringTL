@@ -40,7 +40,7 @@ ProgressBar.defaultProps = {
     { label: "Submitted", value: "submitted" },
     { label: "Under Review", value: "review" },
     { label: "Approved", value: "approved" },
-    { label: "Processed", value: "processed" },
+    { label: "Disbursed", value: "disbursed" },
     { label: "Completed", value: "completed" },
   ],
   currentStep: 0,

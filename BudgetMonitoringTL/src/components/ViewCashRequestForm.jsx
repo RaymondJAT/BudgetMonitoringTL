@@ -108,7 +108,7 @@ const ViewCashRequestForm = () => {
 
   const getCurrentStep = () => {
     if (data?.status === "completed") return 4;
-    if (data?.status === "processed") return 3;
+    if (data?.status === "disbursed") return 3;
     if (data?.status === "approved") return 2;
     if (data?.status === "review") return 1;
     return 0; // submitted

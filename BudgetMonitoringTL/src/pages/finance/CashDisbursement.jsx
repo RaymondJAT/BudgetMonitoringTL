@@ -60,7 +60,7 @@ const CashDisbursement = () => {
     if (!token) return setLoading(false);
 
     try {
-      const res = await fetch("/api/cash_disbursement/getcash_disbursement", {
+      const res = await fetch("/api5001/cash_disbursement/getcash_disbursement", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const CashDisbursement = () => {
         ? formatDate(new Date(endDate).setHours(23, 59, 59, 999))
         : "";
 
-      let url = `/api/cash_disbursement/getcash-disbursement-target`;
+      let url = `/api5001/cash_disbursement/getcash-disbursement-target`;
       if (start) url += `/${start}`;
       if (end) url += `/${end}`;
       if (status) url += `/${status}`;

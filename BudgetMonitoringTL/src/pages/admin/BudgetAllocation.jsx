@@ -28,7 +28,7 @@ const BudgetAllocation = () => {
     }
 
     try {
-      const res = await fetch("/api/budget/getbudget_allocation", {
+      const res = await fetch("/api5001/budget/getbudget_allocation", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -77,7 +77,7 @@ const BudgetAllocation = () => {
         end = formDate(adjustedEnd);
       }
 
-      let url = `/api/budget/getbudget_allocation`;
+      let url = `/api5001/budget/getbudget_allocation`;
       if (start) url += `/${start}`;
       if (end) url += `/${end}`;
       if (status) url += `/${status}`;

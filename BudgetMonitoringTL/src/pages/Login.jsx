@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-bootstrap";
 
-const Login = ({ setUserRole }) => {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -32,26 +32,13 @@ const Login = ({ setUserRole }) => {
     if (demoUser) {
       localStorage.setItem("username", demoUser.username);
       localStorage.setItem("role", demoUser.role);
-      setUserRole(demoUser.role);
 
-      switch (demoUser.role) {
-        case "admin":
-          navigate("/");
-          break;
-        case "employee":
-          navigate("/");
-          break;
-        case "teamlead":
-          navigate("/");
-          break;
-        default:
-          navigate("/login");
-      }
+      navigate("/admin_dashboard");
       return;
     }
 
     try {
-      const response = await fetch("api/login/check-credentials", {
+      const response = await fetch("api5012/login/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -67,15 +54,8 @@ const Login = ({ setUserRole }) => {
 
         let role = data.position || "finance";
         localStorage.setItem("role", role);
-        setUserRole(role);
 
-        switch (role) {
-          case "finance":
-            navigate("/");
-            break;
-          default:
-            navigate("/login");
-        }
+        navigate("/admin_dashboard");
       } else {
         setError(result.message || "Invalid username or password");
       }

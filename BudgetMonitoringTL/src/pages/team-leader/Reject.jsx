@@ -4,7 +4,6 @@ import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
 import { Container } from "react-bootstrap";
 
-import { mockData } from "../../handlers/mockData";
 import { columns } from "../../handlers/tableHeader";
 import { moveEntries } from "../../utils/entryActions";
 import { deleteItems } from "../../utils/deleteItems";
@@ -68,7 +67,6 @@ const Reject = () => {
     LOCAL_KEY_ARCHIVE: LOCAL_KEYS.ARCHIVE,
     LOCAL_KEY_IMPORTANT: LOCAL_KEYS.IMPORTANT,
     LOCAL_KEY_TRASH: LOCAL_KEYS.TRASH,
-    mockData,
   });
 
   const rejectedData = useMemo(

@@ -79,6 +79,5 @@ export const progressSteps = [
   { label: "Submitted", value: "submitted" },
   { label: "Under Review", value: "review" },
   { label: "Approved", value: "approved" },
-  { label: "Processed", value: "processed" },
   { label: "Completed", value: "completed" },
 ];
