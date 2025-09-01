@@ -15,17 +15,13 @@ export const FINANCE_STATUS_LIST = [
   { label: "Pending Fund Releases", key: "pending" },
   { label: "Liquidations to Verify", key: "approved" },
   { label: "Reimbursements to Process", key: "reimbursed" },
-  { label: "Verified Transactions", key: "verified" },
   { label: "Total Funds Released", key: "total" },
 ];
 
 export const BudgetOverview = [
-  { label: "Total Budget", key: "totalBudget" },
-  { label: "Budget Used", key: "budgetUsed" },
-  { label: "Remaining Budget", key: "remainingBudget" },
-  { label: "Total Department Funded", key: "totalRequest" },
-  { label: "Total Liquidations", key: "totalLiquidations" },
-  { label: "Final Approvals Needed", key: "finalApprovals" },
+  { label: "Liquidations to Validate", key: "liquidationsToValidate" },
+  { label: "Validated Liquidations", key: "validatedLiquidations" },
+  { label: "Total Liquidations Processed", key: "totalLiquidationsProcessed" },
 ];
 
 export const BudgetAllocationOverview = [

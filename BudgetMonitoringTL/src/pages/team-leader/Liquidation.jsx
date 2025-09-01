@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { Container } from "react-bootstrap";
 
-import { LOCAL_KEYS } from "../../constants/localKeys";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import { STATUS } from "../../constants/status";
 import { columns } from "../../handlers/tableHeader";
@@ -11,16 +10,18 @@ import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 
 const Liquidation = () => {
-  const [tableData, setTableData] = useState([]);
+  const [tableData] = useState([]); 
   const [searchValue, setSearchValue] = useState("");
 
+ 
   const totalComputationData = useMemo(() => {
-    const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
-    const importantData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-    return [...tableData, ...archiveData, ...importantData];
-  });
+    return [...tableData];
+  }, [tableData]);
+
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .trim();
 
   const isMatch = (item, value) => {
     const fieldsToSearch = [...columns.map((col) => col.accessor), "formType"];
@@ -41,22 +42,17 @@ const Liquidation = () => {
   );
 
   return (
-    <>
-      <div className="pb-3">
-        <div className="mt-3">
-          <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-        </div>
-        <Container fluid>
-          <div className="custom-container shadow-sm rounded p-3">
-            <ToolBar
-              searchValue={searchValue}
-              onSearchChange={setSearchValue}
-            />
-            <DataTable data={filteredData} height="455px" columns={columns} />
-          </div>
-        </Container>
+    <div className="pb-3">
+      <div className="mt-3">
+        <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
       </div>
-    </>
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
+          <DataTable data={filteredData} height="455px" columns={columns} />
+        </div>
+      </Container>
+    </div>
   );
 };
 

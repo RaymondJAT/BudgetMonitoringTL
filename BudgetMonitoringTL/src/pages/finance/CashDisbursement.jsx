@@ -5,8 +5,6 @@ import { LuFolderCheck } from "react-icons/lu";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { cashDisbursementColumns as baseColumns } from "../../constants/BudgetingColumn";
-import { LOCAL_KEYS } from "../../constants/localKeys";
-
 import { handleExportData } from "../../utils/exportItems";
 
 import TotalCards from "../../components/TotalCards";
@@ -30,13 +28,7 @@ const CashDisbursement = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  const totalComputationData = useMemo(() => {
-    const archive =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
-    const important =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
-    return [...tableData, ...archive, ...important];
-  }, [tableData]);
+  const totalComputationData = useMemo(() => [...tableData], [tableData]);
 
   const normalize = (val) =>
     String(val || "")
@@ -60,12 +52,15 @@ const CashDisbursement = () => {
     if (!token) return setLoading(false);
 
     try {
-      const res = await fetch("/api5001/cash_disbursement/getcash_disbursement", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        "/api5001/cash_disbursement/getcash_disbursement",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to fetch disbursement data");
 
@@ -191,7 +186,6 @@ const CashDisbursement = () => {
             const buttons = [];
 
             if (isReturnOrReimburse) {
-              // ✅ Always show only Edit for RETURN / REIMBURSE
               buttons.push(
                 <AppButton
                   key="edit"
@@ -205,7 +199,6 @@ const CashDisbursement = () => {
                 />
               );
             } else {
-              // ✅ Normal flow
               if (String(rowData.status).toUpperCase() === "UNLIQUIDATED") {
                 buttons.push(
                   <AppButton

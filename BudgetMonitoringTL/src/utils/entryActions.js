@@ -1,6 +1,4 @@
-import { LOCAL_KEYS } from "../constants/localKeys";
-
-export const moveEntries = ({
+export const moveEntries = async ({
   entriesToMove,
   sourceData,
   setSourceData,
@@ -8,27 +6,35 @@ export const moveEntries = ({
   statusUpdate,
   avoidDuplicates = false,
 }) => {
-  const updatedSource = sourceData.filter(
-    (entry) => !entriesToMove.find((e) => e.id === entry.id)
-  );
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found.");
+      return;
+    }
 
-  setSourceData(updatedSource);
-  localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedSource)); // 🔥 fix here
+    const res = await fetch("/api5001/cash-request/move", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ids: entriesToMove.map((e) => e.id),
+        newStatus: statusUpdate || null,
+        destination: destinationKey,
+      }),
+    });
 
-  const currentDest = JSON.parse(localStorage.getItem(destinationKey)) || [];
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
-  const newDest = entriesToMove.map((entry) => ({
-    ...entry,
-    ...(statusUpdate && { status: statusUpdate }),
-  }));
+    const resultData = await res.json();
 
-  const merged =
-    avoidDuplicates && destinationKey === LOCAL_KEYS.EMP_IMPORTANT
-      ? [
-          ...currentDest,
-          ...newDest.filter((e) => !currentDest.some((c) => c.id === e.id)),
-        ]
-      : [...currentDest, ...newDest];
-
-  localStorage.setItem(destinationKey, JSON.stringify(merged));
+    const updatedSource = sourceData.filter(
+      (entry) => !entriesToMove.some((e) => e.id === entry.id)
+    );
+    setSourceData(updatedSource);
+  } catch (error) {
+    console.error("Move failed:", error);
+  }
 };

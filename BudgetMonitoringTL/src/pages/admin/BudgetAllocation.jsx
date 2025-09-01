@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Container } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
-import { LOCAL_KEYS } from "../../constants/localKeys";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
@@ -17,10 +16,8 @@ const BudgetAllocation = () => {
   const [budgetData, setBudgetData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // FETCH DATA ON FIRST LOAD
   const fetchBudgetData = async () => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       console.error("No token found.");
       setLoading(false);
@@ -35,14 +32,10 @@ const BudgetAllocation = () => {
         },
       });
 
-      if (!res.ok) {
-        console.error("Server responded with:", res.status);
-        throw new Error("Failed to fetch budget data");
-      }
+      if (!res.ok) throw new Error(`Server responded with: ${res.status}`);
 
       const result = await res.json();
-      const budgetArray = result.data || [];
-      setBudgetData(budgetArray);
+      setBudgetData(result.data || []);
     } catch (error) {
       console.error("Fetch error:", error);
       setBudgetData([]);
@@ -57,10 +50,7 @@ const BudgetAllocation = () => {
 
     const formDate = (date) => {
       const d = new Date(date);
-      if (isNaN(d.getTime())) {
-        console.warn("Invalid date passed to formDate:", date);
-        return "";
-      }
+      if (isNaN(d.getTime())) return "";
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, "0");
       const day = String(d.getDate()).padStart(2, "0");
@@ -92,8 +82,6 @@ const BudgetAllocation = () => {
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
       const result = await res.json();
-      console.log("API response:", result);
-
       setBudgetData(result.data || []);
     } catch (error) {
       console.error("Error fetching by date range:", error);
@@ -105,18 +93,9 @@ const BudgetAllocation = () => {
     fetchBudgetData();
   }, []);
 
-  const archiveData = useMemo(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ARCHIVE)) || [];
-  }, []);
-
-  const importantData = useMemo(() => {
-    return JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_IMPORTANT)) || [];
-  }, []);
-
-  const totalComputationData = useMemo(
-    () => [...archiveData, ...importantData],
-    [archiveData, importantData]
-  );
+  const totalComputationData = useMemo(() => {
+    return budgetData;
+  }, [budgetData]);
 
   const handleAddBudgetItem = (newItem) => {
     setBudgetData((prev) => [newItem, ...prev]);
@@ -125,6 +104,15 @@ const BudgetAllocation = () => {
   const handleUpdateBudget = (updatedTable) => {
     setBudgetData(updatedTable);
   };
+
+  const filteredData = useMemo(() => {
+    if (!searchValue) return budgetData;
+    return budgetData.filter((item) =>
+      Object.values(item).some((value) =>
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
+      )
+    );
+  }, [budgetData, searchValue]);
 
   return (
     <>
@@ -166,7 +154,7 @@ const BudgetAllocation = () => {
             <p className="text-muted">Loading budget data...</p>
           ) : (
             <BudgetTable
-              data={budgetData}
+              data={filteredData}
               height="325px"
               onUpdate={handleUpdateBudget}
             />

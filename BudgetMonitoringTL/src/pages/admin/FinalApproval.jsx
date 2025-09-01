@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Container } from "react-bootstrap";
 
-import { LOCAL_KEYS } from "../../constants/localKeys";
 import { BudgetOverview } from "../../constants/totalList";
 import { columns } from "../../handlers/tableHeader";
 
@@ -12,14 +11,6 @@ import DataTable from "../../components/layout/DataTable";
 const FinalApproval = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-
-  useEffect(() => {
-    const stored =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ACTIVE)) || [];
-    setTableData(stored);
-    setFilteredData(stored);
-  }, []);
 
   const filteredColumns = useMemo(
     () =>
@@ -29,46 +20,43 @@ const FinalApproval = () => {
     []
   );
 
-  const handleSearch = (val) => {
-    setSearchValue(val);
-    const filtered = tableData.filter((item) =>
+  const filteredData = useMemo(() => {
+    if (!searchValue) return tableData;
+    return tableData.filter((item) =>
       Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(val.toLowerCase())
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
       )
     );
-    setFilteredData(filtered);
+  }, [tableData, searchValue]);
+
+  const handleSearch = (val) => {
+    setSearchValue(val);
   };
 
   const totalComputationData = useMemo(() => {
-    const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ARCHIVE)) || [];
-    const activeData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ADM_ACTIVE)) || [];
-    return [...archiveData, ...activeData];
-  }, []);
+    return tableData;
+  }, [tableData]);
 
   return (
-    <>
-      <div className="pb-3">
-        <div className="mt-3">
-          <TotalCards data={totalComputationData} list={BudgetOverview} />
-        </div>
-        <Container fluid>
-          <div className="custom-container shadow-sm rounded p-3">
-            <ToolBar
-              searchValue={searchValue}
-              onSearchChange={(e) => handleSearch(e.target.value)}
-            />
-
-            <DataTable
-              columns={filteredColumns}
-              height="350px"
-              data={filteredData}
-            />
-          </div>
-        </Container>
+    <div className="pb-3">
+      <div className="mt-3">
+        <TotalCards data={totalComputationData} list={BudgetOverview} />
       </div>
-    </>
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={(e) => handleSearch(e.target.value)}
+          />
+
+          <DataTable
+            columns={filteredColumns}
+            height="350px"
+            data={filteredData}
+          />
+        </div>
+      </Container>
+    </div>
   );
 };
 

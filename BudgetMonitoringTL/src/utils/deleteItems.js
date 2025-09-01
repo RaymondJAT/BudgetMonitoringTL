@@ -1,11 +1,9 @@
 import Swal from "sweetalert2";
-import { LOCAL_KEYS } from "../constants/localKeys";
 
 export const deleteItems = async ({
   selectedEntries,
   sourceData,
   setSourceData,
-  destinationKey,
   setSelectedRows,
 }) => {
   if (!selectedEntries || selectedEntries.length === 0) return;
@@ -24,28 +22,37 @@ export const deleteItems = async ({
 
   if (!result.isConfirmed) return;
 
-  // 🔧 1. Remove from source
-  const updatedSource = sourceData.filter(
-    (entry) => !selectedEntries.some((sel) => sel.id === entry.id)
-  );
-  setSourceData(updatedSource);
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      Swal.fire("Error", "No authentication token found.", "error");
+      return;
+    }
 
-  // 🔧 2. Persist ACTIVE update in localStorage
-  localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedSource));
+    const res = await fetch("/api5001/cash-request/delete", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ids: selectedEntries.map((entry) => entry.id),
+      }),
+    });
 
-  // 🔧 3. Merge into Trash (deduplicated by ID)
-  const existingTrash = JSON.parse(localStorage.getItem(destinationKey)) || [];
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    const resultData = await res.json();
 
-  const merged = [
-    ...new Map(
-      [...existingTrash, ...selectedEntries].map((item) => [item.id, item])
-    ).values(),
-  ];
+    const updatedSource = sourceData.filter(
+      (entry) => !selectedEntries.some((sel) => sel.id === entry.id)
+    );
+    setSourceData(updatedSource);
 
-  localStorage.setItem(destinationKey, JSON.stringify(merged));
+    setSelectedRows({});
 
-  // 🔧 4. Reset selected rows
-  setSelectedRows({});
-
-  Swal.fire("Deleted!", "Entries have been moved to Trash.", "success");
+    Swal.fire("Deleted!", "Entries have been moved to Trash.", "success");
+  } catch (error) {
+    console.error("Delete failed:", error);
+    Swal.fire("Error", "Failed to delete entries.", "error");
+  }
 };

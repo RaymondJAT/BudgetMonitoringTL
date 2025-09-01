@@ -1,16 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MdDelete, MdLocalPrintshop } from "react-icons/md";
 import { Container } from "react-bootstrap";
-
 import { useReactToPrint } from "react-to-print";
 
 import { columns } from "../../handlers/tableHeader";
-import { moveEntries } from "../../utils/entryActions";
 import { formatPrintData } from "../../utils/formatPrintData";
-import { deleteItems } from "../../utils/deleteItems";
 import { handleExportData } from "../../utils/exportItems";
-import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 
@@ -56,6 +52,7 @@ const Expenses = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [particulars, setParticulars] = useState([]);
   const [printData, setPrintData] = useState(null);
+
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
@@ -63,26 +60,15 @@ const Expenses = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  const totalComputationData = useMemo(() => {
-    const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ARCHIVE)) || [];
-    const importantData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.IMPORTANT)) || [];
-    return [...tableData, ...archiveData, ...importantData];
-  }, [tableData]);
-
-  const transactions = tableData || [];
-
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-    setTableData(stored);
+    setTableData([]);
   }, []);
 
   useEffect(() => {
-    const items = formatPrintData(transactions);
+    const items = formatPrintData(tableData);
     const isSame = JSON.stringify(particulars) === JSON.stringify(items);
     if (!isSame) setParticulars(items);
-  }, [transactions]);
+  }, [tableData]);
 
   const handleRowClick = (entry) => {
     if (entry.formType === "Cash Request") {
@@ -94,11 +80,8 @@ const Expenses = () => {
 
   const handlePrint = () => {
     if (!selectedEntry) return;
-
     setPrintData(selectedEntry);
-    setTimeout(() => {
-      reactToPrintFn();
-    }, 100);
+    setTimeout(() => reactToPrintFn(), 100);
   };
 
   const normalize = (value) =>
@@ -130,48 +113,18 @@ const Expenses = () => {
       : null;
 
   const handleDelete = (entryToDelete) => {
-    moveEntries({
-      entriesToMove: [entryToDelete],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.TRASH,
-      statusUpdate: STATUS.DELETED,
-    });
-  };
-
-  const handleArchive = (entryToArchive) => {
-    moveEntries({
-      entriesToMove: [entryToArchive],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.ARCHIVE,
-    });
-  };
-
-  const handleToggleImportant = (entryToImportant) => {
-    moveEntries({
-      entriesToMove: [entryToImportant],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.IMPORTANT,
-      avoidDuplicates: true,
-    });
+    setTableData((prev) => prev.filter((item) => item.id !== entryToDelete.id));
   };
 
   const handleDeleteSelected = () => {
     if (selectedCount < 1) return;
-
     const selectedEntries = filteredData.filter(
       (entry) => selectedRows[entry.id]
     );
-
-    deleteItems({
-      selectedEntries,
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: LOCAL_KEYS.TRASH,
-      setSelectedRows,
-    });
+    setTableData((prev) =>
+      prev.filter((item) => !selectedEntries.some((e) => e.id === item.id))
+    );
+    setSelectedRows({});
   };
 
   const handleExport = () => {
@@ -181,61 +134,58 @@ const Expenses = () => {
       selectedCount,
       filename: "Expenses",
     });
-
     setSelectedRows(resetSelection);
   };
 
   return (
-    <>
-      <div className="pb-3">
-        <div className="mt-3">
-          <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
-        </div>
-        <Container fluid>
-          <div className="custom-container shadow-sm rounded p-3">
-            <ToolBar
-              searchValue={searchValue}
-              onSearchChange={setSearchValue}
-              leftContent={
-                selectedCount > 0 && (
-                  <>
-                    {selectedCount === 1 && (
-                      <>
-                        <PrintButton onClick={handlePrint} />
-                        <DeleteButton onClick={handleDeleteSelected} />
-                      </>
-                    )}
-                    {selectedCount > 1 && (
-                      <DeleteButton onClick={handleDeleteSelected} />
-                    )}
-                  </>
-                )
-              }
-              handleExport={handleExport}
-              selectedCount={selectedCount}
-            />
-            <DataTable
-              data={filteredData}
-              height="450px"
-              columns={columns}
-              onRowClick={handleRowClick}
-              onDelete={handleDelete}
-              onArchive={handleArchive}
-              onToggleImportant={handleToggleImportant}
-              selectedRows={selectedRows}
-              onSelectionChange={setSelectedRows}
-              downloadRef={downloadRef}
-              setPrintData={setPrintData}
-            />
-
-            <div className="d-none">
-              <ExpenseReport contentRef={contentRef} data={printData || {}} />
-              <ExpenseReport contentRef={downloadRef} data={printData || {}} />
-            </div>
-          </div>
-        </Container>
+    <div className="pb-3">
+      <div className="mt-3">
+        <TotalCards data={tableData} list={TEAMLEAD_STATUS_LIST} />
       </div>
-    </>
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3">
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            leftContent={
+              selectedCount > 0 && (
+                <>
+                  {selectedCount === 1 && (
+                    <>
+                      <PrintButton onClick={handlePrint} />
+                      <DeleteButton onClick={handleDeleteSelected} />
+                    </>
+                  )}
+                  {selectedCount > 1 && (
+                    <DeleteButton onClick={handleDeleteSelected} />
+                  )}
+                </>
+              )
+            }
+            handleExport={handleExport}
+            selectedCount={selectedCount}
+          />
+
+          <DataTable
+            data={filteredData}
+            height="450px"
+            columns={columns}
+            onRowClick={handleRowClick}
+            onDelete={handleDelete}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
+          />
+
+          {/* hidden print/download */}
+          <div className="d-none">
+            <ExpenseReport contentRef={contentRef} data={printData || {}} />
+            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+          </div>
+        </div>
+      </Container>
+    </div>
   );
 };
 

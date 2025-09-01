@@ -11,27 +11,25 @@ const useExpenseDataLoader = ({
   mockData = [],
 }) => {
   useEffect(() => {
-    const activeData = JSON.parse(localStorage.getItem(LOCAL_KEY_ACTIVE)) || [];
+    const getDataFromStorage = (key) =>
+      JSON.parse(localStorage.getItem(key)) || [];
 
-    const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_ARCHIVE)) || [];
+    const activeData = getDataFromStorage(LOCAL_KEY_ACTIVE);
+    const archiveData = getDataFromStorage(LOCAL_KEY_ARCHIVE);
+    const importantData = getDataFromStorage(LOCAL_KEY_IMPORTANT);
+    const trashData = getDataFromStorage(LOCAL_KEY_TRASH);
 
-    const importantData =
-      JSON.parse(localStorage.getItem(LOCAL_KEY_IMPORTANT)) || [];
-
-    const trashData = JSON.parse(localStorage.getItem(LOCAL_KEY_TRASH)) || [];
-
-    const allData = [
+    const combinedData = [
       ...activeData,
       ...archiveData,
       ...importantData,
       ...trashData,
     ];
 
-    const ids = new Set();
-    const uniqueData = allData.filter((item) => {
-      if (item && !ids.has(item.id)) {
-        ids.add(item.id);
+    const seen = new Set();
+    const uniqueData = combinedData.filter((item) => {
+      if (item && !seen.has(item.id)) {
+        seen.add(item.id);
         return true;
       }
       return false;
@@ -39,12 +37,12 @@ const useExpenseDataLoader = ({
 
     setTableData(uniqueData.length > 0 ? uniqueData : mockData);
   }, [
-    setTableData,
     LOCAL_KEY_ACTIVE,
     LOCAL_KEY_ARCHIVE,
     LOCAL_KEY_IMPORTANT,
     LOCAL_KEY_TRASH,
     mockData,
+    // ❌ no setTableData here
   ]);
 };
 

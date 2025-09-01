@@ -1,16 +1,15 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Container, Tab, Tabs } from "react-bootstrap";
-import { LOCAL_KEYS } from "../../constants/localKeys";
 import { STATUS } from "../../constants/status";
 import { columns } from "../../handlers/tableHeader";
+
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
 
 const History = () => {
-  const [cashHistory, setCashHistory] = useState([]);
-  const [liqHistory, setLiqHistory] = useState([]);
+  const [cashHistory] = useState([]);
+  const [liqHistory] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
   const [activeTab, setActiveTab] = useState("cash");
 
   const normalize = (value) =>
@@ -23,44 +22,35 @@ const History = () => {
       normalize(item[col.accessor]).includes(normalize(value))
     );
 
-  useEffect(() => {
-    const activeData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-    const cashRequests = activeData.filter(
-      (item) =>
-        item.formType === "Cash Request" &&
-        (item.status === STATUS.APPROVED || item.status === STATUS.REJECTED)
-    );
+  const sourceData = useMemo(() => {
+    return activeTab === "cash"
+      ? cashHistory.filter(
+          (item) =>
+            item.formType === "Cash Request" &&
+            (item.status === STATUS.APPROVED || item.status === STATUS.REJECTED)
+        )
+      : liqHistory;
+  }, [activeTab, cashHistory, liqHistory]);
 
-    const liquidations =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
-
-    setCashHistory(cashRequests);
-    setLiqHistory(liquidations);
-
-    setFilteredData(cashRequests);
-  }, []);
+  const filteredData = useMemo(() => {
+    return sourceData.filter((item) => isMatch(item, searchValue));
+  }, [sourceData, searchValue]);
 
   const handleSearch = (val) => {
     setSearchValue(val);
-    const source = activeTab === "cash" ? cashHistory : liqHistory;
-    const filtered = source.filter((item) => isMatch(item, val));
-    setFilteredData(filtered);
   };
 
   const handleDateRange = ([start, end]) => {
-    const source = activeTab === "cash" ? cashHistory : liqHistory;
-    const filtered = source.filter((item) => {
+    const filtered = sourceData.filter((item) => {
       const date = new Date(item.createdAt);
       return date >= start && date <= end;
     });
-    setFilteredData(filtered);
+    return filtered;
   };
 
   const handleTabChange = (key) => {
     setActiveTab(key);
     setSearchValue("");
-    setFilteredData(key === "cash" ? cashHistory : liqHistory);
   };
 
   return (

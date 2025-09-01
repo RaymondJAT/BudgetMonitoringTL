@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Container } from "react-bootstrap";
-import { LOCAL_KEYS } from "../../constants/localKeys";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { latestListingsData } from "../../constants/latestListingsData";
@@ -13,20 +12,11 @@ import LiquidationPieChart from "../../components/ui/charts/finance/LiquidationP
 import LatestListingsTable from "../../components/LatestListingsTable";
 
 const FnceExpenses = () => {
-  const [tableData, setTableData] = useState([]);
-  const [liquidationData, setLiquidationData] = useState([]);
-
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
-    setLiquidationData(data);
-  }, []);
+  const [tableData] = useState([]);
+  const [liquidationData] = useState(mockLiquidations);
 
   const totalComputationData = useMemo(() => {
-    const archiveData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_ARCHIVE)) || [];
-    const importantData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.FNCE_IMPORTANT)) || [];
-    return [...tableData, ...archiveData, ...importantData];
+    return [...tableData];
   }, [tableData]);
 
   return (
@@ -39,7 +29,7 @@ const FnceExpenses = () => {
         <div className="row g-3 mb-3">
           <div className="col-12 col-lg-4">
             <div className="custom-container rounded p-3 h-100">
-              <LiquidationPieChart data={mockLiquidations} />
+              <LiquidationPieChart data={liquidationData} />
             </div>
           </div>
           <div className="col-12 col-lg-8">

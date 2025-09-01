@@ -1,36 +1,60 @@
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
-import { LOCAL_KEYS } from "../../../../constants/localKeys";
 import CashReqForm from "../../../layout/employee/cash-request/CashReqForm";
 import AppButton from "../../AppButton";
 
-const generateId = () => `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
 const CashReqModal = ({ show, onHide, onSubmit }) => {
   const [formOutput, setFormOutput] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const handleCloseModal = () => {
     onHide();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!formOutput || Object.keys(formOutput).length === 0) {
+      console.warn("No form data to submit.");
+      return;
+    }
+
     const newEntry = {
       ...formOutput,
       createdAt: new Date().toISOString(),
-      id: generateId(),
       formType: "Cash Request",
       status: "Pending",
-      transactions: formOutput.particulars,
+      transactions: formOutput.particulars || [],
     };
 
-    const existingData =
-      JSON.parse(localStorage.getItem(LOCAL_KEYS.ACTIVE)) || [];
-    const updatedData = [...existingData, newEntry];
-    localStorage.setItem(LOCAL_KEYS.ACTIVE, JSON.stringify(updatedData));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found.");
+      return;
+    }
 
-    if (onSubmit) onSubmit(updatedData);
+    try {
+      setSubmitting(true);
 
-    onHide();
+      const res = await fetch("/api5001/cash-request/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newEntry),
+      });
+
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+
+      const result = await res.json();
+
+      if (onSubmit) onSubmit(result.data || newEntry);
+
+      onHide();
+    } catch (error) {
+      console.error("Error submitting cash request:", error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -68,10 +92,11 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
           className="custom-app-button"
         />
         <AppButton
-          label="Submit"
+          label={submitting ? "Submitting..." : "Submit"}
           variant="outline-success"
           className="custom-app-button"
           onClick={handleSave}
+          disabled={submitting}
         />
       </Modal.Footer>
     </Modal>

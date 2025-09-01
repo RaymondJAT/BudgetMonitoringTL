@@ -20,9 +20,7 @@ const Login = () => {
     e.preventDefault();
 
     const demoUsers = {
-      admin: { username: "admin", password: "admin", role: "admin" },
-      employee: { username: "employee", password: "emp", role: "employee" },
-      teamlead: { username: "teamlead", password: "lead", role: "teamlead" },
+      admin: { username: "user", password: "user", role: "Sample User" },
     };
 
     const demoUser = Object.values(demoUsers).find(
