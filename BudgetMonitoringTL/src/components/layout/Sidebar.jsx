@@ -37,7 +37,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
   };
 
   useEffect(() => {
-    // Reset dropdown state based on sidebar state
+    // RESET DROPDOWN STATE BASED ON SIDEBAR STATE
     setOpenDropdown(isSidebarOpen ? [] : null);
   }, [isSidebarOpen]);
 
@@ -64,7 +64,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
   ${isSidebarHiddenMobile ? "d-none d-sm-flex sidebar-hidden" : ""} 
   ${isSidebarOpen ? "open" : "collapsed"}`}
     >
-      {/* Floating Dropdown (collapsed sidebar only) */}
+      {/* FLOATING DROPDOWN */}
       {!isSidebarOpen &&
         openDropdown &&
         (() => {
@@ -101,8 +101,8 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
           );
         })()}
 
-      {/* Sidebar Header */}
-      <div className="sidebar-header px-3 py-2 d-flex align-items-center">
+      {/* SIDEBAR HEADER */}
+      <div className="sidebar-header d-flex align-items-center justify-content-center">
         <FaMoneyBillWave
           style={{
             fontSize: isSidebarOpen ? "1.5rem" : "1.3rem",
@@ -110,12 +110,10 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
             transition: "font-size 0.3s ease",
           }}
         />
-        {isSidebarOpen && (
-          <span className="nav-label ms-2 fw-bold">Budget Monitoring</span>
-        )}
+        {isSidebarOpen && <span className="nav-label ms-2 fw-bold">BMS</span>}
       </div>
 
-      {/* Nav Items */}
+      {/* NAV ITEMS */}
       <div className="cashreq-scroll nav-links flex-grow-1 overflow-y-auto">
         {navItems.map((item) => (
           <div key={item.label}>
@@ -156,7 +154,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
               </div>
             </div>
 
-            {/* Inline Dropdown (only when sidebar is open) */}
+            {/* INLINE DROPDOWN */}
             {item.children && isSidebarOpen && (
               <div
                 className={`dropdown-wrapper ms-4 me-3 ${
