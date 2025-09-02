@@ -14,14 +14,13 @@ const NewUser = ({ show, onHide, onAdd }) => {
     username: "",
     password: "",
     access_id: "",
-    status: "active", // default
+    status: "active",
   });
 
   const [accessOptions, setAccessOptions] = useState([]);
   const [loadingAccess, setLoadingAccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // AUTH FETCH (same as revolving fund)
   const authFetch = useCallback(
     async (url) => {
       const token = localStorage.getItem("token");

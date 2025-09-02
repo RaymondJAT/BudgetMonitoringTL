@@ -5,7 +5,7 @@ import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/AppButton";
 import { FaPlus, FaEdit } from "react-icons/fa";
 import NewUser from "../../components/ui/modal/admin/NewUser";
-import EditUser from "../../components/ui/modal/admin/EditUser"; // 🔹 make sure this exists
+import EditUser from "../../components/ui/modal/admin/EditUser";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -94,8 +94,8 @@ const Users = () => {
         employeeId: u.employee_id,
         fullName: u.fullname,
         username: u.username,
-        accessId: u.access, // ✅ keep the raw id
-        accessLevel: map[u.access] || `#${u.access}`, // ✅ display label
+        accessId: u.access,
+        accessLevel: map[u.access] || `#${u.access}`,
         status: u.status
           ? u.status.charAt(0).toUpperCase() + u.status.slice(1)
           : "",
