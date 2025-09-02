@@ -7,12 +7,12 @@ export default defineConfig({
   server: {
     proxy: {
       "/api5012": {
-        target: "http://192.168.1.22:5012",
+        target: "http://192.168.1.20:5012",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api5012/, ""),
       },
       "/api5001": {
-        target: "http://192.168.1.22:5001",
+        target: "http://192.168.1.20:5001",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api5001/, ""),
       },

@@ -391,13 +391,15 @@ main.no-sidebar {
   border: 1px solid rgb(154, 89, 10);
 }
 
-.status-badge.approved {
+.status-badge.approved,
+.status-badge.active {
   background-color: green;
   color: white;
   border: 1px solid darkgreen;
 }
 
-.status-badge.rejected {
+.status-badge.rejected,
+.status-badge.inactive {
   background-color: red;
   color: white;
   border: 1px solid darkred;

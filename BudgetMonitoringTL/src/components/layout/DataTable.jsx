@@ -11,8 +11,6 @@ const DataTable = ({
   height,
   columns = [],
   onRowClick,
-  onDelete,
-  onArchive,
   onToggleImportant,
   downloadRef,
   selectedRows = {},
@@ -26,11 +24,8 @@ const DataTable = ({
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
 
-  // GENERATE ACTION MENU ITEMS
+  // GENERATE ACTION MENU ITEMS (removed delete/archive/trash)
   const meatballItems = meatballActions({
-    onDelete,
-    onArchive,
-    onToggleImportant,
     downloadRef,
     setPrintData,
   });
