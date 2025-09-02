@@ -22,6 +22,7 @@ import LiquidApprovalForm from "../components/layout/team-leader/liquidation/Liq
 import Liquidation from "../pages/team-leader/Liquidation";
 import TLHistory from "../pages/team-leader/TLHistory";
 import Users from "../pages/admin/Users";
+import Access from "../pages/admin/Access";
 
 const FinanceRoutes = () => {
   return (
@@ -56,6 +57,7 @@ const FinanceRoutes = () => {
       <Route path="/final_approval" element={<FinalApproval />} />
       <Route path="/all_request" element={<AllRequest />} />
       <Route path="/users" element={<Users />} />
+      <Route path="/access" element={<Access />} />
     </Routes>
   );
 };

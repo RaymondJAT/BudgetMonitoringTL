@@ -1,6 +1,10 @@
-import { RxDashboard } from "react-icons/rx";
 import { TbReport } from "react-icons/tb";
-import { MdOutlineManageHistory } from "react-icons/md";
+import {
+  MdOutlineManageAccounts,
+  MdOutlineSavings,
+  MdOutlineDashboard,
+  MdOutlineManageHistory,
+} from "react-icons/md";
 import { GiMoneyStack } from "react-icons/gi";
 
 export const navConfig = {
@@ -8,7 +12,7 @@ export const navConfig = {
   finance: [
     {
       label: "Dashboards",
-      icon: RxDashboard,
+      icon: MdOutlineDashboard,
       children: [
         { label: "Admin Dashboard", path: "/admin_dashboard" },
         { label: "Finance Dashboard", path: "/finance_dashboard" },
@@ -16,7 +20,7 @@ export const navConfig = {
     },
     {
       label: "User Management",
-      icon: RxDashboard,
+      icon: MdOutlineManageAccounts,
       children: [
         { label: "Users", path: "/users" },
         { label: "Positions", path: "/positions" },
@@ -26,7 +30,7 @@ export const navConfig = {
     },
     {
       label: "Fund Management",
-      icon: MdOutlineManageHistory,
+      icon: MdOutlineSavings,
       children: [
         { label: "Budget Allocation", path: "/budget_allocation" },
         { label: "Revolving Fund", path: "/revolving_fund" },
