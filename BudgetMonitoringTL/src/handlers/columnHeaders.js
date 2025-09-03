@@ -26,14 +26,14 @@ export const trashColumns = [...colHeaders];
 
 // cash request fields
 export const approvalFormFields = [
-  { label: "Position", key: "position" },
-  { label: "Amount", key: "total" },
+  { label: "Position", key: "cr_position" },
+  { label: "Amount", key: "subtotal" },
 ];
 
 export const approvalPartnerFields = [
-  { label: "Employee", key: "employee" },
-  { label: "Expense Date", key: "expenseDate" },
-  { label: "Department", key: "department" },
+  { label: "Employee", key: "cr_employee_id" },
+  { label: "Expense Date", key: "cr_request_date" },
+  { label: "Department", key: "department_name" },
   { label: "Team Lead", key: "teamLead" },
 ];
 

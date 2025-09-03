@@ -54,9 +54,9 @@ const Routing = () => {
         }
       />
       <Route
-        path="/cash_form"
+        path="/view_cash_request"
         element={
-          <ProtectedRoute path="/cash_form">
+          <ProtectedRoute path="/view_cash_request">
             <ViewCashRequestForm />
           </ProtectedRoute>
         }

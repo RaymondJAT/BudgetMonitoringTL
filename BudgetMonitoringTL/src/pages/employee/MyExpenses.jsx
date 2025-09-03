@@ -1,13 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Form } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
-import { STATUS } from "../../constants/status";
 import { columns } from "../../handlers/tableHeader";
-import { deleteItems } from "../../utils/deleteItems";
-import { moveEntries } from "../../utils/entryActions";
-import { handleExportData } from "../../utils/exportItems";
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
@@ -25,93 +21,57 @@ const MyExpenses = () => {
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
   const navigate = useNavigate();
 
+  // Fetch cash request data
+  useEffect(() => {
+    const fetchCashRequests = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/cash_request/getcash_request", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!res.ok) throw new Error("Failed to fetch cash requests");
+
+        const result = await res.json();
+        const mappedData = (result || []).map((item) => ({
+          ...item,
+          id: item.cr_id,
+          formType: "Cash Request",
+        }));
+        setTableData(mappedData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCashRequests();
+  }, []);
+
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
-
-  const archiveData = useMemo(() => [], []);
-  const importantData = useMemo(() => [], []);
-
-  const totalComputationData = useMemo(
-    () => [...tableData, ...archiveData, ...importantData],
-    [tableData, archiveData, importantData]
-  );
+  const totalComputationData = useMemo(() => tableData, [tableData]);
 
   const normalize = (value) =>
     String(value || "")
       .toLowerCase()
       .trim();
 
-  const isMatch = (item, value) => {
-    const fields = [...columns.map((col) => col.accessor), "formType"];
-    return fields.some((key) =>
-      normalize(item[key]).includes(normalize(value))
-    );
-  };
-
   const filteredData = useMemo(
-    () => tableData.filter((item) => isMatch(item, searchValue)),
+    () =>
+      tableData.filter((item) =>
+        [...columns.map((col) => col.accessor), "formType"].some((key) =>
+          normalize(item[key]).includes(normalize(searchValue))
+        )
+      ),
     [tableData, searchValue]
   );
 
   const handleRowClick = (entry) => {
-    if (entry.formType === "Cash Request") {
-      navigate("/cash-form", { state: entry });
-    } else if (entry.formType === "Liquidation") {
-      navigate("/liquid-form", { state: entry });
-    }
-  };
-
-  const handleDelete = (entry) => {
-    moveEntries({
-      entriesToMove: [entry],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: null,
-      statusUpdate: STATUS.DELETED,
-    });
-  };
-
-  const handleDeleteSelected = () => {
-    const selectedEntries = filteredData.filter(
-      (entry) => selectedRows[entry.id]
+    navigate(
+      entry.formType === "Cash Request" ? "/view_cash_request" : "/liquid-form",
+      { state: entry }
     );
-
-    deleteItems({
-      selectedEntries,
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: null,
-      setSelectedRows,
-      statusUpdate: STATUS.DELETED,
-    });
-  };
-
-  const handleArchive = (entry) => {
-    moveEntries({
-      entriesToMove: [entry],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: null,
-    });
-  };
-
-  const handleToggleImportant = (entry) => {
-    moveEntries({
-      entriesToMove: [entry],
-      sourceData: tableData,
-      setSourceData: setTableData,
-      destinationKey: null,
-      avoidDuplicates: true,
-    });
-  };
-
-  const handleExport = () => {
-    const reset = handleExportData({
-      filteredData,
-      selectedRows,
-      selectedCount,
-      filename: "MyExpenses",
-    });
-    setSelectedRows(reset);
   };
 
   const selectAllCheckbox = (
@@ -124,9 +84,7 @@ const MyExpenses = () => {
       onChange={(e) => {
         const checked = e.target.checked;
         const newSelection = {};
-        filteredData.forEach((entry) => {
-          newSelection[entry.id] = checked;
-        });
+        filteredData.forEach((entry) => (newSelection[entry.id] = checked));
         setSelectedRows(newSelection);
       }}
       className="d-lg-none"
@@ -164,7 +122,6 @@ const MyExpenses = () => {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             leftContent={leftContent}
-            handleExport={handleExport}
             selectedCount={selectedCount}
             searchBarWidth="300px"
           />
@@ -174,9 +131,6 @@ const MyExpenses = () => {
             height="350px"
             columns={columns}
             onRowClick={handleRowClick}
-            onDelete={handleDelete}
-            onArchive={handleArchive}
-            onToggleImportant={handleToggleImportant}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
           />
@@ -185,18 +139,24 @@ const MyExpenses = () => {
           <CashReqModal
             show={showCashReqModal}
             onHide={() => setShowCashReqModal(false)}
-            onSubmit={(newData) => {
-              setTableData((prev) => [newData, ...prev]);
-            }}
+            onSubmit={(newData) =>
+              setTableData((prev) => [
+                { ...newData, formType: "Cash Request", id: newData.cr_id },
+                ...prev,
+              ])
+            }
           />
 
           {/* LIQUIDATION MODAL */}
           <LiqFormModal
             show={showLiqFormModal}
             onHide={() => setShowLiqFormModal(false)}
-            onSubmit={(newForm) => {
-              setTableData((prev) => [newForm, ...prev]);
-            }}
+            onSubmit={(newForm) =>
+              setTableData((prev) => [
+                { ...newForm, formType: "Liquidation", id: newForm.cr_id },
+                ...prev,
+              ])
+            }
           />
         </div>
       </Container>

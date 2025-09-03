@@ -183,7 +183,7 @@ const ViewCashRequestForm = () => {
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Description:</strong>
               <p className="ms-md-2 mb-0 text-start">
-                {data?.description || "N/A"}
+                {data?.cr_description || "N/A"}
               </p>
             </Col>
           </Row>
