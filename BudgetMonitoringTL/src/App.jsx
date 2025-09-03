@@ -8,7 +8,7 @@ import "./index.css";
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
 import Login from "./pages/Login";
-
+import Unauthorized from "./pages/Unauthorized";
 import Routing from "./routes/Routing";
 
 const App = () => {
@@ -16,6 +16,8 @@ const App = () => {
   const [isSidebarHiddenMobile, setIsSidebarHiddenMobile] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const userRole = localStorage.getItem("role") || "finance";
 
   useEffect(() => {
     const handleResize = () => {
@@ -44,8 +46,11 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Public */}
         <Route path="/login" element={<Login />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
+        {/* Private */}
         <Route
           path="/*"
           element={
@@ -58,9 +63,8 @@ const App = () => {
               <Sidebar
                 isSidebarOpen={isSidebarOpen}
                 isSidebarHiddenMobile={isSidebarHiddenMobile}
-                userRole="finance"
+                userRole={userRole}
               />
-
               <main
                 style={{
                   transition: "margin-left 0.3s ease",

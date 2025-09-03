@@ -1,4 +1,21 @@
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "../components/ProtectedRoute";
+
+// EMPLOYEE
+import MyExpenses from "../pages/employee/MyExpenses";
+import EmpLiquidation from "../pages/employee/EmpLiquidation";
+import ViewCashRequestForm from "../components/ViewCashRequestForm";
+
+// TEAM LEADER
+import Expenses from "../pages/team-leader/Expenses";
+import Approval from "../pages/team-leader/Approval";
+import Reject from "../pages/team-leader/Reject";
+import CashApprovalForm from "../components/layout/team-leader/cash-request/CashApprovalForm";
+import LiquidApprovalForm from "../components/layout/team-leader/liquidation/LiquidApprovalForm";
+import Liquidation from "../pages/team-leader/Liquidation";
+import TLHistory from "../pages/team-leader/TLHistory";
+
+// FINANCE
 import FnceExpenses from "../pages/finance/FnceExpenses";
 import Processing from "../pages/finance/Processing";
 import Released from "../pages/finance/Released";
@@ -8,58 +25,218 @@ import BudgetAllocation from "../pages/admin/BudgetAllocation";
 import RevolvingFund from "../pages/finance/RevolvingFund";
 import CashDisbursement from "../pages/finance/CashDisbursement";
 import History from "../pages/finance/History";
-import MyExpenses from "../pages/employee/MyExpenses";
-import EmpLiquidation from "../pages/employee/EmpLiquidation";
-import ViewCashRequestForm from "../components/ViewCashRequestForm";
-import Expenses from "../pages/team-leader/Expenses";
-import Approval from "../pages/team-leader/Approval";
-import Reject from "../pages/team-leader/Reject";
+
+// ADMIN
+import AdmExpenses from "../pages/admin/AdmExpenses";
 import FinalApproval from "../pages/admin/FinalApproval";
 import AllRequest from "../pages/admin/AllRequest";
-import AdmExpenses from "../pages/admin/AdmExpenses";
-import CashApprovalForm from "../components/layout/team-leader/cash-request/CashApprovalForm";
-import LiquidApprovalForm from "../components/layout/team-leader/liquidation/LiquidApprovalForm";
-import Liquidation from "../pages/team-leader/Liquidation";
-import TLHistory from "../pages/team-leader/TLHistory";
 import Users from "../pages/admin/Users";
 import Access from "../pages/admin/Access";
 
-const FinanceRoutes = () => {
+const Routing = () => {
   return (
     <Routes>
-      {/* EMEPLOYEE */}
-      <Route path="/employee_requests" element={<MyExpenses />} />
-      <Route path="/employee_liquidation" element={<EmpLiquidation />} />
-      <Route path="/cash_form" element={<ViewCashRequestForm />} />
+      {/* EMPLOYEE */}
+      <Route
+        path="/employee_request"
+        element={
+          <ProtectedRoute path="/employee_request">
+            <MyExpenses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee_liquidation"
+        element={
+          <ProtectedRoute path="/employee_liquidation">
+            <EmpLiquidation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cash_form"
+        element={
+          <ProtectedRoute path="/cash_form">
+            <ViewCashRequestForm />
+          </ProtectedRoute>
+        }
+      />
 
       {/* TEAM LEADER */}
-      <Route path="/teamlead_pendings" element={<Expenses />} />
-      <Route path="/my_approvals" element={<Approval />} />
-      <Route path="/rejected_requests" element={<Reject />} />
-      <Route path="/approval_form" element={<CashApprovalForm />} />
-      <Route path="/liquidation_form" element={<LiquidApprovalForm />} />
-      <Route path="/liquidation_note" element={<Liquidation />} />
-      <Route path="/lead_history" element={<TLHistory />} />
+      <Route
+        path="/teamlead_pendings"
+        element={
+          <ProtectedRoute path="/teamlead_pendings">
+            <Expenses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my_approvals"
+        element={
+          <ProtectedRoute path="/my_approvals">
+            <Approval />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rejected_requests"
+        element={
+          <ProtectedRoute path="/rejected_requests">
+            <Reject />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/approval_form"
+        element={
+          <ProtectedRoute path="/approval_form">
+            <CashApprovalForm />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/liquidation_form"
+        element={
+          <ProtectedRoute path="/liquidation_form">
+            <LiquidApprovalForm />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/liquidation_note"
+        element={
+          <ProtectedRoute path="/liquidation_note">
+            <Liquidation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/lead_history"
+        element={
+          <ProtectedRoute path="/lead_history">
+            <TLHistory />
+          </ProtectedRoute>
+        }
+      />
 
       {/* FINANCE */}
-      <Route path="/finance_dashboard" element={<FnceExpenses />} />
-      <Route path="/finance_processing" element={<Processing />} />
-      <Route path="/finance_released" element={<Released />} />
-      <Route path="/finance_verify" element={<Verify />} />
-      <Route path="/finance_verified" element={<Verified />} />
-      <Route path="/budget_allocation" element={<BudgetAllocation />} />
-      <Route path="/revolving_fund" element={<RevolvingFund />} />
-      <Route path="/cash_disbursement" element={<CashDisbursement />} />
-      <Route path="/finance_history" element={<History />} />
+      <Route
+        path="/finance_dashboard"
+        element={
+          <ProtectedRoute path="/finance_dashboard">
+            <FnceExpenses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_processing"
+        element={
+          <ProtectedRoute path="/finance_processing">
+            <Processing />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_released"
+        element={
+          <ProtectedRoute path="/finance_released">
+            <Released />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_verify"
+        element={
+          <ProtectedRoute path="/finance_verify">
+            <Verify />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_verified"
+        element={
+          <ProtectedRoute path="/finance_verified">
+            <Verified />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/budget_allocation"
+        element={
+          <ProtectedRoute path="/budget_allocation">
+            <BudgetAllocation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/revolving_fund"
+        element={
+          <ProtectedRoute path="/revolving_fund">
+            <RevolvingFund />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cash_disbursement"
+        element={
+          <ProtectedRoute path="/cash_disbursement">
+            <CashDisbursement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_history"
+        element={
+          <ProtectedRoute path="/finance_history">
+            <History />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ADMIN */}
-      <Route path="/admin_dashboard" element={<AdmExpenses />} />
-      <Route path="/final_approval" element={<FinalApproval />} />
-      <Route path="/all_request" element={<AllRequest />} />
-      <Route path="/users" element={<Users />} />
-      <Route path="/access" element={<Access />} />
+      <Route
+        path="/admin_dashboard"
+        element={
+          <ProtectedRoute path="/admin_dashboard">
+            <AdmExpenses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/final_approval"
+        element={
+          <ProtectedRoute path="/final_approval">
+            <FinalApproval />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/all_request"
+        element={
+          <ProtectedRoute path="/all_request">
+            <AllRequest />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute path="/users">
+            <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/access"
+        element={
+          <ProtectedRoute path="/access">
+            <Access />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
 
-export default FinanceRoutes;
+export default Routing;

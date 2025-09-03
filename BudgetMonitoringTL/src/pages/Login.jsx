@@ -19,22 +19,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const demoUsers = {
-      admin: { username: "user", password: "user", role: "Sample User" },
-    };
-
-    const demoUser = Object.values(demoUsers).find(
-      (u) => u.username === username && u.password === password
-    );
-
-    if (demoUser) {
-      localStorage.setItem("username", demoUser.username);
-      localStorage.setItem("role", demoUser.role);
-
-      navigate("/admin_dashboard");
-      return;
-    }
-
     try {
       const response = await fetch("api5012/login/", {
         method: "POST",
@@ -44,19 +28,61 @@ const Login = () => {
 
       const result = await response.json();
 
-      if (result.success) {
-        const { token, data } = result;
-
-        localStorage.setItem("token", token);
-        localStorage.setItem("username", data.fullname || data.username);
-
-        let role = data.position || "finance";
-        localStorage.setItem("role", role);
-
-        navigate("/admin_dashboard");
-      } else {
+      if (!result.success) {
         setError(result.message || "Invalid username or password");
+        return;
       }
+
+      const { token, data } = result;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", data.fullname || data.username);
+      localStorage.setItem("role", data.position || "finance");
+
+      const accessRes = await fetch(
+        `/api5012/route_access/getroute_access_table?access_id=${data.access_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      let userAccess = [];
+      if (accessRes.ok) {
+        const accessData = await accessRes.json();
+        userAccess = accessData.data || [];
+        localStorage.setItem("access", JSON.stringify(userAccess));
+      } else {
+        console.warn("Failed to fetch route access for user");
+        localStorage.setItem("access", "[]");
+      }
+
+      let firstRoute = "/";
+      if (userAccess.length > 0) {
+        const routeWithPath = userAccess.find((item) => item.path);
+        if (routeWithPath) firstRoute = routeWithPath.path;
+      } else {
+        switch (data.position) {
+          case "admin":
+            firstRoute = "/admin_dashboard";
+            break;
+          case "finance":
+            firstRoute = "/finance_dashboard";
+            break;
+          case "team_leader":
+            firstRoute = "/teamlead_pendings";
+            break;
+          case "employee":
+            firstRoute = "/employee_requests";
+            break;
+          default:
+            firstRoute = "/";
+        }
+      }
+
+      navigate(firstRoute);
     } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");

@@ -5,11 +5,18 @@ import DataTable from "../../../layout/DataTable";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
 
-const EditRouteAccess = ({ show, onHide, accessId }) => {
+const accessOptions = [
+  { value: "Full Access", label: "Full Access" },
+  { value: "No Access", label: "No Access" },
+];
+
+const EditRouteAccess = ({ show, onHide, accessId, onSuccess }) => {
   const [routeAccessList, setRouteAccessList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [savingId, setSavingId] = useState(null);
 
+  /** Fetch route access list */
   const fetchRouteAccess = async () => {
     if (!accessId) return;
 
@@ -30,17 +37,16 @@ const EditRouteAccess = ({ show, onHide, accessId }) => {
 
       if (!res.ok) throw new Error(`Failed to fetch data (${res.status})`);
 
-      const json = await res.json();
-      const data = Array.isArray(json.data) ? json.data : [];
-
-      const mapped = data.map((item) => ({
+      const { data } = await res.json();
+      const mapped = (Array.isArray(data) ? data : []).map((item) => ({
         id: item.id,
         route: item.name,
-        access: item.status,
+        access: item.status || "No Access",
       }));
 
       setRouteAccessList(mapped);
     } catch (err) {
+      console.error("Fetch error:", err);
       setError(err.message);
       setRouteAccessList([]);
     } finally {
@@ -54,6 +60,36 @@ const EditRouteAccess = ({ show, onHide, accessId }) => {
     }
   }, [show, accessId]);
 
+  /** Update route access */
+  const handleUpdate = async (rowData, newStatus) => {
+    setSavingId(rowData.id);
+
+    try {
+      const token = localStorage.getItem("token");
+      const payload = { id: rowData.id, status: newStatus };
+
+      const res = await fetch("/api5012/route_access/update_status", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Failed to update route access");
+
+      // Refresh parent or just update local state
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error("Update error:", err);
+      alert(err.message || "Failed to save changes");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  /** Table columns */
   const columns = [
     { label: "Route", accessor: "route" },
     {
@@ -61,60 +97,33 @@ const EditRouteAccess = ({ show, onHide, accessId }) => {
       accessor: "access",
       Cell: ({ row }) => {
         const rowData = row.original || row;
+        const currentValue = rowData.access || "No Access";
+
+        if (savingId === rowData.id) {
+          return <Spinner animation="border" size="sm" />;
+        }
+
         return (
           <Select
-            options={[
-              { value: "active", label: "Active" },
-              { value: "inactive", label: "Inactive" },
-            ]}
-            value={{
-              value: rowData.access.toLowerCase(),
-              label:
-                rowData.access.charAt(0).toUpperCase() +
-                rowData.access.slice(1),
-            }}
+            options={accessOptions}
+            value={{ value: currentValue, label: currentValue }}
             onChange={(selected) => {
-              const updated = routeAccessList.map((r) =>
-                r.id === rowData.id
-                  ? { ...r, access: selected?.value ?? "inactive" }
-                  : r
+              const newStatus = selected?.value ?? "No Access";
+              setRouteAccessList((prev) =>
+                prev.map((r) =>
+                  r.id === rowData.id ? { ...r, access: newStatus } : r
+                )
               );
-              setRouteAccessList(updated);
+              handleUpdate(rowData, newStatus);
             }}
             styles={customStyles}
-            isClearable
+            isClearable={false}
+            isDisabled={savingId === rowData.id}
           />
         );
       },
     },
   ];
-
-  const handleSave = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const payload = routeAccessList.map((r) => ({
-        id: r.id,
-        status: r.access,
-      }));
-
-      const res = await fetch("/api5012/route_access/update_route_access", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data: payload }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update route access");
-
-      alert("Route access updated successfully!");
-      onHide();
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "Failed to save changes");
-    }
-  };
 
   return (
     <Modal
@@ -163,12 +172,6 @@ const EditRouteAccess = ({ show, onHide, accessId }) => {
           label="Close"
           variant="outline-danger"
           onClick={onHide}
-          className="custom-app-button"
-        />
-        <AppButton
-          label="Save Changes"
-          variant="outline-success"
-          onClick={handleSave}
           className="custom-app-button"
         />
       </Modal.Footer>

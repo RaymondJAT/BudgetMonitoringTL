@@ -6,7 +6,7 @@ import AppButton from "../../components/ui/AppButton";
 import { FaEdit, FaCog, FaPlus } from "react-icons/fa";
 import NewAccess from "../../components/ui/modal/admin/NewAccess";
 import EditAccess from "../../components/ui/modal/admin/EditAccess";
-import EditRouteAccess from "../../components/ui/modal/admin/EditRouteAccess"; // import the new modal
+import EditRouteAccess from "../../components/ui/modal/admin/EditRouteAccess";
 
 const Access = () => {
   const [accessList, setAccessList] = useState([]);
@@ -154,6 +154,7 @@ const Access = () => {
           show={showEditRouteModal}
           onHide={() => setShowEditRouteModal(false)}
           accessId={selectedAccess?.id}
+          onSuccess={fetchData}
         />
       </div>
     </Container>

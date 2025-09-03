@@ -58,7 +58,7 @@ export const navConfig = {
       label: "Cash Requests",
       icon: GiMoneyStack,
       children: [
-        { label: "My Requests", path: "/employee_requests" },
+        { label: "My Requests", path: "/employee_request" },
         { label: "My Liquidations", path: "/employee_liquidation" },
         { label: "Pending Approvals", path: "/teamlead_pendings" },
         { label: "Approved Requests", path: "/my_approvals" },
