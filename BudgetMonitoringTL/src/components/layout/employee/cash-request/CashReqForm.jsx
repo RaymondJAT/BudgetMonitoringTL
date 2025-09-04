@@ -6,78 +6,118 @@ import RequestForm from "../cash-request/RequestForm";
 import CashReqTable from "./CashReqTable";
 import SignatureUpload from "../../../SignatureUpload";
 
-const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
+const CashReqForm = ({ data = {}, onChange = () => {} }) => {
   const today = new Date().toISOString().split("T")[0];
+  const loggedInUser = localStorage.getItem("employee_fullname") || "";
+  const departmentName = localStorage.getItem("department_name") || "";
+  const positionName = localStorage.getItem("position_name") || "";
 
-  // 👇 Get logged-in user’s name from localStorage
-  const loggedInUser = localStorage.getItem("username") || "";
+  // Helper: convert any base64 signature to proper data URI
+  const getSignatureDataUri = (signature) => {
+    if (!signature) return null;
+    try {
+      const parts = signature.split(":");
+      const base64 =
+        parts.length === 3 && parts[0] === "base64" ? parts[2] : signature;
+      return `data:image/png;base64,${base64}`;
+    } catch {
+      return null;
+    }
+  };
 
-  const [formData, setFormData] = useState({
-    employee: loggedInUser, // auto-fill
-    expenseDate: today, // auto-fill today’s date
-    department: "",
-    teamLead: "",
-    position: "",
-    description: "",
-    ...data,
-  });
+  // Initialize rows and signature from API response or default
+  const initialRows =
+    data.cash_request_items?.length > 0
+      ? data.cash_request_items.map((item) => ({
+          label: item.label || "",
+          price: item.price || 0,
+          quantity: item.quantity || 0,
+        }))
+      : [{ label: "", price: 0, quantity: 0 }];
 
-  const [signatures, setSignatures] = useState({
-    requestedName: "",
-    requestSignature: null,
-  });
-
-  const [rows, setRows] = useState(
-    particulars.length ? particulars : [{ label: "", price: "", quantity: "" }]
+  const initialSignature = getSignatureDataUri(
+    data.cash_request_activities?.[0]?.signature
   );
 
-  const total = rows.reduce((sum, row) => {
-    const price = parseFloat(row.price) || 0;
-    const quantity = parseFloat(row.quantity) || 0;
-    return sum + price * quantity;
-  }, 0);
+  // Form data state
+  const [formData, setFormData] = useState({
+    employee: loggedInUser,
+    requested_by: loggedInUser,
+    department: departmentName,
+    position: positionName,
+    expenseDate: data.request_date?.split("T")[0] || today,
+    teamLead: data.team_lead || "",
+    description: data.description || "",
+  });
+
+  // Rows state
+  const [rows, setRows] = useState(initialRows);
+
+  // Signature state
+  const [signatures, setSignatures] = useState({
+    requestedName: loggedInUser,
+    requestSignature: initialSignature,
+  });
+
+  // Calculate total
+  const total = rows.reduce(
+    (sum, row) =>
+      sum + (parseFloat(row.price) || 0) * (parseFloat(row.quantity) || 0),
+    0
+  );
 
   const amountInWords = total ? numberToWords(total) : "Zero Pesos Only";
 
+  // Map form data to backend structure and trigger onChange
   useEffect(() => {
-    onChange({
-      ...formData,
-      particulars: rows,
-      total,
-      amountInWords,
-      signatures,
-    });
-  }, [formData, rows, total, signatures]);
+    const mapped = {
+      description: formData.description || "",
+      team_lead: formData.teamLead || "",
+      employee: formData.employee || "",
+      department: formData.department || "",
+      position: formData.position || "",
+      action: "REQUESTED",
+      remarks: "",
+      signature: signatures.requestSignature || "",
+      requested_by: formData.employee || "",
+      request_items: rows.map((row) => ({
+        label: row.label,
+        price: Number(row.price) || 0,
+        quantity: Number(row.quantity) || 0,
+        subtotal: (Number(row.price) || 0) * (Number(row.quantity) || 0),
+      })),
+    };
 
+    onChange(mapped);
+  }, [formData, rows, signatures, total, onChange]);
+
+  // Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRowChange = (index, field, value) => {
-    const updated = [...rows];
-    updated[index][field] = value;
-    setRows(updated);
+    setRows((prev) => {
+      const updated = [...prev];
+      updated[index][field] = value;
+      return updated;
+    });
   };
 
-  const handleAddRow = () => {
-    setRows([...rows, { label: "", price: "", quantity: "" }]);
-  };
+  const handleAddRow = () =>
+    setRows((prev) => [...prev, { label: "", price: 0, quantity: 0 }]);
 
   const handleRemoveRow = (index) => {
-    const updated = [...rows];
-    updated.splice(index, 1);
-    setRows(
-      updated.length ? updated : [{ label: "", price: "", quantity: "" }]
-    );
+    setRows((prev) => {
+      const updated = [...prev];
+      updated.splice(index, 1);
+      return updated.length ? updated : [{ label: "", price: 0, quantity: 0 }];
+    });
   };
 
   return (
     <Container fluid>
-      {/* CASH REQUEST FORM */}
       <RequestForm
         fields={cashReqFields}
         formData={formData}
@@ -85,7 +125,6 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
         amountInWords={amountInWords}
       />
 
-      {/* CASH REQ TABLE */}
       <CashReqTable
         rows={rows}
         onRowChange={handleRowChange}
@@ -93,7 +132,6 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
         onRemoveRow={handleRemoveRow}
       />
 
-      {/* CASH REQ SIGNATURE */}
       <div className="mt-3">
         <SignatureUpload
           label="Requested by"

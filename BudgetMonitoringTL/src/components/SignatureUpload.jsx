@@ -18,17 +18,44 @@ const SignatureUpload = ({
     inputRef.current.click();
   };
 
-  const handleFileUpload = (e) => {
+  // Compress the image using a canvas before converting to Base64
+  const compressImage = (
+    file,
+    maxWidth = 500,
+    maxHeight = 200,
+    quality = 0.7
+  ) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const scale = Math.min(
+            maxWidth / img.width,
+            maxHeight / img.height,
+            1
+          );
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/png", quality));
+        };
+      };
+    });
+  };
+
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file?.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSignatures((prev) => ({
-          ...prev,
-          [signatureKey]: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
+      const compressedBase64 = await compressImage(file);
+      setSignatures((prev) => ({
+        ...prev,
+        [signatureKey]: compressedBase64,
+      }));
     }
   };
 
@@ -48,7 +75,6 @@ const SignatureUpload = ({
       >
         <p className="mb-3 fw-bold">Upload Signature</p>
         <Row className="g-2 align-items-center">
-          {/* read only */}
           {readOnly ? (
             <Col xs={12} md={6} className="d-flex align-items-center gap-3">
               <div>
@@ -67,7 +93,6 @@ const SignatureUpload = ({
             </Col>
           ) : (
             <>
-              {/* editable field */}
               <Col xs={12} md={3}>
                 <FloatingLabel
                   controlId={nameKey}
@@ -89,7 +114,6 @@ const SignatureUpload = ({
                 </FloatingLabel>
               </Col>
 
-              {/* file upload and signature preview */}
               <Col xs={12} md={6}>
                 <div className="d-flex align-items-center gap-3">
                   <input
@@ -124,20 +148,6 @@ const SignatureUpload = ({
                           transition: "all 0.2s ease",
                           boxShadow: "0 0 3px rgba(0,0,0,0.3)",
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = "#36454F";
-                          e.currentTarget.style.transform =
-                            "translate(80%, -70%) scale(1.1)";
-                          e.currentTarget.style.boxShadow =
-                            "0 0 5px rgba(0,0,0,0.5)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "red";
-                          e.currentTarget.style.transform =
-                            "translate(80%, -70%)";
-                          e.currentTarget.style.boxShadow =
-                            "0 0 3px rgba(0,0,0,0.3)";
-                        }}
                         onClick={handleRemoveSignature}
                         title="Remove Signature"
                       />
@@ -146,13 +156,6 @@ const SignatureUpload = ({
                 </div>
               </Col>
             </>
-          )}
-
-          {/* message for no signature in read-only mode */}
-          {readOnly && !signatures[signatureKey] && (
-            <Col xs={12}>
-              <p className="text-muted">No signature uploaded.</p>
-            </Col>
           )}
         </Row>
       </div>

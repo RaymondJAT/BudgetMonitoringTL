@@ -43,6 +43,7 @@ const RequestForm = ({
                     value={formData[key] || ""}
                     onChange={onChange}
                     placeholder={label}
+                    readOnly
                     className="form-control-sm small-input"
                   />
                 </FloatingLabel>

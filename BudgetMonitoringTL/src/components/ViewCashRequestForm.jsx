@@ -20,26 +20,44 @@ const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const { state: data } = useLocation();
+
   const [particulars, setParticulars] = useState([]);
   const [amountInWords, setAmountInWords] = useState("");
-  const [signatures, setSignatures] = useState(
-    data?.signatures || {
-      approved: null,
-      approvedName: "",
-    }
-  );
-
+  const [signatures, setSignatures] = useState({
+    requestedName: "",
+    requestSignature: null,
+  });
   const [showModal, setShowModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
-
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-
-  const reactToPrintFn = useReactToPrint({ contentRef });
 
   const transactions = useMemo(() => data?.cash_request_items || [], [data]);
   const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
 
+  // Helper: convert any base64 signature to proper data URI
+  const getSignatureDataUri = (signature) => {
+    if (!signature) return null;
+    try {
+      const parts = signature.split(":");
+      const base64 =
+        parts.length === 3 && parts[0] === "base64" ? parts[2] : signature;
+      return `data:image/png;base64,${base64}`;
+    } catch {
+      return null;
+    }
+  };
+
+  // Initialize requested signature and name from API response
+  useEffect(() => {
+    const requestedActivity = data?.cash_request_activities?.find(
+      (a) => a.action === "REQUESTED"
+    );
+    setSignatures({
+      requestedName: requestedActivity?.requested_by || "",
+      requestSignature: getSignatureDataUri(requestedActivity?.signature),
+    });
+  }, [data]);
+
+  // Map transactions to table-friendly format
   useEffect(() => {
     const items = transactions.map((item) => ({
       label: item.label ?? "N/A",
@@ -50,77 +68,36 @@ const ViewCashRequestForm = () => {
     setParticulars(items);
   }, [transactions]);
 
+  // Convert total to words
   useEffect(() => {
-    if (!isNaN(total)) {
-      setAmountInWords(numberToWords(total));
-    }
+    if (!isNaN(total)) setAmountInWords(numberToWords(total));
   }, [total]);
 
-  const renderPartnerFields = () => (
-    <Row>
-      {approvalPartnerFields.map(({ label, key }, index) => (
-        <Col
-          key={index}
-          xs={12}
-          md={6}
-          className="d-flex align-items-center mb-2"
-        >
-          <strong className="title">{label}:</strong>
-          <p className="ms-2 mb-0">
-            {key === "total"
-              ? `₱${parseFloat(data?.[key] || 0).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}`
-              : data?.[key] || "N/A"}
-          </p>
-        </Col>
-      ))}
-    </Row>
-  );
+  const currentStep = useMemo(() => {
+    switch (data?.status) {
+      case "completed":
+        return 4;
+      case "disbursed":
+        return 3;
+      case "approved":
+        return 2;
+      case "review":
+        return 1;
+      default:
+        return 0;
+    }
+  }, [data]);
 
-  const renderEmployeeFields = () =>
-    approvalFormFields.map(({ label, key }, index) => {
-      const value = data?.[key];
-
-      const isCurrency = key === "subtotal";
-
-      return (
-        <Row key={index}>
-          <Col xs={12} className="d-flex align-items-center mb-2">
-            <strong className="title">{label}:</strong>
-            <p className="ms-2 mb-0">
-              {isCurrency
-                ? `₱${parseFloat(value || 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}`
-                : value || "N/A"}
-            </p>
-          </Col>
-        </Row>
-      );
-    });
-
-  const getCurrentStep = () => {
-    if (data?.status === "completed") return 4;
-    if (data?.status === "disbursed") return 3;
-    if (data?.status === "approved") return 2;
-    if (data?.status === "review") return 1;
-    return 0; // submitted
-  };
-
-  const currentStep = getCurrentStep();
-
-  const handleStepClick = (index, step) => {
+  const handleStepClick = (index, step) =>
     console.log("Clicked step:", step.label);
-  };
 
   return (
     <div className="pb-3">
       <Container fluid>
         <CashReqActionButtons
           onBack={() => navigate(-1)}
-          onView={handleOpenModal}
-          onPrint={reactToPrintFn}
+          onView={() => setShowModal(true)}
+          onPrint={useReactToPrint({ contentRef })}
           onShowLiqFormModal={() => setShowLiqFormModal(true)}
         />
 
@@ -130,27 +107,25 @@ const ViewCashRequestForm = () => {
           onSubmit={(liqData) => {
             const existing =
               JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
-
-            const newEntry = {
-              ...liqData,
-              formType: "Liquidation",
-              createdAt: new Date().toISOString(),
-            };
-
             localStorage.setItem(
               LOCAL_KEYS.LIQUIDATION,
-              JSON.stringify([newEntry, ...existing])
+              JSON.stringify([
+                {
+                  ...liqData,
+                  formType: "Liquidation",
+                  createdAt: new Date().toISOString(),
+                },
+                ...existing,
+              ])
             );
-
             window.dispatchEvent(new Event("liquidations-updated"));
             setShowLiqFormModal(false);
           }}
         />
 
-        {/* PROGRESS BAR  */}
+        {/* PROGRESS BAR */}
         <div className="request-container border p-2 mb-3">
           <Row className="align-items-center d-flex justify-content-between">
-            {/* ProgressBar */}
             <Col className="d-flex">
               <ProgressBar
                 steps={progressSteps}
@@ -158,8 +133,6 @@ const ViewCashRequestForm = () => {
                 onStepClick={handleStepClick}
               />
             </Col>
-
-            {/* Button */}
             <Col className="d-flex">
               <AppButton
                 label="Mark"
@@ -177,13 +150,47 @@ const ViewCashRequestForm = () => {
             <Col xs={12} className="d-flex flex-column flex-md-row">
               <strong className="title text-start">Description:</strong>
               <p className="ms-md-2 mb-0 text-start">
-                {data?.cr_description || "N/A"}
+                {data?.description || "N/A"}
               </p>
             </Col>
           </Row>
 
-          {renderPartnerFields()}
-          {renderEmployeeFields()}
+          {/* Partner Fields */}
+          <Row>
+            {approvalPartnerFields.map(({ label, key }, idx) => (
+              <Col
+                key={idx}
+                xs={12}
+                md={6}
+                className="d-flex align-items-center mb-2"
+              >
+                <strong className="title">{label}:</strong>
+                <p className="ms-2 mb-0">
+                  {key === "total"
+                    ? `₱${parseFloat(data?.[key] || 0).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}`
+                    : data?.[key] || "N/A"}
+                </p>
+              </Col>
+            ))}
+          </Row>
+
+          {/* Employee Fields */}
+          {approvalFormFields.map(({ label, key }, idx) => (
+            <Row key={idx}>
+              <Col xs={12} className="d-flex align-items-center mb-2">
+                <strong className="title">{label}:</strong>
+                <p className="ms-2 mb-0">
+                  {key === "subtotal"
+                    ? `₱${parseFloat(data?.[key] || 0).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}`
+                    : data?.[key] || "N/A"}
+                </p>
+              </Col>
+            </Row>
+          ))}
 
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -208,17 +215,23 @@ const ViewCashRequestForm = () => {
       </Container>
 
       {/* Hidden Printable Component */}
-      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
-        <div ref={contentRef}>
-          <PrintableCashRequest
-            data={{ ...data, items: transactions }}
-            amountInWords={amountInWords}
-            signatures={signatures}
-          />
-        </div>
+      <div
+        style={{ position: "absolute", left: "-9999px", top: 0 }}
+        ref={contentRef}
+      >
+        <PrintableCashRequest
+          data={{ ...data, items: transactions }}
+          amountInWords={amountInWords}
+          signatures={signatures}
+        />
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="lg"
+        centered
+      >
         <Modal.Body>
           <PrintableCashRequest
             data={{ ...data, items: transactions }}

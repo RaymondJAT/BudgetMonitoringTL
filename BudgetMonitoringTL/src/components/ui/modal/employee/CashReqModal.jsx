@@ -1,15 +1,25 @@
-import { useState } from "react";
-import { Modal } from "react-bootstrap";
+import { useState, useCallback } from "react";
+import { Modal, Alert, Spinner } from "react-bootstrap";
 import CashReqForm from "../../../layout/employee/cash-request/CashReqForm";
 import AppButton from "../../AppButton";
 
 const CashReqModal = ({ show, onHide, onSubmit }) => {
   const [formOutput, setFormOutput] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleCloseModal = () => {
-    onHide();
+    if (!submitting) {
+      setFormOutput({});
+      setError("");
+      onHide();
+    }
   };
+
+  // Memoized callback to prevent infinite loop
+  const handleFormChange = useCallback((data) => {
+    setFormOutput(data);
+  }, []);
 
   const handleSave = async () => {
     if (!formOutput || Object.keys(formOutput).length === 0) {
@@ -17,41 +27,37 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
       return;
     }
 
-    const newEntry = {
-      ...formOutput,
-      createdAt: new Date().toISOString(),
-      formType: "Cash Request",
-      status: "Pending",
-      transactions: formOutput.particulars || [],
-    };
-
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("No token found.");
+      setError("Authentication expired. Please log in again.");
       return;
     }
 
     try {
       setSubmitting(true);
+      setError("");
 
-      const res = await fetch("/api5001/cash-request/create", {
+      const res = await fetch("/api5012/cash_request/createcash_request", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newEntry),
+        body: JSON.stringify(formOutput),
       });
 
-      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Server error: ${res.status} - ${errText}`);
+      }
 
       const result = await res.json();
+      if (onSubmit) onSubmit(result.data || formOutput);
 
-      if (onSubmit) onSubmit(result.data || newEntry);
-
-      onHide();
+      handleCloseModal();
     } catch (error) {
       console.error("Error submitting cash request:", error);
+      setError(error.message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -60,7 +66,7 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
   return (
     <Modal
       show={show}
-      onHide={onHide}
+      onHide={handleCloseModal}
       dialogClassName="modal-lg"
       centered
       scrollable
@@ -73,26 +79,47 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
           Cash Request Form
         </Modal.Title>
       </Modal.Header>
+
       <Modal.Body
         className="cashreq-scroll"
         style={{ backgroundColor: "#800000" }}
       >
+        {error && (
+          <Alert
+            variant="danger"
+            className="mb-3"
+            onClose={() => setError("")}
+            dismissible
+          >
+            {error}
+          </Alert>
+        )}
+
         <CashReqForm
           data={{}}
-          signatures={{}}
-          particulars={[]}
-          onChange={(data) => setFormOutput(data)}
+          onChange={handleFormChange} // use memoized callback
         />
       </Modal.Body>
+
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>
         <AppButton
           label="Close"
           variant="outline-danger"
           onClick={handleCloseModal}
           className="custom-app-button"
+          disabled={submitting}
         />
         <AppButton
-          label={submitting ? "Submitting..." : "Submit"}
+          label={
+            submitting ? (
+              <>
+                <Spinner size="sm" animation="border" className="me-2" />
+                Submitting...
+              </>
+            ) : (
+              "Submit"
+            )
+          }
           variant="outline-success"
           className="custom-app-button"
           onClick={handleSave}
