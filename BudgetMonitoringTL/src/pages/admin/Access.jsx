@@ -65,7 +65,7 @@ const Access = () => {
 
     try {
       setLoading(true);
-      const res = await fetch("/api5012/access/getaccess_table", {
+      const res = await fetch("/api5001/access/getaccess_table", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

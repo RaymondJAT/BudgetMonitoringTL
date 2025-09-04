@@ -8,19 +8,22 @@ import {
   Button,
   Card,
   Alert,
+  Spinner,
 } from "react-bootstrap";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await fetch("api5012/login/", {
+      const response = await fetch("api5001/login/check-credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -30,17 +33,20 @@ const Login = () => {
 
       if (!result.success) {
         setError(result.message || "Invalid username or password");
+        setLoading(false);
         return;
       }
 
       const { token, data } = result;
 
+      // STORE LOGIN INFO
       localStorage.setItem("token", token);
       localStorage.setItem("username", data.fullname || data.username);
-      localStorage.setItem("role", data.position || "finance");
+      localStorage.setItem("access_id", data.access);
 
+      // FETCH ACCESS RIGHTS
       const accessRes = await fetch(
-        `/api5012/route_access/getroute_access_table?access_id=${data.access_id}`,
+        `/api5012/route_access/getroute_access_table?access_id=${data.access}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,32 +66,32 @@ const Login = () => {
       }
 
       let firstRoute = "/";
-      if (userAccess.length > 0) {
-        const routeWithPath = userAccess.find((item) => item.path);
-        if (routeWithPath) firstRoute = routeWithPath.path;
-      } else {
-        switch (data.position) {
-          case "admin":
-            firstRoute = "/admin_dashboard";
-            break;
-          case "finance":
-            firstRoute = "/finance_dashboard";
-            break;
-          case "team_leader":
-            firstRoute = "/teamlead_pendings";
-            break;
-          case "employee":
-            firstRoute = "/employee_requests";
-            break;
-          default:
-            firstRoute = "/";
-        }
+      switch (data.access) {
+        case 10:
+          firstRoute = "/employee_request";
+          break;
+        case 11:
+          firstRoute = "/admin_dashboard";
+          break;
+        case 12:
+          firstRoute = "/finance_dashboard";
+          break;
+        case 13:
+          firstRoute = "/teamlead_pendings";
+          break;
+        default:
+          if (userAccess.length > 0) {
+            const routeWithPath = userAccess.find((item) => item.path);
+            if (routeWithPath) firstRoute = routeWithPath.path;
+          }
       }
 
       navigate(firstRoute);
+      window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -126,7 +132,7 @@ const Login = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  className="custom-floating-input"
+                  disabled={loading}
                 />
                 <label htmlFor="floatingUsername">Username</label>
               </Form.Floating>
@@ -139,13 +145,25 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="custom-floating-input"
+                  disabled={loading}
                 />
                 <label htmlFor="floatingPassword">Password</label>
               </Form.Floating>
 
-              <Button variant="outline-dark" type="submit" className="w-100">
-                Login
+              <Button
+                variant="outline-dark"
+                type="submit"
+                className="w-100 d-flex align-items-center justify-content-center"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />{" "}
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </Form>
           </Card>

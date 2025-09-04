@@ -1,6 +1,6 @@
 import { Table } from "react-bootstrap";
 
-const CashApprovalTable = ({ transactions, total }) => {
+const CashApprovalTable = ({ transactions, subtotal }) => {
   return (
     <Table responsive className="custom-table">
       <thead className="tableHead text-center">
@@ -24,7 +24,7 @@ const CashApprovalTable = ({ transactions, total }) => {
             <td>{row.quantity}</td>
             <td>
               ₱
-              {(row.price * row.quantity).toLocaleString("en-US", {
+              {parseFloat(row.subtotal || 0).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
               })}
             </td>
@@ -39,7 +39,7 @@ const CashApprovalTable = ({ transactions, total }) => {
           <td className="text-center border-end">
             <strong>
               ₱
-              {total.toLocaleString("en-US", {
+              {parseFloat(subtotal || 0).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
               })}
             </strong>

@@ -3,7 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Dropdown } from "react-bootstrap";
 import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
 
-const Header = ({ toggleSidebar, isSidebarOpen, isSidebarHiddenMobile }) => {
+const Header = ({
+  toggleSidebar,
+  isSidebarOpen,
+  isSidebarHiddenMobile,
+  onLogout,
+}) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const location = useLocation();
   const navigate = useNavigate();
@@ -46,9 +51,8 @@ const Header = ({ toggleSidebar, isSidebarOpen, isSidebarHiddenMobile }) => {
   const getPageTitle = () => pageTitles[location.pathname] || "";
 
   const handleLogout = () => {
-    localStorage.clear();
+    onLogout(); // ✅ call parent logout
     navigate("/login", { replace: true });
-    window.location.reload();
   };
 
   return (
@@ -58,7 +62,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, isSidebarHiddenMobile }) => {
     >
       <Container fluid>
         <div className="d-flex justify-content-between align-items-center w-100">
-          {/*  Sidebar Toggle & Page Title */}
+          {/* Sidebar Toggle & Page Title */}
           <div className="d-flex align-items-center">
             <button
               onClick={toggleSidebar}
@@ -68,7 +72,6 @@ const Header = ({ toggleSidebar, isSidebarOpen, isSidebarHiddenMobile }) => {
               <FaBars />
             </button>
 
-            {/* Desktop toggle only for ≥768px (md) */}
             <button
               onClick={toggleSidebar}
               className="p-0 me-2 bg-transparent border-0 d-none d-md-inline"
@@ -101,14 +104,12 @@ const Header = ({ toggleSidebar, isSidebarOpen, isSidebarHiddenMobile }) => {
                 id="dropdown-user"
               >
                 <FaUserCircle size={28} />
-                {/* hide username on small screens */}
                 <span
                   className="d-none d-md-inline"
                   style={{ fontWeight: 400, fontSize: "13px" }}
                 >
                   {username}
                 </span>
-                {/* show dropdown arrow only on md and up */}
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">
                 <Dropdown.Item

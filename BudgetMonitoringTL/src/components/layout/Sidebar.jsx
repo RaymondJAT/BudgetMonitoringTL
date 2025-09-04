@@ -4,7 +4,7 @@ import { navConfig } from "../../handlers/navLinks";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { hasAccess } from "../../utils/accessControl";
 
-const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
+const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const sidebarRef = useRef(null);
@@ -13,25 +13,22 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
   const [openDropdown, setOpenDropdown] = useState(isSidebarOpen ? [] : null);
   const [dropdownPositions, setDropdownPositions] = useState({});
 
-  const navItems = navConfig[userRole] || [];
-
   // ✅ get allowed routes from localStorage
   const allowedRoutes = JSON.parse(localStorage.getItem("access") || "[]");
 
   // ✅ filter nav items based on access
-  const filteredNavItems = navItems
+  const filteredNavItems = navConfig
     .map((item) => {
-      // filter children if exist
       if (item.children) {
         const children = item.children.filter((child) =>
           hasAccess(child.path, allowedRoutes)
         );
-        if (children.length === 0) return null; // skip parent if no accessible children
+        if (children.length === 0) return null;
         return { ...item, children };
       }
       return hasAccess(item.path, allowedRoutes) ? item : null;
     })
-    .filter(Boolean); // remove nulls
+    .filter(Boolean);
 
   const toggleDropdown = (e, label) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -81,44 +78,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
         ${isSidebarHiddenMobile ? "d-none d-sm-flex sidebar-hidden" : ""} 
         ${isSidebarOpen ? "open" : "collapsed"}`}
     >
-      {/* FLOATING DROPDOWN */}
-      {!isSidebarOpen &&
-        openDropdown &&
-        (() => {
-          const item = filteredNavItems.find((i) => i.label === openDropdown);
-          const position = dropdownPositions[openDropdown];
-          if (!item || !item.children || !position) return null;
-
-          return (
-            <div
-              ref={dropdownRef}
-              className="floating-dropdown bg-white border shadow-sm"
-              style={{
-                position: "fixed",
-                top: position.top,
-                left: position.left,
-                zIndex: 9999,
-                minWidth: "150px",
-              }}
-            >
-              {item.children.map((child) => (
-                <div
-                  key={child.label}
-                  className="dropdown-item px-3 py-2"
-                  onClick={() => {
-                    navigate(child.path);
-                    setOpenDropdown(null);
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  {child.label}
-                </div>
-              ))}
-            </div>
-          );
-        })()}
-
-      {/* SIDEBAR HEADER */}
+      {/* HEADER */}
       <div className="sidebar-header d-flex align-items-center justify-content-center">
         <FaMoneyBillWave
           style={{
@@ -130,7 +90,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile, userRole }) => {
         {isSidebarOpen && <span className="nav-label ms-2 fw-bold">BMS</span>}
       </div>
 
-      {/* NAV ITEMS */}
+      {/* NAVIGATION */}
       <div className="cashreq-scroll nav-links flex-grow-1 overflow-y-auto">
         {filteredNavItems.map((item) => (
           <div key={item.label}>

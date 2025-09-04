@@ -1,11 +1,4 @@
-import {
-  FaArrowLeft,
-  FaTrash,
-  FaBookmark,
-  FaPlus,
-  FaEye,
-  FaPrint,
-} from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaEye, FaPrint } from "react-icons/fa";
 import AppButton from "./ui/AppButton";
 
 const CashReqActionButtons = ({
@@ -67,31 +60,6 @@ const CashReqActionButtons = ({
           variant="outline-secondary"
           size="sm"
           onClick={onPrint}
-          className="custom-app-button btn-responsive ms-2"
-        />
-      </div>
-
-      {/* Bookmark + Trash */}
-      <div className="d-flex ms-md-auto mt-md-0">
-        <AppButton
-          label={
-            <>
-              <FaBookmark /> <span className="d-sm-inline ms-1">Important</span>
-            </>
-          }
-          variant="outline-dark"
-          size="sm"
-          className="custom-app-button btn-responsive ms-2"
-        />
-
-        <AppButton
-          label={
-            <>
-              <FaTrash /> <span className="d-sm-inline ms-1">Delete</span>
-            </>
-          }
-          variant="outline-danger"
-          size="sm"
           className="custom-app-button btn-responsive ms-2"
         />
       </div>

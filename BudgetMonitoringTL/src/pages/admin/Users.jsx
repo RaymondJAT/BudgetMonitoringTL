@@ -65,7 +65,7 @@ const Users = () => {
       setLoading(true);
 
       // GET ACCESS LIST
-      const accessRes = await fetch("/api5012/access/getaccess", {
+      const accessRes = await fetch("/api5001/access/getaccess", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const Users = () => {
       setAccessMap(map);
 
       // GET USERS
-      const userRes = await fetch("/api5012/users/getusers", {
+      const userRes = await fetch("/api5001/users/getusers", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

@@ -37,21 +37,15 @@ const ViewCashRequestForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const transactions = useMemo(() => data?.transactions || [], [data]);
-
-  const total = useMemo(() => {
-    return transactions.reduce(
-      (sum, row) => sum + (row.quantity ?? 0) * (row.price ?? 0),
-      0
-    );
-  }, [transactions]);
+  const transactions = useMemo(() => data?.cash_request_items || [], [data]);
+  const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
 
   useEffect(() => {
     const items = transactions.map((item) => ({
       label: item.label ?? "N/A",
       quantity: item.quantity ?? 0,
       price: item.price ?? 0,
-      amount: (item.quantity ?? 0) * (item.price ?? 0),
+      amount: item.subtotal ?? (item.quantity ?? 0) * (item.price ?? 0),
     }));
     setParticulars(items);
   }, [transactions]);
@@ -87,8 +81,8 @@ const ViewCashRequestForm = () => {
   const renderEmployeeFields = () =>
     approvalFormFields.map(({ label, key }, index) => {
       const value = data?.[key];
-      const isCurrency =
-        typeof value === "number" || key.toLowerCase().includes("amount");
+
+      const isCurrency = key === "subtotal";
 
       return (
         <Row key={index}>
@@ -200,7 +194,7 @@ const ViewCashRequestForm = () => {
         </div>
 
         {/* Table */}
-        <CashApprovalTable transactions={transactions} total={total} />
+        <CashApprovalTable transactions={transactions} subtotal={total} />
 
         {/* Signatures */}
         <SignatureUpload
@@ -217,7 +211,7 @@ const ViewCashRequestForm = () => {
       <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
         <div ref={contentRef}>
           <PrintableCashRequest
-            data={{ ...data, items: particulars }}
+            data={{ ...data, items: transactions }}
             amountInWords={amountInWords}
             signatures={signatures}
           />
@@ -225,10 +219,9 @@ const ViewCashRequestForm = () => {
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
-        {/* <Modal.Header closeButton></Modal.Header> */}
         <Modal.Body>
           <PrintableCashRequest
-            data={{ ...data, items: particulars }}
+            data={{ ...data, items: transactions }}
             amountInWords={amountInWords}
             signatures={signatures}
           />

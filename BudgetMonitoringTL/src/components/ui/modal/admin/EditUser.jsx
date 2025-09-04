@@ -74,7 +74,7 @@ const EditUser = ({ show, onHide, user, onSuccess }) => {
     const fetchAccessOptions = async () => {
       setLoadingAccess(true);
       try {
-        const result = await authFetch("/api5012/access/getaccess");
+        const result = await authFetch("/api5001/access/getaccess");
         setAccessOptions(
           (result.data || []).map((a) => ({ value: a.id, label: a.name }))
         );
@@ -141,7 +141,7 @@ const EditUser = ({ show, onHide, user, onSuccess }) => {
         payload.password = formData.password;
       }
 
-      const response = await fetch("/api5012/users/updateuser", {
+      const response = await fetch("/api5001/users/updateuser", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

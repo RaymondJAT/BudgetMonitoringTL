@@ -60,7 +60,12 @@ const RequestForm = ({
                   <Form.Control
                     type={type}
                     name={key}
-                    value={formData[key] || ""}
+                    value={
+                      key === "expenseDate"
+                        ? formData[key] ||
+                          new Date().toISOString().split("T")[0]
+                        : formData[key] || ""
+                    }
                     onChange={onChange}
                     placeholder={label}
                     className="form-control-sm small-input"

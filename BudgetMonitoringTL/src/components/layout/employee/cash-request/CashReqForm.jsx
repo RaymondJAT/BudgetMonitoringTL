@@ -7,9 +7,14 @@ import CashReqTable from "./CashReqTable";
 import SignatureUpload from "../../../SignatureUpload";
 
 const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
+  const today = new Date().toISOString().split("T")[0];
+
+  // 👇 Get logged-in user’s name from localStorage
+  const loggedInUser = localStorage.getItem("username") || "";
+
   const [formData, setFormData] = useState({
-    employee: "",
-    expenseDate: "",
+    employee: loggedInUser, // auto-fill
+    expenseDate: today, // auto-fill today’s date
     department: "",
     teamLead: "",
     position: "",
@@ -79,6 +84,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
         onChange={handleInputChange}
         amountInWords={amountInWords}
       />
+
       {/* CASH REQ TABLE */}
       <CashReqTable
         rows={rows}
@@ -86,6 +92,7 @@ const CashReqForm = ({ data = {}, particulars = [], onChange = () => {} }) => {
         onAddRow={handleAddRow}
         onRemoveRow={handleRemoveRow}
       />
+
       {/* CASH REQ SIGNATURE */}
       <div className="mt-3">
         <SignatureUpload

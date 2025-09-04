@@ -1,59 +1,52 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
-import { useNavigate } from "react-router-dom";
+// src/context/AuthContext.jsx
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const [token, setToken] = useState(null);
+  const [access, setAccess] = useState([]);
 
-  const login = (token, userData) => {
+  // ✅ Restore from localStorage on refresh
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    const savedToken = localStorage.getItem("token");
+    const savedAccess = localStorage.getItem("access");
+
+    if (savedUser && savedToken) {
+      setUser(JSON.parse(savedUser));
+      setToken(savedToken);
+      setAccess(savedAccess ? JSON.parse(savedAccess) : []);
+    }
+  }, []);
+
+  // ✅ Login function
+  const login = (data, token, access) => {
+    setUser(data);
     setToken(token);
-    setUser(userData);
-    navigate("/admin_dashboard");
+    setAccess(access);
+
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("token", token);
+    localStorage.setItem("access", JSON.stringify(access));
   };
 
-  const logout = useCallback(() => {
-    setToken(null);
+  // ✅ Logout function
+  const logout = () => {
     setUser(null);
-    navigate("/login");
-  }, [navigate]);
+    setToken(null);
+    setAccess([]);
 
-  // AUTO LOGOUT AFTER 1 HOUR INACTIVITY
-  useEffect(() => {
-    let timer;
-
-    const resetTimer = () => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        logout();
-        alert("You have been logged out due to inactivity.");
-      }, 60 * 60 * 1000);
-    };
-
-    const events = ["mousemove", "keydown", "click"];
-    events.forEach((event) => window.addEventListener(event, resetTimer));
-
-    resetTimer();
-
-    return () => {
-      if (timer) clearTimeout(timer);
-      events.forEach((event) => window.removeEventListener(event, resetTimer));
-    };
-  }, [logout]);
+    localStorage.clear();
+  };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, access, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// ✅ Custom hook to use auth easily
 export const useAuth = () => useContext(AuthContext);

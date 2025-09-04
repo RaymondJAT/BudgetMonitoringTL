@@ -61,7 +61,7 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
     <Modal
       show={show}
       onHide={onHide}
-      dialogClassName="modal-xl"
+      dialogClassName="modal-lg"
       centered
       scrollable
     >

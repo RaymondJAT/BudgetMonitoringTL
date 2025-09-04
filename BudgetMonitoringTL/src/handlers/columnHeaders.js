@@ -34,7 +34,7 @@ export const approvalPartnerFields = [
   { label: "Employee", key: "cr_employee_id" },
   { label: "Expense Date", key: "cr_request_date" },
   { label: "Department", key: "department_name" },
-  { label: "Team Lead", key: "teamLead" },
+  { label: "Team Lead", key: "cr_team_lead_id" },
 ];
 
 // liquidation fields
@@ -53,7 +53,7 @@ export const liquidationRightFields = [
 // cash request form
 export const cashReqFields = [
   { label: "Employee", key: "employee" },
-  { label: "Expense Date", key: "expenseDate", type: "date" },
+  { label: "Request Date", key: "expenseDate", type: "date" },
   { label: "Department", key: "department" },
   { label: "Team Lead", key: "teamLead" },
   { label: "Position", key: "position" },
@@ -64,7 +64,7 @@ export const expenseHeaders = [
   { header: "Employee", accessor: "employee" },
   { header: "Department", accessor: "department" },
   { header: "Description", accessor: "description" },
-  { header: "Expense Date", accessor: "expenseDate" },
+  { header: "Request Date", accessor: "expenseDate" },
   { header: "Total", accessor: "total" },
   { header: "Status", accessor: "status" },
 ];

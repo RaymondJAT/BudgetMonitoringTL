@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -17,7 +22,22 @@ const App = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  const userRole = localStorage.getItem("role") || "finance";
+  // ✅ keep authentication state in React state
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("token")
+  );
+
+  // ✅ login function
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    setIsAuthenticated(true);
+  };
+
+  // ✅ logout function
+  const logout = () => {
+    localStorage.clear();
+    setIsAuthenticated(false);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -47,40 +67,53 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public */}
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Login onLogin={login} />
+            )
+          }
+        />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Private */}
         <Route
           path="/*"
           element={
-            <>
-              <Header
-                toggleSidebar={toggleSidebar}
-                isSidebarOpen={isSidebarOpen}
-                isSidebarHiddenMobile={isSidebarHiddenMobile}
-              />
-              <Sidebar
-                isSidebarOpen={isSidebarOpen}
-                isSidebarHiddenMobile={isSidebarHiddenMobile}
-                userRole={userRole}
-              />
-              <main
-                style={{
-                  transition: "margin-left 0.3s ease",
-                  marginLeft: isMobile
-                    ? isMobileSidebarOpen
-                      ? "70px"
-                      : "0"
-                    : isSidebarOpen
-                    ? "230px"
-                    : "70px",
-                }}
-              >
-                <ToastContainer position="top-right" autoClose={1000} />
-                <Routing />
-              </main>
-            </>
+            isAuthenticated ? (
+              <>
+                <Header
+                  toggleSidebar={toggleSidebar}
+                  isSidebarOpen={isSidebarOpen}
+                  isSidebarHiddenMobile={isSidebarHiddenMobile}
+                  onLogout={logout} // ✅ pass logout here
+                />
+                <Sidebar
+                  isSidebarOpen={isSidebarOpen}
+                  isSidebarHiddenMobile={isSidebarHiddenMobile}
+                />
+                <main
+                  style={{
+                    transition: "margin-left 0.3s ease",
+                    marginLeft: isMobile
+                      ? isMobileSidebarOpen
+                        ? "70px"
+                        : "0"
+                      : isSidebarOpen
+                      ? "230px"
+                      : "70px",
+                  }}
+                >
+                  <ToastContainer position="top-right" autoClose={1000} />
+                  <Routing />
+                </main>
+              </>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
       </Routes>
