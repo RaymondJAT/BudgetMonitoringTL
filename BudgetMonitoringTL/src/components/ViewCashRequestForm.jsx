@@ -15,6 +15,7 @@ import LiqFormModal from "./ui/modal/employee/LiqFormModal";
 import ProgressBar from "./layout/ProgressBar";
 import AppButton from "./ui/AppButton";
 import { progressSteps } from "../handlers/actionMenuItems";
+import { normalizeBase64Image } from "../utils/signature";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -33,31 +34,18 @@ const ViewCashRequestForm = () => {
   const transactions = useMemo(() => data?.cash_request_items || [], [data]);
   const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
 
-  // Helper: convert any base64 signature to proper data URI
-  const getSignatureDataUri = (signature) => {
-    if (!signature) return null;
-    try {
-      const parts = signature.split(":");
-      const base64 =
-        parts.length === 3 && parts[0] === "base64" ? parts[2] : signature;
-      return `data:image/png;base64,${base64}`;
-    } catch {
-      return null;
-    }
-  };
-
-  // Initialize requested signature and name from API response
   useEffect(() => {
     const requestedActivity = data?.cash_request_activities?.find(
       (a) => a.action === "REQUESTED"
     );
+    const sig = normalizeBase64Image(requestedActivity?.signature);
+
     setSignatures({
       requestedName: requestedActivity?.requested_by || "",
-      requestSignature: getSignatureDataUri(requestedActivity?.signature),
+      requestSignature: sig,
     });
   }, [data]);
 
-  // Map transactions to table-friendly format
   useEffect(() => {
     const items = transactions.map((item) => ({
       label: item.label ?? "N/A",
@@ -68,7 +56,6 @@ const ViewCashRequestForm = () => {
     setParticulars(items);
   }, [transactions]);
 
-  // Convert total to words
   useEffect(() => {
     if (!isNaN(total)) setAmountInWords(numberToWords(total));
   }, [total]);

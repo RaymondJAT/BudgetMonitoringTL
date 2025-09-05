@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Row, Col, FloatingLabel, Form } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import AppButton from "./ui/AppButton";
+import { normalizeBase64Image } from "../utils/signature";
 
 const SignatureUpload = ({
   label,
@@ -54,7 +55,7 @@ const SignatureUpload = ({
       const compressedBase64 = await compressImage(file);
       setSignatures((prev) => ({
         ...prev,
-        [signatureKey]: compressedBase64,
+        [signatureKey]: normalizeBase64Image(compressedBase64), // ✅ normalize here
       }));
     }
   };
@@ -83,7 +84,7 @@ const SignatureUpload = ({
               </div>
               {signatures[signatureKey] ? (
                 <img
-                  src={signatures[signatureKey]}
+                  src={normalizeBase64Image(signatures[signatureKey])} // ✅ normalize before render
                   alt="Signature"
                   style={{ maxHeight: "50px", padding: "2px" }}
                 />
@@ -131,8 +132,12 @@ const SignatureUpload = ({
                   />
                   {signatures[signatureKey] && (
                     <div className="position-relative">
+                      {console.log(
+                        "Signature value in SignatureUpload:",
+                        signatures[signatureKey]
+                      )}
                       <img
-                        src={signatures[signatureKey]}
+                        src={normalizeBase64Image(signatures[signatureKey])}
                         alt="Signature"
                         style={{ maxHeight: "50px", padding: "2px" }}
                       />

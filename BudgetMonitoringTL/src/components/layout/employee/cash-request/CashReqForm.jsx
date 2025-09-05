@@ -5,6 +5,7 @@ import { cashReqFields } from "../../../../handlers/columnHeaders";
 import RequestForm from "../cash-request/RequestForm";
 import CashReqTable from "./CashReqTable";
 import SignatureUpload from "../../../SignatureUpload";
+import { normalizeBase64Image } from "../../../../utils/signature";
 
 const CashReqForm = ({ data = {}, onChange = () => {} }) => {
   const today = new Date().toISOString().split("T")[0];
@@ -12,20 +13,6 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
   const departmentName = localStorage.getItem("department_name") || "";
   const positionName = localStorage.getItem("position_name") || "";
 
-  // Helper: convert any base64 signature to proper data URI
-  const getSignatureDataUri = (signature) => {
-    if (!signature) return null;
-    try {
-      const parts = signature.split(":");
-      const base64 =
-        parts.length === 3 && parts[0] === "base64" ? parts[2] : signature;
-      return `data:image/png;base64,${base64}`;
-    } catch {
-      return null;
-    }
-  };
-
-  // Initialize rows and signature from API response or default
   const initialRows =
     data.cash_request_items?.length > 0
       ? data.cash_request_items.map((item) => ({
@@ -35,11 +22,10 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
         }))
       : [{ label: "", price: 0, quantity: 0 }];
 
-  const initialSignature = getSignatureDataUri(
+  const initialSignature = normalizeBase64Image(
     data.cash_request_activities?.[0]?.signature
   );
 
-  // Form data state
   const [formData, setFormData] = useState({
     employee: loggedInUser,
     requested_by: loggedInUser,
@@ -50,16 +36,13 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
     description: data.description || "",
   });
 
-  // Rows state
   const [rows, setRows] = useState(initialRows);
 
-  // Signature state
   const [signatures, setSignatures] = useState({
     requestedName: loggedInUser,
     requestSignature: initialSignature,
   });
 
-  // Calculate total
   const total = rows.reduce(
     (sum, row) =>
       sum + (parseFloat(row.price) || 0) * (parseFloat(row.quantity) || 0),
@@ -68,7 +51,6 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
 
   const amountInWords = total ? numberToWords(total) : "Zero Pesos Only";
 
-  // Map form data to backend structure and trigger onChange
   useEffect(() => {
     const mapped = {
       description: formData.description || "",
@@ -91,7 +73,6 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
     onChange(mapped);
   }, [formData, rows, signatures, total, onChange]);
 
-  // Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

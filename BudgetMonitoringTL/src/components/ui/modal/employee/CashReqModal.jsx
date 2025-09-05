@@ -95,10 +95,7 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
           </Alert>
         )}
 
-        <CashReqForm
-          data={{}}
-          onChange={handleFormChange} // use memoized callback
-        />
+        <CashReqForm data={{}} onChange={handleFormChange} />
       </Modal.Body>
 
       <Modal.Footer style={{ backgroundColor: "#EFEEEA" }}>

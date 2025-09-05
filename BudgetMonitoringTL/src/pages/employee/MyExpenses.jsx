@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Form } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
@@ -21,33 +21,33 @@ const MyExpenses = () => {
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch cash request data
-  useEffect(() => {
-    const fetchCashRequests = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api5012/cash_request/getcash_request", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch cash requests");
+  const fetchCashRequests = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api5012/cash_request/getcash_request", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch cash requests");
 
-        const result = await res.json();
-        const mappedData = (result || []).map((item) => ({
-          ...item,
-          id: item.cr_id,
-          formType: "Cash Request",
-        }));
-        setTableData(mappedData);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchCashRequests();
+      const result = await res.json();
+      const mappedData = (result || []).map((item) => ({
+        ...item,
+        id: item.cr_id,
+        formType: "Cash Request",
+      }));
+      setTableData(mappedData);
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
+
+  // fetch once on mount
+  useEffect(() => {
+    fetchCashRequests();
+  }, [fetchCashRequests]);
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
   const totalComputationData = useMemo(() => tableData, [tableData]);
@@ -139,12 +139,7 @@ const MyExpenses = () => {
           <CashReqModal
             show={showCashReqModal}
             onHide={() => setShowCashReqModal(false)}
-            onSubmit={(newData) =>
-              setTableData((prev) => [
-                { ...newData, formType: "Cash Request", id: newData.cr_id },
-                ...prev,
-              ])
-            }
+            onSubmit={fetchCashRequests}
           />
 
           {/* LIQUIDATION MODAL */}
