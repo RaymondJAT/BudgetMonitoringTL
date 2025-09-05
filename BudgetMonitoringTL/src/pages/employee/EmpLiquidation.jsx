@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Container } from "react-bootstrap";
 
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
@@ -8,33 +8,10 @@ import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 
-const MOCK_LIQUIDATION = [
-  {
-    id: 1,
-    employee: "John Doe",
-    formType: "Liquidation",
-    amount: 1500,
-    status: "Pending",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    employee: "Jane Smith",
-    formType: "Liquidation",
-    amount: 2000,
-    status: "Approved",
-    createdAt: new Date().toISOString(),
-  },
-];
-
 const EmpLiquidation = () => {
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState([]); // start blank
   const [searchValue, setSearchValue] = useState("");
   const [selectedRows, setSelectedRows] = useState({});
-
-  useEffect(() => {
-    setTableData(MOCK_LIQUIDATION);
-  }, []);
 
   const totalComputationData = useMemo(() => tableData, [tableData]);
 

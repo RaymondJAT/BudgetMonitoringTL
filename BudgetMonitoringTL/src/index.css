@@ -381,7 +381,7 @@ main.no-sidebar {
   font-size: 0.55rem;
   font-weight: 600;
   white-space: nowrap;
-  text-transform: capitalize;
+  text-transform: uppercase;
   padding: 0;
 }
 
@@ -391,7 +391,7 @@ main.no-sidebar {
   border: 1px solid rgb(154, 89, 10);
 }
 
-.status-badge.approved,
+.status-badge.completed,
 .status-badge.active {
   background-color: green;
   color: white;
@@ -417,6 +417,7 @@ main.no-sidebar {
   border: 1px solid rgb(154, 89, 10);
 }
 
+.status-badge.approved,
 .status-badge.liquidated {
   background-color: rgb(66, 138, 239);
   color: white;
@@ -1183,11 +1184,11 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /* STATES */
 .progress-step.active .step-arrow-body {
-  background-color: #0176d3;
+  background-color: #0262b1;
 }
 
 .progress-step.completed .step-arrow-body {
-  background-color: #4bca81;
+  background-color: #046412;
 }
 
 .progress-step.upcoming .step-arrow-body {

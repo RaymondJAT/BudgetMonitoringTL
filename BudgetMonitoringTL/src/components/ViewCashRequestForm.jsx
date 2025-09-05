@@ -120,14 +120,6 @@ const ViewCashRequestForm = () => {
                 onStepClick={handleStepClick}
               />
             </Col>
-            <Col className="d-flex">
-              <AppButton
-                label="Mark"
-                variant="outline-dark"
-                className="custom-app-button"
-                style={{ minWidth: "100px" }}
-              />
-            </Col>
           </Row>
         </div>
 

@@ -1,20 +1,105 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { MdLocalPrintshop } from "react-icons/md";
 import { Container } from "react-bootstrap";
+import { useReactToPrint } from "react-to-print";
 
-import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { columns } from "../../handlers/tableHeader";
+import { formatPrintData } from "../../utils/formatPrintData";
+import { handleExportData } from "../../utils/exportItems";
+import { STATUS } from "../../constants/status";
+import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 
-import TotalCards from "../../components/TotalCards";
-import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
+import ToolBar from "../../components/layout/ToolBar";
+import ExpenseReport from "../../components/print/ExpenseReport";
+import AppButton from "../../components/ui/AppButton";
+import TotalCards from "../../components/TotalCards";
+
+// Print Button
+const PrintButton = ({ onClick }) => (
+  <AppButton
+    label={
+      <>
+        <MdLocalPrintshop style={{ marginRight: "5px" }} />
+        Print
+      </>
+    }
+    size="sm"
+    className="custom-app-button"
+    variant="outline-secondary"
+    onClick={onClick}
+  />
+);
 
 const Processing = () => {
-  const [tableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
+  const [tableData, setTableData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
+  const [particulars, setParticulars] = useState([]);
+  const [printData, setPrintData] = useState(null);
 
-  const totalComputationData = useMemo(() => {
-    return [...tableData];
+  const navigate = useNavigate();
+  const contentRef = useRef(null);
+  const downloadRef = useRef(null);
+  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
+
+  const selectedCount = Object.values(selectedRows).filter(Boolean).length;
+
+  // Fetch finance processing data
+  const fetchProcessingData = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        "/api5012/cash_request/getapproved_cash_request?status=approved",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!res.ok) throw new Error("Failed to fetch finance processing data");
+
+      const result = await res.json();
+
+      // Map and filter for approved status (if needed)
+      const mappedData = (result || [])
+        .map((item, index) => ({
+          ...item,
+          id: item.id ?? `${index}`,
+          formType: "Cash Request",
+        }))
+        .filter((item) => item.status === "approved"); // ensure only approved
+
+      setTableData(mappedData);
+    } catch (err) {
+      console.error("Error fetching processing data:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProcessingData();
+  }, [fetchProcessingData]);
+
+  // keep particulars in sync
+  useEffect(() => {
+    const items = formatPrintData(tableData);
+    const isSame = JSON.stringify(particulars) === JSON.stringify(items);
+    if (!isSame) setParticulars(items);
   }, [tableData]);
+
+  const handleRowClick = (entry) => {
+    if (entry.formType === "Cash Request") {
+      navigate("/finance_approval_form", { state: entry });
+    }
+  };
+
+  const handlePrint = () => {
+    if (!selectedEntry) return;
+    setPrintData(selectedEntry);
+    setTimeout(() => reactToPrintFn(), 100);
+  };
 
   const normalize = (value) =>
     String(value || "")
@@ -22,8 +107,8 @@ const Processing = () => {
       .trim();
 
   const isMatch = (item, value) => {
-    const fields = columns.map((col) => col.accessor);
-    return fields.some((key) =>
+    const fieldsToSearch = [...columns.map((col) => col.accessor), "formType"];
+    return fieldsToSearch.some((key) =>
       normalize(item[key]).includes(normalize(value))
     );
   };
@@ -33,15 +118,54 @@ const Processing = () => {
     [tableData, searchValue]
   );
 
+  const selectedEntry =
+    selectedCount === 1
+      ? filteredData.find((item) => selectedRows[item.id])
+      : null;
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "Processing",
+    });
+    setSelectedRows(resetSelection);
+  };
+
   return (
     <div className="pb-3">
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
+        <TotalCards data={tableData} list={FINANCE_STATUS_LIST} />
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
-          <ToolBar searchValue={searchValue} onSearchChange={setSearchValue} />
-          <DataTable data={filteredData} height="355px" columns={columns} />
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            leftContent={
+              selectedCount === 1 && <PrintButton onClick={handlePrint} />
+            }
+            handleExport={handleExport}
+            selectedCount={selectedCount}
+          />
+
+          <DataTable
+            data={filteredData}
+            height="450px"
+            columns={columns}
+            onRowClick={handleRowClick}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
+          />
+
+          {/* hidden print/download */}
+          <div className="d-none">
+            <ExpenseReport contentRef={contentRef} data={printData || {}} />
+            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

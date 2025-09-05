@@ -25,6 +25,8 @@ import BudgetAllocation from "../pages/admin/BudgetAllocation";
 import RevolvingFund from "../pages/finance/RevolvingFund";
 import CashDisbursement from "../pages/finance/CashDisbursement";
 import History from "../pages/finance/History";
+import FinanceApprovalForm from "../components/layout/finance/cash-request/FinanceApprovalForm";
+import RejectedRequest from "../pages/finance/RejectedRequest";
 
 // ADMIN
 import AdmExpenses from "../pages/admin/AdmExpenses";
@@ -119,6 +121,14 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/cash_approval_form"
+        element={
+          <ProtectedRoute path="/cash_approval_form">
+            <CashApprovalForm />
+          </ProtectedRoute>
+        }
+      />
 
       {/* FINANCE */}
       <Route
@@ -142,6 +152,14 @@ const Routing = () => {
         element={
           <ProtectedRoute path="/finance_released">
             <Released />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_rejected"
+        element={
+          <ProtectedRoute path="/finance_rejected">
+            <RejectedRequest />
           </ProtectedRoute>
         }
       />
@@ -190,6 +208,14 @@ const Routing = () => {
         element={
           <ProtectedRoute path="/finance_history">
             <History />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance_approval_form"
+        element={
+          <ProtectedRoute path="/finance_approval_form">
+            <FinanceApprovalForm />
           </ProtectedRoute>
         }
       />

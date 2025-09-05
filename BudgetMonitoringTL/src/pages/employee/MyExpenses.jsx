@@ -33,11 +33,13 @@ const MyExpenses = () => {
       if (!res.ok) throw new Error("Failed to fetch cash requests");
 
       const result = await res.json();
-      const mappedData = (result || []).map((item) => ({
+      console.log(result);
+      const mappedData = (result || []).map((item, index) => ({
         ...item,
-        id: item.cr_id,
+        id: item.id ?? `${index}`,
         formType: "Cash Request",
       }));
+
       setTableData(mappedData);
     } catch (err) {
       console.error(err);
@@ -74,28 +76,8 @@ const MyExpenses = () => {
     );
   };
 
-  const selectAllCheckbox = (
-    <Form.Check
-      type="checkbox"
-      checked={
-        filteredData.length > 0 &&
-        filteredData.every((entry) => selectedRows[entry.id])
-      }
-      onChange={(e) => {
-        const checked = e.target.checked;
-        const newSelection = {};
-        filteredData.forEach((entry) => (newSelection[entry.id] = checked));
-        setSelectedRows(newSelection);
-      }}
-      className="d-lg-none"
-      style={{ marginTop: "3px" }}
-      title="Select All"
-    />
-  );
-
   const leftContent = (
     <div className="d-flex align-items-center gap-2">
-      {selectAllCheckbox}
       <AppButton
         label={
           <>

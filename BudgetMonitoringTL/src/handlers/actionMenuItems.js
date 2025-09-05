@@ -23,7 +23,7 @@ export const actionDropdownItems = ({ handleExport }) => [
 // PROGRESS BAR
 export const progressSteps = [
   { label: "Submitted", value: "submitted" },
-  { label: "Under Review", value: "review" },
   { label: "Approved", value: "approved" },
+  { label: "Under Review", value: "review" },
   { label: "Completed", value: "completed" },
 ];

@@ -9,19 +9,19 @@ import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../../../utils/numberToWords";
 import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
-import CashApprovalTable from "./CashApprovalTable";
+import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable";
 import ActionButtons from "../../../ActionButtons";
 import SignatureUpload from "../../../SignatureUpload";
 import Reference from "../../../Reference";
 
-const CashApprovalForm = () => {
+const FinanceApprovalForm = () => {
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const { state: data } = useLocation();
 
   const [amountInWords, setAmountInWords] = useState("");
   const [signatures, setSignatures] = useState(
-    data?.signatures || { approved: null, approvedName: "" }
+    data?.signatures || { financeApproved: null, financeName: "" }
   );
 
   const reactToPrintFn = useReactToPrint({ contentRef });
@@ -35,15 +35,15 @@ const CashApprovalForm = () => {
     }
   }, [total]);
 
-  // API call to approve or reject
+  // API CALL
   const handleUpdateRequest = async (status, remarks = "") => {
     try {
       const payload = {
         status,
         id: data?.id,
         remarks,
-        signature: signatures.approved,
-        updated_by: signatures.approvedName || "Team Leader",
+        signature: signatures.financeApproved,
+        updated_by: signatures.financeName || "Finance",
       };
 
       const res = await fetch("/api5012/cash_request/updatecash_request", {
@@ -57,8 +57,11 @@ const CashApprovalForm = () => {
       if (!res.ok) throw new Error("Failed to update request");
 
       toast.success(
-        `Cash request ${status === "approved" ? "approved" : "rejected"}`
+        `Cash request ${
+          status === "completed" ? "completed" : "rejected"
+        } by Finance`
       );
+
       navigate(-1);
     } catch (error) {
       console.error(error);
@@ -71,7 +74,7 @@ const CashApprovalForm = () => {
       <Container fluid>
         {/* ACTION BUTTONS */}
         <ActionButtons
-          onApprove={() => handleUpdateRequest("approved")}
+          onApprove={() => handleUpdateRequest("completed")}
           onReject={() => {
             const remarks = prompt("Enter remarks for rejection:");
             if (remarks !== null) {
@@ -84,7 +87,7 @@ const CashApprovalForm = () => {
 
         <Row>
           <Col md={9} className="d-flex flex-column pe-md-2">
-            {/* Info Fields */}
+            {/* INFO FIELDS */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -95,7 +98,7 @@ const CashApprovalForm = () => {
                 </Col>
               </Row>
 
-              {/* Partner Fields */}
+              {/* PARTNER FIELDS */}
               <Row>
                 {approvalPartnerFields.map(({ label, key }, index) => (
                   <Col
@@ -117,7 +120,7 @@ const CashApprovalForm = () => {
                 ))}
               </Row>
 
-              {/* Employee Fields */}
+              {/* EMPLOYEE FIELDS */}
               {approvalFormFields.map(({ label, key }, index) => (
                 <Row key={index}>
                   <Col xs={12} className="d-flex align-items-center mb-2">
@@ -142,14 +145,14 @@ const CashApprovalForm = () => {
               </Row>
             </div>
 
-            {/* Table */}
+            {/* TABLE */}
             <CashApprovalTable transactions={transactions} subtotal={total} />
 
-            {/* Signature Upload */}
+            {/* SIGNATURE */}
             <SignatureUpload
-              label="Checked by"
-              nameKey="approvedName"
-              signatureKey="approved"
+              label="Approved by"
+              nameKey="financeName"
+              signatureKey="financeApproved"
               signatures={signatures}
               setSignatures={setSignatures}
             />
@@ -161,7 +164,7 @@ const CashApprovalForm = () => {
         </Row>
       </Container>
 
-      {/* Hidden Printable */}
+      {/* PRINTABLE HIDDEN */}
       <div className="d-none">
         <PrintableCashRequest
           data={{ ...data, items: transactions }}
@@ -174,4 +177,4 @@ const CashApprovalForm = () => {
   );
 };
 
-export default CashApprovalForm;
+export default FinanceApprovalForm;

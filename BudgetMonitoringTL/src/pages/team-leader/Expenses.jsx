@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdDelete, MdLocalPrintshop } from "react-icons/md";
+import { MdLocalPrintshop } from "react-icons/md";
 import { Container } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 
@@ -31,21 +31,6 @@ const PrintButton = ({ onClick }) => (
   />
 );
 
-const DeleteButton = ({ onClick }) => (
-  <AppButton
-    label={
-      <>
-        <MdDelete style={{ marginRight: "5px" }} />
-        Delete
-      </>
-    }
-    size="sm"
-    className="custom-app-button"
-    variant="outline-danger"
-    onClick={onClick}
-  />
-);
-
 const Expenses = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
@@ -60,10 +45,40 @@ const Expenses = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  useEffect(() => {
-    setTableData([]);
+  //  Fetch team leader expenses
+  const fetchExpenses = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        "/api5012/cash_request/getcash_request?status=pending",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!res.ok) throw new Error("Failed to fetch expenses");
+
+      const result = await res.json();
+      const mappedData = (result || []).map((item, index) => ({
+        ...item,
+        id: item.id ?? `${index}`,
+        formType: "Cash Request",
+      }));
+
+      setTableData(mappedData);
+    } catch (err) {
+      console.error("Error fetching expenses:", err);
+    }
   }, []);
 
+  // fetch on mount
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
+
+  // keep particulars in sync
   useEffect(() => {
     const items = formatPrintData(tableData);
     const isSame = JSON.stringify(particulars) === JSON.stringify(items);
@@ -72,9 +87,9 @@ const Expenses = () => {
 
   const handleRowClick = (entry) => {
     if (entry.formType === "Cash Request") {
-      navigate("/approval-form", { state: entry });
+      navigate("/cash_approval_form", { state: entry });
     } else if (entry.formType === "Liquidation") {
-      navigate("/liquidation-form", { state: entry });
+      navigate("/liquidation_form", { state: entry });
     }
   };
 
@@ -99,10 +114,7 @@ const Expenses = () => {
   const filteredData = useMemo(
     () =>
       tableData
-        .filter(
-          (item) =>
-            item.status !== STATUS.APPROVED && item.status !== STATUS.REJECTED
-        )
+        .filter((item) => item.status === STATUS.PENDING)
         .filter((item) => isMatch(item, searchValue)),
     [tableData, searchValue]
   );
@@ -111,21 +123,6 @@ const Expenses = () => {
     selectedCount === 1
       ? filteredData.find((item) => selectedRows[item.id])
       : null;
-
-  const handleDelete = (entryToDelete) => {
-    setTableData((prev) => prev.filter((item) => item.id !== entryToDelete.id));
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedCount < 1) return;
-    const selectedEntries = filteredData.filter(
-      (entry) => selectedRows[entry.id]
-    );
-    setTableData((prev) =>
-      prev.filter((item) => !selectedEntries.some((e) => e.id === item.id))
-    );
-    setSelectedRows({});
-  };
 
   const handleExport = () => {
     const resetSelection = handleExportData({
@@ -148,19 +145,7 @@ const Expenses = () => {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             leftContent={
-              selectedCount > 0 && (
-                <>
-                  {selectedCount === 1 && (
-                    <>
-                      <PrintButton onClick={handlePrint} />
-                      <DeleteButton onClick={handleDeleteSelected} />
-                    </>
-                  )}
-                  {selectedCount > 1 && (
-                    <DeleteButton onClick={handleDeleteSelected} />
-                  )}
-                </>
-              )
+              selectedCount === 1 && <PrintButton onClick={handlePrint} />
             }
             handleExport={handleExport}
             selectedCount={selectedCount}
@@ -171,7 +156,6 @@ const Expenses = () => {
             height="450px"
             columns={columns}
             onRowClick={handleRowClick}
-            onDelete={handleDelete}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
             downloadRef={downloadRef}

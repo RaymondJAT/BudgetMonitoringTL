@@ -38,9 +38,8 @@ const ProgressBar = ({ steps, currentStep, onStepClick }) => {
 ProgressBar.defaultProps = {
   steps: [
     { label: "Submitted", value: "submitted" },
-    { label: "Under Review", value: "review" },
     { label: "Approved", value: "approved" },
-    { label: "Disbursed", value: "disbursed" },
+    { label: "Under Review", value: "review" },
     { label: "Completed", value: "completed" },
   ],
   currentStep: 0,

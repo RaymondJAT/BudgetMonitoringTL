@@ -1,11 +1,11 @@
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdDelete, MdLocalPrintshop } from "react-icons/md";
+import { MdLocalPrintshop, MdDelete } from "react-icons/md";
 import { useReactToPrint } from "react-to-print";
 import { Container } from "react-bootstrap";
 
 import { columns } from "../../handlers/tableHeader";
-import { STATUS } from "../../constants/status";
+import { handleExportData } from "../../utils/exportItems";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 
 import TotalCards from "../../components/TotalCards";
@@ -53,53 +53,74 @@ const Approval = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  useEffect(() => {
-    setTableData([]);
+  // Fetch only approved and completed expenses
+  const fetchApprovedAndCompleted = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `/api5012/cash_request/getcash_request?status=approved`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok)
+        throw new Error("Failed to fetch approved/completed requests");
+
+      const result = await res.json();
+      const mappedData = (result || []).map((item, index) => ({
+        ...item,
+        id: item.id ?? `${index}`,
+        formType: "Cash Request",
+      }));
+
+      // Safety filter: only keep approved or completed
+      setTableData(
+        mappedData.filter((item) =>
+          ["approved", "completed"].includes(item.status.toLowerCase())
+        )
+      );
+    } catch (err) {
+      console.error("Error fetching approved/completed requests:", err);
+    }
   }, []);
 
-  const approvedData = useMemo(
-    () => tableData.filter((item) => item.status === STATUS.APPROVED),
-    [tableData]
-  );
+  useEffect(() => {
+    fetchApprovedAndCompleted();
+  }, [fetchApprovedAndCompleted]);
 
   const filteredData = useMemo(() => {
     const normalize = (value) =>
       String(value || "")
         .toLowerCase()
         .trim();
-
-    return approvedData.filter((item) =>
+    return tableData.filter((item) =>
       columns.some((col) =>
         normalize(item[col.accessor]).includes(normalize(searchValue))
       )
     );
-  }, [approvedData, searchValue]);
+  }, [tableData, searchValue]);
+
+  const handleRowClick = (entry) => {
+    navigate("/cash_approval_form", { state: entry });
+  };
 
   const selectedEntry =
     selectedCount === 1
       ? filteredData.find((item) => selectedRows[item.id])
       : null;
 
-  const handleRowClick = (entry) => {
-    navigate("/approval-form", { state: entry });
-  };
-
   const handlePrint = () => {
     if (!selectedEntry) return;
     setPrintData(selectedEntry);
     setTimeout(() => reactToPrintFn(), 100);
-  };
-
-  const handleMoveEntry = (entry, newStatus) => {
-    setTableData((prev) =>
-      prev.map((item) =>
-        item.id === entry.id ? { ...item, status: newStatus } : item
-      )
-    );
   };
 
   const handleDeleteSelected = () => {
@@ -108,11 +129,19 @@ const Approval = () => {
       (entry) => selectedRows[entry.id]
     );
     setTableData((prev) =>
-      prev.filter(
-        (entry) => !selectedEntries.some((sel) => sel.id === entry.id)
-      )
+      prev.filter((item) => !selectedEntries.some((e) => e.id === item.id))
     );
     setSelectedRows({});
+  };
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "Approved_Completed",
+    });
+    setSelectedRows(resetSelection);
   };
 
   const totalComputationData = useMemo(() => tableData, [tableData]);
@@ -122,7 +151,6 @@ const Approval = () => {
       <div className="mt-3">
         <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
       </div>
-
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
           <ToolBar
@@ -143,6 +171,7 @@ const Approval = () => {
                 </>
               )
             }
+            handleExport={handleExport}
             selectedCount={selectedCount}
           />
 
@@ -151,10 +180,10 @@ const Approval = () => {
             height="455px"
             columns={columns}
             onRowClick={handleRowClick}
-            onDelete={(entry) => handleMoveEntry(entry, STATUS.DELETED)}
-            onArchive={(entry) => handleMoveEntry(entry, STATUS.ARCHIVED)}
-            onToggleImportant={(entry) =>
-              handleMoveEntry(entry, STATUS.IMPORTANT)
+            onDelete={(entry) =>
+              setTableData((prev) =>
+                prev.filter((item) => item.id !== entry.id)
+              )
             }
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
@@ -162,7 +191,7 @@ const Approval = () => {
             setPrintData={setPrintData}
           />
 
-          <div className="d-none">
+          <div style={{ display: "none" }}>
             <ExpenseReport contentRef={contentRef} data={printData || {}} />
             <ExpenseReport contentRef={downloadRef} data={printData || {}} />
           </div>

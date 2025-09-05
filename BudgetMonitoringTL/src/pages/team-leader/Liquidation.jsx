@@ -10,10 +10,9 @@ import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 
 const Liquidation = () => {
-  const [tableData] = useState([]); 
+  const [tableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
- 
   const totalComputationData = useMemo(() => {
     return [...tableData];
   }, [tableData]);

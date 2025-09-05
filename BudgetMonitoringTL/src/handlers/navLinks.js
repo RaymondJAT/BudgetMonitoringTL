@@ -61,6 +61,7 @@ export const navConfig = [
       { label: "Rejected Requests", path: "/rejected_requests" },
       { label: "For Processing", path: "/finance_processing" },
       { label: "Released", path: "/finance_released" },
+      { label: "Rejected", path: "/finance_rejected" },
     ],
   },
   {
