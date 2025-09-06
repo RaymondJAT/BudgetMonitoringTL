@@ -38,13 +38,85 @@ const FinanceApprovalForm = () => {
   // API CALL
   const handleUpdateRequest = async (status, remarks = "") => {
     try {
+      console.log("🔄 Updating request with status:", status);
+
+      let cashVoucher = null;
+      let revolvingFundId = null;
+      let departmentId = null;
+
+      if (status === "completed") {
+        const department = encodeURIComponent(data?.department_name || "");
+        console.log("📡 Fetching voucher info for department:", department);
+
+        const resVoucher = await fetch(
+          `/api5001/cash_disbursement/getcash_disbursement_cv_number?department=${data?.department}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("📥 Voucher API response status:", resVoucher.status);
+
+        if (!resVoucher.ok)
+          throw new Error("Failed to fetch cash voucher information");
+
+        const voucherData = await resVoucher.json();
+        console.log("✅ Voucher API data:", voucherData);
+
+        const voucherInfo = voucherData?.data || {};
+
+        cashVoucher = (Number(voucherInfo?.cash_voucher) || 0) + 1;
+        revolvingFundId = voucherInfo?.revolving_fund_id || null;
+        departmentId = voucherInfo?.department_id || null;
+
+        const disbursementPayload = {
+          received_by: data?.employee_id || "N/A",
+          revolving_fund_id: revolvingFundId,
+          department_id: departmentId,
+          particulars: data?.description || "N/A",
+          amount_issue: parseFloat(data?.subtotal || 0),
+          amount_return: 0,
+          cash_voucher: cashVoucher,
+        };
+
+        console.log("📤 Sending disbursement payload:", disbursementPayload);
+
+        const resDisbursement = await fetch(
+          "/api5001/cash_disbursement/createcash_disbursement",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(disbursementPayload),
+          }
+        );
+
+        console.log(
+          "📥 Disbursement API response status:",
+          resDisbursement.status
+        );
+
+        if (!resDisbursement.ok)
+          throw new Error("Failed to create cash disbursement");
+
+        const disbursementResult = await resDisbursement.json();
+        console.log("✅ Disbursement API result:", disbursementResult);
+      }
+
       const payload = {
         status,
         id: data?.id,
         remarks,
         signature: signatures.financeApproved,
         updated_by: signatures.financeName || "Finance",
+        department_name: data?.department_name || "N/A",
+        cash_voucher: cashVoucher,
       };
+
+      console.log("📤 Sending cash request update payload:", payload);
 
       const res = await fetch("/api5012/cash_request/updatecash_request", {
         method: "PUT",
@@ -54,18 +126,23 @@ const FinanceApprovalForm = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to update request");
+      console.log("📥 Cash request update response status:", res.status);
+
+      if (!res.ok) throw new Error("Failed to update cash request");
+
+      const updateResult = await res.json();
+      console.log("✅ Cash request update result:", updateResult);
 
       toast.success(
         `Cash request ${
-          status === "completed" ? "completed" : "rejected"
+          status === "completed" ? "completed & disbursed" : "rejected"
         } by Finance`
       );
 
       navigate(-1);
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong while updating.");
+      console.error("❌ Error in handleUpdateRequest:", error);
+      toast.error("Something went wrong while processing approval.");
     }
   };
 

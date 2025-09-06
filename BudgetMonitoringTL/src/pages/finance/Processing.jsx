@@ -7,7 +7,6 @@ import { useReactToPrint } from "react-to-print";
 import { columns } from "../../handlers/tableHeader";
 import { formatPrintData } from "../../utils/formatPrintData";
 import { handleExportData } from "../../utils/exportItems";
-import { STATUS } from "../../constants/status";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 
 import DataTable from "../../components/layout/DataTable";
@@ -46,7 +45,7 @@ const Processing = () => {
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
-  // Fetch finance processing data
+  // FETCH PROCESSING
   const fetchProcessingData = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
@@ -63,14 +62,14 @@ const Processing = () => {
 
       const result = await res.json();
 
-      // Map and filter for approved status (if needed)
+      // MAP & FILTER APPROVED STATUS
       const mappedData = (result || [])
         .map((item, index) => ({
           ...item,
           id: item.id ?? `${index}`,
           formType: "Cash Request",
         }))
-        .filter((item) => item.status === "approved"); // ensure only approved
+        .filter((item) => item.status === "approved");
 
       setTableData(mappedData);
     } catch (err) {
@@ -82,7 +81,7 @@ const Processing = () => {
     fetchProcessingData();
   }, [fetchProcessingData]);
 
-  // keep particulars in sync
+  // KEEP PARTICULARS SYNC
   useEffect(() => {
     const items = formatPrintData(tableData);
     const isSame = JSON.stringify(particulars) === JSON.stringify(items);

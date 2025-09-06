@@ -10,6 +10,7 @@ import { normalizeBase64Image } from "../../../../utils/signature";
 const CashReqForm = ({ data = {}, onChange = () => {} }) => {
   const today = new Date().toISOString().split("T")[0];
   const loggedInUser = localStorage.getItem("employee_fullname") || "";
+  const employeeId = localStorage.getItem("employee_id") || "";
   const departmentName = localStorage.getItem("department_name") || "";
   const positionName = localStorage.getItem("position_name") || "";
 
@@ -27,6 +28,7 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
   );
 
   const [formData, setFormData] = useState({
+    employee_id: employeeId,
     employee: loggedInUser,
     requested_by: loggedInUser,
     department: departmentName,
@@ -53,6 +55,7 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
 
   useEffect(() => {
     const mapped = {
+      employee_id: formData.employee_id,
       description: formData.description || "",
       team_lead: formData.teamLead || "",
       employee: formData.employee || "",
