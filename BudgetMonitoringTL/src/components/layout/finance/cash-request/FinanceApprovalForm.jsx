@@ -13,6 +13,7 @@ import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable"
 import ActionButtons from "../../../ActionButtons";
 import SignatureUpload from "../../../SignatureUpload";
 import Reference from "../../../Reference";
+import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
 
 const FinanceApprovalForm = () => {
   const contentRef = useRef(null);
@@ -23,6 +24,8 @@ const FinanceApprovalForm = () => {
   const [signatures, setSignatures] = useState(
     data?.signatures || { financeApproved: null, financeName: "" }
   );
+
+  const [showFundModal, setShowFundModal] = useState(false);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
@@ -36,74 +39,52 @@ const FinanceApprovalForm = () => {
   }, [total]);
 
   // API CALL
-  const handleUpdateRequest = async (status, remarks = "") => {
+  const handleUpdateRequest = async (
+    status,
+    remarks = "",
+    revolvingFundId = null
+  ) => {
     try {
-      console.log("🔄 Updating request with status:", status);
-
       let cashVoucher = null;
-      let revolvingFundId = null;
       let departmentId = null;
 
       if (status === "completed") {
-        const department = encodeURIComponent(data?.department_name || "");
-        console.log("📡 Fetching voucher info for department:", department);
-
         const resVoucher = await fetch(
           `/api5001/cash_disbursement/getcash_disbursement_cv_number?department=${data?.department}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { "Content-Type": "application/json" } }
         );
-
-        console.log("📥 Voucher API response status:", resVoucher.status);
 
         if (!resVoucher.ok)
           throw new Error("Failed to fetch cash voucher information");
 
         const voucherData = await resVoucher.json();
-        console.log("✅ Voucher API data:", voucherData);
-
         const voucherInfo = voucherData?.data || {};
 
         cashVoucher = (Number(voucherInfo?.cash_voucher) || 0) + 1;
-        revolvingFundId = voucherInfo?.revolving_fund_id || null;
         departmentId = voucherInfo?.department_id || null;
 
         const disbursementPayload = {
           received_by: data?.employee_id || "N/A",
-          revolving_fund_id: revolvingFundId,
           department_id: departmentId,
+          revolving_fund_id: revolvingFundId,
           particulars: data?.description || "N/A",
           amount_issue: parseFloat(data?.subtotal || 0),
           amount_return: 0,
           cash_voucher: cashVoucher,
         };
 
-        console.log("📤 Sending disbursement payload:", disbursementPayload);
-
         const resDisbursement = await fetch(
           "/api5001/cash_disbursement/createcash_disbursement",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(disbursementPayload),
           }
         );
 
-        console.log(
-          "📥 Disbursement API response status:",
-          resDisbursement.status
-        );
-
         if (!resDisbursement.ok)
           throw new Error("Failed to create cash disbursement");
-
-        const disbursementResult = await resDisbursement.json();
-        console.log("✅ Disbursement API result:", disbursementResult);
+        await resDisbursement.json();
       }
 
       const payload = {
@@ -116,22 +97,14 @@ const FinanceApprovalForm = () => {
         cash_voucher: cashVoucher,
       };
 
-      console.log("📤 Sending cash request update payload:", payload);
-
       const res = await fetch("/api5012/cash_request/updatecash_request", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      console.log("📥 Cash request update response status:", res.status);
-
       if (!res.ok) throw new Error("Failed to update cash request");
-
-      const updateResult = await res.json();
-      console.log("✅ Cash request update result:", updateResult);
+      await res.json();
 
       toast.success(
         `Cash request ${
@@ -141,7 +114,7 @@ const FinanceApprovalForm = () => {
 
       navigate(-1);
     } catch (error) {
-      console.error("❌ Error in handleUpdateRequest:", error);
+      console.error("Error in handleUpdateRequest:", error);
       toast.error("Something went wrong while processing approval.");
     }
   };
@@ -151,7 +124,7 @@ const FinanceApprovalForm = () => {
       <Container fluid>
         {/* ACTION BUTTONS */}
         <ActionButtons
-          onApprove={() => handleUpdateRequest("completed")}
+          onApprove={() => setShowFundModal(true)}
           onReject={() => {
             const remarks = prompt("Enter remarks for rejection:");
             if (remarks !== null) {
@@ -240,6 +213,12 @@ const FinanceApprovalForm = () => {
           </Col>
         </Row>
       </Container>
+
+      <PickRevolvingFund
+        show={showFundModal}
+        onClose={() => setShowFundModal(false)}
+        onSelect={(fundId) => handleUpdateRequest("completed", "", fundId)}
+      />
 
       {/* PRINTABLE HIDDEN */}
       <div className="d-none">

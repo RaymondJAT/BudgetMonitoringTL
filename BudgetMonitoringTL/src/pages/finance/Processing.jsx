@@ -15,7 +15,7 @@ import ExpenseReport from "../../components/print/ExpenseReport";
 import AppButton from "../../components/ui/AppButton";
 import TotalCards from "../../components/TotalCards";
 
-// Print Button
+// PRINT BUTTON
 const PrintButton = ({ onClick }) => (
   <AppButton
     label={
@@ -160,7 +160,7 @@ const Processing = () => {
             setPrintData={setPrintData}
           />
 
-          {/* hidden print/download */}
+          {/* PRINT/DOWNLOAD */}
           <div className="d-none">
             <ExpenseReport contentRef={contentRef} data={printData || {}} />
             <ExpenseReport contentRef={downloadRef} data={printData || {}} />

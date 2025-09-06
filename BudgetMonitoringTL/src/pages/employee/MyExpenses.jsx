@@ -24,6 +24,9 @@ const MyExpenses = () => {
   const fetchCashRequests = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
+      const employeeId = localStorage.getItem("employee_id");
+      const accessName = localStorage.getItem("access_name");
+
       const res = await fetch("/api5012/cash_request/getcash_request", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -33,8 +36,15 @@ const MyExpenses = () => {
       if (!res.ok) throw new Error("Failed to fetch cash requests");
 
       const result = await res.json();
-      console.log(result);
-      const mappedData = (result || []).map((item, index) => ({
+
+      const filtered =
+        String(accessName) === "Administrator"
+          ? result || []
+          : (result || []).filter(
+              (item) => String(item.employee_id) === String(employeeId)
+            );
+
+      const mappedData = filtered.map((item, index) => ({
         ...item,
         id: item.id ?? `${index}`,
         formType: "Cash Request",
@@ -42,11 +52,10 @@ const MyExpenses = () => {
 
       setTableData(mappedData);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching cash requests:", err);
     }
   }, []);
 
-  // fetch once on mount
   useEffect(() => {
     fetchCashRequests();
   }, [fetchCashRequests]);

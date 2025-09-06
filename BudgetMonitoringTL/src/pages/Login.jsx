@@ -47,6 +47,7 @@ const Login = () => {
       localStorage.setItem("department_name", data.department_name);
       localStorage.setItem("position_name", data.position_name);
       localStorage.setItem("access_id", data.access);
+      localStorage.setItem("access_name", data.access_name);
 
       // FETCH ACCESS RIGHTS
       const accessRes = await fetch(
