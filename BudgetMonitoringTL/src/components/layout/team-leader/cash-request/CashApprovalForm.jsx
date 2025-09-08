@@ -19,23 +19,31 @@ const CashApprovalForm = () => {
   const navigate = useNavigate();
   const { state: data } = useLocation();
 
-  const [amountInWords, setAmountInWords] = useState("");
-  const [signatures, setSignatures] = useState(
-    data?.signatures || { approved: null, approvedName: "" }
-  );
+  const employeeName =
+    localStorage.getItem("employee_fullname") ||
+    localStorage.getItem("username") ||
+    "";
 
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const [amountInWords, setAmountInWords] = useState("");
+
+  const [signatures, setSignatures] = useState({
+    requestSignature: data?.signatures?.requestSignature || null,
+    requestedName: data?.signatures?.requestedName || data?.requested_by || "",
+    approved: data?.signatures?.approved || null,
+    approvedName: data?.signatures?.approvedName || employeeName,
+    financeApproved: data?.signatures?.financeApproved || null,
+    financeName: data?.signatures?.financeName || "",
+  });
 
   const transactions = useMemo(() => data?.cash_request_items || [], [data]);
   const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
 
   useEffect(() => {
-    if (!isNaN(total)) {
-      setAmountInWords(numberToWords(total));
-    }
+    if (!isNaN(total)) setAmountInWords(numberToWords(total));
   }, [total]);
 
-  // API call to approve or reject
+  const reactToPrintFn = useReactToPrint({ contentRef });
+
   const handleUpdateRequest = async (status, remarks = "") => {
     try {
       const payload = {
@@ -43,14 +51,13 @@ const CashApprovalForm = () => {
         id: data?.id,
         remarks,
         signature: signatures.approved,
-        updated_by: signatures.approvedName || "Team Leader",
+        approvedName: signatures.approvedName || employeeName,
+        updated_by: employeeName,
       };
 
       const res = await fetch("/api5012/cash_request/updatecash_request", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -60,8 +67,8 @@ const CashApprovalForm = () => {
         `Cash request ${status === "approved" ? "approved" : "rejected"}`
       );
       navigate(-1);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       toast.error("Something went wrong while updating.");
     }
   };
@@ -69,22 +76,22 @@ const CashApprovalForm = () => {
   return (
     <div className="pb-3">
       <Container fluid>
-        {/* ACTION BUTTONS */}
+        {/* Action Buttons */}
         <ActionButtons
           onApprove={() => handleUpdateRequest("approved")}
           onReject={() => {
             const remarks = prompt("Enter remarks for rejection:");
-            if (remarks !== null) {
-              handleUpdateRequest("rejected", remarks);
-            }
+            if (remarks !== null) handleUpdateRequest("rejected", remarks);
           }}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
+          status={data?.status}
+          role="teamlead"
         />
 
         <Row>
           <Col md={9} className="d-flex flex-column pe-md-2">
-            {/* Info Fields */}
+            {/* Details */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -97,9 +104,9 @@ const CashApprovalForm = () => {
 
               {/* Partner Fields */}
               <Row>
-                {approvalPartnerFields.map(({ label, key }, index) => (
+                {approvalPartnerFields.map(({ label, key }, idx) => (
                   <Col
-                    key={index}
+                    key={idx}
                     xs={12}
                     md={6}
                     className="d-flex align-items-center mb-2"
@@ -118,8 +125,8 @@ const CashApprovalForm = () => {
               </Row>
 
               {/* Employee Fields */}
-              {approvalFormFields.map(({ label, key }, index) => (
-                <Row key={index}>
+              {approvalFormFields.map(({ label, key }, idx) => (
+                <Row key={idx}>
                   <Col xs={12} className="d-flex align-items-center mb-2">
                     <strong className="title">{label}:</strong>
                     <p className="ms-2 mb-0">
@@ -145,13 +152,17 @@ const CashApprovalForm = () => {
             {/* Table */}
             <CashApprovalTable transactions={transactions} subtotal={total} />
 
-            {/* Signature Upload */}
+            {/* Signature Upload for Team Leader */}
             <SignatureUpload
               label="Checked by"
               nameKey="approvedName"
               signatureKey="approved"
               signatures={signatures}
               setSignatures={setSignatures}
+              readOnly={
+                data?.status?.toLowerCase() === "approved" ||
+                data?.status?.toLowerCase() === "completed"
+              }
             />
           </Col>
 
@@ -161,7 +172,7 @@ const CashApprovalForm = () => {
         </Row>
       </Container>
 
-      {/* Hidden Printable */}
+      {/* Printable */}
       <div className="d-none">
         <PrintableCashRequest
           data={{ ...data, items: transactions }}

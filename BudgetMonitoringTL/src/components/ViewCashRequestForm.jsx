@@ -13,7 +13,6 @@ import SignatureUpload from "./SignatureUpload";
 import CashReqActionButtons from "./CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
 import ProgressBar from "./layout/ProgressBar";
-import AppButton from "./ui/AppButton";
 import { progressSteps } from "../handlers/actionMenuItems";
 import { normalizeBase64Image } from "../utils/signature";
 
@@ -33,6 +32,8 @@ const ViewCashRequestForm = () => {
 
   const transactions = useMemo(() => data?.cash_request_items || [], [data]);
   const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
+
+  const reactToPrintFn = useReactToPrint({ contentRef });
 
   useEffect(() => {
     const requestedActivity = data?.cash_request_activities?.find(
@@ -75,17 +76,15 @@ const ViewCashRequestForm = () => {
     }
   }, [data]);
 
-  const handleStepClick = (index, step) =>
-    console.log("Clicked step:", step.label);
-
   return (
     <div className="pb-3">
       <Container fluid>
         <CashReqActionButtons
           onBack={() => navigate(-1)}
           onView={() => setShowModal(true)}
-          onPrint={useReactToPrint({ contentRef })}
+          onPrint={reactToPrintFn}
           onShowLiqFormModal={() => setShowLiqFormModal(true)}
+          showLiquidationButton={data?.status === "completed"}
         />
 
         <LiqFormModal
@@ -114,11 +113,7 @@ const ViewCashRequestForm = () => {
         <div className="request-container border p-2 mb-3">
           <Row className="align-items-center d-flex justify-content-between">
             <Col className="d-flex">
-              <ProgressBar
-                steps={progressSteps}
-                currentStep={currentStep}
-                onStepClick={handleStepClick}
-              />
+              <ProgressBar steps={progressSteps} currentStep={currentStep} />
             </Col>
           </Row>
         </div>
@@ -134,7 +129,6 @@ const ViewCashRequestForm = () => {
             </Col>
           </Row>
 
-          {/* Partner Fields */}
           <Row>
             {approvalPartnerFields.map(({ label, key }, idx) => (
               <Col
@@ -155,7 +149,6 @@ const ViewCashRequestForm = () => {
             ))}
           </Row>
 
-          {/* Employee Fields */}
           {approvalFormFields.map(({ label, key }, idx) => (
             <Row key={idx}>
               <Col xs={12} className="d-flex align-items-center mb-2">
@@ -194,14 +187,18 @@ const ViewCashRequestForm = () => {
       </Container>
 
       {/* Hidden Printable Component */}
-      <div
-        style={{ position: "absolute", left: "-9999px", top: 0 }}
-        ref={contentRef}
-      >
+      <div className="d-none">
         <PrintableCashRequest
-          data={{ ...data, items: transactions }}
+          data={{
+            ...data,
+            items: transactions.map((t) => ({
+              ...t,
+              description: data?.description || "N/A",
+            })),
+          }}
           amountInWords={amountInWords}
           signatures={signatures}
+          contentRef={contentRef}
         />
       </div>
 
@@ -213,7 +210,13 @@ const ViewCashRequestForm = () => {
       >
         <Modal.Body>
           <PrintableCashRequest
-            data={{ ...data, items: transactions }}
+            data={{
+              ...data,
+              items: transactions.map((t) => ({
+                ...t,
+                description: data?.description || "N/A",
+              })),
+            }}
             amountInWords={amountInWords}
             signatures={signatures}
           />

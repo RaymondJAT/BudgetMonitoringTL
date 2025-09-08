@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
+import { normalizeBase64Image } from "../../utils/signature"; // ✅ make sure path is correct
 
 const PrintableCashRequest = ({
   data,
@@ -15,8 +16,54 @@ const PrintableCashRequest = ({
 
   const particulars = data?.items || [];
   const totalAmount = particulars.reduce(
-    (sum, item) => sum + (parseFloat(item.amount) || 0),
+    (sum, item) => sum + (parseFloat(item.subtotal) || 0),
     0
+  );
+
+  // Helper for rendering signature blocks
+  const SignatureBlock = ({ label, signature, name }) => (
+    <Col xs={12} md={4} className="text-center">
+      <p className="mb-0">
+        <strong>{label}</strong>
+      </p>
+      <div
+        className="text-center mt-4 position-relative"
+        style={{ height: "100px" }}
+      >
+        {signature && (
+          <img
+            src={normalizeBase64Image(signature)}
+            alt={`${label} Signature`}
+            style={{
+              height: "80px",
+              position: "absolute",
+              top: "-45px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1,
+              opacity: 0.9,
+            }}
+          />
+        )}
+        <div
+          style={{
+            position: "absolute",
+            top: "-14px",
+            width: "100%",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontWeight: "bold", zIndex: 2 }}>{name || ""}</div>
+          <div
+            style={{
+              borderTop: "1px solid #000",
+              width: "210px",
+              margin: "2px auto 0 auto",
+            }}
+          ></div>
+        </div>
+      </div>
+    </Col>
   );
 
   return (
@@ -24,6 +71,7 @@ const PrintableCashRequest = ({
       <Container className="px-0 mt-4">
         <h2 className="text-center w-100 fw-bold">CASH REQUEST FORM</h2>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
+
         {/* Employee Details */}
         <Row className="custom-col small">
           <Col xs={12} md={6} className="mb-2">
@@ -40,7 +88,7 @@ const PrintableCashRequest = ({
           <Col xs={12} md={6} className="mb-2 text-md-end">
             <div className="d-flex justify-content-md-end align-items-center mb-2">
               <strong className="title">Date Filed:</strong>
-              <p className="ms-2 mb-0">{data?.expenseDate || " "}</p>
+              <p className="ms-2 mb-0">{data?.request_date || dateFiled}</p>
             </div>
             <div className="d-flex justify-content-md-end align-items-center">
               <strong className="title">Department:</strong>
@@ -63,17 +111,11 @@ const PrintableCashRequest = ({
                 {particulars.length > 0 ? (
                   particulars.map((item, index) => (
                     <tr key={index}>
-                      <td className="text-center">
-                        {`${item.label} - ${item.quantity} x ₱${(
-                          item.price ?? 0
-                        ).toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                        })}`}
-                      </td>
+                      <td className="text-center">{item.description}</td>
                       <td className="text-center">
                         ₱
-                        {item.amount
-                          ? parseFloat(item.amount).toLocaleString("en-US", {
+                        {item.subtotal
+                          ? parseFloat(item.subtotal).toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                             })
                           : "0.00"}
@@ -112,143 +154,21 @@ const PrintableCashRequest = ({
 
         {/* Signatures */}
         <Row className="signature mt-4 small">
-          {/* Requested by */}
-          <Col xs={12} md={4} className="text-center">
-            <p className="mb-0">
-              <strong>Requested by:</strong>
-            </p>
-            <div
-              className="text-center mt-4 position-relative"
-              style={{ height: "100px" }}
-            >
-              {signatures?.requestedName && (
-                <img
-                  src={signatures.requestSignature}
-                  alt="Signature"
-                  style={{
-                    height: "80px",
-                    position: "absolute",
-                    top: "-45px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 1,
-                    opacity: 0.9,
-                  }}
-                />
-              )}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-14px",
-                  width: "100%",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontWeight: "bold", zIndex: 2 }}>
-                  {signatures?.requestedName || ""}
-                </div>
-                <div
-                  style={{
-                    borderTop: "1px solid #000",
-                    width: "210px",
-                    margin: "2px auto 0 auto",
-                  }}
-                ></div>
-              </div>
-            </div>
-          </Col>
-
-          {/* Approved by */}
-          <Col xs={12} md={4} className="text-center">
-            <p className="mb-0">
-              <strong>Approved by:</strong>
-            </p>
-            <div
-              className="text-center mt-4 position-relative"
-              style={{ height: "100px" }}
-            >
-              {signatures?.approved && (
-                <img
-                  src={signatures.approved}
-                  alt="Signature"
-                  style={{
-                    height: "80px",
-                    position: "absolute",
-                    top: "-45px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 1,
-                    opacity: 0.9,
-                  }}
-                />
-              )}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-14px",
-                  width: "100%",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontWeight: "bold", zIndex: 2 }}>
-                  {signatures?.approvedName || ""}
-                </div>
-                <div
-                  style={{
-                    borderTop: "1px solid #000",
-                    width: "210px",
-                    margin: "2px auto 0 auto",
-                  }}
-                ></div>
-              </div>
-            </div>
-          </Col>
-
-          {/* Received by */}
-          <Col xs={12} md={4} className="text-center">
-            <p className="mb-0">
-              <strong>Received by:</strong>
-            </p>
-            <div
-              className="text-center mt-4 position-relative"
-              style={{ height: "100px" }}
-            >
-              {signatures?.received && (
-                <img
-                  src={signatures.received}
-                  alt="Signature"
-                  style={{
-                    height: "80px",
-                    position: "absolute",
-                    top: "-45px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 1,
-                    opacity: 0.9,
-                  }}
-                />
-              )}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-14px",
-                  width: "100%",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontWeight: "bold", zIndex: 2 }}>
-                  {signatures?.receivedName || ""}
-                </div>
-                <div
-                  style={{
-                    borderTop: "1px solid #000",
-                    width: "210px",
-                    margin: "2px auto 0 auto",
-                  }}
-                ></div>
-              </div>
-            </div>
-          </Col>
+          <SignatureBlock
+            label="Requested by:"
+            signature={signatures?.requestSignature}
+            name={signatures?.requestedName}
+          />
+          <SignatureBlock
+            label="Approved by:"
+            signature={signatures?.approved}
+            name={signatures?.approvedName}
+          />
+          <SignatureBlock
+            label="Received by:"
+            signature={signatures?.financeApproved}
+            name={signatures?.financeName}
+          />
         </Row>
       </Container>
     </div>

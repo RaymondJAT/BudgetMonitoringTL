@@ -6,36 +6,35 @@ const CashReqActionButtons = ({
   onPrint,
   onView,
   onShowLiqFormModal,
+  showLiquidationButton = false, // 🔹 new prop
 }) => {
   return (
     <div className="custom-btn d-flex flex-wrap justify-content-between align-items-center pt-3 pb-3">
       <div className="d-flex">
         {/* Back Button */}
         <AppButton
-          label={
-            <>
-              <FaArrowLeft />
-            </>
-          }
+          label={<FaArrowLeft />}
           variant="outline-dark"
           size="sm"
           onClick={onBack}
           className="custom-app-button btn-responsive"
         />
 
-        {/* Create Liquidation Form Button */}
-        <AppButton
-          label={
-            <>
-              <FaPlus />
-              <span className="d-sm-inline ms-1">Liquidation</span>
-            </>
-          }
-          size="sm"
-          variant="outline-success"
-          onClick={() => onShowLiqFormModal(true)}
-          className="custom-app-button ms-2"
-        />
+        {/* Liquidation Button: Only show if flag is true */}
+        {showLiquidationButton && (
+          <AppButton
+            label={
+              <>
+                <FaPlus />
+                <span className="d-sm-inline ms-1">Liquidation</span>
+              </>
+            }
+            size="sm"
+            variant="outline-success"
+            onClick={() => onShowLiqFormModal(true)}
+            className="custom-app-button ms-2"
+          />
+        )}
 
         {/* View Button */}
         <AppButton
