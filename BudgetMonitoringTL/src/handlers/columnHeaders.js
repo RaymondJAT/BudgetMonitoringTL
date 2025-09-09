@@ -41,13 +41,13 @@ export const approvalPartnerFields = [
 export const liquidationLeftFields = [
   { label: "Employee", key: "employee" },
   { label: "Department", key: "department" },
-  { label: "Date of Liquidation", key: "dateOfLiquidation" },
+  { label: "Date of Liquidation", key: "created_date" },
 ];
 
 export const liquidationRightFields = [
-  { label: "Amount Obtained", key: "amountObtained" },
-  { label: "Amount Expended", key: "amountExpended" },
-  { label: "Reimburse/Return", key: "reimburseOrReturn" },
+  { label: "Amount Obtained", key: "amount_obtained" },
+  { label: "Amount Expended", key: "amount_expended" },
+  { label: "Reimburse/Return", key: "reimburse_return" },
 ];
 
 // cash request form
@@ -76,34 +76,45 @@ export const employeeTrashColumns = [...expenseHeaders];
 // liquidation form
 export const formFields = [
   [
-    { controlId: "employee", label: "Employee", name: "employee" },
-    { controlId: "department", label: "Department", name: "department" },
     {
-      controlId: "date",
+      controlId: "employee",
+      label: "Employee",
+      name: "employee",
+      type: "text",
+    },
+    {
+      controlId: "department",
+      label: "Department",
+      name: "department",
+      type: "text",
+    },
+    {
+      controlId: "created_date",
       label: "Date of Liquidation",
-      name: "date",
+      name: "created_date",
       type: "date",
+      max: new Date().toISOString().split("T")[0],
     },
   ],
   [
     {
-      controlId: "amountObtained",
+      controlId: "amount_obtained",
       label: "Amount Obtained",
-      name: "amountObtained",
+      name: "amount_obtained",
       type: "number",
       min: 0,
     },
     {
-      controlId: "amountExpended",
+      controlId: "amount_expended",
       label: "Amount Expended",
-      name: "amountExpended",
+      name: "amount_expended",
       type: "number",
       min: 0,
     },
     {
-      controlId: "reimburseOrReturn",
+      controlId: "reimburse_return",
       label: "Reimburse/Return",
-      name: "reimburseOrReturn",
+      name: "reimburse_return",
       type: "number",
       min: 0,
     },

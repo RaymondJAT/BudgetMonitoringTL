@@ -1,25 +1,26 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
+
 import {
   liquidationLeftFields,
   liquidationRightFields,
-} from "../../../../handlers/columnHeaders";
-import ActionButtons from "../../../ActionButtons";
-import SignatureUpload from "../../../SignatureUpload";
-import LiquidApprovalTable from "./LiquidApprovalTable";
-import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
-import LiquidationReceipt from "./LiquidationReceipt";
-import { normalizeBase64Image } from "../../../../utils/signature";
+} from "../handlers/columnHeaders";
 
-const LiquidApprovalForm = () => {
+import LiquidApprovalTable from "./layout/team-leader/liquidation/LiquidApprovalTable";
+import PrintableLiquidForm from "./print/PrintableLiquidForm";
+import LiquidationReceipt from "./layout/team-leader/liquidation/LiquidationReceipt";
+import SignatureUpload from "./SignatureUpload";
+import { normalizeBase64Image } from "../utils/signature";
+import ActionButtons from "./ActionButtons";
+
+const ViewLiquidationForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
   const [transactions, setTransactions] = useState([]);
-  const [particulars, setParticulars] = useState([]);
   const [total, setTotal] = useState(0);
   const [signatures, setSignatures] = useState({
     verified: data?.signatures?.verified
@@ -34,19 +35,11 @@ const LiquidApprovalForm = () => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
 
-    const computedItems = items.map((item) => ({
-      ...item,
-      amount: item.amount ?? 0,
-    }));
-
-    setParticulars(computedItems);
-
-    const totalAmount = computedItems.reduce(
+    const computedTotal = items.reduce(
       (sum, item) => sum + (item.amount ?? 0),
       0
     );
-
-    setTotal(totalAmount);
+    setTotal(computedTotal);
   }, [data]);
 
   const renderInfoFields = () => (
@@ -82,23 +75,22 @@ const LiquidApprovalForm = () => {
   );
 
   return (
-    <>
-      <Container fluid className="pb-3">
-        {/* ACTION BUTTON */}
+    <div className="pb-3">
+      <Container fluid>
+        {/* Only Back + Print */}
         <ActionButtons
-          onApprove={() => {}}
-          onReject={() => {}}
-          onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
+          onPrint={reactToPrintFn}
+          hideApproveReject
         />
 
-        {/* INFO FIELDS */}
+        {/* Info Fields */}
         <div className="custom-container border p-3">{renderInfoFields()}</div>
 
-        {/* TABLE */}
+        {/* Transactions Table */}
         <LiquidApprovalTable transactions={transactions} total={total} />
 
-        {/* IMAGE CONTAINER */}
+        {/* Receipts */}
         <LiquidationReceipt
           images={
             Array.isArray(data?.receipts)
@@ -109,17 +101,18 @@ const LiquidApprovalForm = () => {
           }
         />
 
-        {/* SIGNATURE */}
+        {/* Signatures (read-only mode) */}
         <SignatureUpload
           label="Noted by"
-          nameKey="notedName"
-          signatureKey="noted"
+          nameKey="verifiedName"
+          signatureKey="verified"
           signatures={signatures}
           setSignatures={setSignatures}
+          readOnly
         />
       </Container>
 
-      {/* PRINTABLE */}
+      {/* Printable */}
       <div className="d-none">
         <PrintableLiquidForm
           data={{ ...data }}
@@ -127,8 +120,8 @@ const LiquidApprovalForm = () => {
           signatures={signatures}
         />
       </div>
-    </>
+    </div>
   );
 };
 
-export default LiquidApprovalForm;
+export default ViewLiquidationForm;

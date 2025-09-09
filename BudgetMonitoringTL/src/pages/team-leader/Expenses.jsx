@@ -89,7 +89,7 @@ const Expenses = () => {
     if (entry.formType === "Cash Request") {
       navigate("/cash_approval_form", { state: entry });
     } else if (entry.formType === "Liquidation") {
-      navigate("/liquidation_form", { state: entry });
+      navigate("/liquid_approval_form", { state: entry });
     }
   };
 

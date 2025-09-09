@@ -3,7 +3,7 @@ import { Form, Modal } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import AppButton from "../../../ui/AppButton";
 
-const LiquidReceipt = () => {
+const LiquidReceipt = ({ remarksValue = "", onRemarksChange = () => {} }) => {
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -49,6 +49,20 @@ const LiquidReceipt = () => {
 
   return (
     <div className="request-container border p-3 mt-3">
+      {/* REMARKS FIELD */}
+      <Form.Group controlId="remarks" className="mb-3">
+        <Form.Label className="fw-bold">Remarks</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={1}
+          value={remarksValue}
+          onChange={onRemarksChange}
+          placeholder="Enter any remarks"
+          className="small-input"
+        />
+      </Form.Group>
+
+      {/* UPLOAD RECEIPTS */}
       <Form.Group controlId="formFileMultiple" className="mb-3">
         <Form.Label className="fw-bold">Upload Receipts</Form.Label>
         <div className="d-flex align-items-center gap-2">
@@ -79,6 +93,7 @@ const LiquidReceipt = () => {
         </div>
       </Form.Group>
 
+      {/* IMAGE PREVIEWS */}
       {previews.length > 0 && (
         <div className="mt-4">
           <div
@@ -99,10 +114,7 @@ const LiquidReceipt = () => {
                   src={preview.url}
                   alt={`Receipt ${index + 1}`}
                   onClick={() => handleImageClick(preview.url)}
-                  style={{
-                    maxWidth: "150px",
-                    maxHeight: "150px",
-                  }}
+                  style={{ maxWidth: "150px", maxHeight: "150px" }}
                 />
                 <IoIosRemoveCircleOutline
                   size={18}
@@ -116,7 +128,7 @@ const LiquidReceipt = () => {
         </div>
       )}
 
-      {/* IMAGE PREVIEW */}
+      {/* MODAL FOR FULL IMAGE */}
       <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
         <Modal.Body className="text-center p-3">
           {modalImage && (

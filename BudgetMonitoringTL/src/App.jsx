@@ -22,18 +22,18 @@ const App = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // ✅ keep authentication state in React state
+  // keep authentication state in React state
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem("token")
   );
 
-  // ✅ login function
+  // login function
   const login = (token) => {
     localStorage.setItem("token", token);
     setIsAuthenticated(true);
   };
 
-  // ✅ logout function
+  // logout function
   const logout = () => {
     localStorage.clear();
     setIsAuthenticated(false);
@@ -89,7 +89,7 @@ const App = () => {
                   toggleSidebar={toggleSidebar}
                   isSidebarOpen={isSidebarOpen}
                   isSidebarHiddenMobile={isSidebarHiddenMobile}
-                  onLogout={logout} // ✅ pass logout here
+                  onLogout={logout} // pass logout here
                 />
                 <Sidebar
                   isSidebarOpen={isSidebarOpen}

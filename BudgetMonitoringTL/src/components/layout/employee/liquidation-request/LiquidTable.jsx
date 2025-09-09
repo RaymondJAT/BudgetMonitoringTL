@@ -7,12 +7,12 @@ const LiquidTable = () => {
   const [tableRows, setTableRows] = useState([
     {
       date: "",
-      rtNumber: "",
-      storeName: "",
+      rt: "",
+      store_name: "",
       particulars: "",
       from: "",
       to: "",
-      modeOfTransport: "",
+      mode_of_transportation: "",
       amount: "",
     },
   ]);

@@ -20,12 +20,12 @@ const LiquidApprovalTable = ({ transactions, total }) => {
         {transactions.map((row, index) => (
           <tr key={index}>
             <td>{row.date || "N/A"}</td>
-            <td>{row.rtNumber || "N/A"}</td>
-            <td>{row.storeName || "N/A"}</td>
+            <td>{row.rt || "N/A"}</td>
+            <td>{row.store_name || "N/A"}</td>
             <td>{row.particulars || "N/A"}</td>
             <td>{row.from || "N/A"}</td>
             <td>{row.to || "N/A"}</td>
-            <td>{row.transportation || "N/A"}</td>
+            <td>{row.mode_of_transportation || "N/A"}</td>
             <td>
               ₱
               {(row.amount ?? 0).toLocaleString("en-US", {

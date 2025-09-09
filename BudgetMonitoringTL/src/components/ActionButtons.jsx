@@ -9,6 +9,7 @@ const ActionButtons = ({
   onBack,
   status,
   role,
+  hideApproveReject = false,
 }) => {
   let isApproved = false;
 
@@ -19,6 +20,7 @@ const ActionButtons = ({
   } else if (role === "finance") {
     isApproved = status?.toLowerCase() === "completed";
   }
+
   // Determine if the request is already approved
   // const isApproved =
   //   status?.toLowerCase() === "approved" ||
@@ -35,34 +37,35 @@ const ActionButtons = ({
         className="custom-app-button btn-responsive"
       />
 
-      {!isApproved && (
-        <AppButton
-          label={
-            <>
-              <FaCheck />
-              <span className="d-sm-inline ms-1">Approve</span>
-            </>
-          }
-          variant="outline-success"
-          size="sm"
-          onClick={onApprove}
-          className="custom-app-button btn-responsive ms-2"
-        />
-      )}
+      {/* Approve/Reject only if not hidden */}
+      {!hideApproveReject && !isApproved && (
+        <>
+          <AppButton
+            label={
+              <>
+                <FaCheck />
+                <span className="d-sm-inline ms-1">Approve</span>
+              </>
+            }
+            variant="outline-success"
+            size="sm"
+            onClick={onApprove}
+            className="custom-app-button btn-responsive ms-2"
+          />
 
-      {!isApproved && (
-        <AppButton
-          label={
-            <>
-              <ImCross />
-              <span className="d-sm-inline ms-1">Reject</span>
-            </>
-          }
-          variant="outline-danger"
-          size="sm"
-          onClick={onReject}
-          className="custom-app-button btn-responsive ms-2"
-        />
+          <AppButton
+            label={
+              <>
+                <ImCross />
+                <span className="d-sm-inline ms-1">Reject</span>
+              </>
+            }
+            variant="outline-danger"
+            size="sm"
+            onClick={onReject}
+            className="custom-app-button btn-responsive ms-2"
+          />
+        </>
       )}
 
       {/* Print Button */}

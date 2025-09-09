@@ -5,6 +5,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import MyExpenses from "../pages/employee/MyExpenses";
 import EmpLiquidation from "../pages/employee/EmpLiquidation";
 import ViewCashRequestForm from "../components/ViewCashRequestForm";
+import ViewLiquidationForm from "../components/ViewLiquidationForm";
 
 // TEAM LEADER
 import Expenses from "../pages/team-leader/Expenses";
@@ -64,6 +65,17 @@ const Routing = () => {
         }
       />
 
+      {/* <Route
+        path="/view_liquidation_form"
+        element={
+          <ProtectedRoute path="/view_liquidation_form">
+            <ViewLiquidationForm />
+          </ProtectedRoute>
+        }
+      /> */}
+
+      <Route path="/view_liquidation_form" element={<ViewLiquidationForm />} />
+
       {/* TEAM LEADER */}
       <Route
         path="/teamlead_pendings"
@@ -89,26 +101,22 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/approval_form"
+
+      {/* <Route
+        path="/liquid_approval_form"
         element={
-          <ProtectedRoute path="/approval_form">
-            <CashApprovalForm />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/liquidation_form"
-        element={
-          <ProtectedRoute path="/liquidation_form">
+          <ProtectedRoute path="/liquid_approval_form">
             <LiquidApprovalForm />
           </ProtectedRoute>
         }
-      />
+      /> */}
+
+      <Route path="/liquid_approval_form" element={<LiquidApprovalForm />} />
+
       <Route
-        path="/liquidation_note"
+        path="/liquidation_review"
         element={
-          <ProtectedRoute path="/liquidation_note">
+          <ProtectedRoute path="/liquidation_review">
             <Liquidation />
           </ProtectedRoute>
         }
