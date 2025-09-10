@@ -3,7 +3,7 @@ import { Modal, Spinner, Alert } from "react-bootstrap";
 import LiqReqForm from "../../../layout/employee/liquidation-request/LiqReqForm";
 import AppButton from "../../AppButton";
 
-const LiqFormModal = ({ show, onHide }) => {
+const LiqFormModal = ({ show, onHide, requestData = null }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -16,10 +16,12 @@ const LiqFormModal = ({ show, onHide }) => {
       setSubmitting(true);
       setError(null);
 
+      console.log("Submitting liquidation payload:", formData);
+
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      const response = await fetch("/api5012/route_access/createroute_access", {
+      const response = await fetch("/api5012/liquidation/create_liquidation", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -35,7 +37,6 @@ const LiqFormModal = ({ show, onHide }) => {
 
       const result = await response.json();
       console.log("Liquidation submitted:", result);
-
       onHide();
     } catch (err) {
       console.error("Error submitting liquidation:", err);
@@ -66,8 +67,7 @@ const LiqFormModal = ({ show, onHide }) => {
         className="cashreq-scroll"
         style={{ backgroundColor: "#800000" }}
       >
-        {/* Pass submit handler down */}
-        <LiqReqForm onSubmit={handleSubmit} />
+        <LiqReqForm requestData={requestData} onSubmit={handleSubmit} />
         {error && (
           <Alert variant="danger" className="mt-2">
             {error}
@@ -80,8 +80,8 @@ const LiqFormModal = ({ show, onHide }) => {
           label="Close"
           variant="outline-danger"
           onClick={handleCloseModal}
-          className="custom-app-button"
           disabled={submitting}
+          className="custom-app-button"
         />
 
         <AppButton
@@ -95,13 +95,11 @@ const LiqFormModal = ({ show, onHide }) => {
             )
           }
           variant="outline-success"
-          className="custom-app-button"
-          onClick={() => {
-            // trigger LiqReqForm submission manually
-            const form = document.getElementById("liq-req-form");
-            if (form) form.requestSubmit();
-          }}
+          onClick={() =>
+            document.getElementById("liq-req-form")?.requestSubmit()
+          }
           disabled={submitting}
+          className="custom-app-button"
         />
       </Modal.Footer>
     </Modal>

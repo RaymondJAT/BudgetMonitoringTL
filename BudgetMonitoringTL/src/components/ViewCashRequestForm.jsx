@@ -35,6 +35,7 @@ const ViewCashRequestForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
+  // Populate requested signature
   useEffect(() => {
     const requestedActivity = data?.cash_request_activities?.find(
       (a) => a.action === "REQUESTED"
@@ -47,6 +48,7 @@ const ViewCashRequestForm = () => {
     });
   }, [data]);
 
+  // Map transactions to particulars
   useEffect(() => {
     const items = transactions.map((item) => ({
       label: item.label ?? "N/A",
@@ -87,14 +89,23 @@ const ViewCashRequestForm = () => {
           showLiquidationButton={data?.status === "completed"}
         />
 
+        {/* Liquidation Modal */}
         <LiqFormModal
           show={showLiqFormModal}
           onHide={() => setShowLiqFormModal(false)}
+          requestData={{
+            reference_id: data?.reference_id || "",
+            description: data?.description || "",
+            employee: data?.employee || "",
+            department: data?.department || "",
+            amount_issue: data?.subtotal || 0,
+            request_items: data?.cash_request_items || [],
+          }}
           onSubmit={(liqData) => {
             const existing =
-              JSON.parse(localStorage.getItem(LOCAL_KEYS.LIQUIDATION)) || [];
+              JSON.parse(localStorage.getItem("LIQUIDATION")) || [];
             localStorage.setItem(
-              LOCAL_KEYS.LIQUIDATION,
+              "LIQUIDATION",
               JSON.stringify([
                 {
                   ...liqData,
@@ -109,7 +120,7 @@ const ViewCashRequestForm = () => {
           }}
         />
 
-        {/* PROGRESS BAR */}
+        {/* Progress Bar */}
         <div className="request-container border p-2 mb-3">
           <Row className="align-items-center d-flex justify-content-between">
             <Col className="d-flex">
@@ -202,6 +213,7 @@ const ViewCashRequestForm = () => {
         />
       </div>
 
+      {/* Modal Preview */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}

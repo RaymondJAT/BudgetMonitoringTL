@@ -8,14 +8,10 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
     }
   };
 
-  const handleNumberInput = (e, type) => {
-    if (type === "number") {
-      const value = e.target.value;
-      if (parseFloat(value) < 0) {
-        e.target.value = "0";
-      }
-    }
-    onChange(e);
+  const handleNumberInput = (e) => {
+    const { name, value } = e.target;
+
+    onChange({ target: { name, value: value ? parseFloat(value) : 0 } });
   };
 
   const enhancedFields = formFields.map((column) =>
@@ -24,7 +20,7 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
         return {
           ...field,
           onKeyDown: preventInvalidKeys,
-          onChange: (e) => handleNumberInput(e, "number"),
+          onChange: handleNumberInput,
         };
       }
       return field;
@@ -63,7 +59,11 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
                 <Form.Control
                   type={field.type || "text"}
                   name={field.name}
-                  value={formData[field.name] || ""}
+                  value={
+                    field.type === "number"
+                      ? formData[field.name] ?? 0
+                      : formData[field.name] || ""
+                  }
                   onChange={field.onChange || onChange}
                   placeholder={field.label}
                   className="form-control-sm small-input"

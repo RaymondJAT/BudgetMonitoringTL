@@ -1,27 +1,47 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import AppButton from "../../../ui/AppButton";
+import { normalizeBase64Image } from "../../../../utils/signature";
 
-const LiquidReceipt = ({ remarksValue = "", onRemarksChange = () => {} }) => {
-  const [images, setImages] = useState([]);
+const LiquidReceipt = ({
+  remarksValue = "",
+  onRemarksChange = () => {},
+  onReceiptsChange = () => {},
+}) => {
   const [previews, setPreviews] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const fileInputRef = useRef(null);
 
-  const handleImageChange = (e) => {
+  // CONVERT TO BASE64
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(normalizeBase64Image(reader.result));
+      reader.onerror = (error) => reject(error);
+    });
+
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     const validImages = files.filter((file) => file.type.startsWith("image/"));
 
-    const newPreviews = validImages.map((file) => ({
-      file,
+    // CONVERT ALL VALID IMAGES TO BASE64
+    const base64List = await Promise.all(validImages.map(fileToBase64));
+
+    const newPreviews = validImages.map((file, i) => ({
       url: URL.createObjectURL(file),
+      base64: base64List[i],
     }));
 
-    setImages((prev) => [...prev, ...validImages]);
     setPreviews((prev) => [...prev, ...newPreviews]);
   };
+
+  // KEEP PARENT IN SYNC WITH PREVIEWS
+  useEffect(() => {
+    onReceiptsChange(previews.map((p) => p.base64));
+  }, [previews, onReceiptsChange]);
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
@@ -38,13 +58,12 @@ const LiquidReceipt = ({ remarksValue = "", onRemarksChange = () => {} }) => {
   };
 
   const handleClearImages = () => {
-    setImages([]);
     setPreviews([]);
   };
 
   const handleRemoveImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
+    const updated = previews.filter((_, i) => i !== index);
+    setPreviews(updated);
   };
 
   return (
