@@ -417,6 +417,7 @@ main.no-sidebar {
   border: 1px solid rgb(154, 89, 10);
 }
 
+.status-badge.checked,
 .status-badge.approved,
 .status-badge.liquidated {
   background-color: rgb(66, 138, 239);

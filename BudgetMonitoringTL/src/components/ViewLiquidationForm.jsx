@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
@@ -33,7 +33,9 @@ const ViewLiquidationForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
+  // -----------------------------
   // Fetch liquidation if only reference_id is provided
+  // -----------------------------
   useEffect(() => {
     const fetchLiquidation = async () => {
       if (!state?.reference_id || state?.employee) return;
@@ -49,36 +51,6 @@ const ViewLiquidationForm = () => {
 
         const result = await res.json();
         setData(result);
-
-        // Extract PREPARED activity or fallback
-        const preparedActivity = result.liquidation_activities?.find(
-          (act) => act.action === "PREPARED"
-        );
-
-        // After fetching liquidation
-        setSignatures({
-          created_by:
-            preparedActivity?.created_by ||
-            result.created_by ||
-            result.employee ||
-            state?.employee ||
-            "",
-          signature: normalizeBase64Image(
-            preparedActivity?.signature ||
-              result.signature || // 👈 fallback
-              state?.signature
-          ),
-        });
-
-        // Debug log after setting
-        console.log("🖊️ Signature received from API:", {
-          fromPrepared: preparedActivity?.signature,
-          fromResult: result.signature,
-          fromState: state?.signature,
-          finalSignature: normalizeBase64Image(
-            preparedActivity?.signature || result.signature || state?.signature
-          ),
-        });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -89,12 +61,42 @@ const ViewLiquidationForm = () => {
     fetchLiquidation();
   }, [state]);
 
+  // -----------------------------
+  // Populate transactions and total whenever data changes
+  // -----------------------------
   useEffect(() => {
-    if (signatures) {
-      console.log("✅ ViewLiquidationForm signatures state:", signatures);
-    }
-  }, [signatures]);
+    if (!data) return;
 
+    const items = data.liquidation_items || [];
+    setTransactions(items);
+
+    const totalAmount = items.reduce(
+      (sum, item) => sum + (item.amount || 0),
+      0
+    );
+    setTotal(totalAmount);
+
+    // Set signature from PREPARED activity or fallback
+    const preparedActivity = data.liquidation_activities?.find(
+      (act) => act.action === "PREPARED"
+    );
+
+    setSignatures({
+      created_by:
+        preparedActivity?.created_by ||
+        data.created_by ||
+        data.employee ||
+        state?.employee ||
+        "",
+      signature: normalizeBase64Image(
+        preparedActivity?.signature || data.signature || state?.signature
+      ),
+    });
+  }, [data, state?.employee, state?.signature]);
+
+  // -----------------------------
+  // Render info fields
+  // -----------------------------
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -127,6 +129,29 @@ const ViewLiquidationForm = () => {
     </Row>
   );
 
+  // -----------------------------
+  // Parse receipts
+  // -----------------------------
+  const receiptImages = useMemo(() => {
+    if (!Array.isArray(data?.liquidation_activities)) return [];
+
+    return data.liquidation_activities
+      .filter((act) => act.receipts)
+      .flatMap((act) => {
+        try {
+          const parsed = JSON.parse(act.receipts);
+          if (Array.isArray(parsed))
+            return parsed.map((r) => normalizeBase64Image(r.image || r));
+        } catch {
+          return [normalizeBase64Image(act.receipts)];
+        }
+        return [];
+      });
+  }, [data]);
+
+  // -----------------------------
+  // Loading / Error states
+  // -----------------------------
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center p-5">
@@ -143,6 +168,9 @@ const ViewLiquidationForm = () => {
     );
   }
 
+  // -----------------------------
+  // Render main
+  // -----------------------------
   return (
     <div className="pb-3">
       <Container fluid>
@@ -160,30 +188,9 @@ const ViewLiquidationForm = () => {
         <LiquidApprovalTable transactions={transactions} total={total} />
 
         {/* Receipts */}
-        <LiquidationReceipt
-          images={
-            Array.isArray(data?.liquidation_activities)
-              ? data.liquidation_activities
-                  .filter((act) => act.receipts)
-                  .flatMap((act) => {
-                    try {
-                      const parsed = JSON.parse(act.receipts);
-                      if (Array.isArray(parsed)) {
-                        return parsed.map((r) =>
-                          normalizeBase64Image(r.image || r)
-                        );
-                      }
-                    } catch {
-                      return [normalizeBase64Image(act.receipts)];
-                    }
-                    return [];
-                  })
-              : []
-          }
-        />
+        <LiquidationReceipt images={receiptImages} />
 
-        {/* ✅ Prepared by */}
-        {console.log("📌 Passing to SignatureUpload:", signatures)}
+        {/* Prepared by Signature */}
         <SignatureUpload
           label="Prepared by"
           nameKey="created_by"
@@ -199,7 +206,7 @@ const ViewLiquidationForm = () => {
         <PrintableLiquidForm
           data={{ ...data }}
           contentRef={contentRef}
-          signatures={signatures} // ✅ pass as-is
+          signatures={signatures}
         />
       </div>
     </div>

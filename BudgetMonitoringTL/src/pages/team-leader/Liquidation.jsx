@@ -22,6 +22,7 @@ const Liquidation = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null); // Track selected row
 
   const fetchLiquidations = useCallback(async () => {
     try {
@@ -45,7 +46,8 @@ const Liquidation = () => {
 
       const mappedData = apiData.map((item, index) => ({
         ...item,
-        id: item.id || item._id || `${index}-${Date.now()}`,
+        // Use stable id: prefer id or _id, fallback to index only
+        id: item.id || item._id || index,
         formType: "Liquidation",
       }));
 
@@ -72,8 +74,9 @@ const Liquidation = () => {
     if (!searchValue) return base;
 
     return base.filter((item) =>
-      [...columns.map((col) => col.accessor), "formType"].some((key) =>
-        normalizeString(item[key]).includes(normalizeString(searchValue))
+      [...liquidationColumns.map((col) => col.accessor), "formType"].some(
+        (key) =>
+          normalizeString(item[key]).includes(normalizeString(searchValue))
       )
     );
   }, [tableData, searchValue]);
@@ -83,6 +86,7 @@ const Liquidation = () => {
   };
 
   const handleRowClick = (entry) => {
+    setSelectedRowId(entry.id); // Highlight selected row
     navigate("/liquid_approval_form", { state: entry });
   };
 
@@ -100,14 +104,12 @@ const Liquidation = () => {
             onRefresh={handleRetry}
           />
 
-          {/* Loading state */}
           {loading && (
             <Alert variant="info" className="text-center">
               Loading data...
             </Alert>
           )}
 
-          {/* Error state */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
@@ -122,20 +124,19 @@ const Liquidation = () => {
             </Alert>
           )}
 
-          {/* Empty state */}
           {!loading && !error && filteredData.length === 0 && (
             <Alert variant="warning" className="text-center">
               No pending liquidation records found.
             </Alert>
           )}
 
-          {/* Data table */}
           {!loading && !error && filteredData.length > 0 && (
             <DataTable
               data={filteredData}
               height="455px"
               columns={liquidationColumns}
               onRowClick={handleRowClick}
+              selectedRowId={selectedRowId} // Pass selected row to table
             />
           )}
         </div>

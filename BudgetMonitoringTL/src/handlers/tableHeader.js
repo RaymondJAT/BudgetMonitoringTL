@@ -19,3 +19,13 @@ export const liquidationColumns = [
   { label: "Status", accessor: "status" },
   { label: "Liquidation Date", accessor: "created_date" },
 ];
+
+export const liquidationFinanceColumns = [
+  { label: "Reference ID", accessor: "cr_reference_id" },
+  { label: "Employee", accessor: "employee" },
+  { label: "Department", accessor: "department" },
+  { label: "Particulars", accessor: "description" },
+  { label: "Amount", accessor: "amount_obtained" },
+  { label: "Status", accessor: "status" },
+  { label: "Liquidation Date", accessor: "created_date" },
+];
