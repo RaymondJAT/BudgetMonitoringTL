@@ -6,48 +6,60 @@ import { useReactToPrint } from "react-to-print";
 import {
   liquidationLeftFields,
   liquidationRightFields,
-} from "../../../../handlers/columnHeaders";
-import ActionButtons from "../../../ActionButtons";
-import SignatureUpload from "../../../SignatureUpload";
-import LiquidApprovalTable from "./LiquidApprovalTable";
-import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
-import LiquidationReceipt from "./LiquidationReceipt";
-import { normalizeBase64Image } from "../../../../utils/signature";
+} from "../../../handlers/columnHeaders";
+import ActionButtons from "../../ActionButtons";
+import SignatureUpload from "../../SignatureUpload";
+import LiquidApprovalTable from "../team-leader/liquidation/LiquidApprovalTable";
+import PrintableLiquidForm from "../../print/PrintableLiquidForm";
+import LiquidationReceipt from "../team-leader/liquidation/LiquidationReceipt";
+import { normalizeBase64Image } from "../../../utils/signature";
 
-const LiquidApprovalForm = () => {
+const ROLE_CONFIG = {
+  "team-leader": {
+    approveStatus: "APPROVED",
+    rejectStatus: "REJECTED",
+    approveLabel: "Approve",
+    signatureKey: "noted", // ✅ Noted by
+    signatureLabel: "Noted by",
+  },
+  finance: {
+    approveStatus: "VERIFIED",
+    rejectStatus: "REJECTED",
+    approveLabel: "Verify",
+    signatureKey: "checked", // ✅ Checked by
+    signatureLabel: "Checked by",
+  },
+};
+
+const LiquidationForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
+  // detect role (default = team-leader)
+  const role = data?.role || "team-leader";
+  const {
+    approveStatus,
+    rejectStatus,
+    approveLabel,
+    signatureKey,
+    signatureLabel,
+  } = ROLE_CONFIG[role] || ROLE_CONFIG["team-leader"];
+
+  // state
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
   const [signatures, setSignatures] = useState({
-    verified: data?.signatures?.verified
-      ? normalizeBase64Image(data.signatures.verified)
+    [signatureKey]: data?.signatures?.[signatureKey]
+      ? normalizeBase64Image(data.signatures[signatureKey])
       : null,
-    verifiedName: data?.signatures?.verifiedName || "",
+    [`${signatureKey}Name`]: data?.signatures?.[`${signatureKey}Name`] || "",
   });
-
   const [newReceipts, setNewReceipts] = useState([]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const handleReceiptsChange = async (files) => {
-    const base64List = await Promise.all(
-      Array.from(files).map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) =>
-              resolve(normalizeBase64Image(e.target.result));
-            reader.readAsDataURL(file);
-          })
-      )
-    );
-    setNewReceipts(base64List);
-  };
-
-  // ✅ existing receipts from DB + activities
+  // existing receipts from data + activities
   const existingReceipts = useMemo(() => {
     const receiptsFromData = Array.isArray(data?.receipts)
       ? data.receipts.map(normalizeBase64Image)
@@ -75,44 +87,37 @@ const LiquidApprovalForm = () => {
     );
   }, [data]);
 
-  const receiptImages = useMemo(() => {
-    return Array.from(new Set([...existingReceipts, ...newReceipts]));
-  }, [existingReceipts, newReceipts]);
+  // merged receipts
+  const receiptImages = useMemo(
+    () => Array.from(new Set([...existingReceipts, ...newReceipts])),
+    [existingReceipts, newReceipts]
+  );
 
-  // TRANSACTION TOTAL
+  // compute total
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
-
-    const totalAmount = items.reduce(
-      (sum, item) => sum + (item.amount ?? 0),
-      0
-    );
-    setTotal(totalAmount);
+    setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // APPROVE & REJECT
+  // approve / reject
   const handleAction = async (action) => {
     try {
       const token = localStorage.getItem("token");
       const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
 
-      const status = action === "approve" ? "APPROVED" : "REJECTED";
-      let remarks = "";
-
-      if (action === "reject") {
-        remarks = prompt("Enter remarks for rejection:") || "";
-      }
+      const status = action === "approve" ? approveStatus : rejectStatus;
+      const remarks =
+        action === "reject" ? prompt("Enter remarks for rejection:") || "" : "";
 
       const payload = {
         id: data?.id,
         status,
         remarks,
-        signature: signatures.verified || "",
+        [signatureKey]: signatures[signatureKey] || "", // ✅ store under noted / checked
+        [`${signatureKey}Name`]: signatures[`${signatureKey}Name`] || "",
+        receipts: JSON.stringify(receiptImages),
         created_by: employeeId,
-        ...(newReceipts.length > 0 && {
-          receipts: JSON.stringify(newReceipts),
-        }),
       };
 
       console.log("🔼 Sending payload:", payload);
@@ -137,7 +142,6 @@ const LiquidApprovalForm = () => {
     }
   };
 
-  // RENDER FIELDS
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -150,7 +154,6 @@ const LiquidApprovalForm = () => {
           </Row>
         ))}
       </Col>
-
       <Col md={6}>
         {liquidationRightFields.map(({ label, key }, index) => (
           <Row key={index} className="mb-2">
@@ -178,6 +181,7 @@ const LiquidApprovalForm = () => {
           onReject={() => handleAction("reject")}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
+          approveLabel={approveLabel}
         />
 
         <div className="custom-container border p-3">{renderInfoFields()}</div>
@@ -186,13 +190,13 @@ const LiquidApprovalForm = () => {
 
         <LiquidationReceipt
           images={receiptImages}
-          setNewReceipts={handleReceiptsChange}
+          setNewReceipts={setNewReceipts}
         />
 
         <SignatureUpload
-          label="Noted by"
-          nameKey="verifiedName"
-          signatureKey="verified"
+          label={signatureLabel}
+          nameKey={`${signatureKey}Name`}
+          signatureKey={signatureKey}
           signatures={signatures}
           setSignatures={setSignatures}
         />
@@ -209,4 +213,4 @@ const LiquidApprovalForm = () => {
   );
 };
 
-export default LiquidApprovalForm;
+export default LiquidationForm;

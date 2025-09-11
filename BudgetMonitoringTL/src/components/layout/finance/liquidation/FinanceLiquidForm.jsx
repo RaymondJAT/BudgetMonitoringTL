@@ -9,12 +9,12 @@ import {
 } from "../../../../handlers/columnHeaders";
 import ActionButtons from "../../../ActionButtons";
 import SignatureUpload from "../../../SignatureUpload";
-import LiquidApprovalTable from "./LiquidApprovalTable";
+import LiquidApprovalTable from "../../team-leader/liquidation/LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
-import LiquidationReceipt from "./LiquidationReceipt";
+import LiquidationReceipt from "../../team-leader/liquidation/LiquidationReceipt";
 import { normalizeBase64Image } from "../../../../utils/signature";
 
-const LiquidApprovalForm = () => {
+const FinanceLiquidForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -22,40 +22,24 @@ const LiquidApprovalForm = () => {
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
   const [signatures, setSignatures] = useState({
-    verified: data?.signatures?.verified
-      ? normalizeBase64Image(data.signatures.verified)
+    released: data?.signatures?.released
+      ? normalizeBase64Image(data.signatures.released)
       : null,
-    verifiedName: data?.signatures?.verifiedName || "",
+    releasedName: data?.signatures?.releasedName || "",
   });
 
   const [newReceipts, setNewReceipts] = useState([]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const handleReceiptsChange = async (files) => {
-    const base64List = await Promise.all(
-      Array.from(files).map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) =>
-              resolve(normalizeBase64Image(e.target.result));
-            reader.readAsDataURL(file);
-          })
-      )
-    );
-    setNewReceipts(base64List);
-  };
-
-  // ✅ existing receipts from DB + activities
   const existingReceipts = useMemo(() => {
-    const receiptsFromData = Array.isArray(data?.receipts)
+    const fromData = Array.isArray(data?.receipts)
       ? data.receipts.map(normalizeBase64Image)
       : data?.receipts
       ? [normalizeBase64Image(data.receipts)]
       : [];
 
-    const receiptsFromActivities = Array.isArray(data?.liquidation_activities)
+    const fromActivities = Array.isArray(data?.liquidation_activities)
       ? data.liquidation_activities
           .filter((act) => act.receipts)
           .flatMap((act) => {
@@ -70,45 +54,48 @@ const LiquidApprovalForm = () => {
           })
       : [];
 
-    return Array.from(
-      new Set([...receiptsFromData, ...receiptsFromActivities])
-    );
+    return Array.from(new Set([...fromData, ...fromActivities]));
   }, [data]);
 
-  const receiptImages = useMemo(() => {
-    return Array.from(new Set([...existingReceipts, ...newReceipts]));
-  }, [existingReceipts, newReceipts]);
+  const receiptImages = useMemo(
+    () => Array.from(new Set([...existingReceipts, ...newReceipts])),
+    [existingReceipts, newReceipts]
+  );
 
-  // TRANSACTION TOTAL
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
-
-    const totalAmount = items.reduce(
-      (sum, item) => sum + (item.amount ?? 0),
-      0
-    );
-    setTotal(totalAmount);
+    setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // APPROVE & REJECT
+  const handleReceiptUpload = async (files) => {
+    const base64List = await Promise.all(
+      files.map(async (file) => {
+        const reader = new FileReader();
+        return new Promise((resolve) => {
+          reader.onload = (e) => resolve(normalizeBase64Image(e.target.result));
+          reader.readAsDataURL(file);
+        });
+      })
+    );
+    setNewReceipts((prev) => [...prev, ...base64List]);
+  };
+
+  // APPROVE / REJECT
   const handleAction = async (action) => {
     try {
       const token = localStorage.getItem("token");
       const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
 
-      const status = action === "approve" ? "APPROVED" : "REJECTED";
-      let remarks = "";
-
-      if (action === "reject") {
-        remarks = prompt("Enter remarks for rejection:") || "";
-      }
+      const status = action === "approve" ? "VERIFIED" : "REJECTED";
+      const remarks =
+        action === "reject" ? prompt("Enter remarks for rejection:") || "" : "";
 
       const payload = {
         id: data?.id,
         status,
         remarks,
-        signature: signatures.verified || "",
+        signature: signatures.released || "",
         created_by: employeeId,
         ...(newReceipts.length > 0 && {
           receipts: JSON.stringify(newReceipts),
@@ -141,8 +128,8 @@ const LiquidApprovalForm = () => {
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
-        {liquidationLeftFields.map(({ label, key }, index) => (
-          <Row key={index} className="mb-2">
+        {liquidationLeftFields.map(({ label, key }, idx) => (
+          <Row key={idx} className="mb-2">
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
               <p className="ms-2 mb-0">{data?.[key] || "N/A"}</p>
@@ -152,8 +139,8 @@ const LiquidApprovalForm = () => {
       </Col>
 
       <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, index) => (
-          <Row key={index} className="mb-2">
+        {liquidationRightFields.map(({ label, key }, idx) => (
+          <Row key={idx} className="mb-2">
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
               <p className="ms-2 mb-0">
@@ -178,6 +165,7 @@ const LiquidApprovalForm = () => {
           onReject={() => handleAction("reject")}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
+          approveLabel="Approve"
         />
 
         <div className="custom-container border p-3">{renderInfoFields()}</div>
@@ -186,13 +174,13 @@ const LiquidApprovalForm = () => {
 
         <LiquidationReceipt
           images={receiptImages}
-          setNewReceipts={handleReceiptsChange}
+          setNewReceipts={handleReceiptUpload}
         />
 
         <SignatureUpload
-          label="Noted by"
-          nameKey="verifiedName"
-          signatureKey="verified"
+          label="Released by"
+          nameKey="releasedName"
+          signatureKey="released"
           signatures={signatures}
           setSignatures={setSignatures}
         />
@@ -209,4 +197,4 @@ const LiquidApprovalForm = () => {
   );
 };
 
-export default LiquidApprovalForm;
+export default FinanceLiquidForm;

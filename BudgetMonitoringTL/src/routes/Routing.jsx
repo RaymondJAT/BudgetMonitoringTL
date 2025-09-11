@@ -28,6 +28,7 @@ import CashDisbursement from "../pages/finance/CashDisbursement";
 import History from "../pages/finance/History";
 import FinanceApprovalForm from "../components/layout/finance/cash-request/FinanceApprovalForm";
 import RejectedRequest from "../pages/finance/RejectedRequest";
+import FinanceLiquidForm from "../components/layout/finance/liquidation/FinanceLiquidForm";
 
 // ADMIN
 import AdmExpenses from "../pages/admin/AdmExpenses";
@@ -35,6 +36,7 @@ import FinalApproval from "../pages/admin/FinalApproval";
 import AllRequest from "../pages/admin/AllRequest";
 import Users from "../pages/admin/Users";
 import Access from "../pages/admin/Access";
+import LiquidationForm from "../components/layout/common/LiquidationForm";
 
 const Routing = () => {
   return (
@@ -269,6 +271,9 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/finance_liquid_form" element={<FinanceLiquidForm />} />
+      <Route path="/liquidation_form" element={<LiquidationForm />} />
     </Routes>
   );
 };

@@ -391,6 +391,7 @@ main.no-sidebar {
   border: 1px solid rgb(154, 89, 10);
 }
 
+.status-badge.verified,
 .status-badge.completed,
 .status-badge.active {
   background-color: green;

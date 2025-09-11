@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Container, Alert } from "react-bootstrap";
 
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
-import { STATUS } from "../../constants/status";
 import { liquidationColumns } from "../../handlers/tableHeader";
 
 import TotalCards from "../../components/TotalCards";
@@ -22,7 +21,7 @@ const Liquidation = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedRowId, setSelectedRowId] = useState(null); // Track selected row
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const fetchLiquidations = useCallback(async () => {
     try {
@@ -46,7 +45,6 @@ const Liquidation = () => {
 
       const mappedData = apiData.map((item, index) => ({
         ...item,
-        // Use stable id: prefer id or _id, fallback to index only
         id: item.id || item._id || index,
         formType: "Liquidation",
       }));
@@ -66,14 +64,9 @@ const Liquidation = () => {
   const totalComputationData = useMemo(() => tableData, [tableData]);
 
   const filteredData = useMemo(() => {
-    const base = tableData.filter(
-      (item) =>
-        item.status !== STATUS.APPROVED && item.status !== STATUS.REJECTED
-    );
+    if (!searchValue) return tableData;
 
-    if (!searchValue) return base;
-
-    return base.filter((item) =>
+    return tableData.filter((item) =>
       [...liquidationColumns.map((col) => col.accessor), "formType"].some(
         (key) =>
           normalizeString(item[key]).includes(normalizeString(searchValue))
@@ -81,13 +74,17 @@ const Liquidation = () => {
     );
   }, [tableData, searchValue]);
 
-  const handleRetry = () => {
-    fetchLiquidations();
-  };
+  const handleRetry = () => fetchLiquidations();
 
   const handleRowClick = (entry) => {
-    setSelectedRowId(entry.id); // Highlight selected row
-    navigate("/liquid_approval_form", { state: entry });
+    setSelectedRowId(entry.id);
+
+    navigate("/liquid_approval_form", {
+      state: {
+        ...entry,
+        role: "team-leader",
+      },
+    });
   };
 
   return (
@@ -106,7 +103,7 @@ const Liquidation = () => {
 
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading data...
+              Loading liquidation records...
             </Alert>
           )}
 
@@ -126,7 +123,7 @@ const Liquidation = () => {
 
           {!loading && !error && filteredData.length === 0 && (
             <Alert variant="warning" className="text-center">
-              No pending liquidation records found.
+              No liquidation records found.
             </Alert>
           )}
 
@@ -136,7 +133,7 @@ const Liquidation = () => {
               height="455px"
               columns={liquidationColumns}
               onRowClick={handleRowClick}
-              selectedRowId={selectedRowId} // Pass selected row to table
+              selectedRowId={selectedRowId}
             />
           )}
         </div>

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Alert } from "react-bootstrap";
+import { Container, Alert, Button } from "react-bootstrap";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { liquidationFinanceColumns } from "../../handlers/tableHeader";
@@ -19,15 +19,15 @@ const Verify = () => {
 
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 🔹 Fetch approved liquidations
-  const fetchApprovedLiquidations = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fetch approved/verified/completed liquidations for Finance
+  const fetchFinanceLiquidations = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
+    try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
@@ -35,14 +35,14 @@ const Verify = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch approved liquidations");
+      if (!res.ok) throw new Error("Failed to fetch liquidations");
 
       const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
       const mappedData = apiData.map((item, index) => ({
         ...item,
-        id: item.id || `${index}-${Date.now()}`, // fallback ID
+        id: item.id || item._id || `liq-${index}`,
       }));
 
       setTableData(mappedData);
@@ -53,12 +53,15 @@ const Verify = () => {
     }
   }, []);
 
+  // initial fetch
   useEffect(() => {
-    fetchApprovedLiquidations();
-  }, [fetchApprovedLiquidations]);
+    fetchFinanceLiquidations();
+  }, [fetchFinanceLiquidations]);
 
+  // compute totals for dashboard cards
   const totalComputationData = useMemo(() => tableData, [tableData]);
 
+  // filter + search
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -71,14 +74,16 @@ const Verify = () => {
     );
   }, [tableData, searchValue]);
 
-  const handleRetry = () => fetchApprovedLiquidations();
-
+  // navigation to Finance form
   const handleRowClick = (entry) => {
-    navigate("/liquid_approval_form", { state: entry });
+    navigate("/finance_liquid_form", {
+      state: { ...entry, role: "finance" },
+    });
   };
 
   return (
     <div className="pb-3">
+      {/* Finance dashboard cards */}
       <div className="mt-3">
         <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
       </div>
@@ -88,13 +93,13 @@ const Verify = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onRefresh={handleRetry}
+            onRefresh={fetchFinanceLiquidations}
           />
 
           {/* Loading state */}
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading approved liquidations...
+              Loading liquidation records...
             </Alert>
           )}
 
@@ -103,20 +108,17 @@ const Verify = () => {
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={handleRetry}
-                >
+                <Button size="sm" onClick={fetchFinanceLiquidations}>
                   Try Again
-                </button>
+                </Button>
               </div>
             </Alert>
           )}
 
-          {/* Empty state */}
+          {/* No records */}
           {!loading && !error && filteredData.length === 0 && (
             <Alert variant="warning" className="text-center">
-              No approved liquidation records found.
+              No liquidation records found.
             </Alert>
           )}
 
@@ -126,7 +128,7 @@ const Verify = () => {
               data={filteredData}
               height="455px"
               columns={liquidationFinanceColumns}
-              onRowClick={handleRowClick} // 🔹 Navigate to approval form
+              onRowClick={handleRowClick}
             />
           )}
         </div>
