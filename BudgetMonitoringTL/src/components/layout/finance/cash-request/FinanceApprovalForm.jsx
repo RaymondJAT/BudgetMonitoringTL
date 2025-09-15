@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable";
 import ActionButtons from "../../../ActionButtons";
-import SignatureUpload from "../../../SignatureUpload";
 import Reference from "../../../Reference";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
 
@@ -28,17 +27,8 @@ const FinanceApprovalForm = () => {
   const [amountInWords, setAmountInWords] = useState("");
   const [showFundModal, setShowFundModal] = useState(false);
 
-  const [signatures, setSignatures] = useState({
-    requestSignature: data?.signatures?.requestSignature || null,
-    requestedName: data?.signatures?.requestedName || data?.requested_by || "",
-    approved: data?.signatures?.approved || null,
-    approvedName: data?.signatures?.approvedName || "",
-    financeApproved: data?.signatures?.financeApproved || null,
-    financeName: data?.signatures?.financeName || employeeName,
-  });
-
-  const transactions = useMemo(() => data?.cash_request_items || [], [data]);
-  const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
+  // ✅ Now use only amount
+  const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   useEffect(() => {
     if (!isNaN(total)) setAmountInWords(numberToWords(total));
@@ -68,6 +58,7 @@ const FinanceApprovalForm = () => {
         cashVoucher = (Number(voucherInfo?.cash_voucher) || 0) + 1;
         departmentId = voucherInfo?.department_id || null;
 
+        // ✅ Use amount instead of subtotal
         await fetch("/api5001/cash_disbursement/createcash_disbursement", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -76,7 +67,7 @@ const FinanceApprovalForm = () => {
             department_id: departmentId,
             revolving_fund_id: revolvingFundId,
             particulars: data?.description || "N/A",
-            amount_issue: parseFloat(data?.subtotal || 0),
+            amount_issue: parseFloat(data?.amount || 0),
             amount_return: 0,
             cash_voucher: cashVoucher,
           }),
@@ -87,8 +78,6 @@ const FinanceApprovalForm = () => {
         status,
         id: data?.id,
         remarks,
-        signature: signatures.financeApproved,
-        financeName: signatures.financeName || employeeName,
         updated_by: employeeName,
         department_name: data?.department_name || "N/A",
         cash_voucher: cashVoucher,
@@ -155,11 +144,10 @@ const FinanceApprovalForm = () => {
                   >
                     <strong className="title">{label}:</strong>
                     <p className="ms-2 mb-0">
-                      {key === "total"
-                        ? `₱${parseFloat(data?.[key] || 0).toLocaleString(
-                            "en-US",
-                            { minimumFractionDigits: 2 }
-                          )}`
+                      {key === "amount"
+                        ? `₱${parseFloat(total || 0).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })}`
                         : data?.[key] || "N/A"}
                     </p>
                   </Col>
@@ -172,17 +160,17 @@ const FinanceApprovalForm = () => {
                   <Col xs={12} className="d-flex align-items-center mb-2">
                     <strong className="title">{label}:</strong>
                     <p className="ms-2 mb-0">
-                      {key === "subtotal"
-                        ? `₱${parseFloat(data?.[key] || 0).toLocaleString(
-                            "en-US",
-                            { minimumFractionDigits: 2 }
-                          )}`
+                      {key === "amount"
+                        ? `₱${parseFloat(total || 0).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })}`
                         : data?.[key] || "N/A"}
                     </p>
                   </Col>
                 </Row>
               ))}
 
+              {/* Amount in Words */}
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
                   <strong className="title text-start">Amount in Words:</strong>
@@ -191,18 +179,8 @@ const FinanceApprovalForm = () => {
               </Row>
             </div>
 
-            {/* Table */}
-            <CashApprovalTable transactions={transactions} subtotal={total} />
-
-            {/* Signature Upload for Finance */}
-            <SignatureUpload
-              label="Received by"
-              nameKey="financeName"
-              signatureKey="financeApproved"
-              signatures={signatures}
-              setSignatures={setSignatures}
-              readOnly={data?.status?.toLowerCase() === "completed"}
-            />
+            {/* Table: Amount + Total */}
+            <CashApprovalTable total={total} />
           </Col>
 
           <Col md={3} className="ps-md-2">
@@ -220,9 +198,8 @@ const FinanceApprovalForm = () => {
       {/* Printable */}
       <div className="d-none">
         <PrintableCashRequest
-          data={{ ...data, items: transactions }}
+          data={{ ...data, items: [] }}
           amountInWords={amountInWords}
-          signatures={signatures}
           contentRef={contentRef}
         />
       </div>

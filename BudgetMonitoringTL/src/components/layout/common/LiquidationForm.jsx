@@ -8,26 +8,21 @@ import {
   liquidationRightFields,
 } from "../../../handlers/columnHeaders";
 import ActionButtons from "../../ActionButtons";
-import SignatureUpload from "../../SignatureUpload";
 import LiquidApprovalTable from "../team-leader/liquidation/LiquidApprovalTable";
 import PrintableLiquidForm from "../../print/PrintableLiquidForm";
 import LiquidationReceipt from "../team-leader/liquidation/LiquidationReceipt";
-import { normalizeBase64Image } from "../../../utils/signature";
+import { normalizeBase64Image } from "../../../utils/image";
 
 const ROLE_CONFIG = {
   "team-leader": {
     approveStatus: "APPROVED",
     rejectStatus: "REJECTED",
     approveLabel: "Approve",
-    signatureKey: "noted", // ✅ Noted by
-    signatureLabel: "Noted by",
   },
   finance: {
     approveStatus: "VERIFIED",
     rejectStatus: "REJECTED",
     approveLabel: "Verify",
-    signatureKey: "checked", // ✅ Checked by
-    signatureLabel: "Checked by",
   },
 };
 
@@ -38,23 +33,12 @@ const LiquidationForm = () => {
 
   // detect role (default = team-leader)
   const role = data?.role || "team-leader";
-  const {
-    approveStatus,
-    rejectStatus,
-    approveLabel,
-    signatureKey,
-    signatureLabel,
-  } = ROLE_CONFIG[role] || ROLE_CONFIG["team-leader"];
+  const { approveStatus, rejectStatus, approveLabel } =
+    ROLE_CONFIG[role] || ROLE_CONFIG["team-leader"];
 
   // state
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
-  const [signatures, setSignatures] = useState({
-    [signatureKey]: data?.signatures?.[signatureKey]
-      ? normalizeBase64Image(data.signatures[signatureKey])
-      : null,
-    [`${signatureKey}Name`]: data?.signatures?.[`${signatureKey}Name`] || "",
-  });
   const [newReceipts, setNewReceipts] = useState([]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
@@ -114,8 +98,6 @@ const LiquidationForm = () => {
         id: data?.id,
         status,
         remarks,
-        [signatureKey]: signatures[signatureKey] || "", // ✅ store under noted / checked
-        [`${signatureKey}Name`]: signatures[`${signatureKey}Name`] || "",
         receipts: JSON.stringify(receiptImages),
         created_by: employeeId,
       };
@@ -192,22 +174,10 @@ const LiquidationForm = () => {
           images={receiptImages}
           setNewReceipts={setNewReceipts}
         />
-
-        <SignatureUpload
-          label={signatureLabel}
-          nameKey={`${signatureKey}Name`}
-          signatureKey={signatureKey}
-          signatures={signatures}
-          setSignatures={setSignatures}
-        />
       </Container>
 
       <div className="d-none">
-        <PrintableLiquidForm
-          data={{ ...data }}
-          contentRef={contentRef}
-          signatures={signatures}
-        />
+        <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>
     </>
   );

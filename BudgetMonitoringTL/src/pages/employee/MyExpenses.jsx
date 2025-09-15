@@ -48,6 +48,7 @@ const MyExpenses = () => {
         ...item,
         id: item.id ?? `${index}`,
         formType: "Cash Request",
+        amount: item.amount ?? 0,
       }));
 
       setTableData(mappedData);

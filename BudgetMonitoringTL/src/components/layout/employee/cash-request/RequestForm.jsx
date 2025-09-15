@@ -11,11 +11,12 @@ const RequestForm = ({
   return (
     <>
       <div className="request-container border p-3">
+        {/* PARTICULARS */}
         <Row className="mb-2">
           <Col xs={12}>
             <FloatingLabel
               controlId="description"
-              label="Description"
+              label="Particulars"
               className="mb-2"
             >
               <Form.Control
@@ -31,6 +32,7 @@ const RequestForm = ({
           </Col>
         </Row>
 
+        {/* EMPLOYEE DETAILS */}
         <Row className="mb-2">
           {["employee", "department", "position"].map((key) => {
             const { label = "", type = "text" } = getField(key);
@@ -52,8 +54,9 @@ const RequestForm = ({
           })}
         </Row>
 
+        {/* DATE + TEAM LEAD */}
         <Row>
-          {["expenseDate", "teamLead"].map((key) => {
+          {["request_date", "team_lead"].map((key) => {
             const { label = "", type = "text" } = getField(key);
             return (
               <Col xs={12} md={6} className="mb-2" key={key}>
@@ -62,7 +65,7 @@ const RequestForm = ({
                     type={type}
                     name={key}
                     value={
-                      key === "expenseDate"
+                      key === "request_date"
                         ? formData[key] ||
                           new Date().toISOString().split("T")[0]
                         : formData[key] || ""
@@ -77,7 +80,7 @@ const RequestForm = ({
           })}
         </Row>
 
-        {/* Amount in Words */}
+        {/* AMOUNT IN WORDS */}
         <Row className="mb-2">
           <Col xs={12}>
             <strong>Amount in Words:</strong>

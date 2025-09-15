@@ -150,21 +150,6 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
                 className="text-center mt-4 position-relative"
                 style={{ height: "100px" }}
               >
-                {signatures?.[key] && (
-                  <img
-                    src={signatures[key]}
-                    alt="Signature"
-                    style={{
-                      height: "70px",
-                      position: "absolute",
-                      top: "-45px",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      zIndex: 1,
-                      opacity: 0.9,
-                    }}
-                  />
-                )}
                 <div
                   style={{
                     position: "absolute",

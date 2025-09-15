@@ -5,7 +5,7 @@ import {
   MdOutlineSavings,
   MdOutlineDashboard,
 } from "react-icons/md";
-import { GiMoneyStack } from "react-icons/gi";
+import { GiMoneyStack, GiExpense } from "react-icons/gi";
 
 export const navConfig = [
   {
@@ -44,7 +44,7 @@ export const navConfig = [
   },
   {
     label: "Cash Flow",
-    icon: GiMoneyStack,
+    icon: GiExpense,
     children: [
       { label: "Pending Final Approval", path: "/final_approval" },
       { label: "All Requests", path: "/all_request" },

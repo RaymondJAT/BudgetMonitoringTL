@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import AppButton from "../../../ui/AppButton";
-import { normalizeBase64Image } from "../../../../utils/signature";
+import { normalizeBase64Image } from "../../../../utils/image";
 
 const LiquidReceipt = ({
   remarksValue = "",
@@ -14,61 +14,72 @@ const LiquidReceipt = ({
   const [modalImage, setModalImage] = useState("");
   const fileInputRef = useRef(null);
 
-  // CONVERT TO BASE64
-  const fileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(normalizeBase64Image(reader.result));
-      reader.onerror = (error) => reject(error);
-    });
+  /** 🔹 Convert File → Base64 */
+  const fileToBase64 = useCallback(
+    (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(normalizeBase64Image(reader.result));
+        reader.onerror = reject;
+      }),
+    []
+  );
 
-  const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files);
-    const validImages = files.filter((file) => file.type.startsWith("image/"));
+  /** 🔹 Handle file upload */
+  const handleImageChange = useCallback(
+    async (e) => {
+      const files = Array.from(e.target.files).filter((f) =>
+        f.type.startsWith("image/")
+      );
+      if (!files.length) return;
 
-    // CONVERT ALL VALID IMAGES TO BASE64
-    const base64List = await Promise.all(validImages.map(fileToBase64));
+      const base64List = await Promise.all(files.map(fileToBase64));
 
-    const newPreviews = validImages.map((file, i) => ({
-      url: URL.createObjectURL(file),
-      base64: base64List[i],
-    }));
+      const newPreviews = files.map((file, i) => ({
+        url: URL.createObjectURL(file),
+        base64: base64List[i],
+      }));
 
-    setPreviews((prev) => [...prev, ...newPreviews]);
-  };
+      setPreviews((prev) => [...prev, ...newPreviews]);
+      e.target.value = ""; // reset input for same-file reselect
+    },
+    [fileToBase64]
+  );
 
-  // KEEP PARENT IN SYNC WITH PREVIEWS
+  /** 🔹 Sync with parent (send only base64s) */
   useEffect(() => {
     onReceiptsChange(previews.map((p) => p.base64));
   }, [previews, onReceiptsChange]);
 
-  const handleButtonClick = () => {
-    fileInputRef.current.click();
-  };
+  /** 🔹 Cleanup object URLs on unmount */
+  useEffect(() => {
+    return () => previews.forEach((p) => URL.revokeObjectURL(p.url));
+  }, [previews]);
 
+  /** 🔹 Handlers */
+  const handleButtonClick = () => fileInputRef.current?.click();
   const handleImageClick = (src) => {
     setModalImage(src);
     setShowModal(true);
   };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setModalImage("");
-  };
+  const handleCloseModal = () => setShowModal(false);
 
   const handleClearImages = () => {
+    previews.forEach((p) => URL.revokeObjectURL(p.url));
     setPreviews([]);
   };
 
   const handleRemoveImage = (index) => {
-    const updated = previews.filter((_, i) => i !== index);
-    setPreviews(updated);
+    setPreviews((prev) => {
+      URL.revokeObjectURL(prev[index].url);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   return (
     <div className="request-container border p-3 mt-3">
-      {/* REMARKS FIELD */}
+      {/* Remarks Field */}
       <Form.Group controlId="remarks" className="mb-3">
         <Form.Label className="fw-bold">Remarks</Form.Label>
         <Form.Control
@@ -81,38 +92,35 @@ const LiquidReceipt = ({
         />
       </Form.Group>
 
-      {/* UPLOAD RECEIPTS */}
+      {/* Upload Receipts */}
       <Form.Group controlId="formFileMultiple" className="mb-3">
         <Form.Label className="fw-bold">Upload Receipts</Form.Label>
         <div className="d-flex align-items-center gap-2">
-          <div className="position-relative">
-            <Form.Control
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageChange}
-              className="d-none"
-              ref={fileInputRef}
-            />
-            <AppButton
-              label="Choose File"
-              variant="outline-dark"
-              onClick={handleButtonClick}
-              className="custom-app-button"
-            />
-          </div>
-
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            ref={fileInputRef}
+            className="d-none"
+          />
+          <AppButton
+            label="Choose File"
+            variant="outline-dark"
+            onClick={handleButtonClick}
+            className="custom-app-button"
+          />
           <AppButton
             label="Clear All"
             variant="outline-danger"
             onClick={handleClearImages}
-            disabled={previews.length === 0}
+            disabled={!previews.length}
             className="custom-app-button"
           />
         </div>
       </Form.Group>
 
-      {/* IMAGE PREVIEWS */}
+      {/* Image Previews */}
       {previews.length > 0 && (
         <div className="mt-4">
           <div
@@ -130,9 +138,11 @@ const LiquidReceipt = ({
                 style={{ display: "inline-block" }}
               >
                 <img
-                  src={preview.url}
+                  src={preview.base64 || preview.url}
                   alt={`Receipt ${index + 1}`}
-                  onClick={() => handleImageClick(preview.url)}
+                  onClick={() =>
+                    handleImageClick(preview.base64 || preview.url)
+                  }
                   style={{ maxWidth: "150px", maxHeight: "150px" }}
                 />
                 <IoIosRemoveCircleOutline
@@ -147,7 +157,7 @@ const LiquidReceipt = ({
         </div>
       )}
 
-      {/* MODAL FOR FULL IMAGE */}
+      {/* Modal for Full Image */}
       <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
         <Modal.Body className="text-center p-3">
           {modalImage && (

@@ -22,7 +22,6 @@ const Verify = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch approved/verified/completed liquidations for Finance
   const fetchFinanceLiquidations = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -53,15 +52,14 @@ const Verify = () => {
     }
   }, []);
 
-  // initial fetch
+  // INITIAL FETCH
   useEffect(() => {
     fetchFinanceLiquidations();
   }, [fetchFinanceLiquidations]);
 
-  // compute totals for dashboard cards
   const totalComputationData = useMemo(() => tableData, [tableData]);
 
-  // filter + search
+  // FILTER & SEARCH
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -74,7 +72,7 @@ const Verify = () => {
     );
   }, [tableData, searchValue]);
 
-  // navigation to Finance form
+  // NAVIGATION TO FINANCE FORM
   const handleRowClick = (entry) => {
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
@@ -83,7 +81,6 @@ const Verify = () => {
 
   return (
     <div className="pb-3">
-      {/* Finance dashboard cards */}
       <div className="mt-3">
         <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
       </div>
@@ -96,14 +93,14 @@ const Verify = () => {
             onRefresh={fetchFinanceLiquidations}
           />
 
-          {/* Loading state */}
+          {/* LOADING STATE */}
           {loading && (
             <Alert variant="info" className="text-center">
               Loading liquidation records...
             </Alert>
           )}
 
-          {/* Error state */}
+          {/* ERROR STATE */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
@@ -115,14 +112,13 @@ const Verify = () => {
             </Alert>
           )}
 
-          {/* No records */}
           {!loading && !error && filteredData.length === 0 && (
             <Alert variant="warning" className="text-center">
               No liquidation records found.
             </Alert>
           )}
 
-          {/* Data table */}
+          {/* TABLE */}
           {!loading && !error && filteredData.length > 0 && (
             <DataTable
               data={filteredData}

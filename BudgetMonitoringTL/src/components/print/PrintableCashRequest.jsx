@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
-import { normalizeBase64Image } from "../../utils/signature"; // ✅ make sure path is correct
 
 const PrintableCashRequest = ({
   data,
@@ -20,8 +19,8 @@ const PrintableCashRequest = ({
     0
   );
 
-  // Helper for rendering signature blocks
-  const SignatureBlock = ({ label, signature, name }) => (
+  // RENDER SIGNATURE BLOCK
+  const SignatureBlock = ({ label, name }) => (
     <Col xs={12} md={4} className="text-center">
       <p className="mb-0">
         <strong>{label}</strong>
@@ -30,21 +29,6 @@ const PrintableCashRequest = ({
         className="text-center mt-4 position-relative"
         style={{ height: "100px" }}
       >
-        {signature && (
-          <img
-            src={normalizeBase64Image(signature)}
-            alt={`${label} Signature`}
-            style={{
-              height: "80px",
-              position: "absolute",
-              top: "-45px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1,
-              opacity: 0.9,
-            }}
-          />
-        )}
         <div
           style={{
             position: "absolute",
@@ -72,7 +56,7 @@ const PrintableCashRequest = ({
         <h2 className="text-center w-100 fw-bold">CASH REQUEST FORM</h2>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
 
-        {/* Employee Details */}
+        {/* EMPLOYEE DETAILS */}
         <Row className="custom-col small">
           <Col xs={12} md={6} className="mb-2">
             <div className="d-flex align-items-center mb-2">
@@ -97,7 +81,7 @@ const PrintableCashRequest = ({
           </Col>
         </Row>
 
-        {/* Particulars Table */}
+        {/* PARTICULARS TABLE */}
         <Row>
           <Col xs={12}>
             <Table bordered className="print-table small">
@@ -152,23 +136,17 @@ const PrintableCashRequest = ({
           </Col>
         </Row>
 
-        {/* Signatures */}
+        {/* SIGNATURES */}
         <Row className="signature mt-4 small">
           <SignatureBlock
             label="Requested by:"
-            signature={signatures?.requestSignature}
             name={signatures?.requestedName}
           />
           <SignatureBlock
             label="Approved by:"
-            signature={signatures?.approved}
             name={signatures?.approvedName}
           />
-          <SignatureBlock
-            label="Received by:"
-            signature={signatures?.financeApproved}
-            name={signatures?.financeName}
-          />
+          <SignatureBlock label="Received by:" name={signatures?.financeName} />
         </Row>
       </Container>
     </div>

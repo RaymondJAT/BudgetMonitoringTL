@@ -769,13 +769,6 @@ input[type="number"]::-webkit-outer-spin-button {
     flex-wrap: wrap;
     justify-content: space-between;
   }
-
-  .signature-box {
-    width: 100%;
-    height: 10px;
-    border-bottom: 1px solid black;
-    margin-top: 5px;
-  }
 }
 
 /* SCROLLBAR */
@@ -964,10 +957,6 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /* 768px */
 @media (max-width: 768px) {
-  .signature-upload-container {
-    margin-bottom: 1rem;
-  }
-
   .mobile-card {
     background-color: #fff;
     border: 1px solid #dee2e6;

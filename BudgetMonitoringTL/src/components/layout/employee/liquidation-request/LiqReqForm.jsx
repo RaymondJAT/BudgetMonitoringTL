@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import LiquidForm from "../liquidation-request/LiquidForm";
 import LiquidTable from "../liquidation-request/LiquidTable";
 import LiquidReceipt from "../liquidation-request/LiquidReceipt";
-import SignatureUpload from "../../../SignatureUpload";
-import { normalizeBase64Image } from "../../../../utils/signature";
 
 const LiqReqForm = ({ requestData = null, onSubmit }) => {
   const today = new Date().toISOString().split("T")[0];
@@ -14,6 +12,7 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
     employee: "",
     department: "",
     created_date: today,
+    created_by: loggedInUser, // 🔹 always pre-fill hidden value
     amount_obtained: 0,
     amount_expended: 0,
     reimburse_return: "",
@@ -33,32 +32,21 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
     },
   ]);
 
-  const initialSignature = normalizeBase64Image(requestData?.signature);
-  const [signatures, setSignatures] = useState({
-    created_by: loggedInUser,
-    signature: initialSignature,
-  });
-
   const [receipts, setReceipts] = useState([]);
 
-  // AUTO FILL
+  // AUTO FILL if editing existing request
   useEffect(() => {
     if (requestData) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         description: requestData.description || "",
         employee: requestData.employee || "",
         department: requestData.department || "",
         created_date: today,
+        created_by: loggedInUser, // 🔹 stays hidden but included
         amount_obtained: parseFloat(requestData.amount_issue) || 0,
-        amount_expended: 0,
-        reimburse_return: "",
         remarks: requestData.remarks || "",
-      });
-
-      setSignatures({
-        created_by: requestData.created_by || loggedInUser,
-        signature: normalizeBase64Image(requestData.signature),
-      });
+      }));
 
       setLiqRows(
         requestData.request_items?.length
@@ -144,11 +132,10 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
 
     const payload = {
       ...formData,
+      created_by: loggedInUser, // 🔹 always attach before submit
       reference_id: requestData?.reference_id || "",
       request_items: liqRows,
       receipts,
-      created_by: signatures.created_by,
-      signature: signatures.signature,
     };
 
     console.log("Submitting liquidation payload:", payload);
@@ -180,16 +167,6 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
         }
         onReceiptsChange={setReceipts}
       />
-
-      <div className="mt-3">
-        <SignatureUpload
-          label="Prepared by"
-          nameKey="created_by"
-          signatureKey="signature"
-          signatures={signatures}
-          setSignatures={setSignatures}
-        />
-      </div>
     </form>
   );
 };

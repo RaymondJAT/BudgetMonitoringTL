@@ -9,55 +9,23 @@ import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../utils/numberToWords";
 import PrintableCashRequest from "./print/PrintableCashRequest";
 import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
-import SignatureUpload from "./SignatureUpload";
 import CashReqActionButtons from "./CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
 import ProgressBar from "./layout/ProgressBar";
 import { progressSteps } from "../handlers/actionMenuItems";
-import { normalizeBase64Image } from "../utils/signature";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
   const navigate = useNavigate();
   const { state: data } = useLocation();
-
-  const [particulars, setParticulars] = useState([]);
   const [amountInWords, setAmountInWords] = useState("");
-  const [signatures, setSignatures] = useState({
-    requestedName: "",
-    requestSignature: null,
-  });
   const [showModal, setShowModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
 
-  const transactions = useMemo(() => data?.cash_request_items || [], [data]);
-  const total = useMemo(() => parseFloat(data?.subtotal || 0), [data]);
+  // ✅ Use amount instead of subtotal
+  const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
-
-  // Populate requested signature
-  useEffect(() => {
-    const requestedActivity = data?.cash_request_activities?.find(
-      (a) => a.action === "REQUESTED"
-    );
-    const sig = normalizeBase64Image(requestedActivity?.signature);
-
-    setSignatures({
-      requestedName: requestedActivity?.requested_by || "",
-      requestSignature: sig,
-    });
-  }, [data]);
-
-  // Map transactions to particulars
-  useEffect(() => {
-    const items = transactions.map((item) => ({
-      label: item.label ?? "N/A",
-      quantity: item.quantity ?? 0,
-      price: item.price ?? 0,
-      amount: item.subtotal ?? (item.quantity ?? 0) * (item.price ?? 0),
-    }));
-    setParticulars(items);
-  }, [transactions]);
 
   useEffect(() => {
     if (!isNaN(total)) setAmountInWords(numberToWords(total));
@@ -81,6 +49,7 @@ const ViewCashRequestForm = () => {
   return (
     <div className="pb-3">
       <Container fluid>
+        {/* ACTION BUTTONS */}
         <CashReqActionButtons
           onBack={() => navigate(-1)}
           onView={() => setShowModal(true)}
@@ -89,7 +58,7 @@ const ViewCashRequestForm = () => {
           showLiquidationButton={data?.status === "completed"}
         />
 
-        {/* Liquidation Modal */}
+        {/* LIQUIDATION MODAL */}
         <LiqFormModal
           show={showLiqFormModal}
           onHide={() => setShowLiqFormModal(false)}
@@ -98,8 +67,8 @@ const ViewCashRequestForm = () => {
             description: data?.description || "",
             employee: data?.employee || "",
             department: data?.department || "",
-            amount_issue: data?.subtotal || 0,
-            request_items: data?.cash_request_items || [],
+            amount_issue: data?.amount || 0,
+            request_items: [],
           }}
           onSubmit={(liqData) => {
             const existing =
@@ -120,7 +89,7 @@ const ViewCashRequestForm = () => {
           }}
         />
 
-        {/* Progress Bar */}
+        {/* PROGRESS BAR */}
         <div className="request-container border p-2 mb-3">
           <Row className="align-items-center d-flex justify-content-between">
             <Col className="d-flex">
@@ -129,11 +98,11 @@ const ViewCashRequestForm = () => {
           </Row>
         </div>
 
-        {/* Request Info */}
+        {/* REQUEST INFORMATION */}
         <div className="custom-container border p-3">
           <Row className="mb-2">
             <Col xs={12} className="d-flex flex-column flex-md-row">
-              <strong className="title text-start">Description:</strong>
+              <strong className="title text-start">Particulars:</strong>
               <p className="ms-md-2 mb-0 text-start">
                 {data?.description || "N/A"}
               </p>
@@ -151,7 +120,7 @@ const ViewCashRequestForm = () => {
                 <strong className="title">{label}:</strong>
                 <p className="ms-2 mb-0">
                   {key === "total"
-                    ? `₱${parseFloat(data?.[key] || 0).toLocaleString("en-US", {
+                    ? `₱${parseFloat(total || 0).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                       })}`
                     : data?.[key] || "N/A"}
@@ -165,8 +134,8 @@ const ViewCashRequestForm = () => {
               <Col xs={12} className="d-flex align-items-center mb-2">
                 <strong className="title">{label}:</strong>
                 <p className="ms-2 mb-0">
-                  {key === "subtotal"
-                    ? `₱${parseFloat(data?.[key] || 0).toLocaleString("en-US", {
+                  {key === "amount"
+                    ? `₱${parseFloat(total || 0).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                       })}`
                     : data?.[key] || "N/A"}
@@ -183,37 +152,23 @@ const ViewCashRequestForm = () => {
           </Row>
         </div>
 
-        {/* Table */}
-        <CashApprovalTable transactions={transactions} subtotal={total} />
-
-        {/* Signatures */}
-        <SignatureUpload
-          label="Requested by"
-          nameKey="requestedName"
-          signatureKey="requestSignature"
-          signatures={signatures}
-          setSignatures={setSignatures}
-          readOnly={true}
-        />
+        {/* TABLE: AMOUNT + TOTAL */}
+        <CashApprovalTable total={total} />
       </Container>
 
-      {/* Hidden Printable Component */}
+      {/* HIDDEN PRINTABLE COMPONENT */}
       <div className="d-none">
         <PrintableCashRequest
           data={{
             ...data,
-            items: transactions.map((t) => ({
-              ...t,
-              description: data?.description || "N/A",
-            })),
+            items: [],
           }}
           amountInWords={amountInWords}
-          signatures={signatures}
           contentRef={contentRef}
         />
       </div>
 
-      {/* Modal Preview */}
+      {/* MODAL PREVIEW */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -224,13 +179,9 @@ const ViewCashRequestForm = () => {
           <PrintableCashRequest
             data={{
               ...data,
-              items: transactions.map((t) => ({
-                ...t,
-                description: data?.description || "N/A",
-              })),
+              items: [],
             }}
             amountInWords={amountInWords}
-            signatures={signatures}
           />
         </Modal.Body>
       </Modal>

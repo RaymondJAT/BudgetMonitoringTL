@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 
 import {
@@ -8,11 +8,10 @@ import {
   liquidationRightFields,
 } from "../../../../handlers/columnHeaders";
 import ActionButtons from "../../../ActionButtons";
-import SignatureUpload from "../../../SignatureUpload";
 import LiquidApprovalTable from "./LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "./LiquidationReceipt";
-import { normalizeBase64Image } from "../../../../utils/signature";
+import { normalizeBase64Image } from "../../../../utils/image";
 
 const LiquidApprovalForm = () => {
   const { state: data } = useLocation();
@@ -21,17 +20,14 @@ const LiquidApprovalForm = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
-  const [signatures, setSignatures] = useState({
-    verified: data?.signatures?.verified
-      ? normalizeBase64Image(data.signatures.verified)
-      : null,
-    verifiedName: data?.signatures?.verifiedName || "",
-  });
-
   const [newReceipts, setNewReceipts] = useState([]);
+  const [apiReceipts, setApiReceipts] = useState([]);
+  const [loadingReceipts, setLoadingReceipts] = useState(false);
+  const [errorReceipts, setErrorReceipts] = useState(null);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
+  // Handle newly uploaded receipts
   const handleReceiptsChange = async (files) => {
     const base64List = await Promise.all(
       Array.from(files).map(
@@ -47,39 +43,52 @@ const LiquidApprovalForm = () => {
     setNewReceipts(base64List);
   };
 
-  // ✅ existing receipts from DB + activities
-  const existingReceipts = useMemo(() => {
-    const receiptsFromData = Array.isArray(data?.receipts)
-      ? data.receipts.map(normalizeBase64Image)
-      : data?.receipts
-      ? [normalizeBase64Image(data.receipts)]
-      : [];
+  // Fetch receipts from the new API
+  useEffect(() => {
+    if (!data?.id) return;
 
-    const receiptsFromActivities = Array.isArray(data?.liquidation_activities)
-      ? data.liquidation_activities
-          .filter((act) => act.receipts)
-          .flatMap((act) => {
-            try {
-              const parsed = JSON.parse(act.receipts);
-              return Array.isArray(parsed)
-                ? parsed.map((r) => normalizeBase64Image(r.image || r))
-                : [normalizeBase64Image(act.receipts)];
-            } catch {
-              return [normalizeBase64Image(act.receipts)];
-            }
-          })
-      : [];
+    const fetchReceipts = async () => {
+      setLoadingReceipts(true);
+      setErrorReceipts(null);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(
+          `/api5012/liquidation/getcash_liquidation_id?id=${data.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-    return Array.from(
-      new Set([...receiptsFromData, ...receiptsFromActivities])
-    );
+        if (!res.ok) throw new Error("Failed to fetch receipts");
+        const result = await res.json();
+
+        const parsedReceipts = result.flatMap((r) => {
+          try {
+            const arr = JSON.parse(r.receipts);
+            return Array.isArray(arr)
+              ? arr.map((x) => normalizeBase64Image(x.image || x))
+              : [normalizeBase64Image(r.receipts)];
+          } catch {
+            return [normalizeBase64Image(r.receipts)];
+          }
+        });
+
+        setApiReceipts(parsedReceipts);
+      } catch (err) {
+        console.error(err);
+        setErrorReceipts(err.message || "Failed to load receipts");
+      } finally {
+        setLoadingReceipts(false);
+      }
+    };
+
+    fetchReceipts();
   }, [data]);
 
+  // Combine API receipts and new uploads
   const receiptImages = useMemo(() => {
-    return Array.from(new Set([...existingReceipts, ...newReceipts]));
-  }, [existingReceipts, newReceipts]);
+    return Array.from(new Set([...apiReceipts, ...newReceipts]));
+  }, [apiReceipts, newReceipts]);
 
-  // TRANSACTION TOTAL
+  // Populate transactions and total
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
@@ -91,13 +100,13 @@ const LiquidApprovalForm = () => {
     setTotal(totalAmount);
   }, [data]);
 
-  // APPROVE & REJECT
+  // Approve / Reject action
   const handleAction = async (action) => {
     try {
       const token = localStorage.getItem("token");
       const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
 
-      const status = action === "approve" ? "APPROVED" : "REJECTED";
+      const status = action === "approve" ? "approved" : "rejected";
       let remarks = "";
 
       if (action === "reject") {
@@ -108,14 +117,11 @@ const LiquidApprovalForm = () => {
         id: data?.id,
         status,
         remarks,
-        signature: signatures.verified || "",
         created_by: employeeId,
         ...(newReceipts.length > 0 && {
           receipts: JSON.stringify(newReceipts),
         }),
       };
-
-      console.log("🔼 Sending payload:", payload);
 
       const res = await fetch(`/api5012/liquidation/update_liquidation`, {
         method: "PUT",
@@ -137,7 +143,7 @@ const LiquidApprovalForm = () => {
     }
   };
 
-  // RENDER FIELDS
+  // Render info fields
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -184,26 +190,17 @@ const LiquidApprovalForm = () => {
 
         <LiquidApprovalTable transactions={transactions} total={total} />
 
+        {loadingReceipts && <Spinner animation="border" />}
+        {errorReceipts && <Alert variant="danger">{errorReceipts}</Alert>}
+
         <LiquidationReceipt
           images={receiptImages}
           setNewReceipts={handleReceiptsChange}
         />
-
-        <SignatureUpload
-          label="Noted by"
-          nameKey="verifiedName"
-          signatureKey="verified"
-          signatures={signatures}
-          setSignatures={setSignatures}
-        />
       </Container>
 
       <div className="d-none">
-        <PrintableLiquidForm
-          data={{ ...data }}
-          contentRef={contentRef}
-          signatures={signatures}
-        />
+        <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>
     </>
   );

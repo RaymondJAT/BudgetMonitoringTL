@@ -8,11 +8,10 @@ import {
   liquidationRightFields,
 } from "../../../../handlers/columnHeaders";
 import ActionButtons from "../../../ActionButtons";
-import SignatureUpload from "../../../SignatureUpload";
 import LiquidApprovalTable from "../../team-leader/liquidation/LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "../../team-leader/liquidation/LiquidationReceipt";
-import { normalizeBase64Image } from "../../../../utils/signature";
+import { normalizeBase64Image } from "../../../../utils/image";
 
 const FinanceLiquidForm = () => {
   const { state: data } = useLocation();
@@ -21,28 +20,21 @@ const FinanceLiquidForm = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
-  const [signatures, setSignatures] = useState({
-    released: data?.signatures?.released
-      ? normalizeBase64Image(data.signatures.released)
-      : null,
-    releasedName: data?.signatures?.releasedName || "",
-  });
-
   const [newReceipts, setNewReceipts] = useState([]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const existingReceipts = useMemo(() => {
-    const fromData = Array.isArray(data?.receipts)
-      ? data.receipts.map(normalizeBase64Image)
-      : data?.receipts
-      ? [normalizeBase64Image(data.receipts)]
-      : [];
-
-    const fromActivities = Array.isArray(data?.liquidation_activities)
-      ? data.liquidation_activities
-          .filter((act) => act.receipts)
-          .flatMap((act) => {
+  // Combine existing receipts and new uploads
+  const receiptImages = useMemo(() => {
+    const existingReceipts = [
+      ...(Array.isArray(data?.receipts)
+        ? data.receipts
+        : data?.receipts
+        ? [data.receipts]
+        : []),
+      ...(Array.isArray(data?.liquidation_activities)
+        ? data.liquidation_activities.flatMap((act) => {
+            if (!act.receipts) return [];
             try {
               const parsed = JSON.parse(act.receipts);
               return Array.isArray(parsed)
@@ -52,42 +44,42 @@ const FinanceLiquidForm = () => {
               return [normalizeBase64Image(act.receipts)];
             }
           })
-      : [];
+        : []),
+    ].map(normalizeBase64Image);
 
-    return Array.from(new Set([...fromData, ...fromActivities]));
-  }, [data]);
+    return Array.from(new Set([...existingReceipts, ...newReceipts]));
+  }, [data, newReceipts]);
 
-  const receiptImages = useMemo(
-    () => Array.from(new Set([...existingReceipts, ...newReceipts])),
-    [existingReceipts, newReceipts]
-  );
-
+  // Populate transactions and total
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
+  // Handle new receipt uploads
   const handleReceiptUpload = async (files) => {
     const base64List = await Promise.all(
-      files.map(async (file) => {
-        const reader = new FileReader();
-        return new Promise((resolve) => {
-          reader.onload = (e) => resolve(normalizeBase64Image(e.target.result));
-          reader.readAsDataURL(file);
-        });
-      })
+      Array.from(files).map(
+        (file) =>
+          new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) =>
+              resolve(normalizeBase64Image(e.target.result));
+            reader.readAsDataURL(file);
+          })
+      )
     );
     setNewReceipts((prev) => [...prev, ...base64List]);
   };
 
-  // APPROVE / REJECT
+  // Approve / Reject action
   const handleAction = async (action) => {
     try {
       const token = localStorage.getItem("token");
       const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
 
-      const status = action === "approve" ? "VERIFIED" : "REJECTED";
+      const status = action === "approve" ? "verified" : "rejected";
       const remarks =
         action === "reject" ? prompt("Enter remarks for rejection:") || "" : "";
 
@@ -95,7 +87,6 @@ const FinanceLiquidForm = () => {
         id: data?.id,
         status,
         remarks,
-        signature: signatures.released || "",
         created_by: employeeId,
         ...(newReceipts.length > 0 && {
           receipts: JSON.stringify(newReceipts),
@@ -114,8 +105,8 @@ const FinanceLiquidForm = () => {
       });
 
       if (!res.ok) throw new Error("Failed to update liquidation");
-
       await res.json();
+
       alert(`Liquidation ${status} successfully!`);
       navigate(-1);
     } catch (err) {
@@ -124,7 +115,7 @@ const FinanceLiquidForm = () => {
     }
   };
 
-  // RENDER FIELDS
+  // Render info fields
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -132,7 +123,7 @@ const FinanceLiquidForm = () => {
           <Row key={idx} className="mb-2">
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">{data?.[key] || "N/A"}</p>
+              <p className="ms-2 mb-0">{data?.[key] ?? "N/A"}</p>
             </Col>
           </Row>
         ))}
@@ -148,7 +139,7 @@ const FinanceLiquidForm = () => {
                   ? `₱${parseFloat(data[key]).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                     })}`
-                  : data?.[key] || "N/A"}
+                  : data?.[key] ?? "N/A"}
               </p>
             </Col>
           </Row>
@@ -176,22 +167,10 @@ const FinanceLiquidForm = () => {
           images={receiptImages}
           setNewReceipts={handleReceiptUpload}
         />
-
-        <SignatureUpload
-          label="Released by"
-          nameKey="releasedName"
-          signatureKey="released"
-          signatures={signatures}
-          setSignatures={setSignatures}
-        />
       </Container>
 
       <div className="d-none">
-        <PrintableLiquidForm
-          data={{ ...data }}
-          contentRef={contentRef}
-          signatures={signatures}
-        />
+        <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>
     </>
   );

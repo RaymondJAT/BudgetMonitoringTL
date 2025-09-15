@@ -27,12 +27,12 @@ export const trashColumns = [...colHeaders];
 // cash request fields
 export const approvalFormFields = [
   { label: "Position", key: "position" },
-  { label: "Amount", key: "subtotal" },
+  { label: "Amount", key: "amount" },
 ];
 
 export const approvalPartnerFields = [
   { label: "Employee", key: "employee" },
-  { label: "Expense Date", key: "request_date" },
+  { label: "Request Date", key: "request_date" },
   { label: "Department", key: "department" },
   { label: "Team Lead", key: "team_lead" },
 ];
@@ -53,9 +53,9 @@ export const liquidationRightFields = [
 // cash request form
 export const cashReqFields = [
   { label: "Employee", key: "employee" },
-  { label: "Request Date", key: "expenseDate", type: "date" },
+  { label: "Request Date", key: "request_date", type: "date" },
   { label: "Department", key: "department" },
-  { label: "Team Lead", key: "teamLead" },
+  { label: "Team Lead", key: "team_lead" },
   { label: "Position", key: "position" },
 ];
 
