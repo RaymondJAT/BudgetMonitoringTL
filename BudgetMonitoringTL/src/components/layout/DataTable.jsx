@@ -19,6 +19,7 @@ const DataTable = ({
   showActions = true,
   actionType = "meatball",
   renderActionButton,
+  noDataMessage = "No transactions available",
 }) => {
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
@@ -276,7 +277,7 @@ const DataTable = ({
                 }
                 className="text-center"
               >
-                No data available
+                {noDataMessage}
               </td>
             </tr>
           )}
@@ -288,7 +289,7 @@ const DataTable = ({
         {data.length > 0 ? (
           renderMobileCards()
         ) : (
-          <div className="text-center mt-4">No data available</div>
+          <div className="text-center mt-4">{noDataMessage}</div>
         )}
       </div>
     </div>

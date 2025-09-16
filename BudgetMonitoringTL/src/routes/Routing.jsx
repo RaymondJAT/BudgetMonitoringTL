@@ -15,6 +15,7 @@ import CashApprovalForm from "../components/layout/team-leader/cash-request/Cash
 import LiquidApprovalForm from "../components/layout/team-leader/liquidation/LiquidApprovalForm";
 import Liquidation from "../pages/team-leader/Liquidation";
 import TLHistory from "../pages/team-leader/TLHistory";
+import Reviewed from "../pages/team-leader/Reviewed";
 
 // FINANCE
 import FnceExpenses from "../pages/finance/FnceExpenses";
@@ -58,24 +59,8 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/view_cash_request"
-        element={
-          <ProtectedRoute path="/view_cash_request">
-            <ViewCashRequestForm />
-          </ProtectedRoute>
-        }
-      />
 
-      {/* <Route
-        path="/view_liquidation_form"
-        element={
-          <ProtectedRoute path="/view_liquidation_form">
-            <ViewLiquidationForm />
-          </ProtectedRoute>
-        }
-      /> */}
-
+      <Route path="/view_cash_request" element={<ViewCashRequestForm />} />
       <Route path="/view_liquidation_form" element={<ViewLiquidationForm />} />
 
       {/* TEAM LEADER */}
@@ -104,17 +89,6 @@ const Routing = () => {
         }
       />
 
-      {/* <Route
-        path="/liquid_approval_form"
-        element={
-          <ProtectedRoute path="/liquid_approval_form">
-            <LiquidApprovalForm />
-          </ProtectedRoute>
-        }
-      /> */}
-
-      <Route path="/liquid_approval_form" element={<LiquidApprovalForm />} />
-
       <Route
         path="/liquidation_review"
         element={
@@ -123,6 +97,16 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="liquidation_reviewed"
+        element={
+          <ProtectedRoute path="liquidation_reviewed">
+            <Reviewed />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/lead_history"
         element={
@@ -131,14 +115,9 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/cash_approval_form"
-        element={
-          <ProtectedRoute path="/cash_approval_form">
-            <CashApprovalForm />
-          </ProtectedRoute>
-        }
-      />
+
+      <Route path="/cash_approval_form" element={<CashApprovalForm />} />
+      <Route path="/liquid_approval_form" element={<LiquidApprovalForm />} />
 
       {/* FINANCE */}
       <Route
@@ -221,14 +200,8 @@ const Routing = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/finance_approval_form"
-        element={
-          <ProtectedRoute path="/finance_approval_form">
-            <FinanceApprovalForm />
-          </ProtectedRoute>
-        }
-      />
+
+      <Route path="/finance_approval_form" element={<FinanceApprovalForm />} />
 
       {/* ADMIN */}
       <Route

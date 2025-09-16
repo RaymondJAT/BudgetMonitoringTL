@@ -1,4 +1,3 @@
-// handlers/navLinks.js
 import { TbReport } from "react-icons/tb";
 import {
   MdOutlineManageAccounts,
@@ -71,7 +70,8 @@ export const navConfig = [
       { label: "To Verify", path: "/finance_verify" },
       { label: "Verified", path: "/finance_verified" },
       { label: "For Review", path: "/liquidation_review" },
-      { label: "History", path: "/lead_history" },
+      { label: "Reviewed", path: "/liquidation_reviewed" },
+      // { label: "History", path: "/lead_history" },
     ],
   },
 ];

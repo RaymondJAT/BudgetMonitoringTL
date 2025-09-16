@@ -30,9 +30,12 @@ const Verify = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      const res = await fetch("/api5012/liquidation/getapproved_liquidation", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "/api5012/liquidation/getapproved_liquidation?status=approved",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to fetch liquidations");
 
@@ -112,19 +115,14 @@ const Verify = () => {
             </Alert>
           )}
 
-          {!loading && !error && filteredData.length === 0 && (
-            <Alert variant="warning" className="text-center">
-              No liquidation records found.
-            </Alert>
-          )}
-
-          {/* TABLE */}
-          {!loading && !error && filteredData.length > 0 && (
+          {/* TABLE IS ALWAYS RENDERED */}
+          {!loading && !error && (
             <DataTable
               data={filteredData}
               height="455px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
+              noDataMessage="No liquidation records found."
             />
           )}
         </div>

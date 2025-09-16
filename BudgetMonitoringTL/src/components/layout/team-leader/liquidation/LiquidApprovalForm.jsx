@@ -20,30 +20,13 @@ const LiquidApprovalForm = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
-  const [newReceipts, setNewReceipts] = useState([]);
   const [apiReceipts, setApiReceipts] = useState([]);
   const [loadingReceipts, setLoadingReceipts] = useState(false);
   const [errorReceipts, setErrorReceipts] = useState(null);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // Handle newly uploaded receipts
-  const handleReceiptsChange = async (files) => {
-    const base64List = await Promise.all(
-      Array.from(files).map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) =>
-              resolve(normalizeBase64Image(e.target.result));
-            reader.readAsDataURL(file);
-          })
-      )
-    );
-    setNewReceipts(base64List);
-  };
-
-  // Fetch receipts from the new API
+  // Fetch receipts from the API (always requester’s receipts)
   useEffect(() => {
     if (!data?.id) return;
 
@@ -83,21 +66,14 @@ const LiquidApprovalForm = () => {
     fetchReceipts();
   }, [data]);
 
-  // Combine API receipts and new uploads
-  const receiptImages = useMemo(() => {
-    return Array.from(new Set([...apiReceipts, ...newReceipts]));
-  }, [apiReceipts, newReceipts]);
+  // Use only requester’s receipts
+  const receiptImages = useMemo(() => apiReceipts, [apiReceipts]);
 
   // Populate transactions and total
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
-
-    const totalAmount = items.reduce(
-      (sum, item) => sum + (item.amount ?? 0),
-      0
-    );
-    setTotal(totalAmount);
+    setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
   // Approve / Reject action
@@ -118,9 +94,6 @@ const LiquidApprovalForm = () => {
         status,
         remarks,
         created_by: employeeId,
-        ...(newReceipts.length > 0 && {
-          receipts: JSON.stringify(newReceipts),
-        }),
       };
 
       const res = await fetch(`/api5012/liquidation/update_liquidation`, {
@@ -184,6 +157,8 @@ const LiquidApprovalForm = () => {
           onReject={() => handleAction("reject")}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
+          status={data?.status}
+          role={localStorage.getItem("role") || "teamlead"}
         />
 
         <div className="custom-container border p-3">{renderInfoFields()}</div>
@@ -193,10 +168,8 @@ const LiquidApprovalForm = () => {
         {loadingReceipts && <Spinner animation="border" />}
         {errorReceipts && <Alert variant="danger">{errorReceipts}</Alert>}
 
-        <LiquidationReceipt
-          images={receiptImages}
-          setNewReceipts={handleReceiptsChange}
-        />
+        {/* Read-only receipts */}
+        <LiquidationReceipt images={receiptImages} />
       </Container>
 
       <div className="d-none">

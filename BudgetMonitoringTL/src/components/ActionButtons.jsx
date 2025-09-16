@@ -16,19 +16,17 @@ const ActionButtons = ({
   if (role === "teamlead") {
     isApproved =
       status?.toLowerCase() === "approved" ||
-      status?.toLowerCase() === "completed";
+      status?.toLowerCase() === "completed" ||
+      status?.toLowerCase() === "verified";
   } else if (role === "finance") {
-    isApproved = status?.toLowerCase() === "completed";
+    isApproved =
+      status?.toLowerCase() === "completed" ||
+      status?.toLowerCase() === "verified";
   }
-
-  // Determine if the request is already approved
-  // const isApproved =
-  //   status?.toLowerCase() === "approved" ||
-  //   status?.toLowerCase() === "completed";
 
   return (
     <div className="custom-btn d-flex flex-wrap justify-content-start align-items-center pt-3 pb-3">
-      {/* Back Button */}
+      {/* BACK BUTTON */}
       <AppButton
         label={<FaArrowLeft />}
         variant="outline-dark"
@@ -37,7 +35,7 @@ const ActionButtons = ({
         className="custom-app-button btn-responsive"
       />
 
-      {/* Approve/Reject only if not hidden */}
+      {/* APPROVE/REJECT IF NOT HIDDENT */}
       {!hideApproveReject && !isApproved && (
         <>
           <AppButton
@@ -68,7 +66,7 @@ const ActionButtons = ({
         </>
       )}
 
-      {/* Print Button */}
+      {/* PRINT BUTTON */}
       <AppButton
         label={
           <>

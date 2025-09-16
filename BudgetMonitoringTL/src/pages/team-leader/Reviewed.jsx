@@ -14,7 +14,7 @@ const normalizeString = (value) =>
     .toLowerCase()
     .trim();
 
-const Liquidation = () => {
+const Reviewed = () => {
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState([]);
@@ -23,7 +23,7 @@ const Liquidation = () => {
   const [error, setError] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
 
-  const fetchLiquidations = useCallback(async () => {
+  const fetchReviewed = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -31,25 +31,35 @@ const Liquidation = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      const response = await fetch(
-        "/api5012/liquidation/getcash_liquidation?status=pending",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch("/api5012/liquidation/getcash_liquidation", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!response.ok) throw new Error("Failed to fetch liquidations");
+      if (!response.ok)
+        throw new Error("Failed to fetch reviewed liquidations");
 
       const result = await response.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const mappedData = apiData.map((item, index) => ({
+      const approvedData = apiData.filter((item) => {
+        const status = normalizeString(item.status);
+        const leadStatus = normalizeString(item.team_lead_status);
+
+        return (
+          status === "approved" ||
+          status === "verified" ||
+          leadStatus === "approved" ||
+          leadStatus === "verified"
+        );
+      });
+
+      const mappedData = approvedData.map((item, index) => ({
         ...item,
         id: item.id || item._id || index,
-        formType: "Liquidation",
+        formType: "Reviewed",
       }));
 
       setTableData(mappedData);
@@ -61,8 +71,8 @@ const Liquidation = () => {
   }, []);
 
   useEffect(() => {
-    fetchLiquidations();
-  }, [fetchLiquidations]);
+    fetchReviewed();
+  }, [fetchReviewed]);
 
   const totalComputationData = useMemo(() => tableData, [tableData]);
 
@@ -77,7 +87,7 @@ const Liquidation = () => {
     );
   }, [tableData, searchValue]);
 
-  const handleRetry = () => fetchLiquidations();
+  const handleRetry = () => fetchReviewed();
 
   const handleRowClick = (entry) => {
     setSelectedRowId(entry.id);
@@ -85,7 +95,7 @@ const Liquidation = () => {
     navigate("/liquid_approval_form", {
       state: {
         ...entry,
-        role: "team-leader",
+        role: "reviewer",
       },
     });
   };
@@ -106,7 +116,7 @@ const Liquidation = () => {
 
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading liquidation records...
+              Loading reviewed records...
             </Alert>
           )}
 
@@ -124,18 +134,25 @@ const Liquidation = () => {
             </Alert>
           )}
 
-          <DataTable
-            data={filteredData}
-            height="455px"
-            columns={liquidationColumns}
-            onRowClick={handleRowClick}
-            selectedRowId={selectedRowId}
-            noDataMessage="No pending liquidation records found."
-          />
+          {!loading && !error && filteredData.length === 0 && (
+            <Alert variant="warning" className="text-center">
+              No reviewed liquidation records found.
+            </Alert>
+          )}
+
+          {!loading && !error && filteredData.length > 0 && (
+            <DataTable
+              data={filteredData}
+              height="455px"
+              columns={liquidationColumns}
+              onRowClick={handleRowClick}
+              selectedRowId={selectedRowId}
+            />
+          )}
         </div>
       </Container>
     </div>
   );
 };
 
-export default Liquidation;
+export default Reviewed;

@@ -12,6 +12,7 @@ import LiquidApprovalTable from "../../team-leader/liquidation/LiquidApprovalTab
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "../../team-leader/liquidation/LiquidationReceipt";
 import { normalizeBase64Image } from "../../../../utils/image";
+import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
 
 const FinanceLiquidForm = () => {
   const { state: data } = useLocation();
@@ -20,13 +21,14 @@ const FinanceLiquidForm = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
-  const [newReceipts, setNewReceipts] = useState([]);
+
+  const [showFundModal, setShowFundModal] = useState(false);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   // Combine existing receipts and new uploads
   const receiptImages = useMemo(() => {
-    const existingReceipts = [
+    const requesterReceipts = [
       ...(Array.isArray(data?.receipts)
         ? data.receipts
         : data?.receipts
@@ -47,8 +49,8 @@ const FinanceLiquidForm = () => {
         : []),
     ].map(normalizeBase64Image);
 
-    return Array.from(new Set([...existingReceipts, ...newReceipts]));
-  }, [data, newReceipts]);
+    return Array.from(new Set(requesterReceipts));
+  }, [data]);
 
   // Populate transactions and total
   useEffect(() => {
@@ -73,27 +75,82 @@ const FinanceLiquidForm = () => {
     setNewReceipts((prev) => [...prev, ...base64List]);
   };
 
-  // Approve / Reject action
-  const handleAction = async (action) => {
+  const handleApprove = async (fundId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const employeeName = localStorage.getItem("employee_name") || "Unknown";
+
+      // LIQUIDATION UPDATE
+      const liquidationPayload = {
+        id: data?.id,
+        status: "verified",
+        remarks: "",
+        created_by: employeeName,
+      };
+
+      const res = await fetch(`/api5012/liquidation/update_liquidation`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(liquidationPayload),
+      });
+
+      if (!res.ok) throw new Error("Failed to approve liquidation");
+      const liquidationResponse = await res.json();
+
+      // BACKEND CALCULATION
+      const updated = Array.isArray(liquidationResponse)
+        ? liquidationResponse[0]
+        : liquidationResponse;
+
+      // CASH DISBURSEMENT UPDATE
+      const disbursementPayload = {
+        rf_id: fundId,
+        amount_expended: parseFloat(updated.amount_expended) || 0,
+        amount_return: parseFloat(updated.amount_return) || 0,
+        amount_reimburse: parseFloat(updated.amount_reimburse) || 0,
+        cash_voucher: updated.cash_voucher || data?.cv_number,
+      };
+
+      const resDisb = await fetch(
+        `/api5001/cash_disbursement/updatecash_disbursement_cv`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(disbursementPayload),
+        }
+      );
+
+      if (!resDisb.ok) throw new Error("Failed to update cash disbursement");
+      await resDisb.json();
+
+      alert("Liquidation verified and cash disbursement updated successfully!");
+      navigate(-1);
+    } catch (err) {
+      console.error("❌ Approve error:", err);
+      alert(err.message || "Something went wrong");
+    }
+  };
+
+  // REJECT ACTION
+  const handleReject = async () => {
     try {
       const token = localStorage.getItem("token");
       const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
 
-      const status = action === "approve" ? "verified" : "rejected";
-      const remarks =
-        action === "reject" ? prompt("Enter remarks for rejection:") || "" : "";
+      const remarks = prompt("Enter remarks for rejection:") || "";
 
       const payload = {
         id: data?.id,
-        status,
+        status: "rejected",
         remarks,
         created_by: employeeId,
-        ...(newReceipts.length > 0 && {
-          receipts: JSON.stringify(newReceipts),
-        }),
       };
-
-      console.log("🔼 Sending payload:", payload);
 
       const res = await fetch(`/api5012/liquidation/update_liquidation`, {
         method: "PUT",
@@ -104,13 +161,13 @@ const FinanceLiquidForm = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to update liquidation");
+      if (!res.ok) throw new Error("Failed to reject liquidation");
       await res.json();
 
-      alert(`Liquidation ${status} successfully!`);
+      alert("Liquidation rejected successfully!");
       navigate(-1);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Reject error:", err);
       alert(err.message || "Something went wrong");
     }
   };
@@ -152,26 +209,36 @@ const FinanceLiquidForm = () => {
     <>
       <Container fluid className="pb-3">
         <ActionButtons
-          onApprove={() => handleAction("approve")}
-          onReject={() => handleAction("reject")}
+          onApprove={() => setShowFundModal(true)}
+          onReject={handleReject}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
           approveLabel="Approve"
+          status={data?.status}
+          role="finance"
         />
 
         <div className="custom-container border p-3">{renderInfoFields()}</div>
 
         <LiquidApprovalTable transactions={transactions} total={total} />
 
-        <LiquidationReceipt
-          images={receiptImages}
-          setNewReceipts={handleReceiptUpload}
-        />
+        <LiquidationReceipt images={receiptImages} />
       </Container>
 
+      {/* Hidden print template */}
       <div className="d-none">
         <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>
+
+      {/* Pick revolving fund modal */}
+      <PickRevolvingFund
+        show={showFundModal}
+        onClose={() => setShowFundModal(false)}
+        onSelect={(fundId) => {
+          setShowFundModal(false);
+          handleApprove(fundId);
+        }}
+      />
     </>
   );
 };

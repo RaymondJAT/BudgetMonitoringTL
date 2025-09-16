@@ -58,7 +58,6 @@ const FinanceApprovalForm = () => {
         cashVoucher = (Number(voucherInfo?.cash_voucher) || 0) + 1;
         departmentId = voucherInfo?.department_id || null;
 
-        // ✅ Use amount instead of subtotal
         await fetch("/api5001/cash_disbursement/createcash_disbursement", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -107,7 +106,7 @@ const FinanceApprovalForm = () => {
   return (
     <div className="pb-3">
       <Container fluid>
-        {/* Action Buttons */}
+        {/* ACTION BUTTONS */}
         <ActionButtons
           onApprove={() => setShowFundModal(true)}
           onReject={() => {
@@ -122,7 +121,7 @@ const FinanceApprovalForm = () => {
 
         <Row>
           <Col md={9} className="d-flex flex-column pe-md-2">
-            {/* Details */}
+            {/* DETAILS */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -133,7 +132,7 @@ const FinanceApprovalForm = () => {
                 </Col>
               </Row>
 
-              {/* Partner Fields */}
+              {/* FIELDS */}
               <Row>
                 {approvalPartnerFields.map(({ label, key }, idx) => (
                   <Col
@@ -154,7 +153,7 @@ const FinanceApprovalForm = () => {
                 ))}
               </Row>
 
-              {/* Employee Fields */}
+              {/* FIELDS */}
               {approvalFormFields.map(({ label, key }, idx) => (
                 <Row key={idx}>
                   <Col xs={12} className="d-flex align-items-center mb-2">
@@ -170,7 +169,7 @@ const FinanceApprovalForm = () => {
                 </Row>
               ))}
 
-              {/* Amount in Words */}
+              {/* AMOUNT IN WORDS */}
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
                   <strong className="title text-start">Amount in Words:</strong>
@@ -179,7 +178,7 @@ const FinanceApprovalForm = () => {
               </Row>
             </div>
 
-            {/* Table: Amount + Total */}
+            {/* TABLE AMOUNT & TOTAL */}
             <CashApprovalTable total={total} />
           </Col>
 
@@ -195,7 +194,7 @@ const FinanceApprovalForm = () => {
         onSelect={(fundId) => handleUpdateRequest("completed", "", fundId)}
       />
 
-      {/* Printable */}
+      {/* PRINTABLE */}
       <div className="d-none">
         <PrintableCashRequest
           data={{ ...data, items: [] }}

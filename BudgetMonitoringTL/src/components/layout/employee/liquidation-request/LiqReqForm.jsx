@@ -12,7 +12,7 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
     employee: "",
     department: "",
     created_date: today,
-    created_by: loggedInUser, // 🔹 always pre-fill hidden value
+    created_by: loggedInUser,
     amount_obtained: 0,
     amount_expended: 0,
     reimburse_return: "",
@@ -34,7 +34,7 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
 
   const [receipts, setReceipts] = useState([]);
 
-  // AUTO FILL if editing existing request
+  // AUTO FILL IF EDITING EXISTING REQUEST
   useEffect(() => {
     if (requestData) {
       setFormData((prev) => ({
@@ -43,7 +43,7 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
         employee: requestData.employee || "",
         department: requestData.department || "",
         created_date: today,
-        created_by: loggedInUser, // 🔹 stays hidden but included
+        created_by: loggedInUser,
         amount_obtained: parseFloat(requestData.amount_issue) || 0,
         remarks: requestData.remarks || "",
       }));
@@ -132,7 +132,7 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
 
     const payload = {
       ...formData,
-      created_by: loggedInUser, // 🔹 always attach before submit
+      created_by: loggedInUser,
       reference_id: requestData?.reference_id || "",
       request_items: liqRows,
       receipts,
