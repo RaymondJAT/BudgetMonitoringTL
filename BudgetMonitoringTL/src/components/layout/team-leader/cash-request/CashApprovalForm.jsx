@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "./CashApprovalTable";
 import ActionButtons from "../../../ActionButtons";
-import Reference from "../../../Reference";
 
 const CashApprovalForm = () => {
   const contentRef = useRef(null);
@@ -25,7 +24,6 @@ const CashApprovalForm = () => {
 
   const [amountInWords, setAmountInWords] = useState("");
 
-  // ✅ Now we only rely on `amount`
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   useEffect(() => {
@@ -78,7 +76,7 @@ const CashApprovalForm = () => {
         />
 
         <Row>
-          <Col md={9} className="d-flex flex-column pe-md-2">
+          <Col md={12} className="d-flex flex-column">
             {/* Details */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
@@ -138,10 +136,6 @@ const CashApprovalForm = () => {
 
             {/* Table: Amount + Total */}
             <CashApprovalTable total={total} />
-          </Col>
-
-          <Col md={3} className="ps-md-2">
-            <Reference data={data} />
           </Col>
         </Row>
       </Container>

@@ -12,10 +12,18 @@ export const TEAMLEAD_STATUS_LIST = [
 ];
 
 export const FINANCE_STATUS_LIST = [
-  { label: "Pending Fund Releases", key: "pending" },
-  { label: "Liquidations to Verify", key: "approved" },
-  { label: "Reimbursements to Process", key: "reimbursed" },
-  { label: "Total Funds Released", key: "total" },
+  { label: "Pending Requests", key: "pending_requests" },
+  {
+    label: "Released Vouchers",
+    key: "released_vouchers_count",
+    subKey: "released_vouchers_total",
+  },
+  {
+    label: "Verified Liquidations",
+    key: "verified_liquidations_count",
+    subKey: "verified_liquidations_total",
+  },
+  { label: "Outstanding Balance", key: "outstanding_balance" },
 ];
 
 export const BudgetOverview = [

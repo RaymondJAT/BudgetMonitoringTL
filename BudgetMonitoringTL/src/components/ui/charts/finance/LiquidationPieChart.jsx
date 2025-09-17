@@ -8,10 +8,16 @@ import {
 } from "recharts";
 import ChartCard from "../../../ChartCard";
 
-const COLORS = ["#c10e20ff", "#014f28ff"]; // Red and Green
-const RADIAN = Math.PI / 180;
+// const COLORS = [
+//   "#c10e20ff", // Red
+//   "#0243c7ff", // Blue
+//   "#ff9f1cff", // Orange
+//   "#014f28ff", // Green
+//   "#ff6b6bff", // Pink
+//   "#6b5b95ff", // Purple
+//   "#f0c808ff", // Yellow
+// ];
 
-// Same as DepartmentBudgetChart
 const renderCustomizedLabel = ({
   cx,
   cy,
@@ -21,8 +27,8 @@ const renderCustomizedLabel = ({
   percent,
 }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  const x = cx + radius * Math.cos((-midAngle * Math.PI) / 180);
+  const y = cy + radius * Math.sin((-midAngle * Math.PI) / 180);
 
   return (
     <text
@@ -39,22 +45,26 @@ const renderCustomizedLabel = ({
 };
 
 const LiquidationPieChart = ({ data }) => {
-  const processedData = [
-    {
-      name: "Unreturned Funds",
-      value: data.filter((item) => !item.reimbursementDate).length,
-    },
-    {
-      name: "Reimbursed",
-      value: data.filter((item) => item.reimbursementDate).length,
-    },
+  if (!data) return null;
+
+  const COLORS = [
+    "#c10e20ff",
+    "#0243c7ff",
+    "#ff9f00ff",
+    "#014f28ff",
+    "#800080ff",
+    "#00ced1ff",
+    "#ff1493ff",
   ];
 
+  const processedData = Object.entries(data).map(([key, value], index) => ({
+    name: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+    value: value,
+    color: COLORS[index % COLORS.length],
+  }));
+
   return (
-    <ChartCard
-      title="🧾 Liquidation vs Reimbursement"
-      style={{ fontSize: "0.75rem" }}
-    >
+    <ChartCard title="🧾 Request Status" style={{ fontSize: "0.75rem" }}>
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
@@ -65,20 +75,15 @@ const LiquidationPieChart = ({ data }) => {
             labelLine={false}
             label={renderCustomizedLabel}
           >
-            {processedData.map((_, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            {processedData.map((entry, index) => (
+              <Cell key={index} fill={entry.color} />
             ))}
           </Pie>
           <Tooltip
-            formatter={(value) => `${value} item(s)`}
+            formatter={(value) => `${value} request(s)`}
             contentStyle={{ fontSize: "0.75rem" }}
           />
-          <Legend
-            wrapperStyle={{ fontSize: "0.75rem" }}
-            formatter={(value) => (
-              <span style={{ marginLeft: "6px" }}>{value}</span>
-            )}
-          />
+          {/* <Legend wrapperStyle={{ fontSize: "0.5rem" }} /> */}
         </PieChart>
       </ResponsiveContainer>
     </ChartCard>

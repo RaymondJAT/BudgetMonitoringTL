@@ -3,7 +3,7 @@ import { Modal, Spinner, Alert } from "react-bootstrap";
 import LiqReqForm from "../../../layout/employee/liquidation-request/LiqReqForm";
 import AppButton from "../../AppButton";
 
-const LiqFormModal = ({ show, onHide, requestData = null }) => {
+const LiqFormModal = ({ show, onHide, requestData = null, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -37,6 +37,12 @@ const LiqFormModal = ({ show, onHide, requestData = null }) => {
 
       const result = await response.json();
       console.log("Liquidation submitted:", result);
+
+      // ✅ notify parent with the new liquidation_id
+      if (onSuccess && result?.id) {
+        onSuccess(result); // pass the whole object, or just result.id
+      }
+
       onHide();
     } catch (err) {
       console.error("Error submitting liquidation:", err);

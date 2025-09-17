@@ -585,7 +585,7 @@ input[type="checkbox"]:checked {
 /* TRASH TABLE */
 .trash-wrapper {
   position: relative;
-  height: 495px;
+  /* height: 537px; */
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 5px;

@@ -106,7 +106,7 @@ const MyExpenses = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
+        {/* <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} /> */}
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
@@ -138,9 +138,9 @@ const MyExpenses = () => {
           <LiqFormModal
             show={showLiqFormModal}
             onHide={() => setShowLiqFormModal(false)}
-            onSubmit={(newForm) =>
+            onSuccess={(newForm) =>
               setTableData((prev) => [
-                { ...newForm, formType: "Liquidation", id: newForm.cr_id },
+                { ...newForm, formType: "Liquidation", id: newForm.id },
                 ...prev,
               ])
             }

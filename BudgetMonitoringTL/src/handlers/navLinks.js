@@ -33,14 +33,14 @@ export const navConfig = [
       { label: "History", path: "/finance_history" },
     ],
   },
-  {
-    label: "Reports & Logs",
-    icon: TbReport,
-    children: [
-      { label: "Budget Reports", path: "/budget_report" },
-      { label: "Audit Logs", path: "#" },
-    ],
-  },
+  // {
+  //   label: "Reports & Logs",
+  //   icon: TbReport,
+  //   children: [
+  //     { label: "Budget Reports", path: "/budget_report" },
+  //     { label: "Audit Logs", path: "#" },
+  //   ],
+  // },
   {
     label: "Cash Flow",
     icon: GiExpense,

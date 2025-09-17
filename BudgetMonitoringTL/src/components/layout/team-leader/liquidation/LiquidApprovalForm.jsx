@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
@@ -11,6 +11,7 @@ import ActionButtons from "../../../ActionButtons";
 import LiquidApprovalTable from "./LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "./LiquidationReceipt";
+import Reference from "../../../Reference";
 import { normalizeBase64Image } from "../../../../utils/image";
 
 const LiquidApprovalForm = () => {
@@ -26,7 +27,7 @@ const LiquidApprovalForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // Fetch receipts from the API (always requester’s receipts)
+  // Fetch receipts
   useEffect(() => {
     if (!data?.id) return;
 
@@ -66,17 +67,14 @@ const LiquidApprovalForm = () => {
     fetchReceipts();
   }, [data]);
 
-  // Use only requester’s receipts
   const receiptImages = useMemo(() => apiReceipts, [apiReceipts]);
 
-  // Populate transactions and total
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // Approve / Reject action
   const handleAction = async (action) => {
     try {
       const token = localStorage.getItem("token");
@@ -116,7 +114,6 @@ const LiquidApprovalForm = () => {
     }
   };
 
-  // Render info fields
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -161,15 +158,31 @@ const LiquidApprovalForm = () => {
           role={localStorage.getItem("role") || "teamlead"}
         />
 
-        <div className="custom-container border p-3">{renderInfoFields()}</div>
+        <Row className="g-3">
+          {/* LEFT COLUMN */}
+          <Col md={9}>
+            <div className="custom-container border p-3">
+              {renderInfoFields()}
+            </div>
 
-        <LiquidApprovalTable transactions={transactions} total={total} />
+            <LiquidApprovalTable transactions={transactions} total={total} />
 
-        {loadingReceipts && <Spinner animation="border" />}
-        {errorReceipts && <Alert variant="danger">{errorReceipts}</Alert>}
+            {loadingReceipts && <Spinner animation="border" />}
+            {errorReceipts && <Alert variant="danger">{errorReceipts}</Alert>}
 
-        {/* Read-only receipts */}
-        <LiquidationReceipt images={receiptImages} />
+            <LiquidationReceipt images={receiptImages} />
+          </Col>
+
+          {/* RIGHT COLUMN */}
+          <Col md={3}>
+            <div
+              className="trash-wrapper"
+              style={{ maxHeight: "525px", overflowY: "auto" }}
+            >
+              <Reference items={data?.liquidation_items || []} />
+            </div>
+          </Col>
+        </Row>
       </Container>
 
       <div className="d-none">

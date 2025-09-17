@@ -13,6 +13,7 @@ import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "../../team-leader/liquidation/LiquidationReceipt";
 import { normalizeBase64Image } from "../../../../utils/image";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
+import Reference from "../../../Reference";
 
 const FinanceLiquidForm = () => {
   const { state: data } = useLocation();
@@ -218,11 +219,25 @@ const FinanceLiquidForm = () => {
           role="finance"
         />
 
-        <div className="custom-container border p-3">{renderInfoFields()}</div>
+        <Row className="g-3">
+          <Col md={9}>
+            <div className="custom-container border p-3">
+              {renderInfoFields()}
+            </div>
 
-        <LiquidApprovalTable transactions={transactions} total={total} />
+            <LiquidApprovalTable transactions={transactions} total={total} />
 
-        <LiquidationReceipt images={receiptImages} />
+            <LiquidationReceipt images={receiptImages} />
+          </Col>
+          <Col md={3}>
+            <div
+              className="trash-wrapper"
+              style={{ maxHeight: "525px", overflowY: "auto" }}
+            >
+              <Reference items={data?.liquidation_items || []} />
+            </div>
+          </Col>
+        </Row>
       </Container>
 
       {/* Hidden print template */}
