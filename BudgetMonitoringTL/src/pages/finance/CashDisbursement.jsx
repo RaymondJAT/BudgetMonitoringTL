@@ -25,6 +25,7 @@ const CashDisbursement = () => {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedDisbursement, setSelectedDisbursement] = useState(null);
+  const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -124,6 +125,39 @@ const CashDisbursement = () => {
 
   useEffect(() => {
     fetchCashDisbursements();
+  }, []);
+
+  // TOTAL CARDS
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_finance_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Finance cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const finance = data[0] || {};
+
+        const enrichedData = FINANCE_STATUS_LIST.map((item) => ({
+          ...item,
+          value: finance[item.key] ?? 0,
+          subValue: item.subKey ? finance[item.subKey] ?? 0 : undefined,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching finance cards:", err);
+      }
+    };
+
+    fetchCards();
   }, []);
 
   const handleExport = () =>
@@ -245,7 +279,7 @@ const CashDisbursement = () => {
   return (
     <>
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} />
+        <TotalCards data={cardsData} list={FINANCE_STATUS_LIST} />
       </div>
 
       <Container fluid className="pb-3">

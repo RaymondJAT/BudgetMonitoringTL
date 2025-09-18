@@ -8,13 +8,16 @@ import { GiMoneyStack, GiExpense } from "react-icons/gi";
 
 export const navConfig = [
   {
-    label: "Dashboards",
+    label: "Admin Dashboard",
     icon: MdOutlineDashboard,
-    children: [
-      { label: "Admin Dashboard", path: "/admin_dashboard" },
-      { label: "Finance Dashboard", path: "/finance_dashboard" },
-    ],
+    path: "/admin_dashboard",
   },
+  {
+    label: "Dashboard",
+    icon: MdOutlineDashboard,
+    path: "/finance_dashboard",
+  },
+
   {
     label: "User Management",
     icon: MdOutlineManageAccounts,

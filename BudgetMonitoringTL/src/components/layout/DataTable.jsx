@@ -206,26 +206,75 @@ const DataTable = ({
     data.map((entry, index) => (
       <div
         key={entry.id || index}
-        className={`mobile-card ${
+        className={`mobile-card p-3 mb-3 border rounded shadow-sm ${
           selectedRows[entry.id] ? "highlighted-row" : ""
         }`}
+        style={{ cursor: "pointer" }}
+        onClick={() => onRowClick?.(entry)}
       >
-        <div className="mobile-card-header d-flex justify-content-between align-items-center">
+        {/* Top: main info (first column) */}
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <strong>{entry.description || entry.name || entry.id}</strong>
+          </div>
           {showCheckbox && (
             <Form.Check
               type="checkbox"
               checked={selectedRows[entry.id] || false}
+              onClick={(e) => e.stopPropagation()}
               onChange={() => toggleRowSelection(entry.id)}
-              style={{ marginRight: "0.5rem" }}
             />
           )}
-          {showActions &&
-            (actionType === "meatball" ? (
+        </div>
+
+        {columns.map((col, i) => {
+          if (col.accessor === "price" || col.accessor === "quantity")
+            return null;
+
+          let value = entry[col.accessor];
+
+          switch (col.accessor) {
+            case "status":
+              value = (
+                <span className={`status-badge ${String(value).toLowerCase()}`}>
+                  {value}
+                </span>
+              );
+              break;
+            case "total":
+              value = formatCurrency(entry.total || entry.amountObtained);
+              break;
+            case "quantity":
+              value = entry.transactions?.map((item, i) => (
+                <div key={i}>{item.quantity}</div>
+              ));
+              break;
+            case "price":
+              value = entry.transactions?.map((item, i) => (
+                <div key={i}>{formatCurrency(item.price)}</div>
+              ));
+              break;
+            default:
+              value = value ?? "";
+          }
+
+          return (
+            <div key={i} className="d-flex justify-content-between mb-1">
+              <span>{col.label}:</span>
+              <span>{value}</span>
+            </div>
+          );
+        })}
+
+        {showActions && (
+          <div className="d-flex justify-content-end mt-2">
+            {actionType === "meatball" ? (
               <ActionMenu entry={entry} index={index} />
             ) : (
               <ActionButton entry={entry} />
-            ))}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     ));
 

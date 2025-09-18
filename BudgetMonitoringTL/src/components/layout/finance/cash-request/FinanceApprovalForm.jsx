@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable";
 import ActionButtons from "../../../ActionButtons";
-import Reference from "../../../Reference";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
 
 const FinanceApprovalForm = () => {
@@ -27,7 +26,7 @@ const FinanceApprovalForm = () => {
   const [amountInWords, setAmountInWords] = useState("");
   const [showFundModal, setShowFundModal] = useState(false);
 
-  // ✅ Now use only amount
+  // ✅ Use amount only
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   useEffect(() => {
@@ -120,7 +119,7 @@ const FinanceApprovalForm = () => {
         />
 
         <Row>
-          <Col md={9} className="d-flex flex-column pe-md-2">
+          <Col md={12} className="d-flex flex-column">
             {/* DETAILS */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
@@ -132,7 +131,7 @@ const FinanceApprovalForm = () => {
                 </Col>
               </Row>
 
-              {/* FIELDS */}
+              {/* PARTNER FIELDS */}
               <Row>
                 {approvalPartnerFields.map(({ label, key }, idx) => (
                   <Col
@@ -153,7 +152,7 @@ const FinanceApprovalForm = () => {
                 ))}
               </Row>
 
-              {/* FIELDS */}
+              {/* APPROVAL FORM FIELDS */}
               {approvalFormFields.map(({ label, key }, idx) => (
                 <Row key={idx}>
                   <Col xs={12} className="d-flex align-items-center mb-2">
@@ -180,10 +179,6 @@ const FinanceApprovalForm = () => {
 
             {/* TABLE AMOUNT & TOTAL */}
             <CashApprovalTable total={total} />
-          </Col>
-
-          <Col md={3} className="ps-md-2">
-            <Reference data={data} />
           </Col>
         </Row>
       </Container>

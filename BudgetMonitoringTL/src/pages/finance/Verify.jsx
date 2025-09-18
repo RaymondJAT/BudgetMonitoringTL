@@ -21,6 +21,7 @@ const Verify = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
 
   const fetchFinanceLiquidations = useCallback(async () => {
     setLoading(true);
@@ -60,7 +61,38 @@ const Verify = () => {
     fetchFinanceLiquidations();
   }, [fetchFinanceLiquidations]);
 
-  const totalComputationData = useMemo(() => tableData, [tableData]);
+  // TOTAL CARDS
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_finance_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Finance cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const finance = data[0] || {};
+
+        const enrichedData = FINANCE_STATUS_LIST.map((item) => ({
+          ...item,
+          value: finance[item.key] ?? 0,
+          subValue: item.subKey ? finance[item.subKey] ?? 0 : undefined,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching finance cards:", err);
+      }
+    };
+
+    fetchCards();
+  }, []);
 
   // FILTER & SEARCH
   const filteredData = useMemo(() => {
@@ -85,7 +117,7 @@ const Verify = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        {/* <TotalCards data={totalComputationData} list={FINANCE_STATUS_LIST} /> */}
+        <TotalCards data={cardsData} list={FINANCE_STATUS_LIST} />
       </div>
 
       <Container fluid>
@@ -119,7 +151,7 @@ const Verify = () => {
           {!loading && !error && (
             <DataTable
               data={filteredData}
-              height="455px"
+              height="440px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
               noDataMessage="No liquidation records found."

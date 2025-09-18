@@ -12,7 +12,7 @@ const History = () => {
   const [revolvingFundData, setRevolvingFundData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch histories
+  // FETCH
   useEffect(() => {
     const fetchHistories = async () => {
       try {
@@ -43,15 +43,15 @@ const History = () => {
   return (
     <>
       <Container fluid className="pb-3">
-        {/*  CASH DISBURSEMENT HISTORY */}
+        {/*  REVOLVING FUND HISTORY */}
         <div className="custom-container shadow-sm rounded p-3 mt-3">
           <Row>
             <Col>
-              <p className="fw-bold mb-2">💰 Revolving Fund History</p>
+              <p className="fw-bold mb-2">Revolving Fund History</p>
               <DataTable
                 data={revolvingFundData}
                 columns={revolvingHistory}
-                height="350px"
+                height="250px"
                 showActions={false}
                 showCheckbox={false}
               />
@@ -60,15 +60,15 @@ const History = () => {
           </Row>
         </div>
 
-        {/*  REVOLVING FUND HISTORY */}
+        {/*  CASH DISBURSEMENT HISTORY */}
         <div className="custom-container shadow-sm rounded p-3 mt-3">
           <Row>
             <Col>
-              <p className="fw-bold mb-2">📑 Cash Disbursement History</p>
+              <p className="fw-bold mb-2">Cash Disbursement History</p>
               <DataTable
                 data={cashDisbursementData}
                 columns={disbursementHistory}
-                height="350px"
+                height="250px"
                 showActions={false}
                 showCheckbox={false}
               />

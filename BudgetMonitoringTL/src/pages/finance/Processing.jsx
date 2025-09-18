@@ -37,6 +37,7 @@ const Processing = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [particulars, setParticulars] = useState([]);
   const [printData, setPrintData] = useState(null);
+  const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
 
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -80,6 +81,39 @@ const Processing = () => {
   useEffect(() => {
     fetchProcessingData();
   }, [fetchProcessingData]);
+
+  // TOTAL CARDS
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_finance_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Finance cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const finance = data[0] || {};
+
+        const enrichedData = FINANCE_STATUS_LIST.map((item) => ({
+          ...item,
+          value: finance[item.key] ?? 0,
+          subValue: item.subKey ? finance[item.subKey] ?? 0 : undefined,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching finance cards:", err);
+      }
+    };
+
+    fetchCards();
+  }, []);
 
   // KEEP PARTICULARS SYNC
   useEffect(() => {
@@ -135,7 +169,7 @@ const Processing = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        {/* <TotalCards data={tableData} list={FINANCE_STATUS_LIST} /> */}
+        <TotalCards data={cardsData} list={FINANCE_STATUS_LIST} />
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
@@ -151,7 +185,7 @@ const Processing = () => {
 
           <DataTable
             data={filteredData}
-            height="450px"
+            height="440px"
             columns={columns}
             onRowClick={handleRowClick}
             selectedRows={selectedRows}
