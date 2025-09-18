@@ -13,20 +13,16 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile }) => {
   const [openDropdown, setOpenDropdown] = useState(isSidebarOpen ? [] : null);
   const [dropdownPositions, setDropdownPositions] = useState({});
 
-  // ✅ get allowed routes from localStorage
   const allowedRoutes = JSON.parse(localStorage.getItem("access") || "[]");
 
-  // ✅ filter nav items based on access
   const filteredNavItems = navConfig
     .map((item) => {
       if (item.children) {
-        const children = item.children.filter((child) =>
-          hasAccess(child.path, allowedRoutes)
-        );
+        const children = item.children.filter((child) => hasAccess(child.path));
         if (children.length === 0) return null;
         return { ...item, children };
       }
-      return hasAccess(item.path, allowedRoutes) ? item : null;
+      return hasAccess(item.path) ? item : null;
     })
     .filter(Boolean);
 

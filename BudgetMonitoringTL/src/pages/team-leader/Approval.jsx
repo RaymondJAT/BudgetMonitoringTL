@@ -149,7 +149,7 @@ const Approval = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} />
+        {/* <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} /> */}
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">

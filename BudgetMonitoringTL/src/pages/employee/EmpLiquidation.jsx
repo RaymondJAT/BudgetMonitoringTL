@@ -29,12 +29,10 @@ const EmpLiquidation = () => {
       setError(null);
 
       const token = localStorage.getItem("token");
-      const employeeName = localStorage.getItem("employee_name");
+      const employeeId = localStorage.getItem("employee_id");
       const accessName = localStorage.getItem("access_name");
 
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
+      if (!token) throw new Error("No authentication token found");
 
       const response = await fetch("/api5012/liquidation/getcash_liquidation", {
         headers: {
@@ -47,24 +45,24 @@ const EmpLiquidation = () => {
 
       const result = await response.json();
 
-      const apiData = Array.isArray(result) ? result : result.data || [];
-
-      if (apiData.length === 0) {
-        setTableData([]);
-        setLoading(false);
-        return;
-      }
-
-      const visibleData =
+      const filtered =
         String(accessName) === "Administrator"
-          ? apiData
-          : apiData.filter(
-              (item) => String(item.employee) === String(employeeName)
-            );
+          ? result || []
+          : (result || []).filter((item) => {
+              const apiEmpId = String(
+                item.employee_id ||
+                  item.emp_id ||
+                  item.employeeId ||
+                  item.created_by ||
+                  ""
+              ).trim();
+              const localEmpId = String(employeeId || "").trim();
+              return apiEmpId === localEmpId;
+            });
 
-      const mappedData = visibleData.map((item, index) => ({
+      const mappedData = filtered.map((item, index) => ({
         ...item,
-        id: item.id || item._id || `${index}-${Date.now()}`,
+        id: item.id ?? `${index}`,
         formType: "Liquidation",
       }));
 
@@ -96,7 +94,7 @@ const EmpLiquidation = () => {
           normalizeString(item[key]).includes(normalizeString(searchValue))
       )
     );
-  }, [tableData, searchValue, liquidationColumns]);
+  }, [tableData, searchValue]);
 
   const handleRowClick = (entry) => {
     navigate("/view_liquidation_form", { state: entry });
@@ -108,12 +106,10 @@ const EmpLiquidation = () => {
 
   return (
     <div className="pb-3">
-      {/* Summary cards */}
       <div className="mt-3">
-        <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} />
+        {/* <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} /> */}
       </div>
 
-      {/* DataTable */}
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
           <ToolBar
@@ -124,14 +120,12 @@ const EmpLiquidation = () => {
             onRefresh={handleRetry}
           />
 
-          {/* Loading state */}
           {loading && (
             <Alert variant="info" className="text-center">
               Loading data...
             </Alert>
           )}
 
-          {/* Error state */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
@@ -146,14 +140,12 @@ const EmpLiquidation = () => {
             </Alert>
           )}
 
-          {/* Empty state */}
           {!loading && !error && tableData.length === 0 && (
             <Alert variant="warning" className="text-center">
               No liquidation records found.
             </Alert>
           )}
 
-          {/* Data table */}
           {!loading && !error && tableData.length > 0 && (
             <DataTable
               data={filteredData}

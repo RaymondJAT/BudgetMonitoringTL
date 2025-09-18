@@ -71,6 +71,11 @@ export const navConfig = [
       { label: "Verified", path: "/finance_verified" },
       { label: "For Review", path: "/liquidation_review" },
       { label: "Reviewed", path: "/liquidation_reviewed" },
+      {
+        label: "Rejected Liquidations",
+        path: "/finance_rejected_liquidations",
+      },
+      { label: "Rejected", path: "/reject_liquidations" },
       // { label: "History", path: "/lead_history" },
     ],
   },

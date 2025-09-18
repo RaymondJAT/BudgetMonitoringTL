@@ -14,7 +14,7 @@ const normalizeString = (value) =>
     .toLowerCase()
     .trim();
 
-const Verified = () => {
+const RejectedLiquidation = () => {
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState([]);
@@ -22,7 +22,7 @@ const Verified = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchVerifiedLiquidations = useCallback(async () => {
+  const fetchRejectedLiquidations = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -30,22 +30,22 @@ const Verified = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      // ✅ Fetch only VERIFIED liquidations
+      // Fetch only rejected liquidations
       const res = await fetch(
-        "/api5012/liquidation/getapproved_liquidation?status=verified",
+        "/api5012/liquidation/getapproved_liquidation?status=rejected",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch verified liquidations");
+      if (!res.ok) throw new Error("Failed to fetch rejected liquidations");
 
       const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
       const mappedData = apiData.map((item, index) => ({
         ...item,
-        id: item.id || item._id || `verified-${index}`,
+        id: item.id || item._id || `liq-${index}`,
       }));
 
       setTableData(mappedData);
@@ -58,8 +58,8 @@ const Verified = () => {
 
   // INITIAL FETCH
   useEffect(() => {
-    fetchVerifiedLiquidations();
-  }, [fetchVerifiedLiquidations]);
+    fetchRejectedLiquidations();
+  }, [fetchRejectedLiquidations]);
 
   const totalComputationData = useMemo(() => tableData, [tableData]);
 
@@ -94,13 +94,13 @@ const Verified = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onRefresh={fetchVerifiedLiquidations}
+            onRefresh={fetchRejectedLiquidations}
           />
 
           {/* LOADING STATE */}
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading verified liquidation records...
+              Loading rejected liquidation records...
             </Alert>
           )}
 
@@ -109,21 +109,21 @@ const Verified = () => {
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <Button size="sm" onClick={fetchVerifiedLiquidations}>
+                <Button size="sm" onClick={fetchRejectedLiquidations}>
                   Try Again
                 </Button>
               </div>
             </Alert>
           )}
 
-          {/* TABLE IS ALWAYS RENDERED */}
+          {/* TABLE */}
           {!loading && !error && (
             <DataTable
               data={filteredData}
               height="455px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
-              noDataMessage="No verified liquidation records found."
+              noDataMessage="No rejected liquidation records found."
             />
           )}
         </div>
@@ -132,4 +132,4 @@ const Verified = () => {
   );
 };
 
-export default Verified;
+export default RejectedLiquidation;

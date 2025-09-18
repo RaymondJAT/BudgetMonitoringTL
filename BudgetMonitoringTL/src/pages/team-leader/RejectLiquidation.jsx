@@ -14,7 +14,7 @@ const normalizeString = (value) =>
     .toLowerCase()
     .trim();
 
-const Reviewed = () => {
+const RejectLiquidation = () => {
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState([]);
@@ -23,7 +23,7 @@ const Reviewed = () => {
   const [error, setError] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
 
-  const fetchReviewed = useCallback(async () => {
+  const fetchRejectedLiquidations = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -31,35 +31,27 @@ const Reviewed = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      const response = await fetch("/api5012/liquidation/getcash_liquidation", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // Fetch only rejected liquidations
+      const response = await fetch(
+        "/api5012/liquidation/getcash_liquidation?status=rejected",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok)
-        throw new Error("Failed to fetch reviewed liquidations");
+        throw new Error("Failed to fetch rejected liquidations");
 
       const result = await response.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const approvedData = apiData.filter((item) => {
-        const status = normalizeString(item.status);
-        const leadStatus = normalizeString(item.team_lead_status);
-
-        return (
-          status === "approved" ||
-          status === "verified" ||
-          leadStatus === "approved" ||
-          leadStatus === "verified"
-        );
-      });
-
-      const mappedData = approvedData.map((item, index) => ({
+      const mappedData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || index,
-        formType: "Reviewed",
+        formType: "Reject Liquidation",
       }));
 
       setTableData(mappedData);
@@ -71,8 +63,8 @@ const Reviewed = () => {
   }, []);
 
   useEffect(() => {
-    fetchReviewed();
-  }, [fetchReviewed]);
+    fetchRejectedLiquidations();
+  }, [fetchRejectedLiquidations]);
 
   const totalComputationData = useMemo(() => tableData, [tableData]);
 
@@ -87,7 +79,7 @@ const Reviewed = () => {
     );
   }, [tableData, searchValue]);
 
-  const handleRetry = () => fetchReviewed();
+  const handleRetry = () => fetchRejectedLiquidations();
 
   const handleRowClick = (entry) => {
     setSelectedRowId(entry.id);
@@ -95,7 +87,7 @@ const Reviewed = () => {
     navigate("/liquid_approval_form", {
       state: {
         ...entry,
-        role: "reviewer",
+        role: "team-leader",
       },
     });
   };
@@ -103,6 +95,7 @@ const Reviewed = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
+        {/* You can uncomment TotalCards if needed */}
         {/* <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} /> */}
       </div>
 
@@ -116,7 +109,7 @@ const Reviewed = () => {
 
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading reviewed records...
+              Loading rejected liquidation records...
             </Alert>
           )}
 
@@ -134,25 +127,18 @@ const Reviewed = () => {
             </Alert>
           )}
 
-          {!loading && !error && filteredData.length === 0 && (
-            <Alert variant="warning" className="text-center">
-              No reviewed liquidation records found.
-            </Alert>
-          )}
-
-          {!loading && !error && filteredData.length > 0 && (
-            <DataTable
-              data={filteredData}
-              height="455px"
-              columns={liquidationColumns}
-              onRowClick={handleRowClick}
-              selectedRowId={selectedRowId}
-            />
-          )}
+          <DataTable
+            data={filteredData}
+            height="455px"
+            columns={liquidationColumns}
+            onRowClick={handleRowClick}
+            selectedRowId={selectedRowId}
+            noDataMessage="No rejected liquidation records found."
+          />
         </div>
       </Container>
     </div>
   );
 };
 
-export default Reviewed;
+export default RejectLiquidation;

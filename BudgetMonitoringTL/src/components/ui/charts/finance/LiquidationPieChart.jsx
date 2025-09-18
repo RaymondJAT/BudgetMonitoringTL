@@ -1,22 +1,5 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import ChartCard from "../../../ChartCard";
-
-// const COLORS = [
-//   "#c10e20ff", // Red
-//   "#0243c7ff", // Blue
-//   "#ff9f1cff", // Orange
-//   "#014f28ff", // Green
-//   "#ff6b6bff", // Pink
-//   "#6b5b95ff", // Purple
-//   "#f0c808ff", // Yellow
-// ];
 
 const renderCustomizedLabel = ({
   cx,
@@ -47,20 +30,20 @@ const renderCustomizedLabel = ({
 const LiquidationPieChart = ({ data }) => {
   if (!data) return null;
 
-  const COLORS = [
-    "#c10e20ff",
-    "#0243c7ff",
-    "#ff9f00ff",
-    "#014f28ff",
-    "#800080ff",
-    "#00ced1ff",
-    "#ff1493ff",
-  ];
+  const COLORS = {
+    rejected_requests: "#c10e20", // Red
+    rejected_liquidations: "#800000", // Maroon
+    pending_requests: "#ff9f00", // Orange
+    pending_liquidations: "#f0c808", // Yellow
+    approved_requests: "#014f28", // Green
+    verified_liquidations: "#205bd1", // Blue
+    approved_liquidations: "#20ced1", // Cyan
+  };
 
-  const processedData = Object.entries(data).map(([key, value], index) => ({
+  const processedData = Object.entries(data).map(([key, value]) => ({
     name: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
-    value: value,
-    color: COLORS[index % COLORS.length],
+    value,
+    color: COLORS[key] || "#000000ff", 
   }));
 
   return (

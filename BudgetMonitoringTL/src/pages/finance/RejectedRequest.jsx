@@ -47,7 +47,6 @@ const RejectedRequest = () => {
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
   // Fetch rejected finance requests
-  // Fetch rejected finance requests
   const fetchRejectedData = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
@@ -135,7 +134,7 @@ const RejectedRequest = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        <TotalCards data={tableData} list={FINANCE_STATUS_LIST} />
+        {/* <TotalCards data={tableData} list={FINANCE_STATUS_LIST} /> */}
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
