@@ -22,6 +22,7 @@ const EmpLiquidation = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cardsData, setCardsData] = useState([EMPLOYEE_STATUS_LIST]);
 
   const fetchLiquidations = useCallback(async () => {
     try {
@@ -78,12 +79,41 @@ const EmpLiquidation = () => {
     fetchLiquidations();
   }, [fetchLiquidations]);
 
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_requester_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Teamleader cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const teamleader = data[0] || {};
+
+        const enrichedData = EMPLOYEE_STATUS_LIST.map((item) => ({
+          ...item,
+          value: teamleader[item.key] ?? 0,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching teamleader cards:", err);
+      }
+    };
+
+    fetchCards();
+  }, []);
+
   const selectedCount = useMemo(
     () => Object.values(selectedRows).filter(Boolean).length,
     [selectedRows]
   );
-
-  const totalComputationData = useMemo(() => tableData, [tableData]);
 
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
@@ -107,7 +137,7 @@ const EmpLiquidation = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        {/* <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} /> */}
+        <TotalCards data={cardsData} list={EMPLOYEE_STATUS_LIST} />
       </div>
 
       <Container fluid>
@@ -149,7 +179,7 @@ const EmpLiquidation = () => {
           {!loading && !error && tableData.length > 0 && (
             <DataTable
               data={filteredData}
-              height="350px"
+              height="450px"
               columns={liquidationColumns}
               onRowClick={handleRowClick}
               selectedRows={selectedRows}

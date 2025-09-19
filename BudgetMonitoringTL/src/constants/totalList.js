@@ -1,11 +1,4 @@
 export const EMPLOYEE_STATUS_LIST = [
-  { label: "Pending Approval", key: "pending" },
-  { label: "Awaiting Liquidation", key: "awaiting_liquidation" },
-  { label: "For Reimbursement", key: "for_reimbursement" },
-  { label: "Outstanding Balance", key: "outstanding_balance" },
-];
-
-export const TEAMLEAD_STATUS_LIST = [
   { label: "Pending Requests", key: "pending_requests", showPeso: false },
   { label: "Approved Requests", key: "approved_requests", showPeso: false },
   {
@@ -13,11 +6,22 @@ export const TEAMLEAD_STATUS_LIST = [
     key: "pending_liquidations",
     showPeso: false,
   },
+  { label: "Remaining Balance", key: "wallet_balance" },
+];
+
+export const TEAMLEAD_STATUS_LIST = [
+  { label: "Pending Requests", key: "pending_requests", showPeso: false },
+  // { label: "Approved Requests", key: "approved_requests", showPeso: false },
   {
-    label: "Reviewed Liquidations",
-    key: "approved_liquidations",
+    label: "Pending Liquidations",
+    key: "pending_liquidations",
     showPeso: false,
   },
+  // {
+  //   label: "Reviewed Liquidations",
+  //   key: "approved_liquidations",
+  //   showPeso: false,
+  // },
 ];
 
 export const FINANCE_STATUS_LIST = [

@@ -1,6 +1,7 @@
 import { FaArrowLeft, FaPrint, FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 import AppButton from "./ui/AppButton";
+import Swal from "sweetalert2";
 
 const ActionButtons = ({
   onApprove,
@@ -24,6 +25,34 @@ const ActionButtons = ({
       status?.toLowerCase() === "verified";
   }
 
+  const handleApprove = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to approve this request?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, approve it",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) onApprove();
+    });
+  };
+
+  const handleReject = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to reject this request?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, reject it",
+      confirmButtonColor: "#ff0000",
+      cancelButtonText: "Cancel",
+      cancelButtonColor: "#000000",
+    }).then((result) => {
+      if (result.isConfirmed) onReject();
+    });
+  };
+
   return (
     <div className="custom-btn d-flex flex-wrap justify-content-start align-items-center pt-3 pb-3">
       {/* BACK BUTTON */}
@@ -35,7 +64,7 @@ const ActionButtons = ({
         className="custom-app-button btn-responsive"
       />
 
-      {/* APPROVE/REJECT IF NOT HIDDENT */}
+      {/* APPROVE/REJECT IF NOT HIDDEN */}
       {!hideApproveReject && !isApproved && (
         <>
           <AppButton
@@ -47,7 +76,24 @@ const ActionButtons = ({
             }
             variant="outline-success"
             size="sm"
-            onClick={onApprove}
+            onClick={() => {
+              if (role === "finance") {
+                onApprove();
+              } else {
+                Swal.fire({
+                  title: "Are you sure?",
+                  text: "Do you want to approve this request?",
+                  icon: "question",
+                  showCancelButton: true,
+                  confirmButtonText: "Yes, approve it",
+                  confirmButtonColor: "#008000",
+                  cancelButtonText: "Cancel",
+                  cancelButtonColor: "#000000",
+                }).then((result) => {
+                  if (result.isConfirmed) onApprove();
+                });
+              }
+            }}
             className="custom-app-button btn-responsive ms-2"
           />
 
@@ -60,7 +106,7 @@ const ActionButtons = ({
             }
             variant="outline-danger"
             size="sm"
-            onClick={onReject}
+            onClick={handleReject}
             className="custom-app-button btn-responsive ms-2"
           />
         </>

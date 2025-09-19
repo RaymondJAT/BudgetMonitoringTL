@@ -7,7 +7,11 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <div
       style={{
-        backgroundColor: "#800000",
+        backgroundImage:
+          "linear-gradient(rgba(0,0,0,0.1), rgba(0,0,1,0.4)), url('/background.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
         minHeight: "100vh",
       }}
       className="table-wrapper"

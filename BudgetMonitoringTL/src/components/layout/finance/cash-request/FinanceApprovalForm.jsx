@@ -12,6 +12,7 @@ import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable";
 import ActionButtons from "../../../ActionButtons";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
+import Swal from "sweetalert2";
 
 const FinanceApprovalForm = () => {
   const contentRef = useRef(null);
@@ -26,7 +27,7 @@ const FinanceApprovalForm = () => {
   const [amountInWords, setAmountInWords] = useState("");
   const [showFundModal, setShowFundModal] = useState(false);
 
-  // ✅ Use amount only
+  // USE AMOUNT
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   useEffect(() => {
@@ -100,6 +101,33 @@ const FinanceApprovalForm = () => {
       console.error(err);
       toast.error("Something went wrong while processing approval.");
     }
+  };
+
+  const handleSelectFund = (fundId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to approve this cash request using the selected fund?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, approve",
+      confirmButtonColor: "#008000",
+      cancelButtonText: "Cancel",
+      cancelButtonColor: "#000000",
+      zIndex: 2000,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleUpdateRequest("completed", "", fundId);
+        setShowFundModal(false);
+        Swal.fire({
+          icon: "success",
+          title: "Approved!",
+          text: "Cash request approved successfully",
+          timer: 1500,
+          showConfirmButton: false,
+          zIndex: 2000,
+        });
+      }
+    });
   };
 
   return (
@@ -186,7 +214,7 @@ const FinanceApprovalForm = () => {
       <PickRevolvingFund
         show={showFundModal}
         onClose={() => setShowFundModal(false)}
-        onSelect={(fundId) => handleUpdateRequest("completed", "", fundId)}
+        onSelect={handleSelectFund}
       />
 
       {/* PRINTABLE */}

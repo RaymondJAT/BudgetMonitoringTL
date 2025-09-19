@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { Modal, Spinner, Alert, Row, Col, Container } from "react-bootstrap";
 import AppButton from "../../AppButton";
-import TotalCards from "../../../TotalCards";
 import ToolBar from "../../../layout/ToolBar";
 import DataTable from "../../../layout/DataTable";
-import BudgetCharts from "../../charts/admin/BudgetCharts";
-import { BudgetAllocationOverview } from "../../../../constants/totalList";
 import { allocationColumns } from "../../../../constants/historyColumn";
 
-// Normalization function
+// NORMALIZATION FUNCTION
 const normalizeTransaction = (item) => ({
   id: item.id ?? item.ID ?? "—",
   date_issue: item.date_issue ?? item.dateIssued ?? "—",
@@ -125,23 +122,10 @@ const ViewBudgetAllocation = ({ show, onHide, rf_id }) => {
         style={{ backgroundColor: "#800000" }}
         className="cashreq-scroll text-white"
       >
-        <Row>
-          <Col>
-            <TotalCards
-              data={totalsData}
-              list={BudgetAllocationOverview}
-              type="view"
-              size="sm"
-            />
-          </Col>
-        </Row>
-
         <Container fluid>
-          <BudgetCharts transactions={transactions} />
-
           <Row>
             <Col>
-              <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column mt-3">
+              <div className="custom-container flex-grow-1 p-3 rounded shadow-sm d-flex flex-column">
                 <ToolBar
                   searchValue=""
                   onSearchChange={() => {}}
@@ -150,7 +134,7 @@ const ViewBudgetAllocation = ({ show, onHide, rf_id }) => {
                       className="fw-bold"
                       style={{ fontSize: "0.75rem", color: "black" }}
                     >
-                      📑 Budget Overview
+                      Budget Overview
                     </span>
                   }
                   showFilter={false}

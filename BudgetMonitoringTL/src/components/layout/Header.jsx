@@ -51,7 +51,7 @@ const Header = ({
   const getPageTitle = () => pageTitles[location.pathname] || "";
 
   const handleLogout = () => {
-    onLogout(); // ✅ call parent logout
+    onLogout(); // PARENT LOGOUT
     navigate("/login", { replace: true });
   };
 
@@ -62,7 +62,7 @@ const Header = ({
     >
       <Container fluid>
         <div className="d-flex justify-content-between align-items-center w-100">
-          {/* Sidebar Toggle & Page Title */}
+          {/* SIDEBAR TOGGLE & PAGE TITLE */}
           <div className="d-flex align-items-center">
             <button
               onClick={toggleSidebar}
@@ -91,7 +91,7 @@ const Header = ({
             </span>
           </div>
 
-          {/* Notification and User Menu */}
+          {/* NOTIF & USER MENU */}
           <div className="d-flex align-items-center gap-3 ms-auto">
             <FaBell
               style={{ fontSize: "1.2rem", cursor: "pointer" }}
@@ -112,13 +112,6 @@ const Header = ({
                 </span>
               </Dropdown.Toggle>
               <Dropdown.Menu align="end">
-                <Dropdown.Item
-                  className="dropdown-red-highlight"
-                  style={{ fontSize: "0.75rem" }}
-                >
-                  Settings
-                </Dropdown.Item>
-                <Dropdown.Divider />
                 <Dropdown.Item
                   onClick={handleLogout}
                   className="dropdown-red-highlight"

@@ -8,11 +8,11 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const sidebarRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const [openDropdown, setOpenDropdown] = useState([]);
   const [dropdownPositions, setDropdownPositions] = useState({});
 
-  // Filter nav items based on access
   const filteredNavItems = navConfig
     .map((item) => {
       if (item.children) {
@@ -24,7 +24,6 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile }) => {
     })
     .filter(Boolean);
 
-  // Toggle dropdown (handles desktop expanded, mobile collapsed)
   const toggleDropdown = (e, label) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const isMobileView = window.innerWidth <= 576;
@@ -35,28 +34,38 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile }) => {
     }));
 
     if (isSidebarOpen) {
-      // Desktop: open inside sidebar
       setOpenDropdown((prev) =>
         prev.includes(label)
           ? prev.filter((l) => l !== label)
           : [...prev, label]
       );
     } else {
-      // Mobile/collapsed: popout
       setOpenDropdown((prev) => (prev === label ? null : label));
     }
   };
 
-  // Close popouts when clicking outside
+  useEffect(() => {
+    setOpenDropdown([]);
+  }, [isSidebarOpen]);
+
+  // SIDEBAR COLLAPSE CLOSE DROPDOWN ON OUTSIDE CLICK
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
-        setOpenDropdown([]);
+      if (!isSidebarOpen) {
+        if (
+          sidebarRef.current &&
+          !sidebarRef.current.contains(e.target) &&
+          dropdownRef.current &&
+          !dropdownRef.current.contains(e.target)
+        ) {
+          setOpenDropdown(null);
+        }
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isSidebarOpen]);
 
   return (
     <div
@@ -118,6 +127,7 @@ const Sidebar = ({ isSidebarOpen, isSidebarHiddenMobile }) => {
               {/* DROPDOWN MENU */}
               {item.children && (
                 <div
+                  ref={dropdownRef}
                   className={`dropdown-wrapper ${
                     isSidebarOpen ? "ms-4 me-3" : "position-fixed"
                   } ${isOpen ? "open" : ""}`}

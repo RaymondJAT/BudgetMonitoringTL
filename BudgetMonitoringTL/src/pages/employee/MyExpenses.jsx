@@ -19,6 +19,7 @@ const MyExpenses = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showCashReqModal, setShowCashReqModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
+  const [cardsData, setCardsData] = useState([EMPLOYEE_STATUS_LIST]);
   const navigate = useNavigate();
 
   const fetchCashRequests = useCallback(async () => {
@@ -61,8 +62,38 @@ const MyExpenses = () => {
     fetchCashRequests();
   }, [fetchCashRequests]);
 
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_requester_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Teamleader cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const teamleader = data[0] || {};
+
+        const enrichedData = EMPLOYEE_STATUS_LIST.map((item) => ({
+          ...item,
+          value: teamleader[item.key] ?? 0,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching teamleader cards:", err);
+      }
+    };
+
+    fetchCards();
+  }, []);
+
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
-  const totalComputationData = useMemo(() => tableData, [tableData]);
 
   const normalize = (value) =>
     String(value || "")
@@ -106,7 +137,7 @@ const MyExpenses = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        {/* <TotalCards data={totalComputationData} list={EMPLOYEE_STATUS_LIST} /> */}
+        <TotalCards data={cardsData} list={EMPLOYEE_STATUS_LIST} />
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">
@@ -120,7 +151,7 @@ const MyExpenses = () => {
 
           <DataTable
             data={filteredData}
-            height="350px"
+            height="450px"
             columns={columns}
             onRowClick={handleRowClick}
             selectedRows={selectedRows}
