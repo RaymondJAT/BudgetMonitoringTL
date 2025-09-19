@@ -76,7 +76,7 @@ const Login = () => {
           firstRoute = "/employee_request";
           break;
         case 11:
-          firstRoute = "/admin_dashboard";
+          firstRoute = "/finance_dashboard";
           break;
         case 12:
           firstRoute = "/finance_dashboard";

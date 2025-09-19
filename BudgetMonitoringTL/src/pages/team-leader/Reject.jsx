@@ -50,6 +50,8 @@ const Reject = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [printData, setPrintData] = useState(null);
 
+  const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
+
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
@@ -91,6 +93,37 @@ const Reject = () => {
   useEffect(() => {
     fetchRejectedExpenses();
   }, [fetchRejectedExpenses]);
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_teamleader_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Teamleader cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const teamleader = data[0] || {};
+
+        const enrichedData = TEAMLEAD_STATUS_LIST.map((item) => ({
+          ...item,
+          value: teamleader[item.key] ?? 0,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching teamleader cards:", err);
+      }
+    };
+
+    fetchCards();
+  }, []);
 
   const filteredData = useMemo(() => {
     const normalize = (value) =>
@@ -141,12 +174,10 @@ const Reject = () => {
     setSelectedRows(resetSelection);
   };
 
-  const totalComputationData = useMemo(() => tableData, [tableData]);
-
   return (
     <div className="pb-3">
       <div className="mt-3">
-        {/* <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} /> */}
+        <TotalCards data={cardsData} list={TEAMLEAD_STATUS_LIST} />
       </div>
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3">

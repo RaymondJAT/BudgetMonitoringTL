@@ -22,6 +22,7 @@ const RejectLiquidation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
+  const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
 
   const fetchRejectedLiquidations = useCallback(async () => {
     try {
@@ -66,7 +67,36 @@ const RejectLiquidation = () => {
     fetchRejectedLiquidations();
   }, [fetchRejectedLiquidations]);
 
-  const totalComputationData = useMemo(() => tableData, [tableData]);
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api5012/dashboard/get_teamleader_cards", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Teamleader cards API error:", text);
+          return;
+        }
+
+        const data = await res.json();
+        const teamleader = data[0] || {};
+
+        const enrichedData = TEAMLEAD_STATUS_LIST.map((item) => ({
+          ...item,
+          value: teamleader[item.key] ?? 0,
+        }));
+
+        setCardsData(enrichedData);
+      } catch (err) {
+        console.error("Error fetching teamleader cards:", err);
+      }
+    };
+
+    fetchCards();
+  }, []);
 
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
@@ -95,8 +125,7 @@ const RejectLiquidation = () => {
   return (
     <div className="pb-3">
       <div className="mt-3">
-        {/* You can uncomment TotalCards if needed */}
-        {/* <TotalCards data={totalComputationData} list={TEAMLEAD_STATUS_LIST} /> */}
+        <TotalCards data={cardsData} list={TEAMLEAD_STATUS_LIST} />
       </div>
 
       <Container fluid>
@@ -129,7 +158,7 @@ const RejectLiquidation = () => {
 
           <DataTable
             data={filteredData}
-            height="455px"
+            height="440px"
             columns={liquidationColumns}
             onRowClick={handleRowClick}
             selectedRowId={selectedRowId}

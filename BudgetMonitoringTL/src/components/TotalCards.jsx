@@ -26,12 +26,13 @@ const TotalCards = ({ data = [], size = "md" }) => {
 
   return (
     <Container fluid className="total-container mb-3 d-flex flex-wrap gap-2">
-      {data.map(({ label, key, value, subValue }) => {
+      {data.map(({ label, key, value, subValue, showPeso = true }) => {
         let displayValue;
 
+        // If showPeso is false, show plain number, otherwise show currency
         if (subValue !== undefined) {
           displayValue = formatNumber(value);
-        } else if (key === "pending_requests") {
+        } else if (!showPeso || key === "pending_requests") {
           displayValue = formatNumber(value);
         } else {
           displayValue = formatPeso(value);
@@ -45,7 +46,7 @@ const TotalCards = ({ data = [], size = "md" }) => {
             <h5 className={`${currentStyle.label} mb-1`}>{label}</h5>
             <p className={`${currentStyle.value} m-0`}>{displayValue}</p>
 
-            {subValue !== undefined && (
+            {subValue !== undefined && showPeso && (
               <small className="text-muted">
                 Total: {formatPeso(subValue)}
               </small>

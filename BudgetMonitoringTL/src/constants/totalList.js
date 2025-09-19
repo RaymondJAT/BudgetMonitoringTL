@@ -6,9 +6,18 @@ export const EMPLOYEE_STATUS_LIST = [
 ];
 
 export const TEAMLEAD_STATUS_LIST = [
-  { label: "Requests to Approve", key: "pending" },
-  { label: "Liquidations to Review", key: "liqToNote" },
-  { label: "Approved Requests", key: "approvedRequest" },
+  { label: "Pending Requests", key: "pending_requests", showPeso: false },
+  { label: "Approved Requests", key: "approved_requests", showPeso: false },
+  {
+    label: "Pending Liquidations",
+    key: "pending_liquidations",
+    showPeso: false,
+  },
+  {
+    label: "Reviewed Liquidations",
+    key: "approved_liquidations",
+    showPeso: false,
+  },
 ];
 
 export const FINANCE_STATUS_LIST = [
