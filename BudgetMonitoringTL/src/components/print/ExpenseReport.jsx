@@ -1,146 +1,153 @@
-import { Row, Col, Container, Table, Image } from "react-bootstrap";
-import logo from "../../assets/logo5L.png";
+import { Row, Col, Container, Table } from "react-bootstrap";
 
-const ExpenseReport = ({ data, contentRef }) => {
+const ExpenseReport = ({ data, contentRef, signatures = {} }) => {
   const particulars =
     data?.items?.length > 0
       ? data.items.map((item) => ({
-          label: item.label || " ",
-          price: parseFloat(item.price) || 0,
-          quantity: parseFloat(item.quantity) || 0,
-          amount:
+          description: item.label || " ",
+          subtotal:
             (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
         }))
       : data?.transactions?.length > 0
       ? data.transactions.map((item) => ({
-          label: item.label || " ",
-          price: parseFloat(item.price) || 0,
-          quantity: parseFloat(item.quantity) || 0,
-          amount:
+          description: item.label || " ",
+          subtotal:
             (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
         }))
       : [
           {
-            label: data?.label || " ",
-            price: parseFloat(data?.unitPrice) || 0,
-            quantity: parseFloat(data?.quantity) || 0,
-            amount:
+            description: data?.description || " ",
+            subtotal:
               (parseFloat(data?.unitPrice) || 0) *
               (parseFloat(data?.quantity) || 0),
           },
         ];
 
   const totalAmount = particulars.reduce(
-    (sum, item) => sum + (parseFloat(item.amount) || 0),
+    (sum, item) => sum + (parseFloat(item.subtotal) || 0),
     0
+  );
+
+  // Signature block (same as PrintableCashRequest)
+  const SignatureBlock = ({ label, name }) => (
+    <Col xs={12} md={4} className="text-center">
+      <p className="mb-0">
+        <strong>{label}</strong>
+      </p>
+      <div
+        className="text-center mt-4 position-relative"
+        style={{ height: "100px" }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "-14px",
+            width: "100%",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontWeight: "bold", zIndex: 2 }}>{name || ""}</div>
+          <div
+            style={{
+              borderTop: "1px solid #000",
+              width: "210px",
+              margin: "2px auto 0 auto",
+            }}
+          ></div>
+        </div>
+      </div>
+    </Col>
   );
 
   return (
     <div ref={contentRef}>
-      <Container fluid className="px-0 mt-4" style={{ maxWidth: "90%" }}>
-        {/* Header */}
-        <Row className="border-bottom pb-3 mb-4 align-items-center">
-          <Col xs={6}>
-            <h4 className="m-0">Expense Report</h4>
-          </Col>
-          <Col xs={6} className="text-end">
-            <Image
-              src={logo}
-              crossOrigin="anonymous"
-              alt="Company Logo"
-              width={100}
-              height="auto"
-            />
-          </Col>
-        </Row>
+      <Container className="px-0 mt-4">
+        <h2 className="text-center w-100 fw-bold text-uppercase">
+          cash request form
+        </h2>
+        <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
 
         {/* Employee Details */}
-        <Row className="mb-4 small">
-          <Col xs={6} className="mb-2">
-            <p>
-              <strong>Employee:</strong> {data?.employee || " "}
-            </p>
+        <Row className="custom-col small mb-3">
+          <Col xs={12} md={6} className="mb-2">
+            <div className="d-flex align-items-center mb-2">
+              <strong className="title">Employee:</strong>
+              <p className="ms-2 mb-0">{data?.employee || " "}</p>
+            </div>
+            <div className="d-flex align-items-center">
+              <strong className="title">Team Leader:</strong>
+              <p className="ms-2 mb-0">{data?.team_lead || " "}</p>
+            </div>
           </Col>
-          <Col xs={6} className="mb-2">
-            <p>
-              <strong>Team Leader:</strong> {data?.teamLead || " "}
-            </p>
-          </Col>
-          <Col xs={6} className="mb-2">
-            <p>
-              <strong>Date:</strong> {data?.expenseDate || " "}
-            </p>
-          </Col>
-          <Col xs={6} className="mb-2">
-            <p>
-              <strong>Paid By:</strong> {data?.paidBy || " "}
-            </p>
+
+          <Col xs={12} md={6} className="mb-2 text-md-end">
+            <div className="d-flex justify-content-md-end align-items-center mb-2">
+              <strong className="title">Date:</strong>
+              <p className="ms-2 mb-0">{data?.request_date || " "}</p>
+            </div>
+            <div className="d-flex justify-content-md-end align-items-center">
+              <strong className="title">Department:</strong>
+              <p className="ms-2 mb-0">{data?.department || " "}</p>
+            </div>
           </Col>
         </Row>
 
-        {/* Reference */}
-        <Row className="reference-section mb-4 small">
-          <Col>
-            <p>
-              <strong>Reference:</strong> {data?.description || " "}
-            </p>
-          </Col>
-        </Row>
-
-        {/* Expense Table */}
-        <Table className="expense-table">
-          <thead className="border-top">
-            <tr>
-              <th className="text-center">Label</th>
-              <th className="text-center">Price</th>
-              <th className="text-center">Quantity</th>
-              <th className="text-center">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            {particulars.length > 0 ? (
-              particulars.map((item, index) => (
-                <tr key={index}>
-                  <td className="text-center">{item.label}</td>
-                  <td className="text-center">
-                    ₱
-                    {(item.price ?? 0).toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}
+        {/* Particulars Table */}
+        <Row>
+          <Col xs={12}>
+            <Table bordered className="print-table small">
+              <thead>
+                <tr>
+                  <th className="text-center">Particulars</th>
+                  <th className="text-center">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {particulars.length > 0 ? (
+                  particulars.map((item, index) => (
+                    <tr key={index}>
+                      <td className="text-center">{item.description}</td>
+                      <td className="text-center">
+                        ₱
+                        {item.total
+                          ? parseFloat(item.total).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })
+                          : "0.00"}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" className="text-center">
+                      No particulars added.
+                    </td>
+                  </tr>
+                )}
+                <tr className="no-border">
+                  <td className="text-end pe-3">
+                    <strong>Total:</strong>
                   </td>
-                  <td className="text-center">{item.quantity}</td>
-                  <td className="text-center border-start">
-                    ₱
-                    {item.amount
-                      ? parseFloat(item.amount).toLocaleString("es-US", {
-                          minimumFractionDigits: 2,
-                        })
-                      : "0.00"}
+                  <td className="text-center">
+                    <strong>
+                      ₱
+                      {totalAmount.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </strong>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center">
-                  No particulars added.
-                </td>
-              </tr>
-            )}
-            <tr>
-              <td colSpan="3" className="text-end border-end">
-                <strong>Total:</strong>
-              </td>
-              <td className="text-center">
-                <strong>
-                  ₱
-                  {totalAmount.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </strong>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
+
+        {/* Signatures */}
+        <Row className="signature mt-4 small">
+          <SignatureBlock label="Prepared by:" name={signatures?.employee} />
+          <SignatureBlock label="Approved by:" name={signatures?.teamLead} />
+          <SignatureBlock label="Received by:" name={signatures?.finance} />
+        </Row>
       </Container>
     </div>
   );

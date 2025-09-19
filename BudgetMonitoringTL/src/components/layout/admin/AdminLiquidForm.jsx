@@ -4,18 +4,17 @@ import { Container, Row, Col } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 
 import {
-  liquidationLeftFields,
   liquidationRightFields,
-} from "../../../../handlers/columnHeaders";
-import ActionButtons from "../../../ActionButtons";
-import LiquidApprovalTable from "../../team-leader/liquidation/LiquidApprovalTable";
-import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
-import LiquidationReceipt from "../../team-leader/liquidation/LiquidationReceipt";
-import { normalizeBase64Image } from "../../../../utils/image";
-import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
-import Reference from "../../../Reference";
+  liquidationLeftFields,
+} from "../../../handlers/columnHeaders";
+import ActionButtons from "../../ActionButtons";
+import LiquidApprovalTable from "../team-leader/liquidation/LiquidApprovalTable";
+import PrintableLiquidForm from "../../print/PrintableLiquidForm";
+import LiquidationReceipt from "../team-leader/liquidation/LiquidationReceipt";
+import { normalizeBase64Image } from "../../../utils/image";
+import Reference from "../../Reference";
 
-const FinanceLiquidForm = () => {
+const AdminLiquidForm = () => {
   const { state: data } = useLocation();
   const navigate = useNavigate();
   const contentRef = useRef(null);
@@ -23,11 +22,9 @@ const FinanceLiquidForm = () => {
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
 
-  const [showFundModal, setShowFundModal] = useState(false);
-
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // COMBINE EXISTING RECEIPTS AND NEW UPLOADS
+  // Combine receipts
   const receiptImages = useMemo(() => {
     const requesterReceipts = [
       ...(Array.isArray(data?.receipts)
@@ -53,38 +50,22 @@ const FinanceLiquidForm = () => {
     return Array.from(new Set(requesterReceipts));
   }, [data]);
 
-  // POPULATE TRANSACTIONS AND TOTAL
+  // Populate transactions + total
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // HANDLE NEW RECEIPT UPLOADS
-  const handleReceiptUpload = async (files) => {
-    const base64List = await Promise.all(
-      Array.from(files).map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) =>
-              resolve(normalizeBase64Image(e.target.result));
-            reader.readAsDataURL(file);
-          })
-      )
-    );
-    setNewReceipts((prev) => [...prev, ...base64List]);
-  };
-
-  const handleApprove = async (fundId) => {
+  // APPROVE → set status to completed
+  const handleApprove = async () => {
     try {
       const token = localStorage.getItem("token");
-      const employeeName = localStorage.getItem("employee_name") || "Unknown";
+      const employeeName = localStorage.getItem("employee_name") || "Admin";
 
-      // LIQUIDATION UPDATE
-      const liquidationPayload = {
+      const payload = {
         id: data?.id,
-        status: "verified",
+        status: "completed",
         remarks: "",
         created_by: employeeName,
       };
@@ -95,50 +76,21 @@ const FinanceLiquidForm = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(liquidationPayload),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to approve liquidation");
-      const liquidationResponse = await res.json();
+      if (!res.ok) throw new Error("Failed to mark liquidation as completed");
+      await res.json();
 
-      // BACKEND CALCULATION
-      const updated = Array.isArray(liquidationResponse)
-        ? liquidationResponse[0]
-        : liquidationResponse;
-
-      // CASH DISBURSEMENT UPDATE
-      const disbursementPayload = {
-        rf_id: fundId,
-        amount_expended: parseFloat(updated.amount_expended) || 0,
-        amount_return: parseFloat(updated.amount_return) || 0,
-        amount_reimburse: parseFloat(updated.amount_reimburse) || 0,
-        cash_voucher: updated.cash_voucher || data?.cv_number,
-      };
-
-      const resDisb = await fetch(
-        `/api5001/cash_disbursement/updatecash_disbursement_cv`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(disbursementPayload),
-        }
-      );
-
-      if (!resDisb.ok) throw new Error("Failed to update cash disbursement");
-      await resDisb.json();
-
-      alert("Liquidation verified and cash disbursement updated successfully!");
+      alert("Liquidation marked as completed successfully!");
       navigate(-1);
     } catch (err) {
-      console.error("Approve error:", err);
+      console.error(" Approve error:", err);
       alert(err.message || "Something went wrong");
     }
   };
 
-  // REJECT ACTION
+  // REJECT
   const handleReject = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -168,12 +120,12 @@ const FinanceLiquidForm = () => {
       alert("Liquidation rejected successfully!");
       navigate(-1);
     } catch (err) {
-      console.error("Reject error:", err);
+      console.error("❌ Reject error:", err);
       alert(err.message || "Something went wrong");
     }
   };
 
-  // Render info fields
+  // Info fields
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -210,13 +162,13 @@ const FinanceLiquidForm = () => {
     <>
       <Container fluid className="pb-3">
         <ActionButtons
-          onApprove={() => setShowFundModal(true)}
+          onApprove={handleApprove}
           onReject={handleReject}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
-          approveLabel="Approve"
+          approveLabel="Mark Completed"
           status={data?.status}
-          role="finance"
+          role="admin"
         />
 
         <Row className="g-3">
@@ -244,18 +196,8 @@ const FinanceLiquidForm = () => {
       <div className="d-none">
         <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>
-
-      {/* Pick revolving fund modal */}
-      <PickRevolvingFund
-        show={showFundModal}
-        onClose={() => setShowFundModal(false)}
-        onSelect={(fundId) => {
-          setShowFundModal(false);
-          handleApprove(fundId);
-        }}
-      />
     </>
   );
 };
 
-export default FinanceLiquidForm;
+export default AdminLiquidForm;

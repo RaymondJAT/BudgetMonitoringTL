@@ -63,6 +63,8 @@ const Expenses = () => {
       if (!res.ok) throw new Error("Failed to fetch expenses");
 
       const result = await res.json();
+      console.log("expenses", result);
+
       const mappedData = (result || []).map((item, index) => ({
         ...item,
         id: item.id ?? `${index}`,
@@ -162,7 +164,7 @@ const Expenses = () => {
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "Expenses",
+      filename: "cash-requests",
     });
     setSelectedRows(resetSelection);
   };

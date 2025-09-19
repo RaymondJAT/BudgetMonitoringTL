@@ -40,6 +40,7 @@ import AllRequest from "../pages/admin/AllRequest";
 import Users from "../pages/admin/Users";
 import Access from "../pages/admin/Access";
 import LiquidationForm from "../components/layout/common/LiquidationForm";
+import AdminLiquidForm from "../components/layout/admin/AdminLiquidForm";
 
 export const routeConfig = [
   // EMPLOYEE
@@ -81,6 +82,7 @@ export const routeConfig = [
   { path: "/users", element: <Users /> },
   { path: "/access", element: <Access /> },
   { path: "/liquidation_form", element: <LiquidationForm /> },
+  { path: "/admin_liquid_form", element: <AdminLiquidForm /> },
 ];
 
 const Routing = () => {

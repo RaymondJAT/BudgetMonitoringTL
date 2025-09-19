@@ -143,7 +143,15 @@ const CashApprovalForm = () => {
       {/* Printable */}
       <div className="d-none">
         <PrintableCashRequest
-          data={{ ...data, items: [] }}
+          data={{
+            ...data,
+            items: [
+              {
+                description: data?.description || "N/A",
+                subtotal: parseFloat(data?.amount || 0),
+              },
+            ],
+          }}
           amountInWords={amountInWords}
           contentRef={contentRef}
         />

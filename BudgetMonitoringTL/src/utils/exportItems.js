@@ -17,7 +17,7 @@ export const handleExportData = ({
   if (exportData.length === 0) return;
 
   const cleanedData = exportData.map(
-    ({ transactions, images, ...rest }) => rest
+    ({ transactions, images, cv_number, activities, ...rest }) => rest
   );
 
   exportToExcel(cleanedData, filename);

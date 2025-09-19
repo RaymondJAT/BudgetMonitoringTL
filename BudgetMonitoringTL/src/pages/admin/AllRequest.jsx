@@ -1,80 +1,167 @@
-import { useState, useMemo } from "react";
-import { Container, Tabs, Tab } from "react-bootstrap";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { MdLocalPrintshop } from "react-icons/md";
+import { Container } from "react-bootstrap";
+import { useReactToPrint } from "react-to-print";
 
 import { columns } from "../../handlers/tableHeader";
+import { formatPrintData } from "../../utils/formatPrintData";
+import { handleExportData } from "../../utils/exportItems";
+import { STATUS } from "../../constants/status";
 
+import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
-import EntryStates from "../../components/layout/EntryStates";
+import ExpenseReport from "../../components/print/ExpenseReport";
+import AppButton from "../../components/ui/AppButton";
+
+// Print Button
+const PrintButton = ({ onClick }) => (
+  <AppButton
+    label={
+      <>
+        <MdLocalPrintshop style={{ marginRight: "5px" }} />
+        Print
+      </>
+    }
+    size="sm"
+    className="custom-app-button"
+    variant="outline-secondary"
+    onClick={onClick}
+  />
+);
 
 const AllRequest = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [activeTab, setActiveTab] = useState("cash");
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [cashRequests, setCashRequests] = useState([]); 
-  const [liquidations, setLiquidations] = useState([]); 
+  const [tableData, setTableData] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
+  const [particulars, setParticulars] = useState([]);
+  const [printData, setPrintData] = useState(null);
 
- 
-  const filteredColumns = useMemo(
-    () =>
-      columns.filter(
-        (col) => col.accessor !== "price" && col.accessor !== "quantity"
-      ),
-    []
-  );
+  const navigate = useNavigate();
+  const contentRef = useRef(null);
+  const downloadRef = useRef(null);
+  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
 
- 
-  const sourceData = useMemo(
-    () => (activeTab === "cash" ? cashRequests : liquidations),
-    [activeTab, cashRequests, liquidations]
-  );
+  const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
- 
-  const filteredData = useMemo(() => {
-    if (!searchValue) return sourceData;
-    return sourceData.filter((item) =>
-      Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(searchValue.toLowerCase())
-      )
-    );
-  }, [sourceData, searchValue]);
+  // Fetch released/completed finance requests
+  const fetchReleasedData = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        "/api5012/cash_request/getapproved_cash_request?status=completed",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!res.ok) throw new Error("Failed to fetch released requests");
 
-  const handleTabChange = (key) => {
-    setActiveTab(key);
-    setSearchValue(""); 
-    setSelectedItems([]);
+      const result = await res.json();
+      const mappedData = (result || [])
+        .map((item, index) => ({
+          ...item,
+          id: item.id ?? `${index}`,
+          formType: "Cash Request",
+        }))
+        .filter((item) => item.status === STATUS.COMPLETED);
+
+      setTableData(mappedData);
+    } catch (err) {
+      console.error("Error fetching released requests:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReleasedData();
+  }, [fetchReleasedData]);
+
+  // keep particulars in sync
+  useEffect(() => {
+    const items = formatPrintData(tableData);
+    const isSame = JSON.stringify(particulars) === JSON.stringify(items);
+    if (!isSame) setParticulars(items);
+  }, [tableData]);
+
+  const handleRowClick = (entry) => {
+    if (entry.formType === "Cash Request") {
+      navigate("/finance_approval_form", { state: entry });
+    }
   };
 
-  const handleSearch = (val) => {
-    setSearchValue(val);
+  const handlePrint = () => {
+    if (!selectedEntry) return;
+    setPrintData(selectedEntry);
+    setTimeout(() => reactToPrintFn(), 100);
+  };
+
+  const normalize = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .trim();
+
+  const isMatch = (item, value) => {
+    const fieldsToSearch = [...columns.map((col) => col.accessor), "formType"];
+    return fieldsToSearch.some((key) =>
+      normalize(item[key]).includes(normalize(value))
+    );
+  };
+
+  const filteredData = useMemo(
+    () => tableData.filter((item) => isMatch(item, searchValue)),
+    [tableData, searchValue]
+  );
+
+  const selectedEntry =
+    selectedCount === 1
+      ? filteredData.find((item) => selectedRows[item.id])
+      : null;
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "ReleasedRequests",
+    });
+    setSelectedRows(resetSelection);
   };
 
   return (
-    <Container fluid className="py-3">
-      <div className="custom-container shadow-sm rounded p-3">
-        <Tabs
-          activeKey={activeTab}
-          onSelect={handleTabChange}
-          className="mb-3 custom-tabs"
-        >
-          <Tab eventKey="cash" title="Cash Requests" />
-          <Tab eventKey="liquidation" title="Liquidations" />
-        </Tabs>
+    <div className="pb-3">
+      <Container fluid>
+        <div className="custom-container shadow-sm rounded p-3 mt-3">
+          <ToolBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            leftContent={
+              selectedCount === 1 && <PrintButton onClick={handlePrint} />
+            }
+            handleExport={handleExport}
+            selectedCount={selectedCount}
+          />
 
-        <ToolBar
-          searchValue={searchValue}
-          onSearchChange={(e) => handleSearch(e.target.value)}
-        />
+          <DataTable
+            data={filteredData}
+            height="550px"
+            columns={columns}
+            onRowClick={handleRowClick}
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
+          />
 
-        <EntryStates
-          columns={filteredColumns}
-          items={filteredData}
-          setItems={activeTab === "cash" ? setCashRequests : setLiquidations}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-          height="495px"
-        />
-      </div>
-    </Container>
+          {/* hidden print/download */}
+          <div className="d-none">
+            <ExpenseReport contentRef={contentRef} data={printData || {}} />
+            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+          </div>
+        </div>
+      </Container>
+    </div>
   );
 };
 

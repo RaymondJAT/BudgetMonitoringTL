@@ -39,17 +39,7 @@ const Login = () => {
 
       const { token, data } = result;
 
-      // STORE LOGIN INFO
-      localStorage.setItem("token", token);
-      localStorage.setItem("username", data.fullname || data.username);
-      localStorage.setItem("employee_fullname", data.employee_fullname);
-      localStorage.setItem("employee_id", data.employee_id);
-      localStorage.setItem("department_name", data.department_name);
-      localStorage.setItem("position_name", data.position_name);
-      localStorage.setItem("access_id", data.access);
-      localStorage.setItem("access_name", data.access_name);
-
-      // FETCH ACCESS RIGHTS
+      // Fetch access rights
       const accessRes = await fetch(
         `/api5012/route_access/getroute_access_table?access_id=${data.access}`,
         {
@@ -64,31 +54,56 @@ const Login = () => {
       if (accessRes.ok) {
         const accessData = await accessRes.json();
         userAccess = accessData.data || [];
-        localStorage.setItem("access", JSON.stringify(userAccess));
-      } else {
-        console.warn("Failed to fetch route access for user");
-        localStorage.setItem("access", "[]");
       }
 
+      // 🔑 Check if user has "No Access to All"
+      const hasNoAccess =
+        userAccess.length === 0 ||
+        userAccess.every(
+          (item) =>
+            item.status?.toLowerCase() === "no access" ||
+            item.path === null ||
+            item.path === ""
+        );
+
+      if (hasNoAccess) {
+        setError(
+          "Your account has no access. Please contact the administrator."
+        );
+        setLoading(false);
+        localStorage.clear(); // ensure no login info is stored
+        return;
+      }
+
+      // Store login info only if they have access
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", data.fullname || data.username);
+      localStorage.setItem("employee_fullname", data.employee_fullname);
+      localStorage.setItem("employee_id", data.employee_id);
+      localStorage.setItem("department_name", data.department_name);
+      localStorage.setItem("position_name", data.position_name);
+      localStorage.setItem("access_id", data.access);
+      localStorage.setItem("access_name", data.access_name);
+      localStorage.setItem("access", JSON.stringify(userAccess));
+
+      // Pick first route
       let firstRoute = "/";
       switch (data.access) {
         case 10:
           firstRoute = "/employee_request";
           break;
         case 11:
-          firstRoute = "/finance_dashboard";
-          break;
         case 12:
+        case 14:
+        case 19:
           firstRoute = "/finance_dashboard";
           break;
         case 13:
           firstRoute = "/teamlead_pendings";
           break;
         default:
-          if (userAccess.length > 0) {
-            const routeWithPath = userAccess.find((item) => item.path);
-            if (routeWithPath) firstRoute = routeWithPath.path;
-          }
+          const routeWithPath = userAccess.find((item) => item.path);
+          if (routeWithPath) firstRoute = routeWithPath.path;
       }
 
       navigate(firstRoute);

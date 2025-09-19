@@ -39,7 +39,7 @@ const MyExpenses = () => {
       const result = await res.json();
 
       const filtered =
-        String(accessName) === "Administrator"
+        String(accessName) === "Developer"
           ? result || []
           : (result || []).filter(
               (item) => String(item.employee_id) === String(employeeId)
