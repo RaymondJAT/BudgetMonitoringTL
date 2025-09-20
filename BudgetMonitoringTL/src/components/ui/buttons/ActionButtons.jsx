@@ -1,6 +1,6 @@
 import { FaArrowLeft, FaPrint, FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
-import AppButton from "./ui/AppButton";
+import AppButton from "./AppButton";
 import Swal from "sweetalert2";
 
 const ActionButtons = ({

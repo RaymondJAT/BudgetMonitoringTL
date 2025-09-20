@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Modal, Spinner, InputGroup, FormControl } from "react-bootstrap";
 import { columns } from "../../../../constants/BudgetingColumn";
 import DataTable from "../../../layout/DataTable";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
   const [loading, setLoading] = useState(false);

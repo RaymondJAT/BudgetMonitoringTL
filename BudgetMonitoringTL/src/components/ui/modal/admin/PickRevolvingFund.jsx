@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const PickRevolvingFund = ({ show, onClose, onSelect }) => {
   const [funds, setFunds] = useState([]);

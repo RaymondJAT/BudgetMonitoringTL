@@ -25,7 +25,7 @@ const TotalCards = ({ data = [], size = "md" }) => {
   const currentStyle = sizeStyles[size] || sizeStyles.md;
 
   return (
-    <Container fluid className="total-container mb-3 d-flex flex-wrap gap-2">
+    <Container fluid className="total-container mb-2 d-flex flex-wrap gap-2">
       {data.map(({ label, key, value, subValue, showPeso = true }) => {
         let displayValue;
 

@@ -7,9 +7,9 @@ import { revolvingHistory } from "../../constants/historyColumn";
 import { columns, liquidationFinanceColumns } from "../../handlers/tableHeader";
 
 import TotalCards from "../../components/TotalCards";
-import OutstandingBalanceChart from "../../components/ui/charts/finance/OutstandingBalanceChart";
-import LiquidationPieChart from "../../components/ui/charts/finance/LiquidationPieChart";
-import CashFlowChart from "../../components/ui/charts/finance/CashFlowChart";
+import OutstandingBalanceChart from "../../components/ui/charts/OutstandingBalanceChart";
+import LiquidationPieChart from "../../components/ui/charts/LiquidationPieChart";
+import CashFlowChart from "../../components/ui/charts/CashFlowChart";
 import DataTable from "../../components/layout/DataTable";
 
 const FnceExpenses = () => {
@@ -29,7 +29,7 @@ const FnceExpenses = () => {
 
   const navigate = useNavigate();
 
-  // --- Fetch Cards ---
+  // FETCH CARDS
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -62,7 +62,7 @@ const FnceExpenses = () => {
     fetchCards();
   }, []);
 
-  // --- Fetch Charts ---
+  // FETCH CHARTS
   useEffect(() => {
     const fetchFinanceCharts = async () => {
       try {
@@ -110,7 +110,7 @@ const FnceExpenses = () => {
     fetchFinanceCharts();
   }, []);
 
-  // --- Fetch Revolving Fund ---
+  // FETCH REVOLVING FUND
   useEffect(() => {
     const fetchRevolving = async () => {
       try {
@@ -130,7 +130,7 @@ const FnceExpenses = () => {
     fetchRevolving();
   }, []);
 
-  // --- Fetch Pending Requests ---
+  // FETCH PENDING REQUESTS
   useEffect(() => {
     const fetchPending = async () => {
       try {
@@ -165,7 +165,7 @@ const FnceExpenses = () => {
     fetchPending();
   }, []);
 
-  // --- Fetch Pending Liquidations ---
+  //FETCH PENDING LIQUIDATIONS
   useEffect(() => {
     const fetchPendingLiquidations = async () => {
       try {
@@ -199,7 +199,7 @@ const FnceExpenses = () => {
     fetchPendingLiquidations();
   }, []);
 
-  // --- Handle Row Clicks ---
+  // HANDLE ROW CLICKS
   const handleRowClick = (entry) => {
     if (entry.formType === "Cash Request") {
       navigate("/finance_approval_form", { state: entry });
@@ -219,7 +219,7 @@ const FnceExpenses = () => {
 
       <Container fluid className="pb-1">
         {/* Charts */}
-        <div className="row g-2 mb-3">
+        <div className="row g-2 mb-2">
           {/* Top row: Cash Flow Chart full width */}
           <div className="col-12">
             <div className="custom-container rounded p-3">
@@ -241,7 +241,7 @@ const FnceExpenses = () => {
         </div>
 
         {/* Pending Cash Requests */}
-        <div className="row g-2 mb-3">
+        <div className="row g-2 mb-2">
           <div className="col-12">
             <div className="custom-container rounded p-3 h-100">
               <p className="fw-bold mb-2">Pending Cash Requests</p>
@@ -261,7 +261,7 @@ const FnceExpenses = () => {
         </div>
 
         {/* Pending Liquidations */}
-        <div className="row g-2 mb-3">
+        <div className="row g-2 mb-2">
           <div className="col-12">
             <div className="custom-container rounded p-3 h-100">
               <p className="fw-bold mb-2">Pending Liquidations</p>

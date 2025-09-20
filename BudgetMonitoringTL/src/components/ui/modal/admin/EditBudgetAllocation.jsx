@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const EditBudgetAllocation = ({ show, onHide, budgetItem = {}, onSave }) => {
   const [department, setDepartment] = useState("");
@@ -38,7 +38,10 @@ const EditBudgetAllocation = ({ show, onHide, budgetItem = {}, onSave }) => {
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body  className="cashreq-scroll" style={{ backgroundColor: "#800000" }}>
+      <Modal.Body
+        className="cashreq-scroll"
+        style={{ backgroundColor: "#800000" }}
+      >
         <Form className="text-white">
           <Row className="mb-3">
             <Col md={12}>

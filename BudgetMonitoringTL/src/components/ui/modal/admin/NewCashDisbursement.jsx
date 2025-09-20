@@ -2,9 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
-
 import { customStyles } from "../../../../constants/customStyles";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
   const navigate = useNavigate();
@@ -76,7 +75,9 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
     const fetchRevolvingFund = async () => {
       setLoadingFundBudget(true);
       try {
-        const result = await authFetch("/api5001/revolving_fund/getrevolving_fund");
+        const result = await authFetch(
+          "/api5001/revolving_fund/getrevolving_fund"
+        );
         const options = (result.data || []).map((b) => ({
           value: b.id,
           label: `${b.name}`,

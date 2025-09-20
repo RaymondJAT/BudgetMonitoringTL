@@ -7,7 +7,7 @@ import { columns } from "../../handlers/tableHeader";
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 
 import ToolBar from "../../components/layout/ToolBar";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 import DataTable from "../../components/layout/DataTable";
 import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
@@ -66,27 +66,37 @@ const MyExpenses = () => {
     const fetchCards = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("/api5012/dashboard/get_requester_cards", {
+        const employeeId = localStorage.getItem("employee_id");
+        const accessName = localStorage.getItem("access_name");
+
+        // check if user is a Developer
+        const isDev = String(accessName).toLowerCase() === "developer";
+
+        const url = isDev
+          ? `/api5012/dashboard/get_requester_cards`
+          : `/api5012/dashboard/get_requester_cards?employee_id=${employeeId}`;
+
+        const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
           const text = await res.text();
-          console.error("Teamleader cards API error:", text);
+          console.error("Requester cards API error:", text);
           return;
         }
 
         const data = await res.json();
-        const teamleader = data[0] || {};
+        const requester = data[0] || {};
 
         const enrichedData = EMPLOYEE_STATUS_LIST.map((item) => ({
           ...item,
-          value: teamleader[item.key] ?? 0,
+          value: requester[item.key] ?? 0,
         }));
 
         setCardsData(enrichedData);
       } catch (err) {
-        console.error("Error fetching teamleader cards:", err);
+        console.error("Error fetching requester cards:", err);
       }
     };
 

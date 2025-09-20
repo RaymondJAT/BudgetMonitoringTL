@@ -3,8 +3,8 @@ import { FaFilter, FaFileExport } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import SearchBar from "../ui/SearchBar";
-import AppButton from "../ui/AppButton";
+import SearchBar from "../SearchBar";
+import AppButton from "../ui/buttons/AppButton";
 
 const ToolBar = ({
   searchValue,

@@ -3,7 +3,7 @@ import { Table } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 
 import ViewBudgetAllocation from "../ui/modal/admin/ViewBudgetAllocation";
-import AppButton from "../ui/AppButton";
+import AppButton from "../ui/buttons/AppButton";
 
 const BudgetTable = ({ data, height }) => {
   const [showViewModal, setShowViewModal] = useState(false);

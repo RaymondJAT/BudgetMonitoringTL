@@ -8,7 +8,7 @@ import ToolBar from "../../components/layout/ToolBar";
 import BudgetTable from "../../components/layout/BudgetTable";
 import TotalCards from "../../components/TotalCards";
 import NewBudgetAllocation from "../../components/ui/modal/admin/NewBudgetAllocation";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 
 const BudgetAllocation = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -94,10 +94,6 @@ const BudgetAllocation = () => {
   useEffect(() => {
     fetchBudgetData();
   }, []);
-
-  const totalComputationData = useMemo(() => {
-    return budgetData;
-  }, [budgetData]);
 
   const handleAddBudgetItem = (newItem) => {
     setBudgetData((prev) => [newItem, ...prev]);

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
-import AppButton from "../../../ui/AppButton";
+import AppButton from "../../../ui/buttons/AppButton";
 import { normalizeBase64Image } from "../../../../utils/image";
 
 const LiquidReceipt = ({

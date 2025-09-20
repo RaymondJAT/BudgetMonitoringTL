@@ -1,4 +1,4 @@
-// ✅ Centralized custom styles for all selects
+// CENTRALIZED STYLE FOR REACT-SELECT
 export const customStyles = {
   control: (base) => ({
     ...base,

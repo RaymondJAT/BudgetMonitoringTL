@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 import { FaPlus, FaEdit } from "react-icons/fa";
 import NewUser from "../../components/ui/modal/admin/NewUser";
 import EditUser from "../../components/ui/modal/admin/EditUser";

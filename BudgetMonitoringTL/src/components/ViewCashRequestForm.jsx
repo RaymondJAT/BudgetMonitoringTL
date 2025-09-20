@@ -9,9 +9,9 @@ import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../utils/numberToWords";
 import PrintableCashRequest from "./print/PrintableCashRequest";
 import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
-import CashReqActionButtons from "./CashReqActionButtons";
+import CashReqActionButtons from "./ui/buttons/CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
-import ProgressBar from "./layout/ProgressBar";
+import ProgressBar from "../components/ProgressBar";
 import { progressSteps } from "../handlers/actionMenuItems";
 
 const ViewCashRequestForm = () => {
@@ -22,7 +22,6 @@ const ViewCashRequestForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
 
-  // ✅ Use amount instead of subtotal
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });

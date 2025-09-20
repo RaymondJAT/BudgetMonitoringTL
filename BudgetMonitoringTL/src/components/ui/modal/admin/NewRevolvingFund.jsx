@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Modal, Form, Row, Col } from "react-bootstrap";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const NewRevolvingFund = ({ show, onHide, onAdd }) => {
   const navigate = useNavigate();

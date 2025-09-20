@@ -13,7 +13,7 @@ import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 import TotalCards from "../../components/TotalCards";
 
 const PrintButton = ({ onClick }) => (

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import CashReqForm from "../../../layout/employee/cash-request/CashReqForm";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const CashReqModal = ({ show, onHide, onSubmit }) => {
   const [formOutput, setFormOutput] = useState({});

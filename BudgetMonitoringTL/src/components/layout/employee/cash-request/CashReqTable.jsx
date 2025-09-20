@@ -1,6 +1,6 @@
 import { Table, Form } from "react-bootstrap";
 import { FiTrash2 } from "react-icons/fi";
-import AppButton from "../../../ui/AppButton";
+import AppButton from "../../../ui/buttons/AppButton";
 
 const CashReqTable = ({ amount, onAmountChange, onClear }) => {
   const numericAmount = parseFloat(amount) || 0;

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal, InputGroup, FormControl, Form } from "react-bootstrap";
 import Select from "react-select";
-import AppButton from "../../AppButton";
-
+import AppButton from "../../buttons/AppButton";
 import { customStyles } from "../../../../constants/customStyles";
 
 const SubmitCashDisbursement = ({ show, onHide, disbursement }) => {

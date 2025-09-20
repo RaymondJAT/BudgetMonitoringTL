@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
 import { useNavigate } from "react-router-dom";

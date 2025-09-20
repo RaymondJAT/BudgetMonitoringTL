@@ -4,7 +4,7 @@ import { GoKebabHorizontal } from "react-icons/go";
 import { FaEye } from "react-icons/fa";
 
 import { meatballActions } from "../../handlers/actionMenuItems";
-import AppButton from "../ui/AppButton";
+import AppButton from "../ui/buttons/AppButton";
 
 const DataTable = ({
   data = [],

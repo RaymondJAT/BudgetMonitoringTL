@@ -1,6 +1,6 @@
 import { FiTrash2 } from "react-icons/fi";
 import { Table, Form } from "react-bootstrap";
-import AppButton from "../../../ui/AppButton";
+import AppButton from "../../../ui/buttons/AppButton";
 
 const LiquidTable = ({ tableRows, onRowChange, onAddRow, onRemoveRow }) => {
   return (

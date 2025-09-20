@@ -65,7 +65,7 @@ const OutstandingBalanceChart = ({ data }) => {
             <Line
               type="monotone"
               dataKey="outstanding_balance"
-              stroke="#0243c7"
+              stroke="#d97706"
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}
@@ -74,7 +74,7 @@ const OutstandingBalanceChart = ({ data }) => {
             <Line
               type="monotone"
               dataKey="released_amount"
-              stroke="#28a745"
+              stroke="#0d6efd"
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}

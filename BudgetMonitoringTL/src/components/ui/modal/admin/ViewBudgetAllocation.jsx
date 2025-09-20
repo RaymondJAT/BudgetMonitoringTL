@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Spinner, Alert, Row, Col, Container } from "react-bootstrap";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 import ToolBar from "../../../layout/ToolBar";
 import DataTable from "../../../layout/DataTable";
 import { allocationColumns } from "../../../../constants/historyColumn";

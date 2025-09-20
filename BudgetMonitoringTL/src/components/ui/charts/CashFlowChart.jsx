@@ -41,12 +41,12 @@ const CashFlowChart = ({ data }) => {
             {/* Side-by-side bars */}
             <Bar
               dataKey="total_cash_request"
-              fill="#0243c7"
+              fill="#4e79a7"
               name="Cash Request"
             />
             <Bar
               dataKey="total_liquidation"
-              fill="#28a745"
+              fill="#f28e2b"
               name="Liquidation"
             />
           </BarChart>

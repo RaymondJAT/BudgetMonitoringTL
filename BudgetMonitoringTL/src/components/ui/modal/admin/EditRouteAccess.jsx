@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Spinner, Alert } from "react-bootstrap";
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 import DataTable from "../../../layout/DataTable";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";

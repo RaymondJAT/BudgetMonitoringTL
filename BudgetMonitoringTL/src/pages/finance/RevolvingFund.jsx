@@ -11,7 +11,7 @@ import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import TotalCards from "../../components/TotalCards";
 import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 import ViewRevolvingFund from "../../components/ui/modal/admin/ViewRevolvingFund";
 import SubmitRevolvingFund from "../../components/ui/modal/admin/SubmitRevolvingFund";
 

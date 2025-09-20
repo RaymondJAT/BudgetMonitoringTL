@@ -10,7 +10,7 @@ import { numberToWords } from "../../../../utils/numberToWords";
 import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "./CashApprovalTable";
-import ActionButtons from "../../../ActionButtons";
+import ActionButtons from "../../../ui/buttons/ActionButtons";
 
 const CashApprovalForm = () => {
   const contentRef = useRef(null);

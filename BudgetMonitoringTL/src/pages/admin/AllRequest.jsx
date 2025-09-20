@@ -12,7 +12,7 @@ import { STATUS } from "../../constants/status";
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 
 // Print Button
 const PrintButton = ({ onClick }) => (

@@ -11,7 +11,7 @@ import LiquidApprovalTable from "./layout/team-leader/liquidation/LiquidApproval
 import PrintableLiquidForm from "./print/PrintableLiquidForm";
 import LiquidationReceipt from "./layout/team-leader/liquidation/LiquidationReceipt";
 import { normalizeBase64Image } from "../utils/image";
-import ActionButtons from "./ActionButtons";
+import ActionButtons from "./ui/buttons/ActionButtons";
 
 const ViewLiquidationForm = () => {
   const { state } = useLocation();
@@ -28,7 +28,6 @@ const ViewLiquidationForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // Fetch receipts from the server when data.id is available
   useEffect(() => {
     if (!data?.id) return;
 
@@ -70,7 +69,7 @@ const ViewLiquidationForm = () => {
     fetchReceipts();
   }, [data?.id]);
 
-  // Populate transactions and total
+  // POPULATE TRANSACTIONS AND TOTAL
   useEffect(() => {
     if (!data) return;
     const items = data.liquidation_items || [];
@@ -78,7 +77,7 @@ const ViewLiquidationForm = () => {
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // Handle newly uploaded receipts
+  // HANDLE NEW UPLOAD RECEIPTS
   const handleReceiptsChange = async (files) => {
     const base64List = await Promise.all(
       Array.from(files).map(
@@ -95,13 +94,13 @@ const ViewLiquidationForm = () => {
     setNewReceipts((prev) => [...prev, ...base64List]);
   };
 
-  // Combine API receipts and newly uploaded receipts
+  // COMBINE NEW AND OLD RECEIPTS
   const receiptImages = useMemo(
     () => [...apiReceipts, ...newReceipts],
     [apiReceipts, newReceipts]
   );
 
-  // Render information fields
+  // INFORMATION FIELDS
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>

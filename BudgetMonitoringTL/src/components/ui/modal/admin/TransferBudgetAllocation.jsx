@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
-
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const TransferBudgetAllocation = ({
   show,

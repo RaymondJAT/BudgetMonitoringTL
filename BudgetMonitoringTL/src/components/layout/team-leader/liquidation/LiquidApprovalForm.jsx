@@ -7,7 +7,7 @@ import {
   liquidationLeftFields,
   liquidationRightFields,
 } from "../../../../handlers/columnHeaders";
-import ActionButtons from "../../../ActionButtons";
+import ActionButtons from "../../../ui/buttons/ActionButtons";
 import LiquidApprovalTable from "./LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "./LiquidationReceipt";

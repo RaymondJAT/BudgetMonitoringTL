@@ -2,7 +2,7 @@ import React from "react";
 import { FaEdit } from "react-icons/fa";
 import { LuFolderCheck } from "react-icons/lu";
 
-import AppButton from "../components/ui/AppButton";
+import AppButton from "../components/ui/buttons/AppButton";
 
 const pesoFormatter = new Intl.NumberFormat("en-PH", {
   style: "currency",

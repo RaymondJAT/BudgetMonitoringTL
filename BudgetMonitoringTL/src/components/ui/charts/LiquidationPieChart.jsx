@@ -37,13 +37,15 @@ const LiquidationPieChart = ({ data }) => {
   if (!data) return null;
 
   const COLORS = {
-    rejected_requests: "#c10e20",
-    rejected_liquidations: "#800000",
-    pending_requests: "#ff9f00",
-    pending_liquidations: "#f0c808",
-    approved_requests: "#014f28",
-    verified_liquidations: "#205bd1",
-    approved_liquidations: "#20ced1",
+    pending_requests: "#e6a700",
+    pending_liquidations: "#e6a700",
+    approved_requests: "#198754",
+    approved_liquidations: "#198754",
+    verified_liquidations: "#0d6efd",
+    completed_requests: "#375a7f",
+    completed_liquidations: "#375a7f",
+    rejected_requests: "#dc3545",
+    rejected_liquidations: "#b02a37",
   };
 
   const processedData = Object.entries(data).map(([key, value]) => ({

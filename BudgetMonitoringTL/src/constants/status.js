@@ -4,3 +4,5 @@ export const STATUS = {
   COMPLETED: "completed",
   REJECTED: "rejected",
 };
+
+export const types = ["CASH", "GCASH", "ETC"];

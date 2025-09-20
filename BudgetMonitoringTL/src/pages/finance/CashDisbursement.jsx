@@ -10,7 +10,7 @@ import { handleExportData } from "../../utils/exportItems";
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 import NewCashDisbursement from "../../components/ui/modal/admin/NewCashDisbursement";
 import SubmitCashDisbursement from "../../components/ui/modal/admin/SubmitCashDisbursement";
 import EditCashDisbursement from "../../components/ui/modal/admin/EditCashDisbursement";

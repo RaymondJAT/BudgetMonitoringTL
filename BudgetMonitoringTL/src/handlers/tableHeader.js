@@ -3,7 +3,12 @@ export const columns = [
   { label: "Employee", accessor: "employee" },
   { label: "Department", accessor: "department" },
   { label: "Particulars", accessor: "description" },
-  { label: "Amount", accessor: "amount" },
+  {
+    label: "Amount",
+    accessor: "amount",
+    Cell: ({ value }) =>
+      `₱${Number(value).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+  },
   { label: "Status", accessor: "status" },
   { label: "Request Date", accessor: "request_date" },
 ];
@@ -13,7 +18,12 @@ export const liquidationColumns = [
   { label: "Employee", accessor: "employee" },
   { label: "Department", accessor: "department" },
   { label: "Particulars", accessor: "description" },
-  { label: "Amount", accessor: "amount_obtained" },
+  {
+    label: "Amount",
+    accessor: "amount_obtained",
+    Cell: ({ value }) =>
+      `₱${Number(value).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+  },
   { label: "Status", accessor: "status" },
   { label: "Liquidation Date", accessor: "created_date" },
 ];
@@ -23,7 +33,12 @@ export const liquidationFinanceColumns = [
   { label: "Employee", accessor: "employee" },
   { label: "Department", accessor: "department" },
   { label: "Particulars", accessor: "description" },
-  { label: "Amount", accessor: "amount_obtained" },
+  {
+    label: "Amount",
+    accessor: "amount_obtained",
+    Cell: ({ value }) =>
+      `₱${Number(value).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+  },
   { label: "Status", accessor: "status" },
   { label: "Liquidation Date", accessor: "created_date" },
 ];

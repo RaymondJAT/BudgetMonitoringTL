@@ -1,5 +1,5 @@
 import { FaArrowLeft, FaPlus, FaEye, FaPrint } from "react-icons/fa";
-import AppButton from "./ui/AppButton";
+import AppButton from "./AppButton";
 
 const CashReqActionButtons = ({
   onBack,

@@ -5,7 +5,12 @@ export const allocationColumns = [
   { label: "Received By", accessor: "received_by" },
   { label: "Department", accessor: "description" },
   { label: "Particulars", accessor: "particulars" },
-  { label: "Amount Issued", accessor: "amount_issue" },
+  {
+    label: "Amount Issued",
+    accessor: "amount_issue",
+    Cell: ({ value }) =>
+      `₱${Number(value).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+  },
   { label: "Status", accessor: "status" },
   { label: "Date Liquidated", accessor: "date_liquidated" },
 ];
@@ -22,7 +27,12 @@ export const revolvingHistory = [
 export const disbursementHistory = [
   { label: "ID", accessor: "id" },
   { label: "Cash Disbursement ID", accessor: "cash_disbursement_id" },
-  { label: "Amount", accessor: "amount" },
+  {
+    label: "Amount",
+    accessor: "amount",
+    Cell: ({ value }) =>
+      `₱${Number(value).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`,
+  },
   { label: "Remarks", accessor: "remarks" },
   { label: "Particulars", accessor: "particulars" },
   { label: "Date", accessor: "date" },

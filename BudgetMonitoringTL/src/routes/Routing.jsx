@@ -34,7 +34,6 @@ import History from "../pages/finance/History";
 import RejectedLiquidation from "../pages/finance/RejectedLiquidation";
 
 // ADMIN
-import AdmExpenses from "../pages/admin/AdmExpenses";
 import FinalApproval from "../pages/admin/FinalApproval";
 import AllRequest from "../pages/admin/AllRequest";
 import Users from "../pages/admin/Users";
@@ -76,7 +75,6 @@ export const routeConfig = [
   { path: "/finance_history", element: <History /> },
 
   // ADMIN
-  { path: "/admin_dashboard", element: <AdmExpenses /> },
   { path: "/final_approval", element: <FinalApproval /> },
   { path: "/all_request", element: <AllRequest /> },
   { path: "/users", element: <Users /> },

@@ -2,11 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
-
-import { types } from "../../../../constants/departmentModal";
+import { types } from "../../../../constants/status";
 import { customStyles } from "../../../../constants/customStyles";
-
-import AppButton from "../../AppButton";
+import AppButton from "../../buttons/AppButton";
 
 const NewBudgetAllocation = ({ show, onHide, onAdd }) => {
   const navigate = useNavigate();

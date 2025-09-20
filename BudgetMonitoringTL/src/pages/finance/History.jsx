@@ -61,7 +61,7 @@ const History = () => {
         </div>
 
         {/*  CASH DISBURSEMENT HISTORY */}
-        <div className="custom-container shadow-sm rounded p-3 mt-3">
+        <div className="custom-container shadow-sm rounded p-3 mt-2">
           <Row>
             <Col>
               <p className="fw-bold mb-2">Cash Disbursement History</p>

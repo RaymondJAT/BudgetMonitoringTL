@@ -12,7 +12,7 @@ import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import ExpenseReport from "../../components/print/ExpenseReport";
-import AppButton from "../../components/ui/AppButton";
+import AppButton from "../../components/ui/buttons/AppButton";
 
 const PrintButton = ({ onClick }) => (
   <AppButton
