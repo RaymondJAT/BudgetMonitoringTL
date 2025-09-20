@@ -23,11 +23,13 @@ const ViewLiquidationForm = () => {
   const [total, setTotal] = useState(0);
   const [apiReceipts, setApiReceipts] = useState([]);
   const [newReceipts, setNewReceipts] = useState([]);
+  const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState(!state);
   const [error, setError] = useState(null);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
+  // FETCH RECEIPTS AND REMARKS
   useEffect(() => {
     if (!data?.id) return;
 
@@ -45,6 +47,7 @@ const ViewLiquidationForm = () => {
 
         const receiptData = await res.json();
 
+        // PARSE RECEIPTS
         const parsedReceipts = receiptData.flatMap((entry) => {
           if (!entry.receipts) return [];
           try {
@@ -58,6 +61,11 @@ const ViewLiquidationForm = () => {
         });
 
         setApiReceipts(parsedReceipts);
+
+        // UPDATE REMARKS
+        if (receiptData.length > 0 && receiptData[0].remarks) {
+          setRemarks(receiptData[0].remarks);
+        }
       } catch (err) {
         console.error(err);
         setError(err.message || "Something went wrong");
@@ -94,13 +102,13 @@ const ViewLiquidationForm = () => {
     setNewReceipts((prev) => [...prev, ...base64List]);
   };
 
-  // COMBINE NEW AND OLD RECEIPTS
+  // COMBINE RECEIPTS
   const receiptImages = useMemo(
     () => [...apiReceipts, ...newReceipts],
     [apiReceipts, newReceipts]
   );
 
-  // INFORMATION FIELDS
+  // INFO FIELDS
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -163,6 +171,7 @@ const ViewLiquidationForm = () => {
 
         <LiquidationReceipt
           images={receiptImages}
+          remarks={remarks}
           setNewReceipts={handleReceiptsChange}
         />
       </Container>

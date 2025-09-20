@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
+import Swal from "sweetalert2";
 
 import {
   liquidationLeftFields,
@@ -22,12 +23,11 @@ const FinanceLiquidForm = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
-
   const [showFundModal, setShowFundModal] = useState(false);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // COMBINE EXISTING RECEIPTS AND NEW UPLOADS
+  // RECEIPTS
   const receiptImages = useMemo(() => {
     const requesterReceipts = [
       ...(Array.isArray(data?.receipts)
@@ -53,35 +53,19 @@ const FinanceLiquidForm = () => {
     return Array.from(new Set(requesterReceipts));
   }, [data]);
 
-  // POPULATE TRANSACTIONS AND TOTAL
+  // TRANSACTION AND TOTAL
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // HANDLE NEW RECEIPT UPLOADS
-  const handleReceiptUpload = async (files) => {
-    const base64List = await Promise.all(
-      Array.from(files).map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) =>
-              resolve(normalizeBase64Image(e.target.result));
-            reader.readAsDataURL(file);
-          })
-      )
-    );
-    setNewReceipts((prev) => [...prev, ...base64List]);
-  };
-
+  // APPROVE
   const handleApprove = async (fundId) => {
     try {
       const token = localStorage.getItem("token");
       const employeeName = localStorage.getItem("employee_name") || "Unknown";
 
-      // LIQUIDATION UPDATE
       const liquidationPayload = {
         id: data?.id,
         status: "verified",
@@ -99,20 +83,15 @@ const FinanceLiquidForm = () => {
       });
 
       if (!res.ok) throw new Error("Failed to approve liquidation");
-      const liquidationResponse = await res.json();
+      const updated = await res.json();
+      const responseData = Array.isArray(updated) ? updated[0] : updated;
 
-      // BACKEND CALCULATION
-      const updated = Array.isArray(liquidationResponse)
-        ? liquidationResponse[0]
-        : liquidationResponse;
-
-      // CASH DISBURSEMENT UPDATE
       const disbursementPayload = {
         rf_id: fundId,
-        amount_expended: parseFloat(updated.amount_expended) || 0,
-        amount_return: parseFloat(updated.amount_return) || 0,
-        amount_reimburse: parseFloat(updated.amount_reimburse) || 0,
-        cash_voucher: updated.cash_voucher || data?.cv_number,
+        amount_expended: parseFloat(responseData.amount_expended) || 0,
+        amount_return: parseFloat(responseData.amount_return) || 0,
+        amount_reimburse: parseFloat(responseData.amount_reimburse) || 0,
+        cash_voucher: responseData.cash_voucher || data?.cv_number,
       };
 
       const resDisb = await fetch(
@@ -128,29 +107,55 @@ const FinanceLiquidForm = () => {
       );
 
       if (!resDisb.ok) throw new Error("Failed to update cash disbursement");
-      await resDisb.json();
 
-      alert("Liquidation verified and cash disbursement updated successfully!");
+      Swal.fire({
+        icon: "success",
+        title: "Approved!",
+        text: "Liquidation approved successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
       navigate(-1);
     } catch (err) {
       console.error("Approve error:", err);
-      alert(err.message || "Something went wrong");
+      Swal.fire("Error", "Something went wrong while approving.", "error");
     }
   };
 
-  // REJECT ACTION
+  // SELECT FUND CONFIRM
+  const handleSelectFund = (fundId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to approve this liquidation using the selected fund?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, approve",
+      confirmButtonColor: "#008000",
+      cancelButtonText: "Cancel",
+      cancelButtonColor: "#000000",
+      zIndex: 2000,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleApprove(fundId);
+        setShowFundModal(false);
+      }
+    });
+  };
+
+  // REJECT WITH REMARKS
   const handleReject = async () => {
+    const remarks = prompt("Enter remarks for rejection:") || "";
+
     try {
       const token = localStorage.getItem("token");
-      const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
-
-      const remarks = prompt("Enter remarks for rejection:") || "";
+      const employeeName = localStorage.getItem("employee_name") || "Unknown";
 
       const payload = {
         id: data?.id,
         status: "rejected",
         remarks,
-        created_by: employeeId,
+        created_by: employeeName,
       };
 
       const res = await fetch(`/api5012/liquidation/update_liquidation`, {
@@ -162,18 +167,35 @@ const FinanceLiquidForm = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to reject liquidation");
-      await res.json();
+      let responseData;
+      try {
+        responseData = await res.json(); // parse JSON if available
+      } catch {
+        responseData = null; // empty body (204)
+      }
 
-      alert("Liquidation rejected successfully!");
+      if (!res.ok) {
+        console.warn(
+          "API returned non-ok status but update may have succeeded:",
+          responseData
+        );
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Rejected",
+        text: "Liquidation rejected successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
       navigate(-1);
     } catch (err) {
       console.error("Reject error:", err);
-      alert(err.message || "Something went wrong");
+      Swal.fire("Error", "Something went wrong while rejecting.", "error");
     }
   };
 
-  // Render info fields
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -186,15 +208,14 @@ const FinanceLiquidForm = () => {
           </Row>
         ))}
       </Col>
-
       <Col md={6}>
         {liquidationRightFields.map(({ label, key }, idx) => (
           <Row key={idx} className="mb-2">
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
               <p className="ms-2 mb-0">
-                {typeof data?.[key] === "number"
-                  ? `₱${parseFloat(data[key]).toLocaleString("en-US", {
+                {data?.[key] != null && !isNaN(Number(data[key]))
+                  ? `₱${Number(data[key]).toLocaleString("en-PH", {
                       minimumFractionDigits: 2,
                     })}`
                   : data?.[key] ?? "N/A"}
@@ -205,6 +226,12 @@ const FinanceLiquidForm = () => {
       </Col>
     </Row>
   );
+
+  const remarks =
+    data?.remarks ||
+    (Array.isArray(data?.liquidation_activities) &&
+      data.liquidation_activities[0]?.remarks) ||
+    "";
 
   return (
     <>
@@ -226,13 +253,16 @@ const FinanceLiquidForm = () => {
             </div>
 
             <LiquidApprovalTable transactions={transactions} total={total} />
-
-            <LiquidationReceipt images={receiptImages} />
+            <LiquidationReceipt images={receiptImages} remarks={remarks} />
           </Col>
           <Col md={3}>
             <div
-              className="trash-wrapper"
-              style={{ maxHeight: "525px", overflowY: "auto" }}
+              style={{
+                height: "80vh",
+                overflowY: "auto",
+                position: "sticky",
+                top: 0,
+              }}
             >
               <Reference items={data?.liquidation_items || []} />
             </div>
@@ -240,19 +270,14 @@ const FinanceLiquidForm = () => {
         </Row>
       </Container>
 
-      {/* Hidden print template */}
       <div className="d-none">
         <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>
 
-      {/* Pick revolving fund modal */}
       <PickRevolvingFund
         show={showFundModal}
         onClose={() => setShowFundModal(false)}
-        onSelect={(fundId) => {
-          setShowFundModal(false);
-          handleApprove(fundId);
-        }}
+        onSelect={handleSelectFund}
       />
     </>
   );

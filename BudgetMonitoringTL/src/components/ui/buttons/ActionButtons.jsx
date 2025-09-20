@@ -25,32 +25,41 @@ const ActionButtons = ({
       status?.toLowerCase() === "verified";
   }
 
-  const handleApprove = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to approve this request?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, approve it",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) onApprove();
-    });
-  };
+  // Generic confirmation + success function
+  const handleAction = async (type, callback) => {
+    const isApprove = type === "approve";
+    const needConfirm =
+      role === "teamlead" || (role === "finance" && !isApprove);
 
-  const handleReject = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to reject this request?",
-      icon: "warning",
+    if (!needConfirm) {
+      // No confirmation needed (Finance approve)
+      callback?.();
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      title: `Are you sure?`,
+      text: `Do you want to ${type} this request?`,
+      icon: isApprove ? "question" : "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, reject it",
-      confirmButtonColor: "#ff0000",
+      confirmButtonText: isApprove ? "Yes, approve it" : "Yes, reject it",
+      confirmButtonColor: isApprove ? "#008000" : "#ff0000",
       cancelButtonText: "Cancel",
       cancelButtonColor: "#000000",
-    }).then((result) => {
-      if (result.isConfirmed) onReject();
     });
+
+    if (confirmResult.isConfirmed) {
+      callback?.();
+      await Swal.fire({
+        title: isApprove ? "Approved!" : "Rejected!",
+        text: `The request has been ${
+          isApprove ? "approved" : "rejected"
+        } successfully.`,
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
   };
 
   return (
@@ -76,24 +85,7 @@ const ActionButtons = ({
             }
             variant="outline-success"
             size="sm"
-            onClick={() => {
-              if (role === "finance") {
-                onApprove();
-              } else {
-                Swal.fire({
-                  title: "Are you sure?",
-                  text: "Do you want to approve this request?",
-                  icon: "question",
-                  showCancelButton: true,
-                  confirmButtonText: "Yes, approve it",
-                  confirmButtonColor: "#008000",
-                  cancelButtonText: "Cancel",
-                  cancelButtonColor: "#000000",
-                }).then((result) => {
-                  if (result.isConfirmed) onApprove();
-                });
-              }
-            }}
+            onClick={() => handleAction("approve", onApprove)}
             className="custom-app-button btn-responsive ms-2"
           />
 
@@ -106,7 +98,7 @@ const ActionButtons = ({
             }
             variant="outline-danger"
             size="sm"
-            onClick={handleReject}
+            onClick={() => handleAction("reject", onReject)}
             className="custom-app-button btn-responsive ms-2"
           />
         </>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Spinner, Alert } from "react-bootstrap";
+import { Container, Row, Col, Spinner } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
 
 import {
@@ -24,10 +24,15 @@ const LiquidApprovalForm = () => {
   const [apiReceipts, setApiReceipts] = useState([]);
   const [loadingReceipts, setLoadingReceipts] = useState(false);
   const [errorReceipts, setErrorReceipts] = useState(null);
+  const [remarks, setRemarks] = useState("");
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // Fetch receipts
+  useEffect(() => {
+    console.log("✅ LiquidApprovalForm received data from navigation:", data);
+  }, [data]);
+
+  // FETCH RECEIPTS
   useEffect(() => {
     if (!data?.id) return;
 
@@ -44,6 +49,12 @@ const LiquidApprovalForm = () => {
         if (!res.ok) throw new Error("Failed to fetch receipts");
         const result = await res.json();
 
+        console.log("API response for receipts:", result);
+
+        if (result[0]?.remarks) {
+          setRemarks(result[0].remarks);
+        }
+
         const parsedReceipts = result.flatMap((r) => {
           try {
             const arr = JSON.parse(r.receipts);
@@ -57,7 +68,7 @@ const LiquidApprovalForm = () => {
 
         setApiReceipts(parsedReceipts);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching receipts:", err);
         setErrorReceipts(err.message || "Failed to load receipts");
       } finally {
         setLoadingReceipts(false);
@@ -105,39 +116,39 @@ const LiquidApprovalForm = () => {
 
       if (!res.ok) throw new Error("Failed to update liquidation");
 
-      await res.json();
-      alert(`Liquidation ${status} successfully!`);
+      const response = await res.json();
+      console.log("Update response:", response);
+
       navigate(-1);
     } catch (err) {
-      console.error(err);
-      alert(err.message || "Something went wrong");
+      console.error("Error in handleAction:", err);
     }
   };
 
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
-        {liquidationLeftFields.map(({ label, key }, index) => (
-          <Row key={index} className="mb-2">
+        {liquidationLeftFields.map(({ label, key }, idx) => (
+          <Row key={idx} className="mb-2">
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">{data?.[key] || "N/A"}</p>
+              <p className="ms-2 mb-0">{data?.[key] ?? "N/A"}</p>
             </Col>
           </Row>
         ))}
       </Col>
 
       <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, index) => (
-          <Row key={index} className="mb-2">
+        {liquidationRightFields.map(({ label, key }, idx) => (
+          <Row key={idx} className="mb-2">
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
               <p className="ms-2 mb-0">
-                {typeof data?.[key] === "number"
-                  ? `₱${parseFloat(data[key]).toLocaleString("en-US", {
+                {data?.[key] != null && !isNaN(Number(data[key]))
+                  ? `₱${Number(data[key]).toLocaleString("en-PH", {
                       minimumFractionDigits: 2,
                     })}`
-                  : data?.[key] || "N/A"}
+                  : data?.[key] ?? "N/A"}
               </p>
             </Col>
           </Row>
@@ -168,16 +179,20 @@ const LiquidApprovalForm = () => {
             <LiquidApprovalTable transactions={transactions} total={total} />
 
             {loadingReceipts && <Spinner animation="border" />}
-            {errorReceipts && <Alert variant="danger">{errorReceipts}</Alert>}
 
-            <LiquidationReceipt images={receiptImages} />
+            <LiquidationReceipt images={receiptImages} remarks={remarks} />
           </Col>
 
           {/* RIGHT COLUMN */}
           <Col md={3}>
             <div
               className="trash-wrapper"
-              style={{ maxHeight: "525px", overflowY: "auto" }}
+              style={{
+                height: "80vh",
+                overflowY: "auto",
+                position: "sticky",
+                top: 0,
+              }}
             >
               <Reference items={data?.liquidation_items || []} />
             </div>

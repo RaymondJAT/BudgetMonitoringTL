@@ -49,6 +49,7 @@ export const navConfig = [
     icon: GiExpense,
     children: [
       { label: "Pending Final Approval", path: "/final_approval" },
+      { label: "Completed Liquidations", path: "/completed_liquidations" },
       { label: "All Requests", path: "/all_request" },
     ],
   },

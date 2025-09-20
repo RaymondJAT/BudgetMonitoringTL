@@ -24,7 +24,7 @@ const AdminLiquidForm = () => {
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // Combine receipts
+  // COMBINE RECEIPTS
   const receiptImages = useMemo(() => {
     const requesterReceipts = [
       ...(Array.isArray(data?.receipts)
@@ -50,14 +50,14 @@ const AdminLiquidForm = () => {
     return Array.from(new Set(requesterReceipts));
   }, [data]);
 
-  // Populate transactions + total
+  // POPULATE TRANSACTIONS AND TOTAL
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  // APPROVE → set status to completed
+  // APPROVE
   const handleApprove = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -120,12 +120,12 @@ const AdminLiquidForm = () => {
       alert("Liquidation rejected successfully!");
       navigate(-1);
     } catch (err) {
-      console.error("❌ Reject error:", err);
+      console.error("Reject error:", err);
       alert(err.message || "Something went wrong");
     }
   };
 
-  // Info fields
+  // INFO FIELDS
   const renderInfoFields = () => (
     <Row>
       <Col md={6}>
@@ -145,8 +145,8 @@ const AdminLiquidForm = () => {
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
               <p className="ms-2 mb-0">
-                {typeof data?.[key] === "number"
-                  ? `₱${parseFloat(data[key]).toLocaleString("en-US", {
+                {data?.[key] != null && !isNaN(Number(data[key]))
+                  ? `₱${Number(data[key]).toLocaleString("en-PH", {
                       minimumFractionDigits: 2,
                     })}`
                   : data?.[key] ?? "N/A"}
@@ -179,12 +179,20 @@ const AdminLiquidForm = () => {
 
             <LiquidApprovalTable transactions={transactions} total={total} />
 
-            <LiquidationReceipt images={receiptImages} />
+            <LiquidationReceipt
+              images={receiptImages}
+              remarks={data?.remarks}
+            />
           </Col>
           <Col md={3}>
             <div
               className="trash-wrapper"
-              style={{ maxHeight: "525px", overflowY: "auto" }}
+              style={{
+                height: "80vh",
+                overflowY: "auto",
+                position: "sticky",
+                top: 0,
+              }}
             >
               <Reference items={data?.liquidation_items || []} />
             </div>
@@ -192,7 +200,6 @@ const AdminLiquidForm = () => {
         </Row>
       </Container>
 
-      {/* Hidden print template */}
       <div className="d-none">
         <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
       </div>

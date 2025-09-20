@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal } from "react-bootstrap";
 
-const LiquidationReceipt = ({ images = [] }) => {
+const LiquidationReceipt = ({ images = [], remarks = "" }) => {
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
 
@@ -16,8 +16,16 @@ const LiquidationReceipt = ({ images = [] }) => {
   };
 
   return (
-    <div className="custom-container border mb-3 p-3  rounded">
-      <p className="fw-bold mb-3">Proof of Liquidation</p>
+    <div className="custom-container border mb-3 p-3 rounded">
+      <p className="fw-bold mb-2">Proof of Liquidation</p>
+
+      {/* REMARKS */}
+
+      {remarks ? (
+        <p className="mb-3">
+          <strong>Remarks:</strong> {remarks}
+        </p>
+      ) : null}
 
       {images.length > 0 ? (
         <div
@@ -44,7 +52,7 @@ const LiquidationReceipt = ({ images = [] }) => {
                   border: "1px solid #dee2e6",
                   borderRadius: "4px",
                   padding: "2px",
-                  cursor: "pointer", // moved here
+                  cursor: "pointer",
                 }}
               />
             </div>
