@@ -12,12 +12,12 @@ const RequestForm = ({
     <>
       <div className="request-container border p-3">
         {/* PARTICULARS */}
-        <Row className="mb-2">
+        <Row className="mb-1">
           <Col xs={12}>
             <FloatingLabel
               controlId="description"
               label="Particulars"
-              className="mb-2"
+              className="mb-1"
             >
               <Form.Control
                 as="textarea"
@@ -33,12 +33,12 @@ const RequestForm = ({
         </Row>
 
         {/* EMPLOYEE DETAILS */}
-        <Row className="mb-2">
+        <Row className="mb-1">
           {["employee", "department", "position"].map((key) => {
             const { label = "", type = "text" } = getField(key);
             return (
               <Col xs={12} md={4} key={key}>
-                <FloatingLabel controlId={key} label={label} className="mb-2">
+                <FloatingLabel controlId={key} label={label} className="mb-1">
                   <Form.Control
                     type={type}
                     name={key}
@@ -59,8 +59,8 @@ const RequestForm = ({
           {["request_date", "team_lead"].map((key) => {
             const { label = "", type = "text" } = getField(key);
             return (
-              <Col xs={12} md={6} className="mb-2" key={key}>
-                <FloatingLabel controlId={key} label={label} className="mb-2">
+              <Col xs={12} md={6} className="mb-1" key={key}>
+                <FloatingLabel controlId={key} label={label} className="mb-1">
                   <Form.Control
                     type={type}
                     name={key}
@@ -81,7 +81,7 @@ const RequestForm = ({
         </Row>
 
         {/* AMOUNT IN WORDS */}
-        <Row className="mb-2">
+        <Row className="mb-1">
           <Col xs={12}>
             <strong>Amount in Words:</strong>
             <p className="ms-md-2 mb-0 text-start">{amountInWords}</p>

@@ -14,7 +14,7 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
 
   // SINGLE AMOUNT
   const [amount, setAmount] = useState(
-    data.amount ? parseFloat(data.amount) : 0
+    data.amount ? parseFloat(data.amount) : ""
   );
 
   const amountInWords = amount ? numberToWords(amount) : "Zero Pesos Only";
@@ -53,7 +53,7 @@ const CashReqForm = ({ data = {}, onChange = () => {} }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleClearAmount = () => setAmount(0);
+  const handleClearAmount = () => setAmount("");
 
   return (
     <Container fluid>

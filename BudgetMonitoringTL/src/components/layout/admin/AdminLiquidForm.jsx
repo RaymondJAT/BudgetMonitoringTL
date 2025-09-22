@@ -82,11 +82,9 @@ const AdminLiquidForm = () => {
       if (!res.ok) throw new Error("Failed to mark liquidation as completed");
       await res.json();
 
-      alert("Liquidation marked as completed successfully!");
       navigate(-1);
     } catch (err) {
-      console.error(" Approve error:", err);
-      alert(err.message || "Something went wrong");
+      console.error("Approve error:", err);
     }
   };
 
@@ -117,11 +115,9 @@ const AdminLiquidForm = () => {
       if (!res.ok) throw new Error("Failed to reject liquidation");
       await res.json();
 
-      alert("Liquidation rejected successfully!");
       navigate(-1);
     } catch (err) {
       console.error("Reject error:", err);
-      alert(err.message || "Something went wrong");
     }
   };
 

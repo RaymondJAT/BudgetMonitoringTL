@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
-import Swal from "sweetalert2";
 
 import {
   liquidationLeftFields,
@@ -15,6 +14,7 @@ import LiquidationReceipt from "../../team-leader/liquidation/LiquidationReceipt
 import { normalizeBase64Image } from "../../../../utils/image";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
 import Reference from "../../../Reference";
+import { showSwal, confirmSwal } from "../../../../utils/swal";
 
 const FinanceLiquidForm = () => {
   const { state: data } = useLocation();
@@ -53,7 +53,7 @@ const FinanceLiquidForm = () => {
     return Array.from(new Set(requesterReceipts));
   }, [data]);
 
-  // TRANSACTION AND TOTAL
+  // TRANSACTIONS + TOTAL
   useEffect(() => {
     const items = data?.liquidation_items || [];
     setTransactions(items);
@@ -108,33 +108,32 @@ const FinanceLiquidForm = () => {
 
       if (!resDisb.ok) throw new Error("Failed to update cash disbursement");
 
-      Swal.fire({
+      showSwal({
         icon: "success",
         title: "Approved!",
         text: "Liquidation approved successfully",
-        timer: 1500,
-        showConfirmButton: false,
       });
 
       navigate(-1);
     } catch (err) {
       console.error("Approve error:", err);
-      Swal.fire("Error", "Something went wrong while approving.", "error");
+      showSwal({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while approving.",
+      });
     }
   };
 
-  // SELECT FUND CONFIRM
+  // SELECT FUND
   const handleSelectFund = (fundId) => {
-    Swal.fire({
+    confirmSwal({
       title: "Are you sure?",
       text: "Do you want to approve this liquidation using the selected fund?",
       icon: "question",
-      showCancelButton: true,
       confirmButtonText: "Yes, approve",
       confirmButtonColor: "#008000",
-      cancelButtonText: "Cancel",
       cancelButtonColor: "#000000",
-      zIndex: 2000,
     }).then((result) => {
       if (result.isConfirmed) {
         handleApprove(fundId);
@@ -143,9 +142,10 @@ const FinanceLiquidForm = () => {
     });
   };
 
-  // REJECT WITH REMARKS
+  // REJECT
   const handleReject = async () => {
-    const remarks = prompt("Enter remarks for rejection:") || "";
+    const remarks = prompt("Enter remarks for rejection:");
+    if (remarks === null) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -167,32 +167,22 @@ const FinanceLiquidForm = () => {
         body: JSON.stringify(payload),
       });
 
-      let responseData;
-      try {
-        responseData = await res.json(); // parse JSON if available
-      } catch {
-        responseData = null; // empty body (204)
-      }
+      if (!res.ok) throw new Error("Failed to reject liquidation");
 
-      if (!res.ok) {
-        console.warn(
-          "API returned non-ok status but update may have succeeded:",
-          responseData
-        );
-      }
-
-      Swal.fire({
+      showSwal({
         icon: "success",
         title: "Rejected",
         text: "Liquidation rejected successfully",
-        timer: 1500,
-        showConfirmButton: false,
       });
 
       navigate(-1);
     } catch (err) {
       console.error("Reject error:", err);
-      Swal.fire("Error", "Something went wrong while rejecting.", "error");
+      showSwal({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while rejecting.",
+      });
     }
   };
 
@@ -251,7 +241,6 @@ const FinanceLiquidForm = () => {
             <div className="custom-container border p-3">
               {renderInfoFields()}
             </div>
-
             <LiquidApprovalTable transactions={transactions} total={total} />
             <LiquidationReceipt images={receiptImages} remarks={remarks} />
           </Col>

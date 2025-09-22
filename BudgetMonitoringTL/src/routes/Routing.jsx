@@ -41,6 +41,7 @@ import Access from "../pages/admin/Access";
 import LiquidationForm from "../components/layout/common/LiquidationForm";
 import AdminLiquidForm from "../components/layout/admin/AdminLiquidForm";
 import CompletedLiquidation from "../pages/admin/CompletedLiquidation";
+import AdminRejectLiquidation from "../pages/admin/AdminRejectLiquidation";
 
 export const routeConfig = [
   // EMPLOYEE
@@ -83,6 +84,7 @@ export const routeConfig = [
   { path: "/liquidation_form", element: <LiquidationForm /> },
   { path: "/admin_liquid_form", element: <AdminLiquidForm /> },
   { path: "/completed_liquidations", element: <CompletedLiquidation /> },
+  { path: "/admin_reject_liquidations", element: <AdminRejectLiquidation /> },
 ];
 
 const Routing = () => {

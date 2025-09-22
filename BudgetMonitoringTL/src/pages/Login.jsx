@@ -93,6 +93,8 @@ const Login = () => {
           firstRoute = "/employee_request";
           break;
         case 11:
+          firstRoute = "/final_approval";
+          break;
         case 12:
         case 14:
         case 19:

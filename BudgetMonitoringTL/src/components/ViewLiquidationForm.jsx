@@ -127,10 +127,17 @@ const ViewLiquidationForm = () => {
             <Col xs={12} className="d-flex align-items-center">
               <strong className="title">{label}:</strong>
               <p className="ms-2 mb-0">
-                {typeof data?.[key] === "number"
-                  ? `₱${parseFloat(data[key]).toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}`
+                {[
+                  "amount_obtained",
+                  "amount_expended",
+                  "reimburse_return",
+                ].includes(key)
+                  ? data?.[key] != null
+                    ? `₱${parseFloat(data[key]).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`
+                    : "₱0.00"
                   : data?.[key] ?? "N/A"}
               </p>
             </Col>

@@ -1,26 +1,26 @@
 import { Row, Col, FloatingLabel, Form } from "react-bootstrap";
 import { formFields } from "../../../../handlers/columnHeaders";
 
-const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
-  const preventInvalidKeys = (e) => {
-    if (["e", "E", "+", "-"].includes(e.key) || (e.ctrlKey && e.key === "v")) {
-      e.preventDefault();
-    }
-  };
+const pesoFields = ["amount_obtained", "amount_expended", "reimburse_return"];
 
-  const handleNumberInput = (e) => {
-    const { name, value } = e.target;
-
-    onChange({ target: { name, value: value ? parseFloat(value) : 0 } });
+const LiquidForm = ({ formData = {} }) => {
+  const formatPeso = (value) => {
+    if (value === "" || value == null || isNaN(value)) return "₱0.00";
+    return (
+      "₱" +
+      Number(value).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
   };
 
   const enhancedFields = formFields.map((column) =>
     column.map((field) => {
-      if (field.type === "number") {
+      if (pesoFields.includes(field.name)) {
         return {
           ...field,
-          onKeyDown: preventInvalidKeys,
-          onChange: handleNumberInput,
+          type: "text", // render ₱ with formatting
         };
       }
       return field;
@@ -29,7 +29,7 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
 
   return (
     <div className="request-container border p-3 mb-2">
-      {/* DESCRIPTION FIELD */}
+      {/* DESCRIPTION FIELD (now read-only too) */}
       <Row className="mb-3">
         <Col md={12}>
           <FloatingLabel controlId="description" label="Description">
@@ -37,15 +37,15 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
               type="text"
               name="description"
               value={formData.description || ""}
-              onChange={onChange}
               placeholder="Enter description"
               className="form-control-sm small-input"
+              readOnly // 🔹 Now also readonly
             />
           </FloatingLabel>
         </Col>
       </Row>
 
-      {/* DYNAMIC FIELDS */}
+      {/* DYNAMIC FIELDS (all read-only) */}
       <Row>
         {enhancedFields.map((column, colIndex) => (
           <Col md={6} key={`col-${colIndex}`}>
@@ -60,15 +60,13 @@ const LiquidForm = ({ formData = {}, onChange = () => {} }) => {
                   type={field.type || "text"}
                   name={field.name}
                   value={
-                    field.type === "number"
-                      ? formData[field.name] ?? 0
+                    pesoFields.includes(field.name)
+                      ? formatPeso(formData[field.name])
                       : formData[field.name] || ""
                   }
-                  onChange={field.onChange || onChange}
                   placeholder={field.label}
                   className="form-control-sm small-input"
-                  min={field.min}
-                  onKeyDown={field.onKeyDown}
+                  readOnly // 🔹 All fields readonly
                 />
               </FloatingLabel>
             ))}

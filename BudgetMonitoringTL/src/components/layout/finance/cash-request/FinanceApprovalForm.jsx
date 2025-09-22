@@ -1,18 +1,17 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
+import { useReactToPrint } from "react-to-print";
 import {
   approvalFormFields,
   approvalPartnerFields,
 } from "../../../../handlers/columnHeaders";
-import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../../../utils/numberToWords";
-import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable";
 import ActionButtons from "../../../ui/buttons/ActionButtons";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
-import Swal from "sweetalert2";
+import { showSwal, confirmSwal } from "../../../../utils/swal";
 
 const FinanceApprovalForm = () => {
   const contentRef = useRef(null);
@@ -27,7 +26,6 @@ const FinanceApprovalForm = () => {
   const [amountInWords, setAmountInWords] = useState("");
   const [showFundModal, setShowFundModal] = useState(false);
 
-  // USE AMOUNT
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   useEffect(() => {
@@ -91,41 +89,54 @@ const FinanceApprovalForm = () => {
       if (!res.ok) throw new Error("Failed to update cash request");
       await res.json();
 
-      toast.success(
-        `Cash request ${
-          status === "completed" ? "completed & disbursed" : "rejected"
-        } by Finance`
-      );
+      showSwal({
+        icon: "success",
+        title:
+          status === "completed"
+            ? "Cash request approved & disbursed"
+            : "Cash request rejected",
+      });
+
       navigate(-1);
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong while processing approval.");
+      showSwal({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while processing approval.",
+      });
     }
   };
 
   const handleSelectFund = (fundId) => {
-    Swal.fire({
+    confirmSwal({
       title: "Are you sure?",
       text: "Do you want to approve this cash request using the selected fund?",
       icon: "question",
-      showCancelButton: true,
       confirmButtonText: "Yes, approve",
       confirmButtonColor: "#008000",
-      cancelButtonText: "Cancel",
       cancelButtonColor: "#000000",
-      zIndex: 2000,
     }).then((result) => {
       if (result.isConfirmed) {
         handleUpdateRequest("completed", "", fundId);
         setShowFundModal(false);
-        Swal.fire({
-          icon: "success",
-          title: "Approved!",
-          text: "Cash request approved successfully",
-          timer: 1500,
-          showConfirmButton: false,
-          zIndex: 2000,
-        });
+      }
+    });
+  };
+
+  const handleReject = () => {
+    confirmSwal({
+      title: "Reject Cash Request",
+      input: "text",
+      inputLabel: "Enter remarks for rejection:",
+      inputPlaceholder: "Type remarks here...",
+      showCancelButton: true,
+      confirmButtonText: "Reject",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#000",
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        handleUpdateRequest("rejected", result.value);
       }
     });
   };
@@ -133,13 +144,9 @@ const FinanceApprovalForm = () => {
   return (
     <div className="pb-3">
       <Container fluid>
-        {/* ACTION BUTTONS */}
         <ActionButtons
           onApprove={() => setShowFundModal(true)}
-          onReject={() => {
-            const remarks = prompt("Enter remarks for rejection:");
-            if (remarks !== null) handleUpdateRequest("rejected", remarks);
-          }}
+          onReject={handleReject}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
           status={data?.status}
@@ -148,7 +155,6 @@ const FinanceApprovalForm = () => {
 
         <Row>
           <Col md={12} className="d-flex flex-column">
-            {/* DETAILS */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -159,7 +165,6 @@ const FinanceApprovalForm = () => {
                 </Col>
               </Row>
 
-              {/* PARTNER FIELDS */}
               <Row>
                 {approvalPartnerFields.map(({ label, key }, idx) => (
                   <Col
@@ -180,7 +185,6 @@ const FinanceApprovalForm = () => {
                 ))}
               </Row>
 
-              {/* APPROVAL FORM FIELDS */}
               {approvalFormFields.map(({ label, key }, idx) => (
                 <Row key={idx}>
                   <Col xs={12} className="d-flex align-items-center mb-2">
@@ -196,7 +200,6 @@ const FinanceApprovalForm = () => {
                 </Row>
               ))}
 
-              {/* AMOUNT IN WORDS */}
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
                   <strong className="title text-start">Amount in Words:</strong>
@@ -205,7 +208,6 @@ const FinanceApprovalForm = () => {
               </Row>
             </div>
 
-            {/* TABLE AMOUNT & TOTAL */}
             <CashApprovalTable total={total} />
           </Col>
         </Row>
@@ -217,7 +219,6 @@ const FinanceApprovalForm = () => {
         onSelect={handleSelectFund}
       />
 
-      {/* PRINTABLE */}
       <div className="d-none">
         <PrintableCashRequest
           data={{ ...data, items: [] }}

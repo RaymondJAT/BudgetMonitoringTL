@@ -105,20 +105,50 @@ const LiquidTable = ({ tableRows, onRowChange, onAddRow, onRemoveRow }) => {
               {/* AMOUNT */}
               <td className="text-center p-1">
                 <Form.Control
-                  type="number"
-                  min={0}
-                  value={row.amount}
-                  onChange={(e) => onRowChange(index, "amount", e.target.value)}
-                  onKeyDown={(e) => {
-                    if (
-                      ["e", "E", "+", "-"].includes(e.key) ||
-                      (e.ctrlKey && e.key === "v")
-                    ) {
-                      e.preventDefault();
+                  type="text"
+                  value={
+                    row.amount === ""
+                      ? ""
+                      : new Intl.NumberFormat("en-PH", {
+                          style: "currency",
+                          currency: "PHP",
+                          minimumFractionDigits:
+                            document.activeElement !== null &&
+                            document.activeElement.tagName === "INPUT"
+                              ? 0
+                              : 2,
+                          maximumFractionDigits: 2,
+                        })
+                          .format(row.amount)
+                          .replace("PHP", "₱")
+                  }
+                  onChange={(e) => {
+                    let raw = e.target.value.replace(/[^0-9.]/g, "");
+                    const parts = raw.split(".");
+
+                    if (parts.length > 2) {
+                      raw = parts[0] + "." + parts[1];
+                    }
+
+                    if (raw === "" || raw === ".") {
+                      onRowChange(index, "amount", "");
+                    } else {
+                      onRowChange(index, "amount", raw);
                     }
                   }}
-                  className="form-control-sm small-input mx-auto"
-                  style={{ width: "65px" }}
+                  onBlur={() => {
+                    if (row.amount !== "" && !isNaN(row.amount)) {
+                      onRowChange(
+                        index,
+                        "amount",
+                        parseFloat(row.amount).toFixed(2)
+                      );
+                    }
+                  }}
+                  size="sm"
+                  className="form-control-sm small-input mx-auto text-center"
+                  style={{ width: "90px" }}
+                  placeholder="₱0.00"
                 />
               </td>
 

@@ -50,6 +50,7 @@ export const navConfig = [
     children: [
       { label: "Pending Final Approval", path: "/final_approval" },
       { label: "Completed Liquidations", path: "/completed_liquidations" },
+      { label: "Rejected Liquidations", path: "/admin_reject_liquidations" },
       { label: "All Requests", path: "/all_request" },
     ],
   },
@@ -79,7 +80,7 @@ export const navConfig = [
         label: "Rejected Liquidations",
         path: "/finance_rejected_liquidations",
       },
-      { label: "Rejected", path: "/reject_liquidations" },
+      { label: "Rejected ", path: "/reject_liquidations" },
       // { label: "History", path: "/lead_history" },
     ],
   },

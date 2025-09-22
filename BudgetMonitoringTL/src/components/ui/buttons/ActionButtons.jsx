@@ -18,21 +18,27 @@ const ActionButtons = ({
     isApproved =
       status?.toLowerCase() === "approved" ||
       status?.toLowerCase() === "completed" ||
-      status?.toLowerCase() === "verified";
+      status?.toLowerCase() === "verified" ||
+      status?.toLowerCase() === "rejected";
   } else if (role === "finance") {
     isApproved =
       status?.toLowerCase() === "completed" ||
-      status?.toLowerCase() === "verified";
+      status?.toLowerCase() === "verified" ||
+      status?.toLowerCase() === "rejected";
+  } else if (role === "admin") {
+    isApproved =
+      status?.toLowerCase() === "completed" ||
+      status?.toLowerCase() === "rejected";
   }
 
-  // Generic confirmation + success function
   const handleAction = async (type, callback) => {
     const isApprove = type === "approve";
     const needConfirm =
-      role === "teamlead" || (role === "finance" && !isApprove);
+      role === "teamlead" ||
+      (role === "finance" && !isApprove) ||
+      role === "admin";
 
-    if (!needConfirm) {
-      // No confirmation needed (Finance approve)
+    if (!needConfirm && isApprove) {
       callback?.();
       return;
     }
