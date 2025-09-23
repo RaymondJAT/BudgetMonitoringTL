@@ -27,7 +27,7 @@ const FinalApproval = () => {
 
   const downloadRef = useRef(null);
 
-  // FETCH VERIFIED LIQUIDATIONS (for admin final approval)
+  // Fetch verified liquidations for admin
   const fetchVerifiedLiquidations = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -64,15 +64,14 @@ const FinalApproval = () => {
     fetchVerifiedLiquidations();
   }, [fetchVerifiedLiquidations]);
 
-  // SEARCH FILTER
+  // Filter table based on search value
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
+    const lowerSearch = normalizeString(searchValue);
     return tableData.filter((item) =>
       liquidationFinanceColumns.some((col) =>
-        normalizeString(item[col.accessor]).includes(
-          normalizeString(searchValue)
-        )
+        normalizeString(item[col.accessor]).includes(lowerSearch)
       )
     );
   }, [tableData, searchValue]);
@@ -82,15 +81,13 @@ const FinalApproval = () => {
     [selectedRows]
   );
 
-  // HANDLE ROW CLICK → Navigate to AdminLiquidForm
+  // Handle row click → navigate to admin liquid form
   const handleRowClick = (entry) => {
     setSelectedRowId(entry.id);
-
-    navigate("/admin_liquid_form", {
-      state: { ...entry, role: "admin" },
-    });
+    navigate("/admin_liquid_form", { state: { ...entry, role: "admin" } });
   };
 
+  // Export selected/filtered data
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
@@ -107,7 +104,7 @@ const FinalApproval = () => {
         <div className="custom-container shadow-sm rounded p-3 mt-3">
           <ToolBar
             searchValue={searchValue}
-            onSearchChange={(e) => setSearchValue(e.target.value)}
+            onSearchChange={setSearchValue} // Directly passes value from ToolBar
             onRefresh={fetchVerifiedLiquidations}
             selectedCount={selectedCount}
             handleExport={handleExport}

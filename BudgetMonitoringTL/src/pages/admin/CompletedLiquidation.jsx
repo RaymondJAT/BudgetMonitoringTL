@@ -41,14 +41,14 @@ const CompletedLiquidation = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch verified liquidations");
+      if (!res.ok) throw new Error("Failed to fetch completed liquidations");
 
       const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
       const mappedData = apiData.map((item, index) => ({
         ...item,
-        id: item.id || item._id || `verified-${index}`,
+        id: item.id || item._id || `completed-${index}`,
         formType: "Liquidation",
       }));
 
@@ -68,11 +68,11 @@ const CompletedLiquidation = () => {
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
+    const lowerSearch = normalizeString(searchValue);
+
     return tableData.filter((item) =>
       liquidationFinanceColumns.some((col) =>
-        normalizeString(item[col.accessor]).includes(
-          normalizeString(searchValue)
-        )
+        normalizeString(item[col.accessor]).includes(lowerSearch)
       )
     );
   }, [tableData, searchValue]);
@@ -84,9 +84,8 @@ const CompletedLiquidation = () => {
 
   // HANDLE ROW CLICK
   const handleRowClick = (entry) => {
-    navigate("/admin_liquid_form", {
-      state: { ...entry, role: "admin" },
-    });
+    setSelectedRowId(entry.id);
+    navigate("/admin_liquid_form", { state: { ...entry, role: "admin" } });
   };
 
   const handleExport = () => {
@@ -105,7 +104,7 @@ const CompletedLiquidation = () => {
         <div className="custom-container shadow-sm rounded p-3 mt-3">
           <ToolBar
             searchValue={searchValue}
-            onSearchChange={(e) => setSearchValue(e.target.value)}
+            onSearchChange={setSearchValue} // pass value directly
             onRefresh={fetchCompletedLiquidations}
             selectedCount={selectedCount}
             handleExport={handleExport}
@@ -114,7 +113,7 @@ const CompletedLiquidation = () => {
 
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading verified liquidation records...
+              Loading completed liquidation records...
             </Alert>
           )}
 
@@ -135,7 +134,7 @@ const CompletedLiquidation = () => {
               height="550px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
-              noDataMessage="No verified liquidation records found."
+              noDataMessage="No completed liquidation records found."
               showCheckbox={true}
               selectedRowId={selectedRowId}
               selectedRows={selectedRows}

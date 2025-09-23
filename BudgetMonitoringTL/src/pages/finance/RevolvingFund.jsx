@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Container } from "react-bootstrap";
 import { FaPlus, FaEye } from "react-icons/fa";
 import { LuFolderCheck } from "react-icons/lu";
@@ -194,6 +194,21 @@ const RevolvingFund = () => {
     return col;
   });
 
+  const filteredData = useMemo(() => {
+    if (!searchValue) return fundData;
+
+    const normalize = (value) =>
+      String(value || "")
+        .toLowerCase()
+        .trim();
+
+    return fundData.filter((item) =>
+      [...columns.map((col) => col.accessor)].some((key) =>
+        normalize(item[key]).includes(normalize(searchValue))
+      )
+    );
+  }, [fundData, searchValue, columns]);
+
   return (
     <>
       <div className="mt-3">
@@ -234,7 +249,7 @@ const RevolvingFund = () => {
             <p className="text-muted">Loading revolving fund data...</p>
           ) : (
             <DataTable
-              data={fundData}
+              data={filteredData}
               columns={columns}
               height="325px"
               selectedRows={selectedRows}

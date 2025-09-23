@@ -21,9 +21,9 @@ const AdminRejectLiquidation = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [printData, setPrintData] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [selectedRows, setSelectedRows] = useState({});
-  const [printData, setPrintData] = useState(null);
 
   const downloadRef = useRef(null);
 
@@ -68,11 +68,11 @@ const AdminRejectLiquidation = () => {
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
+    const lowerSearch = normalizeString(searchValue);
+
     return tableData.filter((item) =>
       liquidationFinanceColumns.some((col) =>
-        normalizeString(item[col.accessor]).includes(
-          normalizeString(searchValue)
-        )
+        normalizeString(item[col.accessor]).includes(lowerSearch)
       )
     );
   }, [tableData, searchValue]);
@@ -84,9 +84,8 @@ const AdminRejectLiquidation = () => {
 
   // HANDLE ROW CLICK
   const handleRowClick = (entry) => {
-    navigate("/admin_liquid_form", {
-      state: { ...entry, role: "admin" },
-    });
+    setSelectedRowId(entry.id);
+    navigate("/admin_liquid_form", { state: { ...entry, role: "admin" } });
   };
 
   const handleExport = () => {
@@ -105,7 +104,7 @@ const AdminRejectLiquidation = () => {
         <div className="custom-container shadow-sm rounded p-3 mt-3">
           <ToolBar
             searchValue={searchValue}
-            onSearchChange={(e) => setSearchValue(e.target.value)}
+            onSearchChange={setSearchValue} // pass value directly
             onRefresh={fetchRejectedLiquidations}
             selectedCount={selectedCount}
             handleExport={handleExport}
