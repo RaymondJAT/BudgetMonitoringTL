@@ -1,10 +1,12 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 
 import { columns } from "../../handlers/tableHeader";
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
+import { numberToWords } from "../../utils/numberToWords";
+import { handleExportData } from "../../utils/exportItems";
 
 import ToolBar from "../../components/layout/ToolBar";
 import AppButton from "../../components/ui/buttons/AppButton";
@@ -12,6 +14,7 @@ import DataTable from "../../components/layout/DataTable";
 import CashReqModal from "../../components/ui/modal/employee/CashReqModal";
 import LiqFormModal from "../../components/ui/modal/employee/LiqFormModal";
 import TotalCards from "../../components/TotalCards";
+import ExpenseReport from "../../components/print/ExpenseReport";
 
 const MyExpenses = () => {
   const [tableData, setTableData] = useState([]);
@@ -20,7 +23,11 @@ const MyExpenses = () => {
   const [showCashReqModal, setShowCashReqModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
   const [cardsData, setCardsData] = useState([EMPLOYEE_STATUS_LIST]);
+  const [printData, setPrintData] = useState(null);
+
   const navigate = useNavigate();
+  const contentRef = useRef(null);
+  const downloadRef = useRef(null);
 
   const fetchCashRequests = useCallback(async () => {
     try {
@@ -69,7 +76,6 @@ const MyExpenses = () => {
         const employeeId = localStorage.getItem("employee_id");
         const accessName = localStorage.getItem("access_name");
 
-        // check if user is a Developer
         const isDev = String(accessName).toLowerCase() === "developer";
 
         const url = isDev
@@ -120,12 +126,38 @@ const MyExpenses = () => {
     [tableData, searchValue]
   );
 
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "my-expenses",
+    });
+    setSelectedRows(resetSelection);
+  };
+
   const handleRowClick = (entry) => {
     navigate(
       entry.formType === "Cash Request" ? "/view_cash_request" : "/liquid-form",
       { state: entry }
     );
   };
+
+  const amountInWords = useMemo(() => {
+    if (!printData) return "";
+    let total = 0;
+
+    if (printData?.items?.length > 0) {
+      total = printData.items.reduce(
+        (sum, item) => sum + (parseFloat(item.subtotal) || 0),
+        0
+      );
+    } else {
+      total = parseFloat(printData?.amount || 0);
+    }
+
+    return numberToWords(total);
+  }, [printData]);
 
   const leftContent = (
     <div className="d-flex align-items-center gap-2">
@@ -157,6 +189,7 @@ const MyExpenses = () => {
             leftContent={leftContent}
             selectedCount={selectedCount}
             searchBarWidth="300px"
+            handleExport={handleExport}
           />
 
           <DataTable
@@ -166,6 +199,8 @@ const MyExpenses = () => {
             onRowClick={handleRowClick}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
           />
 
           {/* CASH REQUEST MODAL */}
@@ -186,6 +221,28 @@ const MyExpenses = () => {
               ])
             }
           />
+
+          {/* HIDDEN PRINT/DOWNLOAD CONTENT */}
+          <div className="d-none">
+            <ExpenseReport
+              contentRef={contentRef}
+              data={{
+                ...printData,
+                total: printData?.total ?? 0,
+                items: printData?.items || [],
+              }}
+              amountInWords={amountInWords}
+            />
+            <ExpenseReport
+              contentRef={downloadRef}
+              data={{
+                ...printData,
+                total: printData?.total ?? 0,
+                items: printData?.items || [],
+              }}
+              amountInWords={amountInWords}
+            />
+          </div>
         </div>
       </Container>
     </div>

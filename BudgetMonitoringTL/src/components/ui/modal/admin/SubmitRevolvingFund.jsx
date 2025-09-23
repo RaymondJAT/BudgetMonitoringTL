@@ -10,11 +10,11 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
   const [summary, setSummary] = useState(null);
   const [report, setReport] = useState(null);
   const [amount, setAmount] = useState("");
+  const [focused, setFocused] = useState(false);
   const [budgetType, setBudgetType] = useState("");
 
   const token = localStorage.getItem("token");
 
-  // Fetch transactions + summary + budget type
   useEffect(() => {
     if (!show || !fundData?.id) return;
 
@@ -88,7 +88,6 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
       setReport(data);
       onHide();
 
-      // 🔥 trigger parent refresh
       if (typeof onSuccess === "function") {
         onSuccess();
       }
@@ -99,21 +98,34 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
     }
   };
 
-  const computedStatus = (() => {
-    const ending = summary?.ending_amount || 0;
-    const numAmount = parseFloat(amount) || 0;
-
-    if (!amount) return "SHORT";
-    if (numAmount === ending) return "BALANCED";
-    if (numAmount > ending) return "OVER";
-    return "SHORT";
-  })();
-
   const formatCurrency = (val) =>
     `₱ ${Number(val || 0).toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
+
+  // FORMAT NUMBER AS PESO WITH 2 DECIMALS
+  const formatPeso = (val) => {
+    if (val === "" || val == null || isNaN(val)) return "";
+    return (
+      "₱" +
+      Number(val).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
+  };
+
+  // COMPUTE STATUS
+  const computeStatus = () => {
+    const ending = summary?.ending_amount || 0;
+    const amt = parseFloat(amount) || 0;
+    if (amt === ending) return "BALANCED";
+    if (amt > ending) return "OVER";
+    return "SHORT";
+  };
+
+  const computedStatus = computeStatus();
 
   return (
     <Modal
@@ -222,7 +234,6 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
               </InputGroup>
             </div>
 
-            {/* Cash Report */}
             <div className="custom-container border rounded p-3 shadow-sm flex-fill">
               <h6 className="fw-bold mb-3">Cash Report</h6>
 
@@ -232,11 +243,27 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
                 </InputGroup.Text>
                 <FormControl
                   type="text"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) =>
-                    setAmount(e.target.value.replace(/[^0-9.]/g, ""))
+                  placeholder="₱0.00"
+                  value={
+                    focused
+                      ? amount ?? ""
+                      : amount != null && amount !== ""
+                      ? formatPeso(amount)
+                      : ""
                   }
+                  onChange={(e) => {
+                    let raw = e.target.value.replace(/[^0-9.]/g, "");
+                    const parts = raw.split(".");
+                    if (parts.length > 2) raw = parts[0] + "." + parts[1];
+                    setAmount(raw === "" ? "" : raw);
+                  }}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => {
+                    if (amount !== "" && !isNaN(amount)) {
+                      setAmount(parseFloat(amount));
+                    }
+                    setFocused(false);
+                  }}
                   className="small-input"
                 />
               </InputGroup>
@@ -256,7 +283,7 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
                 <FormControl
                   type="text"
                   readOnly
-                  value={formatCurrency(summary?.ending_amount)}
+                  value={formatPeso(summary?.ending_amount)}
                   className="small-input"
                 />
               </InputGroup>

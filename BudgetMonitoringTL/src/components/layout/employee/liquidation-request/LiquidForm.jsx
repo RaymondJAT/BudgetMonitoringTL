@@ -20,7 +20,7 @@ const LiquidForm = ({ formData = {} }) => {
       if (pesoFields.includes(field.name)) {
         return {
           ...field,
-          type: "text", // render ₱ with formatting
+          type: "text",
         };
       }
       return field;
@@ -29,7 +29,7 @@ const LiquidForm = ({ formData = {} }) => {
 
   return (
     <div className="request-container border p-3 mb-2">
-      {/* DESCRIPTION FIELD (now read-only too) */}
+      {/* DESCRIPTION FIELD  */}
       <Row className="mb-3">
         <Col md={12}>
           <FloatingLabel controlId="description" label="Description">
@@ -39,13 +39,13 @@ const LiquidForm = ({ formData = {} }) => {
               value={formData.description || ""}
               placeholder="Enter description"
               className="form-control-sm small-input"
-              readOnly // 🔹 Now also readonly
+              readOnly
             />
           </FloatingLabel>
         </Col>
       </Row>
 
-      {/* DYNAMIC FIELDS (all read-only) */}
+      {/* DYNAMIC FIELDS */}
       <Row>
         {enhancedFields.map((column, colIndex) => (
           <Col md={6} key={`col-${colIndex}`}>
@@ -66,7 +66,7 @@ const LiquidForm = ({ formData = {} }) => {
                   }
                   placeholder={field.label}
                   className="form-control-sm small-input"
-                  readOnly // 🔹 All fields readonly
+                  readOnly
                 />
               </FloatingLabel>
             ))}

@@ -22,6 +22,7 @@ const Verified = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
+  const [selectedRows, setSelectedRows] = useState({});
 
   const fetchVerifiedLiquidations = useCallback(async () => {
     setLoading(true);
@@ -156,6 +157,9 @@ const Verified = () => {
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
               noDataMessage="No verified liquidation records found."
+              showCheckbox={true}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
             />
           )}
         </div>

@@ -1,35 +1,17 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdLocalPrintshop } from "react-icons/md";
 import { Container } from "react-bootstrap";
-import { useReactToPrint } from "react-to-print";
 
 import { columns } from "../../handlers/tableHeader";
 import { formatPrintData } from "../../utils/formatPrintData";
 import { handleExportData } from "../../utils/exportItems";
+import { numberToWords } from "../../utils/numberToWords";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
-import AppButton from "../../components/ui/buttons/AppButton";
 import TotalCards from "../../components/TotalCards";
-
-// PRINT BUTTON
-const PrintButton = ({ onClick }) => (
-  <AppButton
-    label={
-      <>
-        <MdLocalPrintshop style={{ marginRight: "5px" }} />
-        Print
-      </>
-    }
-    size="sm"
-    className="custom-app-button"
-    variant="outline-secondary"
-    onClick={onClick}
-  />
-);
 
 const Processing = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -42,7 +24,6 @@ const Processing = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -128,12 +109,6 @@ const Processing = () => {
     }
   };
 
-  const handlePrint = () => {
-    if (!selectedEntry) return;
-    setPrintData(selectedEntry);
-    setTimeout(() => reactToPrintFn(), 100);
-  };
-
   const normalize = (value) =>
     String(value || "")
       .toLowerCase()
@@ -151,10 +126,21 @@ const Processing = () => {
     [tableData, searchValue]
   );
 
-  const selectedEntry =
-    selectedCount === 1
-      ? filteredData.find((item) => selectedRows[item.id])
-      : null;
+  const amountInWords = useMemo(() => {
+    if (!printData) return "";
+    let total = 0;
+
+    if (printData?.items?.length > 0) {
+      total = printData.items.reduce(
+        (sum, item) => sum + (parseFloat(item.subtotal) || 0),
+        0
+      );
+    } else {
+      total = parseFloat(printData?.amount || 0);
+    }
+
+    return numberToWords(total);
+  }, [printData]);
 
   const handleExport = () => {
     const resetSelection = handleExportData({
@@ -176,9 +162,6 @@ const Processing = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            leftContent={
-              selectedCount === 1 && <PrintButton onClick={handlePrint} />
-            }
             handleExport={handleExport}
             selectedCount={selectedCount}
           />
@@ -196,8 +179,25 @@ const Processing = () => {
 
           {/* PRINT/DOWNLOAD */}
           <div className="d-none">
-            <ExpenseReport contentRef={contentRef} data={printData || {}} />
-            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            <ExpenseReport
+              contentRef={contentRef}
+              data={{
+                ...printData,
+                total: printData?.total ?? 0,
+                items: printData?.items || [],
+              }}
+              amountInWords={amountInWords}
+            />
+
+            <ExpenseReport
+              contentRef={downloadRef}
+              data={{
+                ...printData,
+                total: printData?.total ?? 0,
+                items: printData?.items || [],
+              }}
+              amountInWords={amountInWords}
+            />
           </div>
         </div>
       </Container>

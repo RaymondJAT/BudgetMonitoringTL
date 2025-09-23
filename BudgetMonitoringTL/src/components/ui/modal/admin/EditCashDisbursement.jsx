@@ -19,7 +19,7 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
 
   const [revolvingFundOptions, setRevolvingFundOptions] = useState([]);
   const [employeeOptions, setEmployeeOptions] = useState([]);
-  const [status, setStatus] = useState("");
+  const [focusedAmountField, setFocusedAmountField] = useState(null);
 
   const [formData, setFormData] = useState({
     particulars: "",
@@ -346,11 +346,40 @@ const EditCashDisbursement = ({ show, onHide, onSuccess, disbursement }) => {
                     style={{ fontSize: "0.75rem" }}
                   >
                     <Form.Control
-                      type="number"
+                      type="text"
                       name={field}
-                      placeholder={field}
-                      value={formData[field]}
-                      onChange={handleInputChange}
+                      placeholder="₱0.00"
+                      value={
+                        focusedAmountField === field
+                          ? formData[field] ?? ""
+                          : formData[field] === "" || formData[field] == null
+                          ? ""
+                          : `₱ ${parseFloat(formData[field]).toLocaleString(
+                              "en-PH",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}`
+                      }
+                      onFocus={() => setFocusedAmountField(field)}
+                      onBlur={() => {
+                        if (formData[field] !== "" && !isNaN(formData[field])) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            [field]: parseFloat(prev[field]),
+                          }));
+                        }
+                        setFocusedAmountField(null);
+                      }}
+                      onChange={(e) => {
+                        // Remove non-numeric characters except dot
+                        let raw = e.target.value.replace(/[^0-9.]/g, "");
+                        // Allow only one dot
+                        const parts = raw.split(".");
+                        if (parts.length > 2) raw = parts[0] + "." + parts[1];
+                        setFormData((prev) => ({ ...prev, [field]: raw }));
+                      }}
                       style={{ height: "50px", fontSize: "0.75rem" }}
                       required
                       className="form-control-sm"

@@ -234,6 +234,7 @@ const FinanceLiquidForm = () => {
           approveLabel="Approve"
           status={data?.status}
           role="finance"
+          printRequestLabel="Print"
         />
 
         <Row className="g-3">

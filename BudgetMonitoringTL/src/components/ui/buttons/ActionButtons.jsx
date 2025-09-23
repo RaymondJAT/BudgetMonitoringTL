@@ -7,10 +7,13 @@ const ActionButtons = ({
   onApprove,
   onReject,
   onPrint,
+  onPrintVoucher,
   onBack,
   status,
   role,
   hideApproveReject = false,
+  printRequestLabel = "",
+  printVoucherLabel = "",
 }) => {
   let isApproved = false;
 
@@ -114,7 +117,8 @@ const ActionButtons = ({
       <AppButton
         label={
           <>
-            <FaPrint /> <span className="d-sm-inline ms-1">Print</span>
+            <FaPrint />{" "}
+            <span className="d-sm-inline ms-1">{printRequestLabel}</span>
           </>
         }
         variant="outline-secondary"
@@ -122,6 +126,21 @@ const ActionButtons = ({
         onClick={onPrint}
         className="custom-app-button btn-responsive ms-2"
       />
+
+      {role === "finance" && status?.toLowerCase() === "completed" && (
+        <AppButton
+          label={
+            <>
+              <FaPrint />{" "}
+              <span className="d-sm-inline ms-1">{printVoucherLabel}</span>
+            </>
+          }
+          variant="outline-secondary"
+          size="sm"
+          onClick={onPrintVoucher}
+          className="custom-app-button btn-responsive ms-2"
+        />
+      )}
     </div>
   );
 };

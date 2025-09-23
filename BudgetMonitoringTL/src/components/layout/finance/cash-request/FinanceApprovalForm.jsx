@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useRef, useState, useEffect, use } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import { useReactToPrint } from "react-to-print";
@@ -8,6 +8,7 @@ import {
 } from "../../../../handlers/columnHeaders";
 import { numberToWords } from "../../../../utils/numberToWords";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
+import PrintableCashVoucher from "../../../print/PrintableCashVoucher";
 import CashApprovalTable from "../../team-leader/cash-request/CashApprovalTable";
 import ActionButtons from "../../../ui/buttons/ActionButtons";
 import PickRevolvingFund from "../../../ui/modal/admin/PickRevolvingFund";
@@ -15,6 +16,7 @@ import { showSwal, confirmSwal } from "../../../../utils/swal";
 
 const FinanceApprovalForm = () => {
   const contentRef = useRef(null);
+  const contentVoucherRef = useRef(null);
   const navigate = useNavigate();
   const { state: data } = useLocation();
 
@@ -23,6 +25,7 @@ const FinanceApprovalForm = () => {
     localStorage.getItem("username") ||
     "";
 
+  const [cashVoucher, setCashVoucher] = useState(data?.cash_voucher || null);
   const [amountInWords, setAmountInWords] = useState("");
   const [showFundModal, setShowFundModal] = useState(false);
 
@@ -33,6 +36,9 @@ const FinanceApprovalForm = () => {
   }, [total]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
+  const reactToPrintVoucherFn = useReactToPrint({
+    contentRef: contentVoucherRef,
+  });
 
   const handleUpdateRequest = async (
     status,
@@ -40,7 +46,7 @@ const FinanceApprovalForm = () => {
     revolvingFundId = null
   ) => {
     try {
-      let cashVoucher = null;
+      let generatedVoucher = null;
       let departmentId = null;
 
       if (status === "completed") {
@@ -50,10 +56,11 @@ const FinanceApprovalForm = () => {
         );
         if (!resVoucher.ok)
           throw new Error("Failed to fetch cash voucher information");
+
         const voucherData = await resVoucher.json();
         const voucherInfo = voucherData?.data || {};
 
-        cashVoucher = (Number(voucherInfo?.cash_voucher) || 0) + 1;
+        generatedVoucher = (Number(voucherInfo?.cash_voucher) || 0) + 1;
         departmentId = voucherInfo?.department_id || null;
 
         await fetch("/api5001/cash_disbursement/createcash_disbursement", {
@@ -66,7 +73,7 @@ const FinanceApprovalForm = () => {
             particulars: data?.description || "N/A",
             amount_issue: parseFloat(data?.amount || 0),
             amount_return: 0,
-            cash_voucher: cashVoucher,
+            cash_voucher: generatedVoucher,
           }),
         });
       }
@@ -77,7 +84,7 @@ const FinanceApprovalForm = () => {
         remarks,
         updated_by: employeeName,
         department_name: data?.department_name || "N/A",
-        cash_voucher: cashVoucher,
+        cash_voucher: generatedVoucher,
       };
 
       const res = await fetch("/api5012/cash_request/updatecash_request", {
@@ -87,7 +94,11 @@ const FinanceApprovalForm = () => {
       });
 
       if (!res.ok) throw new Error("Failed to update cash request");
-      await res.json();
+      const updatedData = await res.json();
+
+      if (status === "completed" && generatedVoucher) {
+        setCashVoucher(generatedVoucher);
+      }
 
       showSwal({
         icon: "success",
@@ -97,9 +108,18 @@ const FinanceApprovalForm = () => {
             : "Cash request rejected",
       });
 
-      navigate(-1);
+      if (status === "completed" && cashVoucher) {
+        setCashVoucher(cashVoucher);
+
+        setTimeout(() => {
+          reactToPrintVoucherFn();
+          navigate(-1);
+        }, 500);
+      } else {
+        navigate(-1);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Error in handleUpdateRequest:", err);
       showSwal({
         icon: "error",
         title: "Error",
@@ -148,9 +168,12 @@ const FinanceApprovalForm = () => {
           onApprove={() => setShowFundModal(true)}
           onReject={handleReject}
           onPrint={reactToPrintFn}
+          onPrintVoucher={reactToPrintVoucherFn}
           onBack={() => navigate(-1)}
           status={data?.status}
           role="finance"
+          printRequestLabel="Print Request Form"
+          printVoucherLabel="Print Voucher Form"
         />
 
         <Row>
@@ -221,9 +244,28 @@ const FinanceApprovalForm = () => {
 
       <div className="d-none">
         <PrintableCashRequest
-          data={{ ...data, items: [] }}
+          data={{
+            ...data,
+            description: data?.description,
+            total: total,
+            items: data?.items || [],
+          }}
           amountInWords={amountInWords}
           contentRef={contentRef}
+        />
+      </div>
+
+      <div className="d-none">
+        <PrintableCashVoucher
+          data={{
+            ...data,
+            description: data?.description,
+            total: total,
+            items: data?.items || [],
+            cash_voucher: cashVoucher,
+          }}
+          amountInWords={amountInWords}
+          contentRef={contentVoucherRef}
         />
       </div>
     </div>

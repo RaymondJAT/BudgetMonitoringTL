@@ -9,7 +9,7 @@ export const meatballActions = ({ downloadRef, setPrintData }) => [
     onClick: async (entry) => {
       setPrintData(entry);
       setTimeout(async () => {
-        await downloadPDF(downloadRef, `entry-${"download"}.pdf`);
+        await downloadPDF(downloadRef, `cash-request-${entry.cv_number}.pdf`);
       }, 200);
     },
   },

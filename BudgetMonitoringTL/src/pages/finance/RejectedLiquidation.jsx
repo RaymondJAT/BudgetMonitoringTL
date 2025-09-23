@@ -22,6 +22,7 @@ const RejectedLiquidation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
+  const [selectedRows, setSelectedRows] = useState({});
 
   const fetchRejectedLiquidations = useCallback(async () => {
     setLoading(true);
@@ -156,6 +157,9 @@ const RejectedLiquidation = () => {
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
               noDataMessage="No rejected liquidation records found."
+              showCheckbox={true}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
             />
           )}
         </div>

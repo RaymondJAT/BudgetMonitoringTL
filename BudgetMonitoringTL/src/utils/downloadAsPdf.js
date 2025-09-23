@@ -11,11 +11,11 @@ const downloadPDF = async (ref, filename = "download.pdf") => {
   const element = ref.current;
 
   const options = {
-    margin: 0.5,
+    margin: [0, 0.2, 0, 0.2],
     filename,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2 },
-    jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    jsPDF: { unit: "in", format: "a5", orientation: "landscape" },
   };
 
   await html2pdf().set(options).from(element).save();

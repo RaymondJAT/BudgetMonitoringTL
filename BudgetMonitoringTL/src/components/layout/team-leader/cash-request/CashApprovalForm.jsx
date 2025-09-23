@@ -73,6 +73,7 @@ const CashApprovalForm = () => {
           onBack={() => navigate(-1)}
           status={data?.status}
           role="teamlead"
+          printRequestLabel="Print"
         />
 
         <Row>
@@ -145,12 +146,9 @@ const CashApprovalForm = () => {
         <PrintableCashRequest
           data={{
             ...data,
-            items: [
-              {
-                description: data?.description || "N/A",
-                subtotal: parseFloat(data?.amount || 0),
-              },
-            ],
+            description: data?.description,
+            total: total,
+            items: data?.items || [],
           }}
           amountInWords={amountInWords}
           contentRef={contentRef}

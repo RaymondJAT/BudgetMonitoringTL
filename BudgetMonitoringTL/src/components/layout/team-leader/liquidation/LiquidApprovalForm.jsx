@@ -167,6 +167,7 @@ const LiquidApprovalForm = () => {
           onBack={() => navigate(-1)}
           status={data?.status}
           role={localStorage.getItem("role") || "teamlead"}
+          printRequestLabel="Print"
         />
 
         <Row className="g-3">

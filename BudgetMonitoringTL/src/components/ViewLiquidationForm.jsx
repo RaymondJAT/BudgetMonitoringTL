@@ -170,6 +170,7 @@ const ViewLiquidationForm = () => {
           onBack={() => navigate(-1)}
           onPrint={reactToPrintFn}
           hideApproveReject
+          printRequestLabel="Print"
         />
 
         <div className="custom-container border p-3">{renderInfoFields()}</div>

@@ -1,8 +1,18 @@
+import { useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import { Table, Form } from "react-bootstrap";
 import AppButton from "../../../ui/buttons/AppButton";
 
 const LiquidTable = ({ tableRows, onRowChange, onAddRow, onRemoveRow }) => {
+  const [focusedRowIndex, setFocusedRowIndex] = useState(null);
+
+  const formatPeso = (val) =>
+    "₱" +
+    Number(val || 0).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
   return (
     <div className="request-table-wrapper border">
       <Table size="sm" className="request-table">
@@ -106,49 +116,30 @@ const LiquidTable = ({ tableRows, onRowChange, onAddRow, onRemoveRow }) => {
               <td className="text-center p-1">
                 <Form.Control
                   type="text"
+                  placeholder="₱0.00"
                   value={
-                    row.amount === ""
+                    focusedRowIndex === index
+                      ? row.amount ?? ""
+                      : row.amount == null || row.amount === ""
                       ? ""
-                      : new Intl.NumberFormat("en-PH", {
-                          style: "currency",
-                          currency: "PHP",
-                          minimumFractionDigits:
-                            document.activeElement !== null &&
-                            document.activeElement.tagName === "INPUT"
-                              ? 0
-                              : 2,
-                          maximumFractionDigits: 2,
-                        })
-                          .format(row.amount)
-                          .replace("PHP", "₱")
+                      : formatPeso(row.amount)
                   }
                   onChange={(e) => {
                     let raw = e.target.value.replace(/[^0-9.]/g, "");
                     const parts = raw.split(".");
-
-                    if (parts.length > 2) {
-                      raw = parts[0] + "." + parts[1];
-                    }
-
-                    if (raw === "" || raw === ".") {
-                      onRowChange(index, "amount", "");
-                    } else {
-                      onRowChange(index, "amount", raw);
-                    }
+                    if (parts.length > 2) raw = parts[0] + "." + parts[1];
+                    onRowChange(index, "amount", raw);
                   }}
                   onBlur={() => {
                     if (row.amount !== "" && !isNaN(row.amount)) {
-                      onRowChange(
-                        index,
-                        "amount",
-                        parseFloat(row.amount).toFixed(2)
-                      );
+                      onRowChange(index, "amount", parseFloat(row.amount));
                     }
+                    setFocusedRowIndex(null);
                   }}
+                  onFocus={() => setFocusedRowIndex(index)}
                   size="sm"
                   className="form-control-sm small-input mx-auto text-center"
                   style={{ width: "90px" }}
-                  placeholder="₱0.00"
                 />
               </td>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Table, Form, Dropdown } from "react-bootstrap";
 import { GoKebabHorizontal } from "react-icons/go";
 import { FaEye } from "react-icons/fa";
@@ -20,15 +20,16 @@ const DataTable = ({
   actionType = "meatball",
   renderActionButton,
   noDataMessage = "No transactions available",
+  batchSize = 11,
 }) => {
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(batchSize);
+
+  const visibleData = data.slice(0, visibleCount);
 
   // GENERATE ACTION MENU ITEMS
-  const meatballItems = meatballActions({
-    downloadRef,
-    setPrintData,
-  });
+  const meatballItems = meatballActions({ downloadRef, setPrintData });
 
   // UPDATE SELECT ALL STATE
   useEffect(() => {
@@ -47,16 +48,18 @@ const DataTable = ({
   };
 
   const toggleRowSelection = (entryId) => {
-    onSelectionChange?.({
-      ...selectedRows,
-      [entryId]: !selectedRows[entryId],
-    });
+    onSelectionChange?.({ ...selectedRows, [entryId]: !selectedRows[entryId] });
   };
 
   // CELL RENDERING
+  const formatCurrency = (amount) =>
+    `₱ ${parseFloat(amount || 0).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
   const renderCell = useCallback((entry, col) => {
     const value = entry[col.accessor];
-
     if (typeof col.Cell === "function") return col.Cell({ value, row: entry });
 
     switch (col.accessor) {
@@ -66,11 +69,10 @@ const DataTable = ({
             {value}
           </span>
         );
-      case "total": {
+      case "total":
         const totalValue =
           entry.formType === "Liquidation" ? entry.amountObtained : entry.total;
         return formatCurrency(totalValue);
-      }
       case "quantity":
         return entry.transactions?.map((item, i) => (
           <div key={i}>{item.quantity}</div>
@@ -83,12 +85,6 @@ const DataTable = ({
         return value ?? "";
     }
   }, []);
-
-  const formatCurrency = (amount) =>
-    `₱ ${parseFloat(amount || 0).toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
 
   // MEATBALL DROPDOWN ACTIONS
   const ActionMenu = ({ entry, index }) => (
@@ -127,7 +123,6 @@ const DataTable = ({
     </Dropdown>
   );
 
-  // ACTION BUTTON (ALTERNATIVE)
   const ActionButton = ({ entry }) =>
     renderActionButton ? (
       renderActionButton(entry)
@@ -144,8 +139,8 @@ const DataTable = ({
     );
 
   // RENDER ROWS
-  const renderTableRows = () =>
-    data.filter(Boolean).map((entry, index) => (
+  const renderTableRows = (rows = visibleData) =>
+    rows.filter(Boolean).map((entry, index) => (
       <tr
         key={entry.id ?? index}
         className={`clickable-row ${
@@ -202,8 +197,8 @@ const DataTable = ({
     ));
 
   // RENDER MOBILE CARDS
-  const renderMobileCards = () =>
-    data.map((entry, index) => (
+  const renderMobileCards = (rows = visibleData) =>
+    rows.map((entry, index) => (
       <div
         key={entry.id || index}
         className={`mobile-card p-3 mb-3 border rounded shadow-sm ${
@@ -212,7 +207,6 @@ const DataTable = ({
         style={{ cursor: "pointer" }}
         onClick={() => onRowClick?.(entry)}
       >
-        {/* Top: main info (first column) */}
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div>
             <strong>{entry.description || entry.name || entry.id}</strong>
@@ -230,7 +224,6 @@ const DataTable = ({
         {columns.map((col, i) => {
           if (col.accessor === "price" || col.accessor === "quantity")
             return null;
-
           let value = entry[col.accessor];
 
           switch (col.accessor) {
@@ -278,8 +271,20 @@ const DataTable = ({
       </div>
     ));
 
+  // SCROLL HANDLER FOR INFINITE LOAD
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollTop + clientHeight >= scrollHeight - 5) {
+      setVisibleCount((prev) => Math.min(prev + batchSize, data.length));
+    }
+  };
+
   return (
-    <div className="table-wrapper" style={{ maxHeight: height }}>
+    <div
+      className="table-wrapper"
+      style={{ maxHeight: height, overflowY: "auto" }}
+      onScroll={handleScroll}
+    >
       {/* DESKTOP VIEW */}
       <Table hover className="expense-table mb-0 d-none d-lg-table">
         <thead>
@@ -314,8 +319,8 @@ const DataTable = ({
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 ? (
-            renderTableRows()
+          {visibleData.length > 0 ? (
+            renderTableRows(visibleData)
           ) : (
             <tr>
               <td
@@ -335,8 +340,8 @@ const DataTable = ({
 
       {/* MOBILE VIEW */}
       <div className="d-lg-none">
-        {data.length > 0 ? (
-          renderMobileCards()
+        {visibleData.length > 0 ? (
+          renderMobileCards(visibleData)
         ) : (
           <div className="text-center mt-4">{noDataMessage}</div>
         )}

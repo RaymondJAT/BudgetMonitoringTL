@@ -1,15 +1,22 @@
 import { Container, Row, Col, Table } from "react-bootstrap";
 
 const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
-  const transactions = data?.transactions || [];
+  const transactions = data?.liquidation_items || [];
   const totalAmount = transactions.reduce(
     (sum, item) => sum + (parseFloat(item.amount) || 0),
     0
   );
 
   return (
-    <div ref={contentRef}>
-      <Container className="px-0 mt-4" style={{ fontSize: "0.85rem" }}>
+    <div
+      ref={contentRef}
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
+      {/* MAIN CONTENT */}
+      <Container
+        className="px-0 mt-4 flex-grow-1"
+        style={{ fontSize: "0.85rem" }}
+      >
         <h3 className="text-center w-100 fw-bold">LIQUIDATION FORM</h3>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
 
@@ -28,7 +35,7 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
               <strong className="title text-uppercase">
                 Date of Liquidation:
               </strong>
-              <p className="ms-2 mb-0">{data?.dateOfLiquidation || " "}</p>
+              <p className="ms-2 mb-0">{data?.created_date || " "}</p>
             </div>
           </Col>
 
@@ -37,18 +44,24 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
               <strong className="title text-uppercase">Amount Obtained:</strong>
               <p className="ms-2 mb-0">
                 ₱
-                {parseFloat(data?.amountObtained || 0).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}
+                {parseFloat(data?.amount_obtained || 0).toLocaleString(
+                  "en-US",
+                  {
+                    minimumFractionDigits: 2,
+                  }
+                )}
               </p>
             </div>
             <div className="d-flex justify-content-md-end align-items-center mb-2">
               <strong className="title text-uppercase">Amount Expended:</strong>
               <p className="ms-2 mb-0">
                 ₱
-                {parseFloat(data?.amountExpended || 0).toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                })}
+                {parseFloat(data?.amount_expended || 0).toLocaleString(
+                  "en-US",
+                  {
+                    minimumFractionDigits: 2,
+                  }
+                )}
               </p>
             </div>
             <div className="d-flex justify-content-md-end align-items-center">
@@ -57,7 +70,7 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
               </strong>
               <p className="ms-2 mb-0">
                 ₱
-                {parseFloat(data?.reimburseOrReturn || 0).toLocaleString(
+                {parseFloat(data?.reimburse_return || 0).toLocaleString(
                   "en-US",
                   {
                     minimumFractionDigits: 2,
@@ -90,12 +103,12 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
                   transactions.map((item, index) => (
                     <tr key={index} className="text-center">
                       <td>{item.date || "-"}</td>
-                      <td>{item.rtNumber || "-"}</td>
-                      <td>{item.storeName || "-"}</td>
+                      <td>{item.rt || "-"}</td>
+                      <td>{item.store_name || "-"}</td>
                       <td>{item.particulars || "-"}</td>
                       <td>{item.from || "-"}</td>
                       <td>{item.to || "-"}</td>
-                      <td>{item.transportation || "-"}</td>
+                      <td>{item.mode_of_transportation || "-"}</td>
                       <td>
                         ₱
                         {parseFloat(item.amount || 0).toLocaleString("en-US", {
@@ -128,9 +141,11 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
             </Table>
           </Col>
         </Row>
+      </Container>
 
-        {/* SIGNATURES */}
-        <Row className="signature mt-5 small" style={{ display: "flex" }}>
+      {/* SIGNATURES - pinned at bottom */}
+      <Container className="px-0 mt-5">
+        <Row className="signature small">
           {[
             { label: "Prepared by", key: "prepared" },
             { label: "Noted by", key: "noted" },
@@ -153,7 +168,7 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
                 <div
                   style={{
                     position: "absolute",
-                    top: "-14px",
+                    top: "5px",
                     width: "100%",
                     textAlign: "center",
                   }}

@@ -37,7 +37,7 @@ const CashReqActionButtons = ({
         )}
 
         {/* View Button */}
-        <AppButton
+        {/* <AppButton
           label={
             <>
               <FaEye /> <span className="d-sm-inline ms-1">View</span>
@@ -47,7 +47,7 @@ const CashReqActionButtons = ({
           size="sm"
           onClick={onView}
           className="custom-app-button btn-responsive ms-2"
-        />
+        /> */}
 
         {/* Print Button */}
         <AppButton

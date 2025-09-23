@@ -143,8 +143,24 @@ export const columns = [
   { label: "Received By", accessor: "received_by" },
   { label: "Department", accessor: "department" },
   { label: "Particulars", accessor: "particulars" },
-  { label: "Amount Return", accessor: "amount_return" },
-  { label: "Amount Expended", accessor: "amount_expended" },
+  {
+    label: "Amount Return",
+    accessor: "amount_return",
+    Cell: ({ value }) =>
+      `₱${Number(value || 0).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+  },
+  {
+    label: "Amount Expended",
+    accessor: "amount_expended",
+    Cell: ({ value }) =>
+      `₱${Number(value || 0).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+  },
 ];
 
 // VIEW REVOLVING FUND

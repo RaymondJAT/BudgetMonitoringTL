@@ -1,34 +1,37 @@
 import { Row, Col, Container, Table } from "react-bootstrap";
 
-const ExpenseReport = ({ data, contentRef, signatures = {} }) => {
+const ExpenseReport = ({
+  data,
+  amountInWords,
+  contentRef,
+  signatures = {},
+}) => {
   const particulars =
     data?.items?.length > 0
       ? data.items.map((item) => ({
           description: item.label || " ",
-          subtotal:
+          amount:
             (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
         }))
       : data?.transactions?.length > 0
       ? data.transactions.map((item) => ({
           description: item.label || " ",
-          subtotal:
+          amount:
             (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
         }))
       : [
           {
             description: data?.description || " ",
-            subtotal:
-              (parseFloat(data?.unitPrice) || 0) *
-              (parseFloat(data?.quantity) || 0),
+            amount: parseFloat(data?.amount || 0),
           },
         ];
 
   const totalAmount = particulars.reduce(
-    (sum, item) => sum + (parseFloat(item.subtotal) || 0),
+    (sum, item) => sum + (parseFloat(item.amount) || 0),
     0
   );
 
-  // Signature block (same as PrintableCashRequest)
+  // Signature block
   const SignatureBlock = ({ label, name }) => (
     <Col xs={12} md={4} className="text-center">
       <p className="mb-0">
@@ -41,7 +44,7 @@ const ExpenseReport = ({ data, contentRef, signatures = {} }) => {
         <div
           style={{
             position: "absolute",
-            top: "-14px",
+            top: "5px",
             width: "100%",
             textAlign: "center",
           }}
@@ -109,11 +112,9 @@ const ExpenseReport = ({ data, contentRef, signatures = {} }) => {
                       <td className="text-center">{item.description}</td>
                       <td className="text-center">
                         ₱
-                        {item.total
-                          ? parseFloat(item.total).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                            })
-                          : "0.00"}
+                        {parseFloat(item.amount || 0).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                        })}
                       </td>
                     </tr>
                   ))
@@ -135,6 +136,11 @@ const ExpenseReport = ({ data, contentRef, signatures = {} }) => {
                         minimumFractionDigits: 2,
                       })}
                     </strong>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2" className="text-start">
+                    <strong>Amount in Words:</strong> {amountInWords || "Zero"}
                   </td>
                 </tr>
               </tbody>

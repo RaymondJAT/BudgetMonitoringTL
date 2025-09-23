@@ -160,7 +160,9 @@ const ViewCashRequestForm = () => {
         <PrintableCashRequest
           data={{
             ...data,
-            items: [],
+            description: data?.description,
+            total: total,
+            items: data?.items || [],
           }}
           amountInWords={amountInWords}
           contentRef={contentRef}
@@ -178,9 +180,12 @@ const ViewCashRequestForm = () => {
           <PrintableCashRequest
             data={{
               ...data,
-              items: [],
+              description: data?.description,
+              total: total,
+              items: data?.items || [], 
             }}
             amountInWords={amountInWords}
+            contentRef={contentRef}
           />
         </Modal.Body>
       </Modal>

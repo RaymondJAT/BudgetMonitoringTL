@@ -1,48 +1,16 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdLocalPrintshop, MdDelete } from "react-icons/md";
-import { useReactToPrint } from "react-to-print";
 import { Container } from "react-bootstrap";
 
 import { columns } from "../../handlers/tableHeader";
 import { handleExportData } from "../../utils/exportItems";
+import { numberToWords } from "../../utils/numberToWords";
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import ExpenseReport from "../../components/print/ExpenseReport";
-import AppButton from "../../components/ui/buttons/AppButton";
-
-const PrintButton = ({ onClick }) => (
-  <AppButton
-    label={
-      <>
-        <MdLocalPrintshop style={{ marginRight: "5px" }} />
-        Print
-      </>
-    }
-    size="sm"
-    className="custom-app-button"
-    variant="outline-dark"
-    onClick={onClick}
-  />
-);
-
-const DeleteButton = ({ onClick }) => (
-  <AppButton
-    label={
-      <>
-        <MdDelete style={{ marginRight: "5px" }} />
-        Delete
-      </>
-    }
-    size="sm"
-    className="custom-app-button"
-    variant="outline-danger"
-    onClick={onClick}
-  />
-);
 
 const Approval = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -55,7 +23,6 @@ const Approval = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const downloadRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({ content: () => contentRef.current });
 
   const selectedCount = Object.values(selectedRows).filter(Boolean).length;
 
@@ -145,28 +112,6 @@ const Approval = () => {
     navigate("/cash_approval_form", { state: entry });
   };
 
-  const selectedEntry =
-    selectedCount === 1
-      ? filteredData.find((item) => selectedRows[item.id])
-      : null;
-
-  const handlePrint = () => {
-    if (!selectedEntry) return;
-    setPrintData(selectedEntry);
-    setTimeout(() => reactToPrintFn(), 100);
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedCount < 1) return;
-    const selectedEntries = filteredData.filter(
-      (entry) => selectedRows[entry.id]
-    );
-    setTableData((prev) =>
-      prev.filter((item) => !selectedEntries.some((e) => e.id === item.id))
-    );
-    setSelectedRows({});
-  };
-
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
@@ -176,6 +121,22 @@ const Approval = () => {
     });
     setSelectedRows(resetSelection);
   };
+
+  const amountInWords = useMemo(() => {
+    if (!printData) return "";
+    let total = 0;
+
+    if (printData?.items?.length > 0) {
+      total = printData.items.reduce(
+        (sum, item) => sum + (parseFloat(item.subtotal) || 0),
+        0
+      );
+    } else {
+      total = parseFloat(printData?.amount || 0);
+    }
+
+    return numberToWords(total);
+  }, [printData]);
 
   return (
     <div className="pb-3">
@@ -187,21 +148,6 @@ const Approval = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            leftContent={
-              selectedCount > 0 && (
-                <>
-                  {selectedCount === 1 && (
-                    <>
-                      <PrintButton onClick={handlePrint} />
-                      <DeleteButton onClick={handleDeleteSelected} />
-                    </>
-                  )}
-                  {selectedCount > 1 && (
-                    <DeleteButton onClick={handleDeleteSelected} />
-                  )}
-                </>
-              )
-            }
             handleExport={handleExport}
             selectedCount={selectedCount}
           />
@@ -223,8 +169,25 @@ const Approval = () => {
           />
 
           <div style={{ display: "none" }}>
-            <ExpenseReport contentRef={contentRef} data={printData || {}} />
-            <ExpenseReport contentRef={downloadRef} data={printData || {}} />
+            <ExpenseReport
+              contentRef={contentRef}
+              data={{
+                ...printData,
+                total: printData?.total ?? 0,
+                items: printData?.items || [],
+              }}
+              amountInWords={amountInWords}
+            />
+
+            <ExpenseReport
+              contentRef={downloadRef}
+              data={{
+                ...printData,
+                total: printData?.total ?? 0,
+                items: printData?.items || [],
+              }}
+              amountInWords={amountInWords}
+            />
           </div>
         </div>
       </Container>

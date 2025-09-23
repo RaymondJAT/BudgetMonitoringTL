@@ -156,20 +156,20 @@ const BudgetAllocation = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            leftContent={
-              <AppButton
-                label={
-                  <>
-                    <FaPlus />
-                    <span className="d-none d-sm-inline ms-1">Allocation</span>
-                  </>
-                }
-                variant="outline-dark"
-                size="sm"
-                onClick={() => setShowModal(true)}
-                className="custom-app-button"
-              />
-            }
+            // leftContent={
+            //   <AppButton
+            //     label={
+            //       <>
+            //         <FaPlus />
+            //         <span className="d-none d-sm-inline ms-1">Allocation</span>
+            //       </>
+            //     }
+            //     variant="outline-dark"
+            //     size="sm"
+            //     onClick={() => setShowModal(true)}
+            //     className="custom-app-button"
+            //   />
+            // }
             onDateRangeChange={(start, end) =>
               fetchBudgetDataByDate(start, end)
             }

@@ -23,6 +23,7 @@ const Reviewed = () => {
   const [error, setError] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
+  const [selectedRows, setSelectedRows] = useState({});
 
   const fetchReviewed = useCallback(async () => {
     try {
@@ -177,6 +178,9 @@ const Reviewed = () => {
               columns={liquidationColumns}
               onRowClick={handleRowClick}
               selectedRowId={selectedRowId}
+              showCheckbox={true}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
             />
           )}
         </div>

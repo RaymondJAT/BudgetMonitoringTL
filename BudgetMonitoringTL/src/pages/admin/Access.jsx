@@ -106,20 +106,20 @@ const Access = () => {
     <Container fluid className="mt-3">
       <div className="custom-container shadow-sm rounded p-3">
         <ToolBar
-          leftContent={
-            <AppButton
-              label={
-                <>
-                  <FaPlus />
-                  <span className="d-none d-sm-inline ms-1">Access</span>
-                </>
-              }
-              variant="outline-dark"
-              size="sm"
-              className="custom-app-button"
-              onClick={() => setShowNewModal(true)}
-            />
-          }
+          // leftContent={
+          //   <AppButton
+          //     label={
+          //       <>
+          //         <FaPlus />
+          //         <span className="d-none d-sm-inline ms-1">Access</span>
+          //       </>
+          //     }
+          //     variant="outline-dark"
+          //     size="sm"
+          //     className="custom-app-button"
+          //     onClick={() => setShowNewModal(true)}
+          //   />
+          // }
           showFilter={false}
         />
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Row, Col, Container, Table } from "react-bootstrap";
 
-const PrintableCashRequest = ({
+const PrintableCashVoucher = ({
   data,
   amountInWords,
   contentRef,
@@ -62,7 +62,7 @@ const PrintableCashRequest = ({
   return (
     <div ref={contentRef}>
       <Container className="px-0 mt-4">
-        <h2 className="text-center w-100 fw-bold">CASH REQUEST FORM</h2>
+        <h2 className="text-center w-100 fw-bold">CASH VOUCHER</h2>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
 
         {/* EMPLOYEE DETAILS */}
@@ -73,19 +73,19 @@ const PrintableCashRequest = ({
               <p className="ms-2 mb-0">{data?.employee || " "}</p>
             </div>
             <div className="d-flex align-items-center">
-              <strong className="title">Position:</strong>
-              <p className="ms-2 mb-0">{data?.position || " "}</p>
+              <strong className="title">Department:</strong>
+              <p className="ms-2 mb-0">{data?.department || " "}</p>
             </div>
           </Col>
 
           <Col xs={12} md={6} className="mb-2 text-md-end">
             <div className="d-flex justify-content-md-end align-items-center mb-2">
-              <strong className="title">Date Filed:</strong>
-              <p className="ms-2 mb-0">{data?.request_date || dateFiled}</p>
+              <strong className="title">CV No:</strong>
+              <p className="ms-2 mb-0">{data?.cv_number || ""}</p>
             </div>
             <div className="d-flex justify-content-md-end align-items-center">
-              <strong className="title">Department:</strong>
-              <p className="ms-2 mb-0">{data?.department || " "}</p>
+              <strong className="title">Date:</strong>
+              <p className="ms-2 mb-0">{data?.request_date || " "}</p>
             </div>
           </Col>
         </Row>
@@ -162,4 +162,4 @@ const PrintableCashRequest = ({
   );
 };
 
-export default PrintableCashRequest;
+export default PrintableCashVoucher;
