@@ -24,6 +24,8 @@ export const handleExportData = ({
       activities,
       formType,
       cash_request_activities,
+      liquidation_items,
+      liquidation_activities,
       ...rest
     }) => rest
   );

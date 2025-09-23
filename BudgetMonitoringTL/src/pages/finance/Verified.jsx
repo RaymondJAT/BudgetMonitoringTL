@@ -1,13 +1,15 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Alert, Button } from "react-bootstrap";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { liquidationFinanceColumns } from "../../handlers/tableHeader";
+import { handleExportData } from "../../utils/exportItems";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
+import LiquidationPdf from "../../components/print/LiquidationPdf";
 
 const normalizeString = (value) =>
   String(value || "")
@@ -23,6 +25,9 @@ const Verified = () => {
   const [error, setError] = useState(null);
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
+  const [printData, setPrintData] = useState(null);
+
+  const downloadRef = useRef(null);
 
   const fetchVerifiedLiquidations = useCallback(async () => {
     setLoading(true);
@@ -32,7 +37,7 @@ const Verified = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      // ✅ Fetch only VERIFIED liquidations
+      // Fetch only VERIFIED liquidations
       const res = await fetch(
         "/api5012/liquidation/getapproved_liquidation?status=verified",
         {
@@ -48,6 +53,7 @@ const Verified = () => {
       const mappedData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `verified-${index}`,
+        formType: "Liquidation",
       }));
 
       setTableData(mappedData);
@@ -109,11 +115,26 @@ const Verified = () => {
     );
   }, [tableData, searchValue]);
 
+  const selectedCount = useMemo(
+    () => Object.values(selectedRows).filter(Boolean).length,
+    [selectedRows]
+  );
+
   // NAVIGATION TO FINANCE FORM
   const handleRowClick = (entry) => {
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
     });
+  };
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "liquidated-requests",
+    });
+    setSelectedRows(resetSelection);
   };
 
   return (
@@ -128,6 +149,8 @@ const Verified = () => {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             onRefresh={fetchVerifiedLiquidations}
+            selectedCount={selectedCount}
+            handleExport={handleExport}
           />
 
           {/* LOADING STATE */}
@@ -160,8 +183,14 @@ const Verified = () => {
               showCheckbox={true}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
             />
           )}
+
+          <div className="d-none">
+            <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

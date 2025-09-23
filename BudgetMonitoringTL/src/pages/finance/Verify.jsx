@@ -1,13 +1,15 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Alert, Button } from "react-bootstrap";
 
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
 import { liquidationFinanceColumns } from "../../handlers/tableHeader";
+import { handleExportData } from "../../utils/exportItems";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
+import LiquidationPdf from "../../components/print/LiquidationPdf";
 
 const normalizeString = (value) =>
   String(value || "")
@@ -23,6 +25,9 @@ const Verify = () => {
   const [error, setError] = useState(null);
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
+  const [printData, setPrintData] = useState(null);
+
+  const downloadRef = useRef(null);
 
   const fetchFinanceLiquidations = useCallback(async () => {
     setLoading(true);
@@ -47,6 +52,7 @@ const Verify = () => {
       const mappedData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `liq-${index}`,
+        formType: "Liquidation",
       }));
 
       setTableData(mappedData);
@@ -108,11 +114,26 @@ const Verify = () => {
     );
   }, [tableData, searchValue]);
 
+  const selectedCount = useMemo(
+    () => Object.values(selectedRows).filter(Boolean).length,
+    [selectedRows]
+  );
+
   // NAVIGATION TO FINANCE FORM
   const handleRowClick = (entry) => {
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
     });
+  };
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "liquidated-requests",
+    });
+    setSelectedRows(resetSelection);
   };
 
   return (
@@ -127,6 +148,8 @@ const Verify = () => {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             onRefresh={fetchFinanceLiquidations}
+            selectedCount={selectedCount}
+            handleExport={handleExport}
           />
 
           {/* LOADING STATE */}
@@ -159,8 +182,14 @@ const Verify = () => {
               showCheckbox={true}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
             />
           )}
+        </div>
+
+        <div className="d-none">
+          <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
         </div>
       </Container>
     </div>

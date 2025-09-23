@@ -1,13 +1,15 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Alert } from "react-bootstrap";
 
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 import { liquidationColumns } from "../../handlers/tableHeader";
+import { handleExportData } from "../../utils/exportItems";
 
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
 import TotalCards from "../../components/TotalCards";
+import LiquidationPdf from "../../components/print/LiquidationPdf";
 
 const normalizeString = (value) =>
   String(value || "")
@@ -23,6 +25,9 @@ const EmpLiquidation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cardsData, setCardsData] = useState([EMPLOYEE_STATUS_LIST]);
+  const [printData, setPrintData] = useState(null);
+
+  const downloadRef = useRef(null);
 
   const fetchLiquidations = useCallback(async () => {
     try {
@@ -86,7 +91,6 @@ const EmpLiquidation = () => {
         const employeeId = localStorage.getItem("employee_id");
         const accessName = localStorage.getItem("access_name");
 
-        // check if user is a Developer
         const isDev = String(accessName).toLowerCase() === "developer";
 
         const url = isDev
@@ -144,6 +148,16 @@ const EmpLiquidation = () => {
     fetchLiquidations();
   };
 
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "liquidated-requests",
+    });
+    setSelectedRows(resetSelection);
+  };
+
   return (
     <div className="pb-3">
       <div className="mt-3">
@@ -158,6 +172,7 @@ const EmpLiquidation = () => {
             selectedCount={selectedCount}
             searchBarWidth="300px"
             onRefresh={handleRetry}
+            handleExport={handleExport}
           />
 
           {loading && (
@@ -194,8 +209,14 @@ const EmpLiquidation = () => {
               onRowClick={handleRowClick}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
             />
           )}
+
+          <div className="d-none">
+            <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

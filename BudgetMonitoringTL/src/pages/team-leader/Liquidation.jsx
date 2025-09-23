@@ -1,13 +1,15 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Alert } from "react-bootstrap";
 
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import { liquidationColumns } from "../../handlers/tableHeader";
+import { handleExportData } from "../../utils/exportItems";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
+import LiquidationPdf from "../../components/print/LiquidationPdf";
 
 const normalizeString = (value) =>
   String(value || "")
@@ -24,6 +26,9 @@ const Liquidation = () => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
   const [selectedRows, setSelectedRows] = useState({});
+  const [printData, setPrintData] = useState(null);
+
+  const downloadRef = useRef(null);
 
   const fetchLiquidations = useCallback(async () => {
     try {
@@ -108,6 +113,11 @@ const Liquidation = () => {
     );
   }, [tableData, searchValue]);
 
+  const selectedCount = useMemo(
+    () => Object.values(selectedRows).filter(Boolean).length,
+    [selectedRows]
+  );
+
   const handleRetry = () => fetchLiquidations();
 
   const handleRowClick = (entry) => {
@@ -121,6 +131,16 @@ const Liquidation = () => {
     });
   };
 
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "liquidated-requests",
+    });
+    setSelectedRows(resetSelection);
+  };
+
   return (
     <div className="pb-3">
       <div className="mt-3">
@@ -132,7 +152,9 @@ const Liquidation = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
+            selectedCount={selectedCount}
             onRefresh={handleRetry}
+            handleExport={handleExport}
           />
 
           {loading && (
@@ -165,7 +187,13 @@ const Liquidation = () => {
             showCheckbox={true}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
           />
+
+          <div className="d-none">
+            <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

@@ -26,7 +26,6 @@ const MyExpenses = () => {
   const [printData, setPrintData] = useState(null);
 
   const navigate = useNavigate();
-  const contentRef = useRef(null);
   const downloadRef = useRef(null);
 
   const fetchCashRequests = useCallback(async () => {
@@ -224,15 +223,6 @@ const MyExpenses = () => {
 
           {/* HIDDEN PRINT/DOWNLOAD CONTENT */}
           <div className="d-none">
-            <ExpenseReport
-              contentRef={contentRef}
-              data={{
-                ...printData,
-                total: printData?.total ?? 0,
-                items: printData?.items || [],
-              }}
-              amountInWords={amountInWords}
-            />
             <ExpenseReport
               contentRef={downloadRef}
               data={{

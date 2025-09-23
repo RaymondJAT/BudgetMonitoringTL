@@ -1,11 +1,13 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Container, Alert, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 import { liquidationFinanceColumns } from "../../handlers/tableHeader";
+import { handleExportData } from "../../utils/exportItems";
 
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
+import LiquidationPdf from "../../components/print/LiquidationPdf";
 
 const normalizeString = (value) =>
   String(value || "")
@@ -19,6 +21,11 @@ const CompletedLiquidation = () => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [printData, setPrintData] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const [selectedRows, setSelectedRows] = useState({});
+
+  const downloadRef = useRef(null);
 
   // FETCH COMPLETED LIQUIDATIONS
   const fetchCompletedLiquidations = useCallback(async () => {
@@ -42,6 +49,7 @@ const CompletedLiquidation = () => {
       const mappedData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `verified-${index}`,
+        formType: "Liquidation",
       }));
 
       setTableData(mappedData);
@@ -69,11 +77,26 @@ const CompletedLiquidation = () => {
     );
   }, [tableData, searchValue]);
 
+  const selectedCount = useMemo(
+    () => Object.values(selectedRows).filter(Boolean).length,
+    [selectedRows]
+  );
+
   // HANDLE ROW CLICK
   const handleRowClick = (entry) => {
     navigate("/admin_liquid_form", {
       state: { ...entry, role: "admin" },
     });
+  };
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "completed-liquidations",
+    });
+    setSelectedRows(resetSelection);
   };
 
   return (
@@ -84,6 +107,9 @@ const CompletedLiquidation = () => {
             searchValue={searchValue}
             onSearchChange={(e) => setSearchValue(e.target.value)}
             onRefresh={fetchCompletedLiquidations}
+            selectedCount={selectedCount}
+            handleExport={handleExport}
+            showFilter={false}
           />
 
           {loading && (
@@ -110,8 +136,18 @@ const CompletedLiquidation = () => {
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
               noDataMessage="No verified liquidation records found."
+              showCheckbox={true}
+              selectedRowId={selectedRowId}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
             />
           )}
+
+          <div className="d-none">
+            <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

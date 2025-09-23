@@ -1,13 +1,15 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Alert } from "react-bootstrap";
 
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import { liquidationColumns } from "../../handlers/tableHeader";
+import { handleExportData } from "../../utils/exportItems";
 
 import TotalCards from "../../components/TotalCards";
 import ToolBar from "../../components/layout/ToolBar";
 import DataTable from "../../components/layout/DataTable";
+import LiquidationPdf from "../../components/print/LiquidationPdf";
 
 const normalizeString = (value) =>
   String(value || "")
@@ -24,6 +26,9 @@ const RejectLiquidation = () => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
   const [selectedRows, setSelectedRows] = useState({});
+  const [printData, setPrintData] = useState(null);
+
+  const downloadRef = useRef(null);
 
   const fetchRejectedLiquidations = useCallback(async () => {
     try {
@@ -53,7 +58,7 @@ const RejectLiquidation = () => {
       const mappedData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || index,
-        formType: "Reject Liquidation",
+        formType: "Liquidation",
       }));
 
       setTableData(mappedData);
@@ -110,6 +115,11 @@ const RejectLiquidation = () => {
     );
   }, [tableData, searchValue]);
 
+  const selectedCount = useMemo(
+    () => Object.values(selectedRows).filter(Boolean).length,
+    [selectedRows]
+  );
+
   const handleRetry = () => fetchRejectedLiquidations();
 
   const handleRowClick = (entry) => {
@@ -121,6 +131,16 @@ const RejectLiquidation = () => {
         role: "team-leader",
       },
     });
+  };
+
+  const handleExport = () => {
+    const resetSelection = handleExportData({
+      filteredData,
+      selectedRows,
+      selectedCount,
+      filename: "rejected-liquidations",
+    });
+    setSelectedRows(resetSelection);
   };
 
   return (
@@ -135,6 +155,8 @@ const RejectLiquidation = () => {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             onRefresh={handleRetry}
+            selectedCount={selectedCount}
+            handleExport={handleExport}
           />
 
           {loading && (
@@ -167,7 +189,13 @@ const RejectLiquidation = () => {
             showCheckbox={true}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
+            downloadRef={downloadRef}
+            setPrintData={setPrintData}
           />
+        </div>
+
+        <div className="d-none">
+          <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
         </div>
       </Container>
     </div>
