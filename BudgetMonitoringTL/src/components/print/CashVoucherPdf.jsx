@@ -1,28 +1,18 @@
 import { Row, Col, Container, Table } from "react-bootstrap";
 
-const ExpenseReport = ({
+const CashVoucherPdf = ({
   data,
   amountInWords,
   contentRef,
   signatures = {},
 }) => {
   const particulars =
-    data?.items?.length > 0
-      ? data.items.map((item) => ({
-          description: item.label || " ",
-          amount:
-            (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
-        }))
-      : data?.transactions?.length > 0
-      ? data.transactions.map((item) => ({
-          description: item.label || " ",
-          amount:
-            (parseFloat(item.price) || 0) * (parseFloat(item.quantity) || 0),
-        }))
+    data?.items && data.items.length > 0
+      ? data.items
       : [
           {
-            description: data?.description || " ",
-            amount: parseFloat(data?.amount || 0),
+            description: data?.description || "N/A",
+            amount: data?.amount || 0,
           },
         ];
 
@@ -65,32 +55,30 @@ const ExpenseReport = ({
   return (
     <div ref={contentRef}>
       <Container className="px-0 mt-4">
-        <h2 className="text-center w-100 fw-bold text-uppercase">
-          cash request form
-        </h2>
+        <h2 className="text-center w-100 fw-bold">CASH VOUCHER</h2>
         <hr className="mb-1" style={{ borderTop: "1px solid black" }} />
 
         {/* Employee Details */}
-        <Row className="custom-col small mb-3">
+        <Row className="custom-col small">
           <Col xs={12} md={6} className="mb-2">
             <div className="d-flex align-items-center mb-2">
-              <strong className="title">Name:</strong>
+              <strong className="title">Employee Name:</strong>
               <p className="ms-2 mb-0">{data?.employee || " "}</p>
             </div>
             <div className="d-flex align-items-center">
-              <strong className="title">Position:</strong>
-              <p className="ms-2 mb-0">{data?.position || " "}</p>
+              <strong className="title">Department:</strong>
+              <p className="ms-2 mb-0">{data?.department || " "}</p>
             </div>
           </Col>
 
           <Col xs={12} md={6} className="mb-2 text-md-end">
             <div className="d-flex justify-content-md-end align-items-center mb-2">
-              <strong className="title">Date Filed:</strong>
-              <p className="ms-2 mb-0">{data?.request_date || " "}</p>
+              <strong className="title">CV No:</strong>
+              <p className="ms-2 mb-0">{data?.cv_number || " "}</p>
             </div>
             <div className="d-flex justify-content-md-end align-items-center">
-              <strong className="title">Department:</strong>
-              <p className="ms-2 mb-0">{data?.department || " "}</p>
+              <strong className="title">Date:</strong>
+              <p className="ms-2 mb-0">{data?.request_date || " "}</p>
             </div>
           </Col>
         </Row>
@@ -150,13 +138,19 @@ const ExpenseReport = ({
 
         {/* Signatures */}
         <Row className="signature mt-4 small">
-          <SignatureBlock label="Prepared by:" name={signatures?.employee} />
-          <SignatureBlock label="Approved by:" name={signatures?.teamLead} />
-          <SignatureBlock label="Received by:" name={signatures?.finance} />
+          <SignatureBlock
+            label="Requested by:"
+            name={signatures?.requestedName}
+          />
+          <SignatureBlock
+            label="Approved by:"
+            name={signatures?.approvedName}
+          />
+          <SignatureBlock label="Received by:" name={signatures?.financeName} />
         </Row>
       </Container>
     </div>
   );
 };
 
-export default ExpenseReport;
+export default CashVoucherPdf;

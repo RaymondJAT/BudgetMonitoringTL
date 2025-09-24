@@ -8,11 +8,13 @@ import { handleExportData } from "../../utils/exportItems";
 import { numberToWords } from "../../utils/numberToWords";
 import { STATUS } from "../../constants/status";
 import { FINANCE_STATUS_LIST } from "../../constants/totalList";
+import { meatballActions } from "../../handlers/actionMenuItems";
 
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
 import ExpenseReport from "../../components/print/ExpenseReport";
 import TotalCards from "../../components/TotalCards";
+import CashVoucherPdf from "../../components/print/CashVoucherPdf";
 
 const Released = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -48,7 +50,7 @@ const Released = () => {
         .map((item, index) => ({
           ...item,
           id: item.id ?? `${index}`,
-          formType: "Cash Request",
+          formType: item.type === "voucher" ? "Cash Voucher" : "Cash Request", // ✅ decide type
         }))
         .filter((item) => item.status === STATUS.COMPLETED);
 
@@ -174,29 +176,38 @@ const Released = () => {
             onSelectionChange={setSelectedRows}
             downloadRef={downloadRef}
             setPrintData={setPrintData}
+            actions={meatballActions({
+              downloadRef,
+              setPrintData,
+              isReleasedPage: true,
+            })}
           />
 
           {/* hidden print/download */}
           <div className="d-none">
-            <ExpenseReport
-              contentRef={contentRef}
-              data={{
-                ...printData,
-                total: printData?.total ?? 0,
-                items: printData?.items || [],
-              }}
-              amountInWords={amountInWords}
-            />
+            {printData?.formType === "Cash Request" && (
+              <ExpenseReport
+                contentRef={downloadRef}
+                data={{
+                  ...printData,
+                  total: printData?.total ?? 0,
+                  items: printData?.items || [],
+                }}
+                amountInWords={amountInWords}
+              />
+            )}
 
-            <ExpenseReport
-              contentRef={downloadRef}
-              data={{
-                ...printData,
-                total: printData?.total ?? 0,
-                items: printData?.items || [],
-              }}
-              amountInWords={amountInWords}
-            />
+            {printData?.formType === "Cash Voucher" && (
+              <CashVoucherPdf
+                contentRef={downloadRef}
+                data={{
+                  ...printData,
+                  total: printData?.total ?? 0,
+                  items: printData?.items || [],
+                }}
+                amountInWords={amountInWords}
+              />
+            )}
           </div>
         </div>
       </Container>

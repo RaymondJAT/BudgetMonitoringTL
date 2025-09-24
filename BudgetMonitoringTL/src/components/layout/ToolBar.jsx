@@ -99,7 +99,7 @@ const ToolBar = ({
                 label={
                   <span className="d-flex align-items-center">
                     <FaFilter className="me-1" />
-                    <span>Filter</span>
+                    <span className="d-none d-sm-inline">Filter</span>
                   </span>
                 }
                 variant="outline-dark"

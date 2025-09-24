@@ -21,6 +21,7 @@ const DataTable = ({
   renderActionButton,
   noDataMessage = "No transactions available",
   batchSize = 11,
+  actions,
 }) => {
   const [allSelected, setAllSelected] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
@@ -29,7 +30,8 @@ const DataTable = ({
   const visibleData = data.slice(0, visibleCount);
 
   // GENERATE ACTION MENU ITEMS
-  const meatballItems = meatballActions({ downloadRef, setPrintData });
+  const meatballItems =
+    actions || meatballActions({ downloadRef, setPrintData });
 
   // UPDATE SELECT ALL STATE
   useEffect(() => {

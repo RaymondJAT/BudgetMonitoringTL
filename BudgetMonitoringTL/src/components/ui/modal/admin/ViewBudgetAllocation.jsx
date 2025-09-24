@@ -154,15 +154,83 @@ const ViewBudgetAllocation = ({ show, onHide, rf_id }) => {
                 )}
 
                 {!loading && !error && (
-                  <DataTable
-                    data={transactions}
-                    columns={allocationColumns}
-                    selectedRows={{}}
-                    onSelectionChange={() => {}}
-                    showCheckbox={false}
-                    showActions={false}
-                    height="260px"
-                  />
+                  <>
+                    {/* Desktop View */}
+                    <div className="d-none d-lg-block">
+                      <DataTable
+                        data={transactions}
+                        columns={allocationColumns}
+                        selectedRows={{}}
+                        onSelectionChange={() => {}}
+                        showCheckbox={false}
+                        showActions={false}
+                        height="260px"
+                      />
+                    </div>
+
+                    {/* Mobile View */}
+                    <div className="d-lg-none">
+                      {transactions.length > 0 ? (
+                        transactions.map((t, index) => (
+                          <div
+                            key={t.id || index}
+                            className="mobile-card mb-3 p-2 border rounded bg-light text-dark"
+                          >
+                            <div>
+                              <strong>Date Issued:</strong> {t.date_issue}
+                            </div>
+                            <div>
+                              <strong>Cash Voucher:</strong> {t.cash_voucher}
+                            </div>
+                            <div>
+                              <strong>Received By:</strong> {t.received_by}
+                            </div>
+                            <div>
+                              <strong>Description:</strong> {t.description}
+                            </div>
+                            <div>
+                              <strong>Particulars:</strong> {t.particulars}
+                            </div>
+                            <div>
+                              <strong>Issued:</strong> ₱{" "}
+                              {t.amount_issue.toLocaleString("en-PH", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </div>
+                            <div>
+                              <strong>Returned:</strong> ₱{" "}
+                              {t.amount_return.toLocaleString("en-PH", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </div>
+                            <div>
+                              <strong>Expended:</strong> ₱{" "}
+                              {t.amount_expend.toLocaleString("en-PH", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </div>
+                            <div>
+                              <strong>Outstanding:</strong> ₱{" "}
+                              {t.outstanding_amount.toLocaleString("en-PH", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </div>
+                            <div>
+                              <strong>Status:</strong> {t.status}
+                            </div>
+                            <div>
+                              <strong>Date Liquidated:</strong>{" "}
+                              {t.date_liquidated}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center mt-3">
+                          No transaction data available.
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
             </Col>

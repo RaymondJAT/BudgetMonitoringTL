@@ -13,9 +13,11 @@ const LiquidationPdf = ({ data, contentRef, signatures = {} }) => {
       style={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",
+        height: "297mm",
+        width: "200mm",
         fontSize: "0.85rem",
         padding: "16px",
+        boxSizing: "border-box",
       }}
     >
       {/* MAIN CONTENT */}
@@ -27,7 +29,7 @@ const LiquidationPdf = ({ data, contentRef, signatures = {} }) => {
         <Row className="custom-col small mb-3">
           <Col xs={12} md={6} className="mb-2">
             <div className="d-flex align-items-center mb-2">
-              <strong className="title text-uppercase">Employee:</strong>
+              <strong className="title text-uppercase">Employee Name:</strong>
               <p className="ms-2 mb-0">{data?.employee || " "}</p>
             </div>
             <div className="d-flex align-items-center mb-2">
@@ -140,7 +142,7 @@ const LiquidationPdf = ({ data, contentRef, signatures = {} }) => {
       </Container>
 
       {/* SIGNATURES - pinned at bottom */}
-      <Container className="px-0 mt-5">
+      <Container className="px-0 mt-auto">
         <Row className="signature small">
           {[
             { label: "Prepared by", key: "prepared" },

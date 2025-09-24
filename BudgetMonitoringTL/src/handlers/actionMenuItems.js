@@ -1,31 +1,61 @@
 import downloadPDF from "../utils/downloadAsPdf";
 import { FaFileDownload } from "react-icons/fa";
 
-export const meatballActions = ({ downloadRef, setPrintData }) => [
-  {
-    label: "Download",
-    Icon: FaFileDownload,
-    iconProps: { className: "me-2" },
-    onClick: async (entry) => {
-      setPrintData(entry);
+export const meatballActions = ({
+  downloadRef,
+  setPrintData,
+  isReleasedPage = false,
+}) => {
+  const actions = [
+    {
+      label: "Download",
+      Icon: FaFileDownload,
+      iconProps: { className: "me-2" },
+      onClick: async (entry) => {
+        setPrintData(entry);
 
-      setTimeout(async () => {
-        // FORMAT BASED ON FORM TYPE
-        const pdfOptions =
-          entry.formType === "Liquidation"
-            ? { format: "a4", orientation: "portrait" } // Liquidation PDF
-            : { format: "a5", orientation: "landscape" }; // Cash Request / Cash Voucher
+        setTimeout(async () => {
+          let pdfOptions;
+          let filename;
 
-        const filename =
-          entry.formType === "Liquidation"
-            ? `liquidation-${entry.id}.pdf`
-            : `cash-request-${entry.cv_number || entry.id}.pdf`;
+          if (entry.formType === "Liquidation") {
+            pdfOptions = { format: "a4", orientation: "portrait" };
+            filename = `liquidation-${entry.id}.pdf`;
+          } else if (entry.formType === "Cash Voucher") {
+            pdfOptions = { format: "a5", orientation: "landscape" };
+            filename = `cash-voucher-${entry.cv_number || entry.id}.pdf`;
+          } else {
+            // Default: Cash Request
+            pdfOptions = { format: "a5", orientation: "landscape" };
+            filename = `cash-request-${entry.cv_number || entry.id}.pdf`;
+          }
 
-        await downloadPDF(downloadRef, filename, pdfOptions);
-      }, 200);
+          await downloadPDF(downloadRef, filename, pdfOptions);
+        }, 200);
+      },
     },
-  },
-];
+  ];
+
+  if (isReleasedPage) {
+    actions.push({
+      label: "Download CV",
+      Icon: FaFileDownload,
+      iconProps: { className: "me-2" },
+      onClick: async (entry) => {
+        setPrintData({ ...entry, formType: "Cash Voucher" });
+
+        setTimeout(async () => {
+          const pdfOptions = { format: "a5", orientation: "landscape" };
+          const filename = `cash-voucher-${entry.cv_number || entry.id}.pdf`;
+
+          await downloadPDF(downloadRef, filename, pdfOptions);
+        }, 200);
+      },
+    });
+  }
+
+  return actions;
+};
 
 // actions dropdown menu
 export const actionDropdownItems = ({ handleExport }) => [

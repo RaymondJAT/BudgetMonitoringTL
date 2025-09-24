@@ -17,6 +17,13 @@ const BudgetTable = ({ data, height }) => {
     }, 0);
   };
 
+  const formatCurrency = (value) => {
+    return `₱ ${Number(value).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
   const renderRows = () =>
     data.map((item, index) => {
       const amount = Number(item.remaining_budget) || 0;
@@ -28,9 +35,9 @@ const BudgetTable = ({ data, height }) => {
         <tr key={item.id || index}>
           <td>{item.date}</td>
           <td>{item.department}</td>
-          <td>₱ {amount.toLocaleString()}</td>
-          <td>₱ {used.toLocaleString()}</td>
-          <td>₱ {remaining.toLocaleString()}</td>
+          <td>{formatCurrency(amount)}</td>
+          <td>{formatCurrency(used)}</td>
+          <td>{formatCurrency(remaining)}</td>
           <td>{utilization}%</td>
           <td>
             <AppButton
@@ -87,9 +94,9 @@ const BudgetTable = ({ data, height }) => {
         <div className="d-lg-none">
           {data.length > 0 ? (
             data.map((item, index) => {
-              const amount = Number(item.amount) || 0;
-              const used = Number(item.used) || 0;
-              const remaining = amount - used;
+              const amount = Number(item.remaining_budget) || 0;
+              const used = Number(item.issued_amount) || 0;
+              const remaining = Number(item.remaining_amount) || 0;
               const utilization =
                 amount > 0 ? ((used / amount) * 100).toFixed(2) : "0.00";
 
@@ -102,21 +109,22 @@ const BudgetTable = ({ data, height }) => {
                   <div className="mobile-card-item">
                     <span className="mobile-card-label">Allocated:</span>{" "}
                     <span className="mobile-card-value">
-                      ₱ {amount.toLocaleString()}
+                      {formatCurrency(amount)}
                     </span>
                   </div>
                   <div className="mobile-card-item">
                     <span className="mobile-card-label">Used:</span>{" "}
                     <span className="mobile-card-value">
-                      ₱ {used.toLocaleString()}
+                      {formatCurrency(used)}
                     </span>
                   </div>
                   <div className="mobile-card-item">
                     <span className="mobile-card-label">Remaining:</span>{" "}
                     <span className="mobile-card-value">
-                      ₱ {remaining.toLocaleString()}
+                      {formatCurrency(remaining)}
                     </span>
                   </div>
+
                   <div className="mobile-card-item">
                     <span className="mobile-card-label">Utilization:</span>{" "}
                     <span className="mobile-card-value">{utilization}%</span>
@@ -124,11 +132,7 @@ const BudgetTable = ({ data, height }) => {
 
                   <div className="mobile-card-item d-flex gap-2 mt-2">
                     <AppButton
-                      label={
-                        <>
-                          <FaEye />
-                        </>
-                      }
+                      label={<FaEye />}
                       variant="outline-dark"
                       size="sm"
                       onClick={() => handleView(item)}
