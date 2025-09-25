@@ -9,11 +9,14 @@ import {
   Card,
   Alert,
   Spinner,
+  InputGroup,
 } from "react-bootstrap";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -56,7 +59,6 @@ const Login = () => {
         userAccess = accessData.data || [];
       }
 
-      // 🔑 Check if user has "No Access to All"
       const hasNoAccess =
         userAccess.length === 0 ||
         userAccess.every(
@@ -71,11 +73,10 @@ const Login = () => {
           "Your account has no access. Please contact the administrator."
         );
         setLoading(false);
-        localStorage.clear(); // ensure no login info is stored
+        localStorage.clear();
         return;
       }
 
-      // Store login info only if they have access
       localStorage.setItem("token", token);
       localStorage.setItem("username", data.fullname || data.username);
       localStorage.setItem("employee_fullname", data.employee_fullname);
@@ -86,7 +87,6 @@ const Login = () => {
       localStorage.setItem("access_name", data.access_name);
       localStorage.setItem("access", JSON.stringify(userAccess));
 
-      // Pick first route
       let firstRoute = "/";
       switch (data.access) {
         case 10:
@@ -122,72 +122,150 @@ const Login = () => {
       fluid
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
-        background: "linear-gradient(to bottom right, #8B0000,rgb(45, 31, 31))",
+        background:
+          "linear-gradient(to bottom right, #8B0000, rgb(45, 31, 31))",
       }}
     >
       <Row className="w-100 justify-content-center">
-        <Col xs={12} sm={8} md={5} lg={4}>
+        <Col xs={12} md={8} lg={7}>
           <Card
-            className="p-4"
+            className="overflow-hidden"
             style={{
-              borderRadius: "6px",
-              background: "linear-gradient(145deg, #ffffff,rgb(211, 211, 211))",
-              boxShadow: "10px 10px 25px rgba(0, 0, 0, 0.3)",
+              borderRadius: "12px",
+              boxShadow: "0 8px 25px rgba(0, 0, 0, 0.3)",
               border: "none",
-              fontSize: "0.75rem",
             }}
           >
-            <h3 className="text-center mb-4 fw-bold">Log In</h3>
-
-            {error && (
-              <Alert variant="danger" onClose={() => setError("")} dismissible>
-                {error}
-              </Alert>
-            )}
-
-            <Form onSubmit={handleSubmit}>
-              <Form.Floating className="mb-3">
-                <Form.Control
-                  id="floatingUsername"
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-                <label htmlFor="floatingUsername">Username</label>
-              </Form.Floating>
-
-              <Form.Floating className="mb-4">
-                <Form.Control
-                  id="floatingPassword"
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-                <label htmlFor="floatingPassword">Password</label>
-              </Form.Floating>
-
-              <Button
-                variant="outline-dark"
-                type="submit"
-                className="w-100 d-flex align-items-center justify-content-center"
-                disabled={loading}
+            <Row className="g-0">
+              {/* Left branding / illustration */}
+              <Col
+                md={6}
+                className="d-none d-md-flex flex-column justify-content-center align-items-center text-white"
+                style={{
+                  background: "linear-gradient(145deg, #8B0000, #5a0000)",
+                  padding: "2rem",
+                }}
               >
-                {loading ? (
-                  <>
-                    <Spinner animation="border" size="sm" className="me-2" />{" "}
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </Button>
-            </Form>
+                <h2 className="fw-bold mb-3">Welcome to BMS</h2>
+                <p className="text-light text-center">
+                  Manage requests and funds with ease.
+                </p>
+              </Col>
+
+              {/* Right login form */}
+              <Col md={6} xs={12}>
+                <div className="p-4">
+                  <h3 className="text-center mb-4 fw-bold">Log In</h3>
+
+                  {error && (
+                    <Alert
+                      variant="danger"
+                      onClose={() => setError("")}
+                      dismissible
+                    >
+                      {error}
+                    </Alert>
+                  )}
+
+                  <Form onSubmit={handleSubmit}>
+                    {/* Username */}
+                    <Form.Floating className="mb-3">
+                      <Form.Control
+                        id="floatingUsername"
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        disabled={loading}
+                        className="form-control-sm"
+                        style={{
+                          fontSize: "0.85rem",
+                          padding: "0.55rem 0.75rem",
+                        }}
+                      />
+                      <label
+                        htmlFor="floatingUsername"
+                        style={{ fontSize: "0.8rem" }}
+                      >
+                        Username
+                      </label>
+                    </Form.Floating>
+
+                    {/* Password */}
+                    <div className="position-relative mb-4">
+                      <Form.Floating>
+                        <Form.Control
+                          id="floatingPassword"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          disabled={loading}
+                          className="form-control-sm"
+                          style={{
+                            fontSize: "0.85rem",
+                            padding: "0.55rem 2.2rem 0.55rem 0.75rem",
+                          }}
+                        />
+                        <label
+                          htmlFor="floatingPassword"
+                          style={{ fontSize: "0.8rem" }}
+                        >
+                          Password
+                        </label>
+                      </Form.Floating>
+
+                      {/* Eye icon */}
+                      <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: "absolute",
+                          top: "50%",
+                          right: "10px",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                          color: "#6c757d",
+                          fontSize: "1rem",
+                        }}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
+
+                    {/* Login Button */}
+                    <Button
+                      variant="dark"
+                      type="submit"
+                      className="w-100 d-flex align-items-center justify-content-center shadow-sm"
+                      disabled={loading}
+                      style={{
+                        background: "linear-gradient(90deg, #8B0000, #a83232)",
+                        border: "none",
+                        fontWeight: "600",
+                        borderRadius: "8px",
+                        padding: "0.75rem",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {loading ? (
+                        <>
+                          <Spinner
+                            animation="border"
+                            size="sm"
+                            className="me-2"
+                          />{" "}
+                          Logging in...
+                        </>
+                      ) : (
+                        "Login"
+                      )}
+                    </Button>
+                  </Form>
+                </div>
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>
