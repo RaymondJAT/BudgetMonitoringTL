@@ -11,8 +11,8 @@ import PrintableCashRequest from "./print/PrintableCashRequest";
 import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
 import CashReqActionButtons from "./ui/buttons/CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
-import ProgressBar from "../components/ProgressBar";
-import { progressSteps } from "../handlers/actionMenuItems";
+// import ProgressBar from "../components/ProgressBar";
+// import { progressSteps } from "../handlers/actionMenuItems";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -89,13 +89,13 @@ const ViewCashRequestForm = () => {
         />
 
         {/* PROGRESS BAR */}
-        <div className="request-container border p-2 mb-3">
+        {/* <div className="request-container border p-2 mb-3">
           <Row className="align-items-center d-flex justify-content-between">
             <Col className="d-flex">
               <ProgressBar steps={progressSteps} currentStep={currentStep} />
             </Col>
           </Row>
-        </div>
+        </div> */}
 
         {/* REQUEST INFORMATION */}
         <div className="custom-container border p-3">
@@ -182,7 +182,7 @@ const ViewCashRequestForm = () => {
               ...data,
               description: data?.description,
               total: total,
-              items: data?.items || [], 
+              items: data?.items || [],
             }}
             amountInWords={amountInWords}
             contentRef={contentRef}

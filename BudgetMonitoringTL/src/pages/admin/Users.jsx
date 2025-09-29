@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Container } from "react-bootstrap";
 import DataTable from "../../components/layout/DataTable";
 import ToolBar from "../../components/layout/ToolBar";
@@ -15,6 +15,7 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [accessMap, setAccessMap] = useState({});
   const [loading, setLoading] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -24,36 +25,36 @@ const Users = () => {
     { label: "Username", accessor: "username" },
     { label: "Access Level", accessor: "accessLevel" },
     { label: "Status", accessor: "status" },
-    {
-      label: "Actions",
-      accessor: "actions",
-      Cell: ({ row }) => {
-        const rowData = row.original || row;
-        return (
-          <div className="d-flex gap-1 justify-content-center">
-            <AppButton
-              label={<FaEdit />}
-              variant="outline-dark"
-              className="custom-app-button"
-              onClick={() => {
-                setSelectedUser({
-                  id: rowData.id,
-                  employee_id: rowData.employeeId,
-                  fullname: rowData.fullName,
-                  username: rowData.username,
-                  access_id: rowData.accessId,
-                  status: rowData.status?.toLowerCase() || "active",
-                });
-                setShowEditModal(true);
-              }}
-            />
-          </div>
-        );
-      },
-    },
+    // {
+    //   label: "Actions",
+    //   accessor: "actions",
+    //   Cell: ({ row }) => {
+    //     const rowData = row.original || row;
+    //     return (
+    //       <div className="d-flex gap-1 justify-content-center">
+    //         <AppButton
+    //           label={<FaEdit />}
+    //           variant="outline-dark"
+    //           className="custom-app-button"
+    //           onClick={() => {
+    //             setSelectedUser({
+    //               id: rowData.id,
+    //               employee_id: rowData.employeeId,
+    //               fullname: rowData.fullName,
+    //               username: rowData.username,
+    //               access_id: rowData.accessId,
+    //               status: rowData.status?.toLowerCase() || "active",
+    //             });
+    //             setShowEditModal(true);
+    //           }}
+    //         />
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
-  //   FETCH
+  // FETCH USERS
   const fetchData = async () => {
     if (!token) {
       console.error("No token found.");
@@ -117,10 +118,29 @@ const Users = () => {
     fetchData(); // REFRESH AFTER ADDING
   };
 
+  const normalize = (val) =>
+    String(val || "")
+      .toLowerCase()
+      .trim();
+
+  const filteredUsers = useMemo(
+    () =>
+      users.filter((u) =>
+        ["employeeId", "fullName", "username", "accessLevel", "status"].some(
+          (key) => normalize(u[key]).includes(normalize(searchValue))
+        )
+      ),
+    [users, searchValue]
+  );
+
   return (
     <Container fluid className="mt-3">
       <div className="custom-container shadow-sm rounded p-3">
         <ToolBar
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          searchBarWidth="300px"
+          showFilter={false}
           // leftContent={
           //   <AppButton
           //     label={
@@ -135,20 +155,20 @@ const Users = () => {
           //     onClick={() => setShowModal(true)}
           //   />
           // }
-          showFilter={false}
         />
 
         {loading ? (
           <p className="text-muted">Loading users...</p>
         ) : (
           <DataTable
-            data={users}
+            data={filteredUsers}
             columns={columns}
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
             showActions={false}
             showCheckbox={false}
             height="400px"
+            noDataMessage="No users found."
           />
         )}
       </div>

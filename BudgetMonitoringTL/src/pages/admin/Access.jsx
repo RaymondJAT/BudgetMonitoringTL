@@ -24,7 +24,7 @@ const Access = () => {
     { label: "Access Name", accessor: "name" },
     { label: "Status", accessor: "status" },
     { label: "Created At", accessor: "createdAt" },
-    { label: "Created By", accessor: "createdBy" },
+    // { label: "Created By", accessor: "createdBy" },
     {
       label: "Actions",
       accessor: "actions",

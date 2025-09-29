@@ -226,31 +226,26 @@ const DataTable = ({
         {columns.map((col, i) => {
           if (col.accessor === "price" || col.accessor === "quantity")
             return null;
-          let value = entry[col.accessor];
 
-          switch (col.accessor) {
-            case "status":
-              value = (
-                <span className={`status-badge ${String(value).toLowerCase()}`}>
-                  {value}
-                </span>
-              );
-              break;
-            case "total":
-              value = formatCurrency(entry.total || entry.amountObtained);
-              break;
-            case "quantity":
-              value = entry.transactions?.map((item, i) => (
-                <div key={i}>{item.quantity}</div>
-              ));
-              break;
-            case "price":
-              value = entry.transactions?.map((item, i) => (
-                <div key={i}>{formatCurrency(item.price)}</div>
-              ));
-              break;
-            default:
-              value = value ?? "";
+          let value;
+          if (typeof col.Cell === "function") {
+            value = col.Cell({ value: entry[col.accessor], row: entry });
+          } else {
+            value = entry[col.accessor] ?? "";
+            switch (col.accessor) {
+              case "status":
+                value = (
+                  <span
+                    className={`status-badge ${String(value).toLowerCase()}`}
+                  >
+                    {value}
+                  </span>
+                );
+                break;
+              case "total":
+                value = formatCurrency(entry.total || entry.amountObtained);
+                break;
+            }
           }
 
           return (

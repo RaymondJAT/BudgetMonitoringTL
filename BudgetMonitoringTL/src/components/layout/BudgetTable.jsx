@@ -60,7 +60,6 @@ const BudgetTable = ({ data, height }) => {
 
   return (
     <>
-      <p className="fw-bold mb-2">🏛️ Department Budget</p>
       <div
         className="table-wrapper overflow-auto"
         style={{ maxHeight: height }}
@@ -147,7 +146,6 @@ const BudgetTable = ({ data, height }) => {
           )}
         </div>
       </div>
-
       <ViewBudgetAllocation
         show={showViewModal}
         onHide={() => setShowViewModal(false)}

@@ -32,7 +32,7 @@ const LiquidForm = ({ formData = {} }) => {
       {/* DESCRIPTION FIELD  */}
       <Row className="mb-3">
         <Col md={12}>
-          <FloatingLabel controlId="description" label="Description">
+          <FloatingLabel controlId="description" label="Particulars">
             <Form.Control
               type="text"
               name="description"

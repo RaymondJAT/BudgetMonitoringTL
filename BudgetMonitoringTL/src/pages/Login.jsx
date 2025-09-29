@@ -9,7 +9,6 @@ import {
   Card,
   Alert,
   Spinner,
-  InputGroup,
 } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -77,6 +76,7 @@ const Login = () => {
         return;
       }
 
+      // Save token + user info
       localStorage.setItem("token", token);
       localStorage.setItem("username", data.fullname || data.username);
       localStorage.setItem("employee_fullname", data.employee_fullname);
@@ -87,17 +87,17 @@ const Login = () => {
       localStorage.setItem("access_name", data.access_name);
       localStorage.setItem("access", JSON.stringify(userAccess));
 
+      // Decide first route
       let firstRoute = "/";
       switch (data.access) {
         case 10:
           firstRoute = "/employee_request";
           break;
-        case 11:
+        case 12:
           firstRoute = "/final_approval";
           break;
-        case 12:
-        case 14:
-        case 19:
+        case 20:
+        case 11:
           firstRoute = "/finance_dashboard";
           break;
         case 13:
@@ -108,7 +108,11 @@ const Login = () => {
           if (routeWithPath) firstRoute = routeWithPath.path;
       }
 
-      navigate(firstRoute);
+      // Save first route for auto redirect after reload
+      localStorage.setItem("firstRoute", firstRoute);
+
+      // Navigate immediately
+      navigate(firstRoute, { replace: true });
       window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
@@ -137,7 +141,7 @@ const Login = () => {
             }}
           >
             <Row className="g-0">
-              {/* Left branding / illustration */}
+              {/* Left branding */}
               <Col
                 md={6}
                 className="d-none d-md-flex flex-column justify-content-center align-items-center text-white"
@@ -179,17 +183,8 @@ const Login = () => {
                         required
                         disabled={loading}
                         className="form-control-sm"
-                        style={{
-                          fontSize: "0.85rem",
-                          padding: "0.55rem 0.75rem",
-                        }}
                       />
-                      <label
-                        htmlFor="floatingUsername"
-                        style={{ fontSize: "0.8rem" }}
-                      >
-                        Username
-                      </label>
+                      <label htmlFor="floatingUsername">Username</label>
                     </Form.Floating>
 
                     {/* Password */}
@@ -204,20 +199,10 @@ const Login = () => {
                           required
                           disabled={loading}
                           className="form-control-sm"
-                          style={{
-                            fontSize: "0.85rem",
-                            padding: "0.55rem 2.2rem 0.55rem 0.75rem",
-                          }}
                         />
-                        <label
-                          htmlFor="floatingPassword"
-                          style={{ fontSize: "0.8rem" }}
-                        >
-                          Password
-                        </label>
+                        <label htmlFor="floatingPassword">Password</label>
                       </Form.Floating>
 
-                      {/* Eye icon */}
                       <span
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
@@ -234,7 +219,7 @@ const Login = () => {
                       </span>
                     </div>
 
-                    {/* Login Button */}
+                    {/* Button */}
                     <Button
                       variant="dark"
                       type="submit"
@@ -255,7 +240,7 @@ const Login = () => {
                             animation="border"
                             size="sm"
                             className="me-2"
-                          />{" "}
+                          />
                           Logging in...
                         </>
                       ) : (
