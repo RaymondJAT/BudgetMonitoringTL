@@ -8,13 +8,13 @@ export default defineConfig({
     // BMS
     proxy: {
       "/api5012": {
-        target: "http://192.168.40.37:5012",
+        target: "http://192.168.40.28:5012",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api5012/, ""),
       },
       // GBOOKS
       "/api5001": {
-        target: "http://192.168.40.37:5001",
+        target: "http://192.168.40.28:5001",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api5001/, ""),
       },

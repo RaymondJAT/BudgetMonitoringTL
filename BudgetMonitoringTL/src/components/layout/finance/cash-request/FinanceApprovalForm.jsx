@@ -46,6 +46,7 @@ const FinanceApprovalForm = () => {
     revolvingFundId = null
   ) => {
     try {
+      const token = localStorage.getItem("token"); // get token from login
       let generatedVoucher = null;
       let departmentId = null;
 
@@ -65,7 +66,10 @@ const FinanceApprovalForm = () => {
 
         await fetch("/api5001/cash_disbursement/createcash_disbursement", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // secure this call too
+          },
           body: JSON.stringify({
             received_by: data?.employee_id || "N/A",
             department_id: departmentId,
@@ -89,7 +93,10 @@ const FinanceApprovalForm = () => {
 
       const res = await fetch("/api5012/cash_request/updatecash_request", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // add token back
+        },
         body: JSON.stringify(payload),
       });
 

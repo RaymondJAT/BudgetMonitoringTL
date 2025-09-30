@@ -34,6 +34,8 @@ const CashApprovalForm = () => {
 
   const handleUpdateRequest = async (status, remarks = "") => {
     try {
+      const token = localStorage.getItem("token");
+
       const payload = {
         status,
         id: data?.id,
@@ -43,7 +45,10 @@ const CashApprovalForm = () => {
 
       const res = await fetch("/api5012/cash_request/updatecash_request", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
 

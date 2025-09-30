@@ -35,6 +35,7 @@ const App = () => {
   // logout
   const logout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     setIsAuthenticated(false);
   };
 
@@ -61,6 +62,14 @@ const App = () => {
       setIsSidebarOpen((prev) => !prev);
     }
   };
+
+  useEffect(() => {
+    if (!sessionStorage.getItem("sessionActive")) {
+      localStorage.clear();
+      setIsAuthenticated(false);
+      sessionStorage.setItem("sessionActive", "true");
+    }
+  }, []);
 
   return (
     <Router>

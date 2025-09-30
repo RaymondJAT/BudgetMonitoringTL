@@ -121,7 +121,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
     setAddedAmount(value);
 
     // VALIDATION
-    if (value && parseFloat(value) > 100000) {
+    if (value && parseFloat(value) > 500000) {
       setBalanceError("Added amount exceeds maximum limit");
     } else {
       setBalanceError("");

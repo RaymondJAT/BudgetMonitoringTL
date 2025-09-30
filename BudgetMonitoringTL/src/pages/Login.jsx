@@ -87,6 +87,8 @@ const Login = () => {
       localStorage.setItem("access_name", data.access_name);
       localStorage.setItem("access", JSON.stringify(userAccess));
 
+      sessionStorage.setItem("sessionActive", "true");
+
       // Decide first route
       let firstRoute = "/";
       switch (data.access) {

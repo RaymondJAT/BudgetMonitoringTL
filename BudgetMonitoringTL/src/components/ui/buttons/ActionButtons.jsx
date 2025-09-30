@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FaArrowLeft, FaPrint, FaCheck } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 import AppButton from "./AppButton";
@@ -15,6 +16,8 @@ const ActionButtons = ({
   printRequestLabel = "",
   printVoucherLabel = "",
 }) => {
+  const [loadingAction, setLoadingAction] = useState(null); // "approve" | "reject" | null
+
   let isApproved = false;
 
   if (role === "teamlead") {
@@ -35,6 +38,8 @@ const ActionButtons = ({
   }
 
   const handleAction = async (type, callback) => {
+    if (loadingAction) return; // prevent double click
+
     const isApprove = type === "approve";
     const needConfirm =
       role === "teamlead" ||
@@ -42,7 +47,9 @@ const ActionButtons = ({
       role === "admin";
 
     if (!needConfirm && isApprove) {
-      callback?.();
+      setLoadingAction(type);
+      await callback?.();
+      setLoadingAction(null);
       return;
     }
 
@@ -58,16 +65,21 @@ const ActionButtons = ({
     });
 
     if (confirmResult.isConfirmed) {
-      callback?.();
-      await Swal.fire({
-        title: isApprove ? "Approved!" : "Rejected!",
-        text: `The request has been ${
-          isApprove ? "approved" : "rejected"
-        } successfully.`,
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      try {
+        setLoadingAction(type);
+        await callback?.();
+        await Swal.fire({
+          title: isApprove ? "Approved!" : "Rejected!",
+          text: `The request has been ${
+            isApprove ? "approved" : "rejected"
+          } successfully.`,
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } finally {
+        setLoadingAction(null);
+      }
     }
   };
 
@@ -80,6 +92,7 @@ const ActionButtons = ({
         size="sm"
         onClick={onBack}
         className="custom-app-button btn-responsive"
+        disabled={!!loadingAction}
       />
 
       {/* APPROVE/REJECT IF NOT HIDDEN */}
@@ -88,7 +101,11 @@ const ActionButtons = ({
           <AppButton
             label={
               <>
-                <FaCheck />
+                {loadingAction === "approve" ? (
+                  <span className="spinner-border spinner-border-sm me-1" />
+                ) : (
+                  <FaCheck />
+                )}
                 <span className="d-sm-inline ms-1">Approve</span>
               </>
             }
@@ -96,12 +113,17 @@ const ActionButtons = ({
             size="sm"
             onClick={() => handleAction("approve", onApprove)}
             className="custom-app-button btn-responsive ms-2"
+            disabled={loadingAction === "approve" || !!loadingAction}
           />
 
           <AppButton
             label={
               <>
-                <ImCross />
+                {loadingAction === "reject" ? (
+                  <span className="spinner-border spinner-border-sm me-1" />
+                ) : (
+                  <ImCross />
+                )}
                 <span className="d-sm-inline ms-1">Reject</span>
               </>
             }
@@ -109,6 +131,7 @@ const ActionButtons = ({
             size="sm"
             onClick={() => handleAction("reject", onReject)}
             className="custom-app-button btn-responsive ms-2"
+            disabled={loadingAction === "reject" || !!loadingAction}
           />
         </>
       )}
@@ -125,6 +148,7 @@ const ActionButtons = ({
         size="sm"
         onClick={onPrint}
         className="custom-app-button btn-responsive ms-2"
+        disabled={!!loadingAction}
       />
 
       {role === "finance" && status?.toLowerCase() === "completed" && (
@@ -139,6 +163,7 @@ const ActionButtons = ({
           size="sm"
           onClick={onPrintVoucher}
           className="custom-app-button btn-responsive ms-2"
+          disabled={!!loadingAction}
         />
       )}
     </div>

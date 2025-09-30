@@ -385,69 +385,48 @@ main.no-sidebar {
   padding: 0;
 }
 
-.status-badge.pending {
-  background-color: rgb(235, 136, 30);
-  color: white;
-  border: 1px solid rgb(154, 89, 10);
-}
-
-.status-badge.verified,
-.status-badge.completed,
-.status-badge.active {
-  background-color: green;
-  color: white;
-  border: 1px solid darkgreen;
-}
-
-.status-badge.rejected,
-.status-badge.inactive {
-  background-color: red;
-  color: white;
-  border: 1px solid darkred;
-}
-
-.status-badge.deleted {
-  background-color: #282828;
-  color: white;
-  border: 1px solid darkslategrey;
-}
-
+/* Pending */
+.status-badge.pending,
 .status-badge.review {
-  background-color: rgb(235, 136, 30);
-  color: white;
-  border: 1px solid rgb(154, 89, 10);
+  background-color: #fbbf24;
+  color: #fff;
+  border: 1px solid #b45309;
 }
 
-.status-badge.checked,
+/*  Approved */
 .status-badge.approved,
-.status-badge.liquidated {
-  background-color: rgb(66, 138, 239);
-  color: white;
-  border: 1px solid rgb(22, 25, 177);
-}
-
-.status-badge.unliquidated {
-  background-color: rgb(239, 66, 66);
-  color: white;
-  border: 1px solid rgb(132, 6, 6);
-}
-
-.status-badge.open {
-  background-color: rgb(66, 138, 239);
-  color: white;
-  border: 1px solid rgb(22, 25, 177);
-}
-
 .status-badge.closed {
-  background-color: green;
-  color: white;
-  border: 1px solid darkgreen;
+  background-color: #22c55e;
+  color: #fff;
+  border: 1px solid #166534;
 }
 
+/* Completed */
+.status-badge.completed,
+.status-badge.active,
+.status-badge.checked,
+.status-badge.liquidated,
+.status-badge.open {
+  background-color: #3b82f6;
+  color: #fff;
+  border: 1px solid #1e3a8a;
+}
+
+/*  Rejected */
+.status-badge.rejected,
+.status-badge.inactive,
+.status-badge.unliquidated {
+  background-color: #ef4444;
+  color: #fff;
+  border: 1px solid #7f1d1d;
+}
+
+/*  Cleared */
+.status-badge.verified,
 .status-badge.cleared {
-  background-color: rgb(171, 151, 3);
-  color: white;
-  border: 1px solid rgb(78, 79, 8);
+  background-color: #8b5cf6;
+  color: #fff;
+  border: 1px solid #4c1d95;
 }
 
 /* TOTAL BOX */
