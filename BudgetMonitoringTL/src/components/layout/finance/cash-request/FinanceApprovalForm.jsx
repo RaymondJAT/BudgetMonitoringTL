@@ -46,7 +46,7 @@ const FinanceApprovalForm = () => {
     revolvingFundId = null
   ) => {
     try {
-      const token = localStorage.getItem("token"); // get token from login
+      const token = localStorage.getItem("token");
       let generatedVoucher = null;
       let departmentId = null;
 
@@ -68,7 +68,7 @@ const FinanceApprovalForm = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // secure this call too
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             received_by: data?.employee_id || "N/A",
@@ -95,7 +95,7 @@ const FinanceApprovalForm = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // add token back
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -152,20 +152,12 @@ const FinanceApprovalForm = () => {
   };
 
   const handleReject = () => {
-    confirmSwal({
-      title: "Reject Cash Request",
-      input: "text",
-      inputLabel: "Enter remarks for rejection:",
-      inputPlaceholder: "Type remarks here...",
-      showCancelButton: true,
-      confirmButtonText: "Reject",
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#000",
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        handleUpdateRequest("rejected", result.value);
-      }
-    });
+    let remarks = "";
+    while (!remarks) {
+      remarks = prompt("Enter remarks for rejection (required):");
+      if (remarks === null) return;
+    }
+    handleUpdateRequest("rejected", remarks);
   };
 
   return (
@@ -173,7 +165,7 @@ const FinanceApprovalForm = () => {
       <Container fluid>
         <ActionButtons
           onApprove={() => setShowFundModal(true)}
-          onReject={handleReject}
+          onReject={(remarks) => handleUpdateRequest("rejected", remarks)}
           onPrint={reactToPrintFn}
           onPrintVoucher={reactToPrintVoucherFn}
           onBack={() => navigate(-1)}

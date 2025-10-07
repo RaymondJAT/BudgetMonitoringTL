@@ -7,7 +7,6 @@ import {
 } from "../../../../handlers/columnHeaders";
 import { useReactToPrint } from "react-to-print";
 import { numberToWords } from "../../../../utils/numberToWords";
-import { toast } from "react-toastify";
 import PrintableCashRequest from "../../../print/PrintableCashRequest";
 import CashApprovalTable from "./CashApprovalTable";
 import ActionButtons from "../../../ui/buttons/ActionButtons";
@@ -54,26 +53,19 @@ const CashApprovalForm = () => {
 
       if (!res.ok) throw new Error("Failed to update request");
 
-      toast.success(
-        `Cash request ${status === "approved" ? "approved" : "rejected"}`
-      );
       navigate(-1);
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong while updating.");
     }
   };
 
   return (
     <div className="pb-3">
       <Container fluid>
-        {/* Action Buttons */}
+        {/* ACTION BUTTONS */}
         <ActionButtons
-          onApprove={() => handleUpdateRequest("approved")}
-          onReject={() => {
-            const remarks = prompt("Enter remarks for rejection:");
-            if (remarks !== null) handleUpdateRequest("rejected", remarks);
-          }}
+          onApprove={(remarks = "") => handleUpdateRequest("approved", remarks)}
+          onReject={(remarks) => handleUpdateRequest("rejected", remarks)}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
           status={data?.status}
@@ -83,7 +75,7 @@ const CashApprovalForm = () => {
 
         <Row>
           <Col md={12} className="d-flex flex-column">
-            {/* Details */}
+            {/* DETAILS */}
             <div className="custom-container border p-3">
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
@@ -94,7 +86,7 @@ const CashApprovalForm = () => {
                 </Col>
               </Row>
 
-              {/* Partner Fields */}
+              {/* FIELDS */}
               <Row>
                 {approvalPartnerFields.map(({ label, key }, idx) => (
                   <Col
@@ -115,7 +107,7 @@ const CashApprovalForm = () => {
                 ))}
               </Row>
 
-              {/* Employee Fields */}
+              {/* EMPLOYEE FIELDS */}
               {approvalFormFields.map(({ label, key }, idx) => (
                 <Row key={idx}>
                   <Col xs={12} className="d-flex align-items-center mb-2">
@@ -131,7 +123,6 @@ const CashApprovalForm = () => {
                 </Row>
               ))}
 
-              {/* Amount in Words */}
               <Row className="mb-2">
                 <Col xs={12} className="d-flex flex-column flex-md-row">
                   <strong className="title text-start">Amount in Words:</strong>
@@ -140,7 +131,6 @@ const CashApprovalForm = () => {
               </Row>
             </div>
 
-            {/* Table: Amount + Total */}
             <CashApprovalTable total={total} />
           </Col>
         </Row>

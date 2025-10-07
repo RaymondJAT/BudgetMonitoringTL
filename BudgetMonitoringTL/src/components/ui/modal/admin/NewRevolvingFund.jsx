@@ -20,6 +20,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
   const [loadingBudget, setLoadingBudget] = useState(false);
   const [loadingBank, setLoadingBank] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   // HELPERS
   const formatCurrency = (amount) =>
@@ -28,14 +29,15 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
       maximumFractionDigits: 2,
     })}`;
 
+  const formatPeso = (val) =>
+    "₱" +
+    Number(val || 0).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
   const sanitizeAmount = (value) =>
     parseFloat((value || "").replace(/[₱, ]/g, "")) || 0;
-
-  const preventInvalidKeys = (e) => {
-    if (["e", "E", "+", "-"].includes(e.key) || (e.ctrlKey && e.key === "v")) {
-      e.preventDefault();
-    }
-  };
 
   const authFetch = useCallback(
     async (url) => {
@@ -114,18 +116,6 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
   const handleSelectBudget = (budget) => {
     setSelectedBudget(budget);
     setBeginningAmount(formatCurrency(budget.beginningAmount));
-  };
-
-  const handleAddedChange = (e) => {
-    const value = e.target.value;
-    setAddedAmount(value);
-
-    // VALIDATION
-    if (value && parseFloat(value) > 500000) {
-      setBalanceError("Added amount exceeds maximum limit");
-    } else {
-      setBalanceError("");
-    }
   };
 
   const handleClose = () => {
@@ -232,13 +222,39 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
             <Col md={4}>
               <Form.Label style={{ fontSize: "0.75rem" }}>Added</Form.Label>
               <Form.Control
-                type="number"
-                value={addedAmount}
-                onChange={handleAddedChange}
-                onKeyDown={preventInvalidKeys}
-                min="0"
+                type="text"
+                placeholder="₱0.00"
+                value={
+                  focused
+                    ? addedAmount ?? ""
+                    : addedAmount === "" || addedAmount == null
+                    ? ""
+                    : formatPeso(addedAmount)
+                }
+                onChange={(e) => {
+                  let raw = e.target.value.replace(/[^0-9.]/g, "");
+                  const parts = raw.split(".");
+                  if (parts.length > 2) raw = parts[0] + "." + parts[1];
+                  setAddedAmount(raw);
+
+                  // VALIDATION
+                  if (raw && parseFloat(raw) > 500000) {
+                    setBalanceError("Added amount exceeds maximum limit");
+                  } else {
+                    setBalanceError("");
+                  }
+                }}
+                onBlur={() => {
+                  if (addedAmount !== "" && !isNaN(addedAmount)) {
+                    setAddedAmount(parseFloat(addedAmount));
+                  }
+                  setFocused(false);
+                }}
+                onFocus={() => setFocused(true)}
+                className="form-control-sm small-input mx-auto"
                 style={{ fontSize: "0.75rem", height: "38px" }}
               />
+
               {balanceError && (
                 <div
                   className="text-danger mt-1"
@@ -263,13 +279,7 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
           label={submitting ? "Processing..." : "Confirm"}
           variant="outline-success"
           onClick={handleConfirm}
-          disabled={
-            submitting ||
-            !selectedBudget ||
-            !selectedBank ||
-            !addedAmount ||
-            !!balanceError
-          }
+          disabled={submitting || !!balanceError}
           className="custom-app-button"
         />
       </Modal.Footer>

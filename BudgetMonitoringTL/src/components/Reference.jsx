@@ -14,7 +14,6 @@ const Reference = () => {
 
       try {
         const token = localStorage.getItem("token");
-        console.log("Fetching ALL liquidation references");
 
         const res = await fetch(
           `/api5012/liquidation_item/getliquidation_item`,
@@ -29,7 +28,6 @@ const Reference = () => {
         if (!res.ok) throw new Error("Failed to fetch references");
 
         const data = await res.json();
-        console.log("API references response:", data);
 
         setReferences(Array.isArray(data) ? data : []);
       } catch (err) {

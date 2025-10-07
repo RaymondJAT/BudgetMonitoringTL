@@ -33,24 +33,23 @@ const renderCustomizedLabel = ({
   );
 };
 
-const LiquidationPieChart = ({ data }) => {
+const CashRequestPieChart = ({ data }) => {
   if (!data) return null;
 
   const COLORS = {
-    pending_liquidations: "#f2950a",
-    approved_liquidations: "#1c6b1eff",
-    verified_liquidations: "#6736da",
-    completed_liquidations: "#2464c9",
-    rejected_liquidations: "#dd2525",
+    pending_requests: "#f2950a",
+    approved_requests: "#1c6b1eff",
+    completed_requests: "#2464c9",
+    rejected_requests: "#dd2525",
   };
 
-  // LIQUIDATION KEYS
+  // ONLY REQUEST KEYS
   const processedData = Object.entries(data)
-    .filter(([key]) => key.includes("liquidations"))
+    .filter(([key]) => key.includes("requests"))
     .map(([key, value]) => ({
       name: key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
       value,
-      color: COLORS[key] || "#000000",
+      color: COLORS[key] || "#888888",
     }));
 
   const total = processedData.reduce((sum, entry) => sum + entry.value, 0);
@@ -73,7 +72,7 @@ const LiquidationPieChart = ({ data }) => {
         <Tooltip
           formatter={(value, name) => {
             const percent = total ? ((value / total) * 100).toFixed(1) : 0;
-            return [`${value} liquidation(s) (${percent}%)`, name];
+            return [`${value} request(s) (${percent}%)`, name];
           }}
           contentStyle={{ fontSize: "0.75rem" }}
         />
@@ -88,4 +87,4 @@ const LiquidationPieChart = ({ data }) => {
   );
 };
 
-export default LiquidationPieChart;
+export default CashRequestPieChart;

@@ -61,6 +61,14 @@ const RevolvingFund = () => {
     }
   };
 
+  useEffect(() => {
+    fetchFundData();
+  }, []);
+
+  const handleAddFundItem = () => {
+    fetchFundData();
+  };
+
   // FETCH DATE RANGE
   const fetchFundDataByDate = async (startDate, endDate, status = "") => {
     const token = localStorage.getItem("token");
@@ -112,12 +120,9 @@ const RevolvingFund = () => {
     }
   };
 
-  useEffect(() => {
-    fetchFundData();
-  }, []);
-
-  const handleAddFundItem = () => {
-    fetchFundData();
+  // STORE CLOSED FUND
+  const handleFundSubmit = async () => {
+    await fetchFundData();
   };
 
   // TOTAL CARDS
@@ -153,7 +158,6 @@ const RevolvingFund = () => {
     fetchCards();
   }, []);
 
-  // Inject buttons into the "Actions" column
   const columns = baseColumns.map((col) => {
     if (col.accessor === "actions") {
       return {
@@ -196,7 +200,6 @@ const RevolvingFund = () => {
 
   const filteredData = useMemo(() => {
     if (!searchValue) return fundData;
-
     const normalize = (value) =>
       String(value || "")
         .toLowerCase()
@@ -261,7 +264,6 @@ const RevolvingFund = () => {
         </div>
       </Container>
 
-      {/* ViewRevolvingFund */}
       {showViewModal && (
         <ViewRevolvingFund
           show={showViewModal}
@@ -276,7 +278,7 @@ const RevolvingFund = () => {
           show={showSubmitModal}
           onHide={() => setShowSubmitModal(false)}
           fundData={selectedFund}
-          onSuccess={fetchFundData}
+          onSuccess={handleFundSubmit}
         />
       )}
     </>

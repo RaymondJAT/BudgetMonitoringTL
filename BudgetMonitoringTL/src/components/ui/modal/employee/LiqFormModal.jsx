@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Modal, Spinner, Alert } from "react-bootstrap";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import LiqReqForm from "../../../layout/employee/liquidation-request/LiqReqForm";
 import AppButton from "../../buttons/AppButton";
 
 const LiqFormModal = ({ show, onHide, requestData = null, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleCloseModal = () => {
     if (!submitting) onHide();
@@ -42,10 +45,21 @@ const LiqFormModal = ({ show, onHide, requestData = null, onSuccess }) => {
         onSuccess(result);
       }
 
+      // ✅ show success toast
+      toast.success("Liquidation successfully submitted!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+
       onHide();
+      navigate("/employee_liquidation");
     } catch (err) {
       console.error("Error submitting liquidation:", err);
       setError(err.message);
+      toast.error("Failed to submit liquidation form", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setSubmitting(false);
     }

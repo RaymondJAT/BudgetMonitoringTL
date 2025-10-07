@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -113,9 +113,11 @@ const Login = () => {
       // Save first route for auto redirect after reload
       localStorage.setItem("firstRoute", firstRoute);
 
-      // Navigate immediately
+      // ✅ Update authentication state instantly
+      onLogin(token);
+
+      // ✅ Navigate immediately (no reload, no blinking)
       navigate(firstRoute, { replace: true });
-      window.location.reload();
     } catch (err) {
       console.error("Login failed:", err);
       setError("Login failed. Please try again.");

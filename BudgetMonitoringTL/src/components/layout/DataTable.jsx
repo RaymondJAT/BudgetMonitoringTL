@@ -20,7 +20,7 @@ const DataTable = ({
   actionType = "meatball",
   renderActionButton,
   noDataMessage = "No transactions available",
-  batchSize = 11,
+  batchSize = 15,
   actions,
 }) => {
   const [allSelected, setAllSelected] = useState(false);

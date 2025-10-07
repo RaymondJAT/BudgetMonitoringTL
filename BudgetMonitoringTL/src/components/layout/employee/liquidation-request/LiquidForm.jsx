@@ -15,13 +15,23 @@ const LiquidForm = ({ formData = {} }) => {
     );
   };
 
+  // dynamic label logic for reimburse_return
+  const getReimburseReturnLabel = () => {
+    const obtained = parseFloat(formData.amount_obtained) || 0;
+    const expended = parseFloat(formData.amount_expended) || 0;
+
+    if (expended < obtained) return "Return";
+    if (expended > obtained) return "Reimburse";
+    return "Reimburse/Return";
+  };
+
   const enhancedFields = formFields.map((column) =>
     column.map((field) => {
+      if (field.name === "reimburse_return") {
+        return { ...field, type: "text", label: getReimburseReturnLabel() };
+      }
       if (pesoFields.includes(field.name)) {
-        return {
-          ...field,
-          type: "text",
-        };
+        return { ...field, type: "text" };
       }
       return field;
     })

@@ -78,11 +78,8 @@ const App = () => {
         <Route
           path="/login"
           element={
-            isAuthenticated ? (
-              <Navigate
-                to={localStorage.getItem("firstRoute") || "/"}
-                replace
-              />
+            isAuthenticated && localStorage.getItem("firstRoute") ? (
+              <Navigate to={localStorage.getItem("firstRoute")} replace />
             ) : (
               <Login onLogin={login} />
             )

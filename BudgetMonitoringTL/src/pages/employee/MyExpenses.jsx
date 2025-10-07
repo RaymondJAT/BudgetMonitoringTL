@@ -24,12 +24,17 @@ const MyExpenses = () => {
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
   const [cardsData, setCardsData] = useState([EMPLOYEE_STATUS_LIST]);
   const [printData, setPrintData] = useState(null);
+  const [hasExistingLiquidation, setHasExistingLiquidation] = useState(false);
+
+  // 🆕 NEW: add loading state
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const downloadRef = useRef(null);
 
   const fetchCashRequests = useCallback(async () => {
     try {
+      setLoading(true); // ✅ start loading
       const token = localStorage.getItem("token");
       const employeeId = localStorage.getItem("employee_id");
       const accessName = localStorage.getItem("access_name");
@@ -61,12 +66,47 @@ const MyExpenses = () => {
       setTableData(mappedData);
     } catch (err) {
       console.error("Error fetching cash requests:", err);
+    } finally {
+      setLoading(false); // ✅ end loading
+    }
+  }, []);
+
+  const checkExistingLiquidation = useCallback(async () => {
+    try {
+      setLoading(true); // ✅ start loading
+      const token = localStorage.getItem("token");
+      const employeeId = localStorage.getItem("employee_id");
+
+      const res = await fetch(
+        `/api5012/cash_request/getexisting_liquidation?employee_id=${employeeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to check existing liquidation");
+
+      const data = await res.json();
+      setHasExistingLiquidation(Array.isArray(data) && data.length > 0);
+    } catch (err) {
+      console.error("Error checking liquidation:", err);
+      setHasExistingLiquidation(false);
+    } finally {
+      setLoading(false); // ✅ end loading
     }
   }, []);
 
   useEffect(() => {
-    fetchCashRequests();
-  }, [fetchCashRequests]);
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchCashRequests(), checkExistingLiquidation()]);
+      setLoading(false);
+    };
+    loadData();
+  }, [fetchCashRequests, checkExistingLiquidation]);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -76,7 +116,6 @@ const MyExpenses = () => {
         const accessName = localStorage.getItem("access_name");
 
         const isDev = String(accessName).toLowerCase() === "developer";
-
         const url = isDev
           ? `/api5012/dashboard/get_requester_cards`
           : `/api5012/dashboard/get_requester_cards?employee_id=${employeeId}`;
@@ -158,6 +197,7 @@ const MyExpenses = () => {
     return numberToWords(total);
   }, [printData]);
 
+  // disable while loading or has existing liquidation
   const leftContent = (
     <div className="d-flex align-items-center gap-2">
       <AppButton
@@ -171,6 +211,7 @@ const MyExpenses = () => {
         variant="outline-dark"
         onClick={() => setShowCashReqModal(true)}
         className="custom-app-button"
+        disabled={loading || hasExistingLiquidation} // ✅ HERE
       />
     </div>
   );
@@ -202,14 +243,15 @@ const MyExpenses = () => {
             setPrintData={setPrintData}
           />
 
-          {/* CASH REQUEST MODAL */}
           <CashReqModal
             show={showCashReqModal}
             onHide={() => setShowCashReqModal(false)}
-            onSubmit={fetchCashRequests}
+            onSubmit={() => {
+              fetchCashRequests();
+              checkExistingLiquidation();
+            }}
           />
 
-          {/* LIQUIDATION MODAL */}
           <LiqFormModal
             show={showLiqFormModal}
             onHide={() => setShowLiqFormModal(false)}
@@ -221,7 +263,6 @@ const MyExpenses = () => {
             }
           />
 
-          {/* HIDDEN PRINT/DOWNLOAD CONTENT */}
           <div className="d-none">
             <ExpenseReport
               contentRef={downloadRef}

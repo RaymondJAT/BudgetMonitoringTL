@@ -388,7 +388,7 @@ main.no-sidebar {
 /* Pending */
 .status-badge.pending,
 .status-badge.review {
-  background-color: #fbbf24;
+  background-color: #f2950a;
   color: #fff;
   border: 1px solid #b45309;
 }
@@ -396,7 +396,7 @@ main.no-sidebar {
 /*  Approved */
 .status-badge.approved,
 .status-badge.closed {
-  background-color: #22c55e;
+  background-color: #1a8742;
   color: #fff;
   border: 1px solid #166534;
 }
@@ -407,7 +407,7 @@ main.no-sidebar {
 .status-badge.checked,
 .status-badge.liquidated,
 .status-badge.open {
-  background-color: #3b82f6;
+  background-color: #2464c9;
   color: #fff;
   border: 1px solid #1e3a8a;
 }
@@ -416,7 +416,7 @@ main.no-sidebar {
 .status-badge.rejected,
 .status-badge.inactive,
 .status-badge.unliquidated {
-  background-color: #ef4444;
+  background-color: #dd2525;
   color: #fff;
   border: 1px solid #7f1d1d;
 }
@@ -424,7 +424,7 @@ main.no-sidebar {
 /*  Cleared */
 .status-badge.verified,
 .status-badge.cleared {
-  background-color: #8b5cf6;
+  background-color: #6736da;
   color: #fff;
   border: 1px solid #4c1d95;
 }
@@ -682,6 +682,15 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .remove-icon:hover {
   color: darkred;
+}
+
+.liquid-card label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.liquid-card .form-control-sm {
+  font-size: 0.85rem;
 }
 
 /* inputs */
@@ -988,6 +997,10 @@ input[type="number"]::-webkit-outer-spin-button {
   .table-wrapper {
     height: 75vh;
   }
+
+  /* .liquid-card {
+    display: none;
+  } */
 }
 
 /* 968px */
@@ -1043,6 +1056,10 @@ input[type="number"]::-webkit-outer-spin-button {
 
   .table-wrapper {
     height: 75vh;
+  }
+
+  .request-table-wrapper {
+    height: 300px;
   }
 }
 
@@ -1198,4 +1215,11 @@ input[type="number"]::-webkit-outer-spin-button {
 /* SWAL */
 .swal-popup-zindex {
   z-index: 2000 !important;
+}
+
+.swal2-textarea {
+  min-height: 40px !important;
+  max-height: 60px !important;
+  resize: none;
+  font-size: small;
 }

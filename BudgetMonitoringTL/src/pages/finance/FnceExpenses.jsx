@@ -8,6 +8,7 @@ import { columns, liquidationFinanceColumns } from "../../handlers/tableHeader";
 
 import TotalCards from "../../components/TotalCards";
 import OutstandingBalanceChart from "../../components/ui/charts/OutstandingBalanceChart";
+import CashRequestPieChart from "../../components/ui/charts/CashRequestPieChart";
 import LiquidationPieChart from "../../components/ui/charts/LiquidationPieChart";
 import CashFlowChart from "../../components/ui/charts/CashFlowChart";
 import DataTable from "../../components/layout/DataTable";
@@ -228,13 +229,22 @@ const FnceExpenses = () => {
           </div>
 
           {/* Bottom row: Pie Chart (left) + Outstanding Balance (right) */}
-          <div className="col-12 col-lg-5">
+
+          <div className="col-12 col-lg-6">
             <div className="custom-container rounded p-3 h-100">
+              <p className="fw-bold mb-2 text-center">Liquidation</p>
               <LiquidationPieChart data={requestStatus} />
             </div>
           </div>
-          <div className="col-12 col-lg-7">
+          <div className="col-12 col-lg-6">
             <div className="custom-container rounded p-3 h-100">
+              <p className="fw-bold mb-2 text-center">Cash Requests</p>
+              <CashRequestPieChart data={requestStatus} />
+            </div>
+          </div>
+
+          <div className="col-12">
+            <div className="custom-container rounded p-3">
               <OutstandingBalanceChart data={outstandingBalance} />
             </div>
           </div>

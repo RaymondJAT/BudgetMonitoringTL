@@ -7,12 +7,12 @@ import {
   liquidationLeftFields,
   liquidationRightFields,
 } from "../../../../handlers/columnHeaders";
+import { normalizeBase64Image } from "../../../../utils/image";
 import ActionButtons from "../../../ui/buttons/ActionButtons";
 import LiquidApprovalTable from "./LiquidApprovalTable";
 import PrintableLiquidForm from "../../../print/PrintableLiquidForm";
 import LiquidationReceipt from "./LiquidationReceipt";
 import Reference from "../../../Reference";
-import { normalizeBase64Image } from "../../../../utils/image";
 
 const LiquidApprovalForm = () => {
   const { state: data } = useLocation();
@@ -27,10 +27,6 @@ const LiquidApprovalForm = () => {
   const [remarks, setRemarks] = useState("");
 
   const reactToPrintFn = useReactToPrint({ contentRef });
-
-  useEffect(() => {
-    console.log("✅ LiquidApprovalForm received data from navigation:", data);
-  }, [data]);
 
   // FETCH RECEIPTS
   useEffect(() => {
@@ -48,8 +44,6 @@ const LiquidApprovalForm = () => {
 
         if (!res.ok) throw new Error("Failed to fetch receipts");
         const result = await res.json();
-
-        console.log("API response for receipts:", result);
 
         if (result[0]?.remarks) {
           setRemarks(result[0].remarks);
@@ -86,17 +80,12 @@ const LiquidApprovalForm = () => {
     setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
   }, [data]);
 
-  const handleAction = async (action) => {
+  const handleAction = async (action, remarks = "") => {
     try {
       const token = localStorage.getItem("token");
       const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
 
       const status = action === "approve" ? "approved" : "rejected";
-      let remarks = "";
-
-      if (action === "reject") {
-        remarks = prompt("Enter remarks for rejection:") || "";
-      }
 
       const payload = {
         id: data?.id,
@@ -115,9 +104,6 @@ const LiquidApprovalForm = () => {
       });
 
       if (!res.ok) throw new Error("Failed to update liquidation");
-
-      const response = await res.json();
-      console.log("Update response:", response);
 
       navigate(-1);
     } catch (err) {
@@ -139,35 +125,50 @@ const LiquidApprovalForm = () => {
       </Col>
 
       <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, idx) => (
-          <Row key={idx} className="mb-2">
-            <Col xs={12} className="d-flex align-items-center">
-              <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">
-                {data?.[key] != null && !isNaN(Number(data[key]))
-                  ? `₱${Number(data[key]).toLocaleString("en-PH", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : data?.[key] ?? "N/A"}
-              </p>
-            </Col>
-          </Row>
-        ))}
+        {liquidationRightFields.map(({ label, key }, idx) => {
+          const dynamicLabel =
+            key === "reimburse_return" ? getReimburseReturnLabel() : label;
+
+          return (
+            <Row key={idx} className="mb-2">
+              <Col xs={12} className="d-flex align-items-center">
+                <strong className="title">{dynamicLabel}:</strong>
+                <p className="ms-2 mb-0">
+                  {data?.[key] != null && !isNaN(Number(data[key]))
+                    ? `₱${Number(data[key]).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}`
+                    : data?.[key] ?? "N/A"}
+                </p>
+              </Col>
+            </Row>
+          );
+        })}
       </Col>
     </Row>
   );
+
+  const getReimburseReturnLabel = () => {
+    const obtained = parseFloat(data?.amount_obtained) || 0;
+    const expended = parseFloat(data?.amount_expended) || 0;
+
+    if (expended < obtained) return "Return";
+    if (expended > obtained) return "Reimburse";
+    return "Reimburse/Return";
+  };
 
   return (
     <>
       <Container fluid className="pb-3">
         <ActionButtons
-          onApprove={() => handleAction("approve")}
-          onReject={() => handleAction("reject")}
+          onApprove={(remarks = "") => handleAction("approve", remarks)}
+          onReject={(remarks) => handleAction("reject", remarks)}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
           status={data?.status}
           role={localStorage.getItem("role") || "teamlead"}
           printRequestLabel="Print"
+          formType="liquidation"
         />
 
         <Row className="g-3">

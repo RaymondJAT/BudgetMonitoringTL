@@ -29,7 +29,8 @@ const Verified = () => {
 
   const downloadRef = useRef(null);
 
-  const fetchVerifiedLiquidations = useCallback(async () => {
+  // Fetch VERIFIED & COMPLETED liquidations
+  const fetchVerifiedAndCompleted = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -37,22 +38,35 @@ const Verified = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      // Fetch only VERIFIED liquidations
-      const res = await fetch(
-        "/api5012/liquidation/getapproved_liquidation?status=verified",
-        {
+      const [verifiedRes, completedRes] = await Promise.all([
+        fetch("/api5012/liquidation/getapproved_liquidation?status=verified", {
           headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        }),
+        fetch("/api5012/liquidation/getapproved_liquidation?status=completed", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
 
-      if (!res.ok) throw new Error("Failed to fetch verified liquidations");
+      if (!verifiedRes.ok || !completedRes.ok)
+        throw new Error("Failed to fetch liquidation records");
 
-      const result = await res.json();
-      const apiData = Array.isArray(result) ? result : result.data || [];
+      const [verifiedData, completedData] = await Promise.all([
+        verifiedRes.json(),
+        completedRes.json(),
+      ]);
+
+      const apiData = [
+        ...(Array.isArray(verifiedData)
+          ? verifiedData
+          : verifiedData.data || []),
+        ...(Array.isArray(completedData)
+          ? completedData
+          : completedData.data || []),
+      ];
 
       const mappedData = apiData.map((item, index) => ({
         ...item,
-        id: item.id || item._id || `verified-${index}`,
+        id: item.id || item._id || `liq-${index}`,
         formType: "Liquidation",
       }));
 
@@ -64,12 +78,12 @@ const Verified = () => {
     }
   }, []);
 
-  // INITIAL FETCH
+  // Initial Fetch
   useEffect(() => {
-    fetchVerifiedLiquidations();
-  }, [fetchVerifiedLiquidations]);
+    fetchVerifiedAndCompleted();
+  }, [fetchVerifiedAndCompleted]);
 
-  // TOTAL CARDS
+  // Fetch Finance Dashboard Cards
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -102,7 +116,7 @@ const Verified = () => {
     fetchCards();
   }, []);
 
-  // FILTER & SEARCH
+  // Search + Filter
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -120,19 +134,20 @@ const Verified = () => {
     [selectedRows]
   );
 
-  // NAVIGATION TO FINANCE FORM
+  // Handle row click navigation
   const handleRowClick = (entry) => {
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
     });
   };
 
+  // Export data
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "liquidated-requests",
+      filename: "verified-completed-liquidations",
     });
     setSelectedRows(resetSelection);
   };
@@ -148,38 +163,38 @@ const Verified = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onRefresh={fetchVerifiedLiquidations}
+            onRefresh={fetchVerifiedAndCompleted}
             selectedCount={selectedCount}
             handleExport={handleExport}
           />
 
-          {/* LOADING STATE */}
+          {/* Loading */}
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading verified liquidation records...
+              Loading verified and completed liquidation records...
             </Alert>
           )}
 
-          {/* ERROR STATE */}
+          {/* Error */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <Button size="sm" onClick={fetchVerifiedLiquidations}>
+                <Button size="sm" onClick={fetchVerifiedAndCompleted}>
                   Try Again
                 </Button>
               </div>
             </Alert>
           )}
 
-          {/* TABLE IS ALWAYS RENDERED */}
+          {/* Table */}
           {!loading && !error && (
             <DataTable
               data={filteredData}
               height="440px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
-              noDataMessage="No verified liquidation records found."
+              noDataMessage="No verified or completed liquidation records found."
               showCheckbox={true}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
@@ -188,6 +203,7 @@ const Verified = () => {
             />
           )}
 
+          {/* Hidden PDF export template */}
           <div className="d-none">
             <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
           </div>

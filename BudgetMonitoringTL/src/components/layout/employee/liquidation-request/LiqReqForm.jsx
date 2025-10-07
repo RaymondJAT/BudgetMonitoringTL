@@ -109,36 +109,73 @@ const LiqReqForm = ({ requestData = null, onSubmit }) => {
     setLiqRows(updated);
   };
 
-  const handleAddLiqRow = () =>
-    setLiqRows((prev) => [
-      ...prev,
-      {
-        date: "",
-        rt: "",
-        store_name: "",
-        particulars: "",
-        from: "",
-        to: "",
-        mode_of_transportation: "",
-        amount: "",
-      },
-    ]);
+  const handleAddLiqRow = (newRow, insertIndex = null) => {
+    setLiqRows((prev) => {
+      const updated = [...prev];
+      if (insertIndex !== null && insertIndex >= 0) {
+        // Insert the new row at the specified index
+        updated.splice(insertIndex, 0, newRow);
+      } else {
+        // Add the row at the end if no specific position is provided
+        updated.push(newRow);
+      }
+      return updated;
+    });
+  };
 
-  const handleRemoveLiqRow = (index) =>
+  const handleRemoveLiqRow = (index) => {
     setLiqRows((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // ✅ Check if all rows are empty
+    const allEmpty = liqRows.every((row) =>
+      Object.values(row).every((val) => val === "" || val == null)
+    );
+
+    let finalRows = liqRows;
+
+    if (allEmpty) {
+      finalRows = [
+        {
+          date: "N/A",
+          rt: "N/A",
+          store_name: "N/A",
+          particulars: "N/A",
+          from: "N/A",
+          to: "N/A",
+          mode_of_transportation: "N/A",
+          amount: "0.00",
+        },
+      ];
+    } else {
+      // Fill partially empty rows with "N/A"
+      finalRows = liqRows.map((row) => ({
+        date: row.date || "N/A",
+        rt: row.rt || "N/A",
+        store_name: row.store_name || "N/A",
+        particulars: row.particulars || "N/A",
+        from: row.from || "N/A",
+        to: row.to || "N/A",
+        mode_of_transportation: row.mode_of_transportation || "N/A",
+        amount:
+          row.amount === "" || row.amount == null
+            ? "0.00"
+            : row.amount.toString(),
+      }));
+    }
 
     const payload = {
       ...formData,
       created_by: loggedInUser,
       reference_id: requestData?.reference_id || "",
-      request_items: liqRows,
+      request_items: finalRows,
       receipts,
     };
 
-    console.log("Submitting liquidation payload:", payload);
+    console.log("✅ Submitting liquidation payload:", payload);
     onSubmit(payload);
   };
 

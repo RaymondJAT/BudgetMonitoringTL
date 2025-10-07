@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Modal } from "react-bootstrap";
 import {
@@ -11,8 +11,7 @@ import PrintableCashRequest from "./print/PrintableCashRequest";
 import CashApprovalTable from "./layout/team-leader/cash-request/CashApprovalTable";
 import CashReqActionButtons from "./ui/buttons/CashReqActionButtons";
 import LiqFormModal from "./ui/modal/employee/LiqFormModal";
-// import ProgressBar from "../components/ProgressBar";
-// import { progressSteps } from "../handlers/actionMenuItems";
+import EditCashRequest from "./ui/modal/employee/EditCashRequest";
 
 const ViewCashRequestForm = () => {
   const contentRef = useRef(null);
@@ -21,6 +20,8 @@ const ViewCashRequestForm = () => {
   const [amountInWords, setAmountInWords] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showLiqFormModal, setShowLiqFormModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [hasLiquidation, setHasLiquidation] = useState(false);
 
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
@@ -30,20 +31,37 @@ const ViewCashRequestForm = () => {
     if (!isNaN(total)) setAmountInWords(numberToWords(total));
   }, [total]);
 
-  const currentStep = useMemo(() => {
-    switch (data?.status) {
-      case "completed":
-        return 4;
-      case "disbursed":
-        return 3;
-      case "approved":
-        return 2;
-      case "review":
-        return 1;
-      default:
-        return 0;
+  // CHECK FUNCTION
+  const checkExistingLiquidation = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `/api5012/cash_request/getexisting_cash_request?id=${data?.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch liquidation data");
+
+      const result = await res.json();
+      setHasLiquidation(!(Array.isArray(result) && result.length > 0));
+    } catch (err) {
+      console.error("Error checking liquidation:", err);
+      setHasLiquidation(false);
     }
-  }, [data]);
+  }, [data?.id]);
+
+  useEffect(() => {
+    if (data?.id) {
+      checkExistingLiquidation();
+    }
+  }, [data?.id, checkExistingLiquidation]);
 
   return (
     <div className="pb-3">
@@ -55,6 +73,11 @@ const ViewCashRequestForm = () => {
           onPrint={reactToPrintFn}
           onShowLiqFormModal={() => setShowLiqFormModal(true)}
           showLiquidationButton={data?.status === "completed"}
+          liquidationDisabled={hasLiquidation}
+          onEdit={() => setShowEditModal(true)}
+          showEditButton={
+            data?.status === "pending" || data?.status === "rejected"
+          }
         />
 
         {/* LIQUIDATION MODAL */}
@@ -69,33 +92,35 @@ const ViewCashRequestForm = () => {
             amount_issue: data?.amount || 0,
             request_items: [],
           }}
-          onSubmit={(liqData) => {
-            const existing =
-              JSON.parse(localStorage.getItem("LIQUIDATION")) || [];
-            localStorage.setItem(
-              "LIQUIDATION",
-              JSON.stringify([
-                {
-                  ...liqData,
-                  formType: "Liquidation",
-                  createdAt: new Date().toISOString(),
-                },
-                ...existing,
-              ])
-            );
-            window.dispatchEvent(new Event("liquidations-updated"));
-            setShowLiqFormModal(false);
+          onSuccess={() => {
+            const refreshLiquidation = async () => {
+              try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(
+                  `/api5012/cash_request/getexisting_cash_request?id=${data?.id}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+                if (!res.ok)
+                  throw new Error("Failed to fetch liquidation data");
+                const result = await res.json();
+
+                setHasLiquidation(
+                  !(Array.isArray(result) && result.length > 0)
+                );
+              } catch (err) {
+                console.error("Error refreshing liquidation:", err);
+              }
+            };
+
+            refreshLiquidation();
           }}
         />
-
-        {/* PROGRESS BAR */}
-        {/* <div className="request-container border p-2 mb-3">
-          <Row className="align-items-center d-flex justify-content-between">
-            <Col className="d-flex">
-              <ProgressBar steps={progressSteps} currentStep={currentStep} />
-            </Col>
-          </Row>
-        </div> */}
 
         {/* REQUEST INFORMATION */}
         <div className="custom-container border p-3">
@@ -189,6 +214,13 @@ const ViewCashRequestForm = () => {
           />
         </Modal.Body>
       </Modal>
+
+      {/* EDIT MODAL */}
+      <EditCashRequest
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        requestData={data}
+      />
     </div>
   );
 };

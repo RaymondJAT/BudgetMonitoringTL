@@ -6,9 +6,12 @@ const ProtectedRoute = ({ path, children }) => {
   const location = useLocation();
   const token = localStorage.getItem("token");
 
-  // Check token
+  // No token → refresh to login
   if (!token) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "/login";
+    return null;
   }
 
   try {
@@ -17,25 +20,24 @@ const ProtectedRoute = ({ path, children }) => {
 
     if (isExpired) {
       localStorage.clear();
-      return (
-        <Navigate to="/login" replace state={{ from: location.pathname }} />
-      );
+      sessionStorage.clear();
+      window.location.href = "/login";
+      return null;
     }
   } catch (err) {
     localStorage.clear();
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    sessionStorage.clear();
+    window.location.href = "/login";
+    return null;
   }
 
   // Check route access
   const allowed = hasAccess(path);
   if (!allowed) {
-    return (
-      <Navigate
-        to="/unauthorized"
-        replace
-        state={{ from: location.pathname }}
-      />
-    );
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "/login";
+    return null;
   }
 
   return children;

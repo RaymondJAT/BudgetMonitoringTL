@@ -10,6 +10,7 @@ const AppButton = ({
   className = "",
   style = {},
   children,
+  disabled = false, 
 }) => {
   if (isDropdown) {
     return (
@@ -19,6 +20,7 @@ const AppButton = ({
           size={size}
           className={className}
           style={style}
+          disabled={disabled} 
         >
           {label || children}
         </Dropdown.Toggle>
@@ -41,6 +43,7 @@ const AppButton = ({
       onClick={onClick}
       className={className}
       style={style}
+      disabled={disabled}
     >
       {children || label}
     </Button>

@@ -136,23 +136,37 @@ const AdminLiquidForm = () => {
       </Col>
 
       <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, idx) => (
-          <Row key={idx} className="mb-2">
-            <Col xs={12} className="d-flex align-items-center">
-              <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">
-                {data?.[key] != null && !isNaN(Number(data[key]))
-                  ? `₱${Number(data[key]).toLocaleString("en-PH", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : data?.[key] ?? "N/A"}
-              </p>
-            </Col>
-          </Row>
-        ))}
+        {liquidationRightFields.map(({ label, key }, idx) => {
+          const dynamicLabel =
+            key === "reimburse_return" ? getReimburseReturnLabel() : label;
+
+          return (
+            <Row key={idx} className="mb-2">
+              <Col xs={12} className="d-flex align-items-center">
+                <strong className="title">{dynamicLabel}:</strong>
+                <p className="ms-2 mb-0">
+                  {data?.[key] != null && !isNaN(Number(data[key]))
+                    ? `₱${Number(data[key]).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}`
+                    : data?.[key] ?? "N/A"}
+                </p>
+              </Col>
+            </Row>
+          );
+        })}
       </Col>
     </Row>
   );
+
+  const getReimburseReturnLabel = () => {
+    const obtained = parseFloat(data?.amount_obtained) || 0;
+    const expended = parseFloat(data?.amount_expended) || 0;
+
+    if (expended < obtained) return "Return";
+    if (expended > obtained) return "Reimburse";
+    return "Reimburse/Return";
+  };
 
   return (
     <>
@@ -177,7 +191,15 @@ const AdminLiquidForm = () => {
 
             <LiquidationReceipt
               images={receiptImages}
-              remarks={data?.remarks}
+              remarks={
+                data?.remarks ||
+                data?.liquidation_activities?.[0]?.remarks ||
+                data?.liquidation_activities
+                  ?.map((a) => a.remarks)
+                  ?.filter(Boolean)
+                  ?.join(" | ") ||
+                ""
+              }
             />
           </Col>
           <Col md={3}>

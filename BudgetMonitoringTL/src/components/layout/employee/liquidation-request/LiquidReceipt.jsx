@@ -5,11 +5,17 @@ import AppButton from "../../../ui/buttons/AppButton";
 import { normalizeBase64Image } from "../../../../utils/image";
 
 const LiquidReceipt = ({
+  receipts = [],
   remarksValue = "",
   onRemarksChange = () => {},
   onReceiptsChange = () => {},
 }) => {
-  const [previews, setPreviews] = useState([]);
+  const [previews, setPreviews] = useState(
+    receipts.map((r) => ({
+      url: r.image || r,
+      base64: r.image || r,
+    }))
+  );
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const fileInputRef = useRef(null);

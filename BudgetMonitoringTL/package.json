@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "lint:css": "stylelint \"src/**/*.{css,jsx,tsx}\"",
+    "lint:css:fix": "stylelint \"src/**/*.{css,jsx,tsx}\" --fix",
+    "start": "vite build && vite preview --host"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
@@ -26,6 +29,7 @@
     "react-toastify": "^11.0.5",
     "recharts": "^3.0.2",
     "sweetalert2": "^11.23.0",
+    "terser": "^5.44.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

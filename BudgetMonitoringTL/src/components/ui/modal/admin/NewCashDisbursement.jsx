@@ -26,6 +26,7 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [revolvingFundOptions, setRevolvingFundOptions] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
 
   const formatCurrency = (amount) =>
     `₱ ${Number(amount).toLocaleString("en-PH", {
@@ -33,13 +34,16 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
       maximumFractionDigits: 2,
     })}`;
 
-  const sanitizeAmount = (value) =>
-    parseFloat((value || "").replace(/[₱, ]/g, "")) || 0;
+  const formatPeso = (val) =>
+    "₱" +
+    Number(val || 0).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
-  const preventInvalidKeys = (e) => {
-    if (["e", "E", "+", "-"].includes(e.key) || (e.ctrlKey && e.key === "v")) {
-      e.preventDefault();
-    }
+  const parsePeso = (val) => {
+    if (!val) return "";
+    return val.toString().replace(/[^0-9.]/g, "");
   };
 
   const authFetch = useCallback(
@@ -205,7 +209,7 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
         style={{ backgroundColor: "#800000" }}
       >
         <Form className="text-white">
-          {/* Revolving Fund ID - as Select */}
+          {/* REVOLVING FUND SELECT ID */}
           <Row className="g-1">
             <Col md={8}>
               <Form.Group className="mb-2">
@@ -236,7 +240,7 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
             </Col>
           </Row>
 
-          {/* Received By and Department */}
+          {/* RECEIVED AND DEPARTMENT */}
           <Row className="mb-2 g-1">
             <Col>
               <Form.Group>
@@ -266,7 +270,7 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
             </Col>
           </Row>
 
-          {/* Particulars */}
+          {/* PARTICULARS */}
           <Form.Group className="mb-2">
             <FloatingLabel
               controlId="particulars"
@@ -288,7 +292,7 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
             </FloatingLabel>
           </Form.Group>
 
-          {/* Cash Voucher */}
+          {/* CASH VOUCHER */}
           <Form.Group className="mb-2">
             <FloatingLabel
               controlId="cash_voucher"
@@ -308,7 +312,7 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
             </FloatingLabel>
           </Form.Group>
 
-          {/* Amount Issue and Return */}
+          {/* AMOUNT ISSUE AND RETURN */}
           <Row className="mb-2 g-1">
             <Col>
               <FloatingLabel
@@ -318,12 +322,30 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
                 style={{ fontSize: "0.75rem" }}
               >
                 <Form.Control
-                  type="number"
+                  type="text"
                   name="amount_issue"
-                  value={formData.amount_issue}
-                  onChange={handleChange}
-                  min="0"
-                  placeholder="Amount Issue"
+                  placeholder="₱0.00"
+                  value={
+                    focusedField === "issue"
+                      ? formData.amount_issue
+                      : formData.amount_issue
+                      ? formatPeso(formData.amount_issue)
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const raw = parsePeso(e.target.value);
+                    setFormData((prev) => ({ ...prev, amount_issue: raw }));
+                  }}
+                  onFocus={() => setFocusedField("issue")}
+                  onBlur={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      amount_issue: prev.amount_issue
+                        ? parseFloat(prev.amount_issue).toFixed(2)
+                        : "",
+                    }));
+                    setFocusedField(null);
+                  }}
                   className="form-control-sm"
                   required
                   disabled={!!formData.amount_return}
@@ -338,12 +360,30 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
                 style={{ fontSize: "0.75rem" }}
               >
                 <Form.Control
-                  type="number"
+                  type="text"
                   name="amount_return"
-                  value={formData.amount_return}
-                  onChange={handleChange}
-                  min="0"
-                  placeholder="Amount Return"
+                  placeholder="₱0.00"
+                  value={
+                    focusedField === "return"
+                      ? formData.amount_return
+                      : formData.amount_return
+                      ? formatPeso(formData.amount_return)
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const raw = parsePeso(e.target.value);
+                    setFormData((prev) => ({ ...prev, amount_return: raw }));
+                  }}
+                  onFocus={() => setFocusedField("return")}
+                  onBlur={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      amount_return: prev.amount_return
+                        ? parseFloat(prev.amount_return).toFixed(2)
+                        : "",
+                    }));
+                    setFocusedField(null);
+                  }}
                   className="form-control-sm"
                   required
                   disabled={!!formData.amount_issue}

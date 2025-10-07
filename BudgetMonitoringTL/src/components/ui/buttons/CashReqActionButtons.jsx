@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaPlus, FaEye, FaPrint } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaPrint, FaEdit } from "react-icons/fa";
 import AppButton from "./AppButton";
 
 const CashReqActionButtons = ({
@@ -6,10 +6,14 @@ const CashReqActionButtons = ({
   onPrint,
   onView,
   onShowLiqFormModal,
-  showLiquidationButton = false, // 🔹 new prop
+  onEdit,
+  showLiquidationButton = false,
+  liquidationDisabled = false,
+  showEditButton = false,
 }) => {
   return (
     <div className="custom-btn d-flex flex-wrap justify-content-between align-items-center pt-3 pb-3">
+      {/* LEFT BUTTONS */}
       <div className="d-flex">
         {/* Back Button */}
         <AppButton
@@ -20,7 +24,7 @@ const CashReqActionButtons = ({
           className="custom-app-button btn-responsive"
         />
 
-        {/* Liquidation Button: Only show if flag is true */}
+        {/* Liquidation Button */}
         {showLiquidationButton && (
           <AppButton
             label={
@@ -33,21 +37,9 @@ const CashReqActionButtons = ({
             variant="outline-success"
             onClick={() => onShowLiqFormModal(true)}
             className="custom-app-button ms-2"
+            disabled={liquidationDisabled}
           />
         )}
-
-        {/* View Button */}
-        {/* <AppButton
-          label={
-            <>
-              <FaEye /> <span className="d-sm-inline ms-1">View</span>
-            </>
-          }
-          variant="outline-dark"
-          size="sm"
-          onClick={onView}
-          className="custom-app-button btn-responsive ms-2"
-        /> */}
 
         {/* Print Button */}
         <AppButton
@@ -61,6 +53,23 @@ const CashReqActionButtons = ({
           onClick={onPrint}
           className="custom-app-button btn-responsive ms-2"
         />
+      </div>
+
+      {/* RIGHT BUTTONS */}
+      <div className="ms-auto d-flex">
+        {showEditButton && (
+          <AppButton
+            label={
+              <>
+                <FaEdit /> <span className="d-sm-inline ms-1">Edit</span>
+              </>
+            }
+            variant="outline-dark"
+            size="sm"
+            onClick={onEdit}
+            className="custom-app-button btn-responsive"
+          />
+        )}
       </div>
     </div>
   );

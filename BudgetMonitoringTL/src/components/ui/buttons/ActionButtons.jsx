@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaArrowLeft, FaPrint, FaCheck } from "react-icons/fa";
+import { FaArrowLeft, FaPrint, FaCheck, FaEdit } from "react-icons/fa";
 import { ImCross } from "react-icons/im";
 import AppButton from "./AppButton";
 import Swal from "sweetalert2";
@@ -10,13 +10,15 @@ const ActionButtons = ({
   onPrint,
   onPrintVoucher,
   onBack,
+  onEdit,
   status,
   role,
   hideApproveReject = false,
   printRequestLabel = "",
   printVoucherLabel = "",
+  formType = "request",
 }) => {
-  const [loadingAction, setLoadingAction] = useState(null); // "approve" | "reject" | null
+  const [loadingAction, setLoadingAction] = useState(null);
 
   let isApproved = false;
 
@@ -38,7 +40,7 @@ const ActionButtons = ({
   }
 
   const handleAction = async (type, callback) => {
-    if (loadingAction) return; // prevent double click
+    if (loadingAction) return;
 
     const isApprove = type === "approve";
     const needConfirm =
@@ -53,38 +55,106 @@ const ActionButtons = ({
       return;
     }
 
-    const confirmResult = await Swal.fire({
-      title: `Are you sure?`,
-      text: `Do you want to ${type} this request?`,
-      icon: isApprove ? "question" : "warning",
-      showCancelButton: true,
-      confirmButtonText: isApprove ? "Yes, approve it" : "Yes, reject it",
-      confirmButtonColor: isApprove ? "#008000" : "#ff0000",
-      cancelButtonText: "Cancel",
-      cancelButtonColor: "#000000",
-    });
-
-    if (confirmResult.isConfirmed) {
-      try {
-        setLoadingAction(type);
-        await callback?.();
-        await Swal.fire({
-          title: isApprove ? "Approved!" : "Rejected!",
-          text: `The request has been ${
-            isApprove ? "approved" : "rejected"
-          } successfully.`,
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
+    if (isApprove) {
+      if (role === "teamlead" && formType === "liquidation") {
+        const { value: remarks } = await Swal.fire({
+          title: "Approve Liquidation",
+          input: "textarea",
+          inputLabel: "Remarks (optional)",
+          inputPlaceholder: "Add remarks if necessary...",
+          inputAttributes: {
+            "aria-label": "Type your remarks here",
+          },
+          showCancelButton: true,
+          confirmButtonText: "Approve",
+          confirmButtonColor: "#008000",
+          cancelButtonText: "Cancel",
+          cancelButtonColor: "#000000",
         });
-      } finally {
-        setLoadingAction(null);
+
+        if (remarks !== undefined) {
+          try {
+            setLoadingAction(type);
+            await callback?.(remarks);
+            await Swal.fire({
+              title: "Approved!",
+              text: "The liquidation has been approved successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
+          } finally {
+            setLoadingAction(null);
+          }
+        }
+      } else {
+        const confirmResult = await Swal.fire({
+          title: `Are you sure?`,
+          text: `Do you want to approve this request?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, approve it",
+          confirmButtonColor: "#008000",
+          cancelButtonText: "Cancel",
+          cancelButtonColor: "#000000",
+        });
+
+        if (confirmResult.isConfirmed) {
+          try {
+            setLoadingAction(type);
+            await callback?.();
+            await Swal.fire({
+              title: "Approved!",
+              text: "The request has been approved successfully.",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
+          } finally {
+            setLoadingAction(null);
+          }
+        }
+      }
+    } else {
+      const { value: remarks } = await Swal.fire({
+        title: "Reject Cash Request",
+        input: "textarea",
+        inputLabel: "Enter remarks",
+        inputPlaceholder: "Type your reason here...",
+        inputAttributes: {
+          "aria-label": "Type your reason here",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Reject",
+        confirmButtonColor: "#ff0000",
+        cancelButtonText: "Cancel",
+        cancelButtonColor: "#000000",
+        inputValidator: (value) => {
+          if (!value) return "Remarks are required!";
+          return null;
+        },
+      });
+
+      if (remarks) {
+        try {
+          setLoadingAction(type);
+          await callback?.(remarks);
+          await Swal.fire({
+            title: "Rejected!",
+            text: "The request has been rejected successfully.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } finally {
+          setLoadingAction(null);
+        }
       }
     }
   };
 
   return (
-    <div className="custom-btn d-flex flex-wrap justify-content-start align-items-center pt-3 pb-3">
+    <div className="custom-btn d-flex flex-wrap justify-content-start align-items-center pt-3 pb-3 w-100">
       {/* BACK BUTTON */}
       <AppButton
         label={<FaArrowLeft />}
@@ -165,6 +235,24 @@ const ActionButtons = ({
           className="custom-app-button btn-responsive ms-2"
           disabled={!!loadingAction}
         />
+      )}
+
+      {/* EDIT BUTTON FOR REJECTED REQUESTS */}
+      {status?.toLowerCase() === "rejected" && onEdit && (
+        <div className="ms-auto">
+          <AppButton
+            label={
+              <>
+                <FaEdit /> <span className="d-sm-inline ms-1">Edit</span>
+              </>
+            }
+            variant="outline-dark"
+            size="sm"
+            onClick={onEdit}
+            className="custom-app-button btn-responsive ms-2"
+            disabled={!!loadingAction}
+          />
+        </div>
       )}
     </div>
   );

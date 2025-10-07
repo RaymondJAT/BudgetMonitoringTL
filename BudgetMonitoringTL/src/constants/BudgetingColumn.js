@@ -144,6 +144,15 @@ export const columns = [
   { label: "Department", accessor: "department" },
   { label: "Particulars", accessor: "particulars" },
   {
+    label: "Amount issued",
+    accessor: "amount_issue",
+    Cell: ({ value }) =>
+      `₱${Number(value || 0).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+  },
+  {
     label: "Amount Return",
     accessor: "amount_return",
     Cell: ({ value }) =>
