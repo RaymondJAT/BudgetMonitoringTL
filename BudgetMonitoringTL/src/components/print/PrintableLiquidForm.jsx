@@ -90,7 +90,7 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
                   <th style={{ width: "100px" }}>Date</th>
                   <th>RT#</th>
                   <th style={{ width: "100px" }}>Store Name</th>
-                  <th style={{ width: "180px" }}>Particulars</th>
+                  <th style={{ width: "180px" }}>Purpose</th>
                   <th>From</th>
                   <th>To</th>
                   <th>Mode of Transportation</th>
@@ -106,9 +106,9 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
                       <td>{item.rt || "-"}</td>
                       <td>{item.store_name || "-"}</td>
                       <td>{item.particulars || "-"}</td>
-                      <td>{item.from || "-"}</td>
-                      <td>{item.to || "-"}</td>
-                      <td>{item.mode_of_transportation || "-"}</td>
+                      <td>{item.started_from || "-"}</td>
+                      <td>{item.ended_to || "-"}</td>
+                      <td>{item.li_mode_of_transportation || "-"}</td>
                       <td>
                         ₱
                         {parseFloat(item.amount || 0).toLocaleString("en-US", {
@@ -148,8 +148,8 @@ const PrintableLiquidForm = ({ data, contentRef, signatures = {} }) => {
         <Row className="signature small">
           {[
             { label: "Prepared by", key: "prepared" },
-            { label: "Noted by", key: "noted" },
-            { label: "Checked by", key: "checked" },
+            // { label: "Noted by", key: "noted" },
+            // { label: "Checked by", key: "checked" },
             { label: "Verified by", key: "verified" },
             { label: "Approved by", key: "approved" },
           ].map(({ label, key }) => (

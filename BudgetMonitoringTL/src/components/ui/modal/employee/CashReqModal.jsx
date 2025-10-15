@@ -1,17 +1,16 @@
 import { useState, useCallback } from "react";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Spinner } from "react-bootstrap";
+import Swal from "sweetalert2";
 import CashReqForm from "../../../layout/employee/cash-request/CashReqForm";
 import AppButton from "../../buttons/AppButton";
 
 const CashReqModal = ({ show, onHide, onSubmit }) => {
   const [formOutput, setFormOutput] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
   const handleCloseModal = () => {
     if (!submitting) {
       setFormOutput({});
-      setError("");
       onHide();
     }
   };
@@ -23,19 +22,28 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
 
   const handleSave = async () => {
     if (!formOutput || Object.keys(formOutput).length === 0) {
-      console.warn("No form data to submit.");
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Form",
+        text: "Please fill in all required fields before submitting.",
+        confirmButtonColor: "#800000",
+      });
       return;
     }
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Authentication expired. Please log in again.");
+      Swal.fire({
+        icon: "error",
+        title: "Authentication Expired",
+        text: "Please log in again to continue.",
+        confirmButtonColor: "#800000",
+      });
       return;
     }
 
     try {
       setSubmitting(true);
-      setError("");
 
       const res = await fetch("/api5012/cash_request/createcash_request", {
         method: "POST",
@@ -54,10 +62,25 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
       const result = await res.json();
       if (onSubmit) onSubmit(result.data || formOutput);
 
+      // ✅ Auto-close success Swal without confirm button
+      Swal.fire({
+        icon: "success",
+        title: "Cash Request Submitted",
+        text: "Your cash request has been successfully submitted.",
+        timer: 1500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+
       handleCloseModal();
     } catch (error) {
       console.error("Error submitting cash request:", error);
-      setError(error.message || "Something went wrong. Please try again.");
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: error.message || "Something went wrong. Please try again.",
+        confirmButtonColor: "#800000",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -84,17 +107,6 @@ const CashReqModal = ({ show, onHide, onSubmit }) => {
         className="cashreq-scroll"
         style={{ backgroundColor: "#800000" }}
       >
-        {error && (
-          <Alert
-            variant="danger"
-            className="mb-3"
-            onClose={() => setError("")}
-            dismissible
-          >
-            {error}
-          </Alert>
-        )}
-
         <CashReqForm data={{}} onChange={handleFormChange} />
       </Modal.Body>
 

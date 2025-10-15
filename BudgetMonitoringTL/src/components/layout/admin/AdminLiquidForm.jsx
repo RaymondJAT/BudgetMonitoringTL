@@ -13,6 +13,7 @@ import PrintableLiquidForm from "../../print/PrintableLiquidForm";
 import LiquidationReceipt from "../team-leader/liquidation/LiquidationReceipt";
 import { normalizeBase64Image } from "../../../utils/image";
 import Reference from "../../Reference";
+import { showSwal, confirmSwal } from "../../../utils/swal";
 
 const AdminLiquidForm = () => {
   const { state: data } = useLocation();
@@ -21,10 +22,64 @@ const AdminLiquidForm = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
+  const [activities, setActivities] = useState([]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // COMBINE RECEIPTS
+  // FETCH ACTIVITIES
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token || !data?.id) return;
+
+        const res = await fetch(
+          `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${data.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const text = await res.text();
+        const result = JSON.parse(text);
+        setActivities(result || []);
+      } catch (err) {
+        console.error("Error fetching activities:", err);
+      }
+    };
+
+    fetchActivities();
+  }, [data?.id]);
+
+  // FETCH LIQUIDATION ITEMS
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token || !data?.id) return;
+
+        const res = await fetch(
+          `/api5012/liquidation_item/getliquidation_item_by_id?id=${data.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const text = await res.text();
+        const result = JSON.parse(text);
+
+        setTransactions(result || []);
+        setTotal(
+          (result || []).reduce(
+            (sum, item) => sum + parseFloat(item.amount || 0),
+            0
+          )
+        );
+      } catch (err) {
+        console.error("Error fetching liquidation items:", err);
+      }
+    };
+
+    fetchItems();
+  }, [data?.id]);
+
+  // RECEIPTS
   const receiptImages = useMemo(() => {
     const requesterReceipts = [
       ...(Array.isArray(data?.receipts)
@@ -32,8 +87,8 @@ const AdminLiquidForm = () => {
         : data?.receipts
         ? [data.receipts]
         : []),
-      ...(Array.isArray(data?.liquidation_activities)
-        ? data.liquidation_activities.flatMap((act) => {
+      ...(Array.isArray(activities)
+        ? activities.flatMap((act) => {
             if (!act.receipts) return [];
             try {
               const parsed = JSON.parse(act.receipts);
@@ -48,14 +103,7 @@ const AdminLiquidForm = () => {
     ].map(normalizeBase64Image);
 
     return Array.from(new Set(requesterReceipts));
-  }, [data]);
-
-  // POPULATE TRANSACTIONS AND TOTAL
-  useEffect(() => {
-    const items = data?.liquidation_items || [];
-    setTransactions(items);
-    setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
-  }, [data]);
+  }, [data, activities]);
 
   // APPROVE
   const handleApprove = async () => {
@@ -82,25 +130,36 @@ const AdminLiquidForm = () => {
       if (!res.ok) throw new Error("Failed to mark liquidation as completed");
       await res.json();
 
+      showSwal({
+        icon: "success",
+        title: "Completed!",
+        text: "Liquidation marked as completed successfully.",
+      });
+
       navigate(-1);
     } catch (err) {
       console.error("Approve error:", err);
+      showSwal({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while approving.",
+      });
     }
   };
 
-  // REJECT
-  const handleReject = async () => {
+  // REJECT (same style as FinanceLiquidForm)
+  const handleReject = async (remarks) => {
+    if (!remarks) return;
+
     try {
       const token = localStorage.getItem("token");
-      const employeeId = parseInt(localStorage.getItem("employee_id"), 10) || 0;
-
-      const remarks = prompt("Enter remarks for rejection:") || "";
+      const employeeName = localStorage.getItem("employee_name") || "Admin";
 
       const payload = {
         id: data?.id,
         status: "rejected",
         remarks,
-        created_by: employeeId,
+        created_by: employeeName,
       };
 
       const res = await fetch(`/api5012/liquidation/update_liquidation`, {
@@ -113,49 +172,73 @@ const AdminLiquidForm = () => {
       });
 
       if (!res.ok) throw new Error("Failed to reject liquidation");
-      await res.json();
+
+      showSwal({
+        icon: "success",
+        title: "Rejected",
+        text: "Liquidation rejected successfully.",
+      });
 
       navigate(-1);
     } catch (err) {
       console.error("Reject error:", err);
+      showSwal({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while rejecting.",
+      });
     }
   };
 
   // INFO FIELDS
   const renderInfoFields = () => (
     <Row>
-      <Col md={6}>
-        {liquidationLeftFields.map(({ label, key }, idx) => (
+      {[0, 1, 2].map((idx) => {
+        const leftField = liquidationLeftFields[idx];
+        const rightField = liquidationRightFields[idx];
+        const isAmountObtained = rightField?.key === "amount_obtained";
+        const referenceValue = isAmountObtained
+          ? data?.cr_reference_id ?? "N/A"
+          : null;
+
+        return (
           <Row key={idx} className="mb-2">
-            <Col xs={12} className="d-flex align-items-center">
-              <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">{data?.[key] ?? "N/A"}</p>
+            {/* Employee / Department / Date */}
+            <Col md={4} className="d-flex align-items-center">
+              <strong className="title">{leftField?.label}:</strong>
+              <p className="ms-2 mb-0">{data?.[leftField?.key] ?? "N/A"}</p>
+            </Col>
+
+            {/* Amount Obtained / Expended / Return */}
+            <Col md={4} className="d-flex align-items-center">
+              <strong className="title">
+                {rightField?.key === "reimburse_return"
+                  ? getReimburseReturnLabel()
+                  : rightField?.label}
+                :
+              </strong>
+              <p className="ms-2 mb-0">
+                {data?.[rightField?.key] != null &&
+                !isNaN(Number(data[rightField?.key]))
+                  ? `₱${Number(data[rightField?.key]).toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                    })}`
+                  : data?.[rightField?.key] ?? "N/A"}
+              </p>
+            </Col>
+
+            {/* Reference ID */}
+            <Col md={4} className="d-flex align-items-center">
+              {isAmountObtained && (
+                <>
+                  <strong className="title">Reference ID:</strong>
+                  <p className="ms-2 mb-0">{referenceValue}</p>
+                </>
+              )}
             </Col>
           </Row>
-        ))}
-      </Col>
-
-      <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, idx) => {
-          const dynamicLabel =
-            key === "reimburse_return" ? getReimburseReturnLabel() : label;
-
-          return (
-            <Row key={idx} className="mb-2">
-              <Col xs={12} className="d-flex align-items-center">
-                <strong className="title">{dynamicLabel}:</strong>
-                <p className="ms-2 mb-0">
-                  {data?.[key] != null && !isNaN(Number(data[key]))
-                    ? `₱${Number(data[key]).toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                      })}`
-                    : data?.[key] ?? "N/A"}
-                </p>
-              </Col>
-            </Row>
-          );
-        })}
-      </Col>
+        );
+      })}
     </Row>
   );
 
@@ -173,7 +256,7 @@ const AdminLiquidForm = () => {
       <Container fluid className="pb-3">
         <ActionButtons
           onApprove={handleApprove}
-          onReject={handleReject}
+          onReject={(remarks) => handleReject(remarks)}
           onPrint={reactToPrintFn}
           onBack={() => navigate(-1)}
           approveLabel="Mark Completed"
@@ -186,15 +269,13 @@ const AdminLiquidForm = () => {
             <div className="custom-container border p-3">
               {renderInfoFields()}
             </div>
-
             <LiquidApprovalTable transactions={transactions} total={total} />
-
             <LiquidationReceipt
               images={receiptImages}
               remarks={
                 data?.remarks ||
-                data?.liquidation_activities?.[0]?.remarks ||
-                data?.liquidation_activities
+                activities?.[0]?.remarks ||
+                activities
                   ?.map((a) => a.remarks)
                   ?.filter(Boolean)
                   ?.join(" | ") ||
@@ -212,14 +293,21 @@ const AdminLiquidForm = () => {
                 top: 0,
               }}
             >
-              <Reference items={data?.liquidation_items || []} />
+              <Reference items={transactions} />
             </div>
           </Col>
         </Row>
       </Container>
 
       <div className="d-none">
-        <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
+        <PrintableLiquidForm
+          data={{
+            ...data,
+            liquidation_items: transactions,
+            total_amount: total,
+          }}
+          contentRef={contentRef}
+        />
       </div>
     </>
   );

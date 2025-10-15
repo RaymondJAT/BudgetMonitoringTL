@@ -8,7 +8,7 @@ const LiquidApprovalTable = ({ transactions, total }) => {
           <th style={{ width: "90px" }}>Date</th>
           <th style={{ width: "80px" }}>RT#</th>
           <th style={{ width: "200px" }}>Store Name</th>
-          <th>Particulars</th>
+          <th>Purpose</th>
           <th style={{ width: "150px" }}>From</th>
           <th style={{ width: "150px" }}>To</th>
           <th style={{ width: "200px" }}>Mode of Transportation</th>
@@ -23,9 +23,9 @@ const LiquidApprovalTable = ({ transactions, total }) => {
             <td>{row.rt || "N/A"}</td>
             <td>{row.store_name || "N/A"}</td>
             <td>{row.particulars || "N/A"}</td>
-            <td>{row.from || "N/A"}</td>
-            <td>{row.to || "N/A"}</td>
-            <td>{row.mode_of_transportation || "N/A"}</td>
+            <td>{row.started_from || "N/A"}</td>
+            <td>{row.ended_to || "N/A"}</td>
+            <td>{row.li_mode_of_transportation || "N/A"}</td>
             <td>
               ₱
               {(row.amount ?? 0).toLocaleString("en-US", {

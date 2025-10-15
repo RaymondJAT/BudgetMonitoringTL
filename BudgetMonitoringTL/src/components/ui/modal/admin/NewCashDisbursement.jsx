@@ -4,6 +4,7 @@ import { Modal, Form, FloatingLabel, Row, Col } from "react-bootstrap";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../buttons/AppButton";
+import Swal from "sweetalert2";
 
 const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
   const navigate = useNavigate();
@@ -121,11 +122,27 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
     fetchEmployee();
   }, [show, authFetch]);
 
+  // RESET MODAL WHEN CLOSE
+  useEffect(() => {
+    if (!show) {
+      setFormData({
+        revolving_fund_id: null,
+        received_by: "",
+        department: "",
+        particulars: "",
+        cash_voucher: "",
+        amount_issue: "",
+        amount_return: "",
+      });
+      setSelectedFund(null);
+      setRemainingBalance("");
+      setSelectedEmployee(null);
+      setEmployeeDepartment("");
+      setFocusedField(null);
+    }
+  }, [show]);
+
   const handleClose = () => {
-    setSelectedFund(null);
-    setRemainingBalance("");
-    setSelectedEmployee(null);
-    setEmployeeDepartment("");
     onHide();
   };
 
@@ -146,7 +163,27 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
 
   const handleConfirm = async () => {
     if (!selectedEmployee || !selectedFund) {
-      alert("Please select both Employee and Revolving Fund.");
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Information",
+        text: "Please select both Employee and Revolving Fund.",
+        confirmButtonColor: "#800000",
+      });
+      return;
+    }
+
+    // 🔸 NEW REQUIRED FIELD VALIDATION
+    if (
+      !formData.particulars.trim() ||
+      !formData.cash_voucher.trim() ||
+      (!formData.amount_issue && !formData.amount_return)
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Required Fields",
+        text: "Please complete Particulars, Cash Voucher, and at least one of Amount Issue or Amount Return.",
+        confirmButtonColor: "#800000",
+      });
       return;
     }
 
@@ -159,8 +196,8 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
         revolving_fund_id: selectedFund.value,
         received_by: selectedEmployee.value,
         department_id: selectedEmployee.department_id,
-        particulars: formData.particulars,
-        cash_voucher: formData.cash_voucher,
+        particulars: formData.particulars.trim(),
+        cash_voucher: formData.cash_voucher.trim(),
         amount_issue: parseFloat(formData.amount_issue) || 0,
         amount_return: parseFloat(formData.amount_return) || 0,
       };
@@ -184,10 +221,26 @@ const NewCashDisbursement = ({ show, onHide, fundOptions = [], onAdd }) => {
 
       const result = await response.json();
       onAdd(result.data);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Cash Disbursement Created!",
+        text: "The disbursement has been successfully added.",
+        confirmButtonColor: "#800000",
+        timer: 1800,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+
       handleClose();
     } catch (error) {
       console.error("Create disbursement error:", error);
-      alert(error.message || "Failed to create cash disbursement");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Failed to create cash disbursement.",
+        confirmButtonColor: "#800000",
+      });
     } finally {
       setSubmitting(false);
     }

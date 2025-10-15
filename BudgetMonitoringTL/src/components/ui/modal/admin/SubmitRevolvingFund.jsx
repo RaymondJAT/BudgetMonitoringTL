@@ -235,8 +235,38 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
 
             {/* CASH REPORT */}
             <div className="custom-container border rounded p-3 shadow-sm flex-fill">
-              <h6 className="fw-bold mb-3">Cash Report</h6>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="fw-bold mb-0">Cash Report</h6>
 
+                {amount &&
+                  summary?.ending_amount != null &&
+                  computeStatus() !== "BALANCED" && (
+                    <span
+                      className={`fw-semibold ${
+                        computeStatus() === "OVER"
+                          ? "text-danger"
+                          : "text-warning"
+                      }`}
+                      style={{ fontSize: "0.8rem" }}
+                    >
+                      {computeStatus() === "OVER"
+                        ? `Over by ${formatPeso(
+                            Math.abs(
+                              parseFloat(amount || 0) -
+                                (summary?.ending_amount || 0)
+                            )
+                          )}`
+                        : `Short by ${formatPeso(
+                            Math.abs(
+                              (summary?.ending_amount || 0) -
+                                parseFloat(amount || 0)
+                            )
+                          )}`}
+                    </span>
+                  )}
+              </div>
+
+              {/* Input: Amount */}
               <InputGroup className="mb-2">
                 <InputGroup.Text className="small-input fw-semibold fixed-label">
                   {budgetType}
@@ -278,9 +308,10 @@ const SubmitRevolvingFund = ({ show, onHide, fundData, onSuccess }) => {
                 )}
               </InputGroup>
 
+              {/* Input: Status */}
               <InputGroup>
                 <InputGroup.Text
-                  className={`small-input fw-semibold fixed-label ${
+                  className={`small-input fixed-label ${
                     computeStatus() === "OVER"
                       ? "text-danger"
                       : computeStatus() === "BALANCED"

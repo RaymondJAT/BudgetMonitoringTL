@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Container } from "react-bootstrap";
-import { FaPlus, FaEye } from "react-icons/fa";
+import { FaPlus, FaEye, FaEdit } from "react-icons/fa";
 import { LuFolderCheck } from "react-icons/lu";
 import { TbReportAnalytics } from "react-icons/tb";
 
@@ -14,23 +14,27 @@ import NewRevolvingFund from "../../components/ui/modal/admin/NewRevolvingFund";
 import AppButton from "../../components/ui/buttons/AppButton";
 import ViewRevolvingFund from "../../components/ui/modal/admin/ViewRevolvingFund";
 import SubmitRevolvingFund from "../../components/ui/modal/admin/SubmitRevolvingFund";
+import EditAddedRevolvingFund from "../../components/ui/modal/admin/EditAddedRevolvingFund";
 
 const RevolvingFund = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const [selectedFund, setSelectedFund] = useState(null);
+  const [viewBudgetId, setViewBudgetId] = useState(null);
+
   const [fundData, setFundData] = useState([]);
   const [selectedRows, setSelectedRows] = useState({});
   const [loading, setLoading] = useState(true);
-
-  const [viewBudgetId, setViewBudgetId] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
 
   const token = localStorage.getItem("token");
 
+  // FETCH REVOLVING FUND
   const fetchFundData = async () => {
     if (!token) {
       console.error("No token found.");
@@ -69,21 +73,18 @@ const RevolvingFund = () => {
     fetchFundData();
   };
 
-  // FETCH DATE RANGE
+  // FETCH BY DATE RANGE
   const fetchFundDataByDate = async (startDate, endDate, status = "") => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     const formatDate = (date) => {
       const d = new Date(date);
-      if (isNaN(d.getTime())) {
-        console.warn("Invalid date passed to formatDate:", date);
-        return "";
-      }
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      if (isNaN(d.getTime())) return "";
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(d.getDate()).padStart(2, "0")}`;
     };
 
     try {
@@ -111,8 +112,6 @@ const RevolvingFund = () => {
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
       const result = await res.json();
-      console.log("API Response:", result);
-
       setFundData(result.data || []);
     } catch (error) {
       console.error("Error fetching by date range:", error);
@@ -120,12 +119,12 @@ const RevolvingFund = () => {
     }
   };
 
-  // STORE CLOSED FUND
+  // SUBMIT HANDLER
   const handleFundSubmit = async () => {
     await fetchFundData();
   };
 
-  // TOTAL CARDS
+  // FETCH CARDS
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -158,6 +157,15 @@ const RevolvingFund = () => {
     fetchCards();
   }, []);
 
+  // FORMATTER
+  const pesoFormatter = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  // COLUMN SETUP
   const columns = baseColumns.map((col) => {
     if (col.accessor === "actions") {
       return {
@@ -165,7 +173,8 @@ const RevolvingFund = () => {
         Cell: ({ row }) => {
           const rowData = row.original || row;
           return (
-            <div className="d-flex gap-1">
+            <div className="d-flex gap-1 justify-content-center">
+              {/* VIEW BUTTON */}
               <AppButton
                 label={<FaEye />}
                 variant="outline-dark"
@@ -175,6 +184,8 @@ const RevolvingFund = () => {
                   setShowViewModal(true);
                 }}
               />
+
+              {/* SUBMIT BUTTON */}
               <AppButton
                 label={<LuFolderCheck />}
                 variant="outline-success"
@@ -185,19 +196,57 @@ const RevolvingFund = () => {
                 }}
               />
 
-              <AppButton
+              {/* REPORT BUTTON */}
+              {/* <AppButton
                 label={<TbReportAnalytics />}
                 variant="outline-dark"
                 className="custom-app-button"
+              /> */}
+
+              {/* EDIT BUTTON */}
+              <AppButton
+                label={<FaEdit />}
+                variant="outline-dark"
+                className="custom-app-button"
+                onClick={() => {
+                  console.log("📝 Edit button clicked. Row data:", rowData);
+                  setSelectedFund(rowData);
+                  setShowEditModal(true);
+                }}
               />
             </div>
           );
         },
       };
     }
+
+    // BEGINNING AND ADDED
+    if (col.accessor === "beginning_amount") {
+      return {
+        ...col,
+        Header: "Beginning / Added Amount",
+        Cell: ({ row }) => {
+          const rowData = row.original || row;
+          return (
+            <div className="d-flex flex-column align-items-center text-center">
+              <span style={{ fontSize: "0.8rem" }}>
+                <strong>Beginning:</strong>{" "}
+                {pesoFormatter.format(rowData.beginning_amount || 0)}
+              </span>
+              <span style={{ fontSize: "0.8rem" }}>
+                <strong>Added:</strong>{" "}
+                {pesoFormatter.format(rowData.added_amount || 0)}
+              </span>
+            </div>
+          );
+        },
+      };
+    }
+
     return col;
   });
 
+  // SEARCH FILTER
   const filteredData = useMemo(() => {
     if (!searchValue) return fundData;
     const normalize = (value) =>
@@ -279,6 +328,15 @@ const RevolvingFund = () => {
           onHide={() => setShowSubmitModal(false)}
           fundData={selectedFund}
           onSuccess={handleFundSubmit}
+        />
+      )}
+
+      {showEditModal && (
+        <EditAddedRevolvingFund
+          show={showEditModal}
+          onHide={() => setShowEditModal(false)}
+          fundData={selectedFund}
+          onSuccess={fetchFundData}
         />
       )}
     </>

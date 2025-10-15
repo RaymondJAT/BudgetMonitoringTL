@@ -26,10 +26,12 @@ const Verify = () => {
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
   const [printData, setPrintData] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const downloadRef = useRef(null);
 
-  const fetchFinanceLiquidations = useCallback(async () => {
+  // Fetch approved liquidation records
+  const fetchApprovedLiquidations = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -39,23 +41,57 @@ const Verify = () => {
 
       const res = await fetch(
         "/api5012/liquidation/getapproved_liquidation?status=approved",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch liquidations");
+      if (!res.ok) throw new Error("Failed to fetch approved liquidations");
 
       const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const mappedData = apiData.map((item, index) => ({
+      // Map the basic data
+      const baseData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `liq-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      // 🔹 Fetch each liquidation’s items + activities
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+            console.log("Fetched liquidation_items:", items);
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Failed to fetch details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,23 +99,23 @@ const Verify = () => {
     }
   }, []);
 
-  // INITIAL FETCH
   useEffect(() => {
-    fetchFinanceLiquidations();
-  }, [fetchFinanceLiquidations]);
+    fetchApprovedLiquidations();
+  }, [fetchApprovedLiquidations]);
 
-  // TOTAL CARDS
+  // Fetch finance dashboard cards
   useEffect(() => {
     const fetchCards = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) return;
+
         const res = await fetch("/api5012/dashboard/get_finance_cards", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
-          const text = await res.text();
-          console.error("Finance cards API error:", text);
+          console.error("Finance cards API error:", await res.text());
           return;
         }
 
@@ -101,7 +137,7 @@ const Verify = () => {
     fetchCards();
   }, []);
 
-  // FILTER & SEARCH
+  // Filter table data by search
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -119,8 +155,10 @@ const Verify = () => {
     [selectedRows]
   );
 
-  // NAVIGATION TO FINANCE FORM
+  // Navigate to finance form (fetch items, activities, receipts inside the form)
   const handleRowClick = (entry) => {
+    setSelectedRowId(entry.id);
+
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
     });
@@ -131,10 +169,12 @@ const Verify = () => {
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "liquidated-requests",
+      filename: "approved-liquidations",
     });
     setSelectedRows(resetSelection);
   };
+
+  const handleRetry = () => fetchApprovedLiquidations();
 
   return (
     <div className="pb-3">
@@ -147,38 +187,42 @@ const Verify = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onRefresh={fetchFinanceLiquidations}
+            onRefresh={handleRetry}
             selectedCount={selectedCount}
             handleExport={handleExport}
           />
 
-          {/* LOADING STATE */}
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading liquidation records...
+              Loading approved liquidation records...
             </Alert>
           )}
 
-          {/* ERROR STATE */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <Button size="sm" onClick={fetchFinanceLiquidations}>
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
                 </Button>
               </div>
             </Alert>
           )}
 
-          {/* TABLE IS ALWAYS RENDERED */}
-          {!loading && !error && (
+          {!loading && !error && filteredData.length === 0 && (
+            <Alert variant="warning" className="text-center">
+              No approved liquidation records found.
+            </Alert>
+          )}
+
+          {!loading && !error && filteredData.length > 0 && (
             <DataTable
               data={filteredData}
               height="440px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
-              noDataMessage="No liquidation records found."
+              selectedRowId={selectedRowId}
+              noDataMessage="No approved liquidation records found."
               showCheckbox={true}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
@@ -186,10 +230,10 @@ const Verify = () => {
               setPrintData={setPrintData}
             />
           )}
-        </div>
 
-        <div className="d-none">
-          <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          <div className="d-none">
+            <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

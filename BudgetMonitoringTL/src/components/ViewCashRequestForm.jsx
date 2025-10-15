@@ -23,6 +23,14 @@ const ViewCashRequestForm = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [hasLiquidation, setHasLiquidation] = useState(false);
 
+  const rejectedRemark = useMemo(() => {
+    if (!data?.activities) return null;
+    const rejected = data.activities.find(
+      (activity) => activity.action === "REJECTED"
+    );
+    return rejected ? rejected.remarks : null;
+  }, [data?.activities]);
+
   const total = useMemo(() => parseFloat(data?.amount || 0), [data]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
@@ -121,6 +129,28 @@ const ViewCashRequestForm = () => {
             refreshLiquidation();
           }}
         />
+
+        {/* REMARKS */}
+        {data?.status?.toLowerCase() === "rejected" && !!rejectedRemark && (
+          <Row className="mb-3">
+            <Col xs={12}>
+              <div
+                className="p-2 border rounded"
+                style={{ borderColor: "#e87272ff", background: "#fff5f5" }}
+              >
+                <strong
+                  className="text-danger me-2"
+                  style={{ fontSize: "0.85rem" }}
+                >
+                  Remarks:
+                </strong>
+                <span className="fw-bold" style={{ fontSize: "0.8rem" }}>
+                  {rejectedRemark}
+                </span>
+              </div>
+            </Col>
+          </Row>
+        )}
 
         {/* REQUEST INFORMATION */}
         <div className="custom-container border p-3">

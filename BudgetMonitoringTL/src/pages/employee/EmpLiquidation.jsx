@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Alert } from "react-bootstrap";
+import { Container, Alert, Button } from "react-bootstrap";
 
 import { EMPLOYEE_STATUS_LIST } from "../../constants/totalList";
 import { liquidationColumns } from "../../handlers/tableHeader";
@@ -24,11 +24,12 @@ const EmpLiquidation = () => {
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cardsData, setCardsData] = useState([EMPLOYEE_STATUS_LIST]);
+  const [cardsData, setCardsData] = useState(EMPLOYEE_STATUS_LIST);
   const [printData, setPrintData] = useState(null);
 
   const downloadRef = useRef(null);
 
+  // 🔹 Fetch employee liquidations + items + activities
   const fetchLiquidations = useCallback(async () => {
     try {
       setLoading(true);
@@ -51,6 +52,7 @@ const EmpLiquidation = () => {
 
       const result = await response.json();
 
+      // 🔸 Filter by employee (unless admin)
       const filtered =
         String(accessName) === "Administrator"
           ? result || []
@@ -62,17 +64,50 @@ const EmpLiquidation = () => {
                   item.created_by ||
                   ""
               ).trim();
-              const localEmpId = String(employeeId || "").trim();
-              return apiEmpId === localEmpId;
+              return apiEmpId === String(employeeId || "").trim();
             });
 
-      const mappedData = filtered.map((item, index) => ({
+      const baseData = filtered.map((item, index) => ({
         ...item,
-        id: item.id ?? `${index}`,
+        id: item.id ?? `liq-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      // 🔹 Fetch liquidation_items + activities for each record
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Failed to fetch details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -84,6 +119,7 @@ const EmpLiquidation = () => {
     fetchLiquidations();
   }, [fetchLiquidations]);
 
+  // 🔹 Fetch cards (same as before)
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -92,7 +128,6 @@ const EmpLiquidation = () => {
         const accessName = localStorage.getItem("access_name");
 
         const isDev = String(accessName).toLowerCase() === "developer";
-
         const url = isDev
           ? `/api5012/dashboard/get_requester_cards`
           : `/api5012/dashboard/get_requester_cards?employee_id=${employeeId}`;
@@ -144,16 +179,14 @@ const EmpLiquidation = () => {
     navigate("/view_liquidation_form", { state: entry });
   };
 
-  const handleRetry = () => {
-    fetchLiquidations();
-  };
+  const handleRetry = () => fetchLiquidations();
 
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "liquidated-requests",
+      filename: "employee-liquidations",
     });
     setSelectedRows(resetSelection);
   };
@@ -177,7 +210,7 @@ const EmpLiquidation = () => {
 
           {loading && (
             <Alert variant="info" className="text-center">
-              Loading data...
+              Loading liquidation records...
             </Alert>
           )}
 
@@ -185,12 +218,9 @@ const EmpLiquidation = () => {
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={handleRetry}
-                >
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
-                </button>
+                </Button>
               </div>
             </Alert>
           )}

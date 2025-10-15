@@ -18,7 +18,7 @@ export const allocationColumns = [
 // REVOLVING FUND HISTORY
 export const revolvingHistory = [
   { label: "ID", accessor: "id" },
-  { label: "Revolving Fund ID", accessor: "revolving_fund_id" },
+  { label: "Revolving Fund ID", accessor: "name" },
   { label: "Remarks", accessor: "remarks" },
   { label: "Date", accessor: "date" },
 ];
@@ -26,7 +26,7 @@ export const revolvingHistory = [
 // CASH DISBURSEMENT HISTORY
 export const disbursementHistory = [
   { label: "ID", accessor: "id" },
-  { label: "Cash Disbursement ID", accessor: "cash_disbursement_id" },
+  { label: "Cash Voucher", accessor: "cash_voucher" },
   {
     label: "Amount",
     accessor: "amount",

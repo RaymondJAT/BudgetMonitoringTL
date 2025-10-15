@@ -10,17 +10,36 @@ const LiquidReceipt = ({
   onRemarksChange = () => {},
   onReceiptsChange = () => {},
 }) => {
-  const [previews, setPreviews] = useState(
-    receipts.map((r) => ({
-      url: r.image || r,
-      base64: r.image || r,
-    }))
-  );
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const fileInputRef = useRef(null);
+  const [previews, setPreviews] = useState([]);
 
-  /** 🔹 Convert File → Base64 */
+  // 🧠 Sync previews when parent receipts change (only if different)
+  useEffect(() => {
+    if (!receipts || receipts.length === 0) return;
+
+    const areDifferent =
+      receipts.length !== previews.length ||
+      receipts.some((r, i) => r !== previews[i]?.base64);
+
+    if (areDifferent) {
+      const mapped = receipts.map((r) => {
+        if (typeof r === "string") {
+          return { url: r, base64: r };
+        } else if (r?.base64) {
+          return { url: r.base64, base64: r.base64 };
+        } else if (r?.image) {
+          return { url: r.image, base64: r.image };
+        } else {
+          return { url: "", base64: "" };
+        }
+      });
+      setPreviews(mapped);
+    }
+  }, [receipts]);
+
+  /**  CONVERT TO BASE64 */
   const fileToBase64 = useCallback(
     (file) =>
       new Promise((resolve, reject) => {
@@ -32,7 +51,7 @@ const LiquidReceipt = ({
     []
   );
 
-  /** 🔹 Handle file upload */
+  /** FILE UPLOAD */
   const handleImageChange = useCallback(
     async (e) => {
       const files = Array.from(e.target.files).filter((f) =>
@@ -48,22 +67,21 @@ const LiquidReceipt = ({
       }));
 
       setPreviews((prev) => [...prev, ...newPreviews]);
-      e.target.value = ""; // reset input for same-file reselect
+      e.target.value = "";
     },
     [fileToBase64]
   );
 
-  /** 🔹 Sync with parent (send only base64s) */
+  /** SYNC WITH PARENT */
   useEffect(() => {
     onReceiptsChange(previews.map((p) => p.base64));
   }, [previews, onReceiptsChange]);
 
-  /** 🔹 Cleanup object URLs on unmount */
+  /** CLEANUP OBJECT URLS ON UNMOUNT */
   useEffect(() => {
     return () => previews.forEach((p) => URL.revokeObjectURL(p.url));
   }, [previews]);
 
-  /** 🔹 Handlers */
   const handleButtonClick = () => fileInputRef.current?.click();
   const handleImageClick = (src) => {
     setModalImage(src);
@@ -85,7 +103,7 @@ const LiquidReceipt = ({
 
   return (
     <div className="request-container border p-3 mt-3">
-      {/* Remarks Field */}
+      {/* REMARKS */}
       <Form.Group controlId="remarks" className="mb-3">
         <Form.Label className="fw-bold">Remarks</Form.Label>
         <Form.Control
@@ -98,7 +116,7 @@ const LiquidReceipt = ({
         />
       </Form.Group>
 
-      {/* Upload Receipts */}
+      {/* UPLOAD RECEIPT */}
       <Form.Group controlId="formFileMultiple" className="mb-3">
         <Form.Label className="fw-bold">Upload Receipts</Form.Label>
         <div className="d-flex align-items-center gap-2">
@@ -126,7 +144,7 @@ const LiquidReceipt = ({
         </div>
       </Form.Group>
 
-      {/* Image Previews */}
+      {/* IMAGE PREVIEW */}
       {previews.length > 0 && (
         <div className="mt-4">
           <div
@@ -163,7 +181,7 @@ const LiquidReceipt = ({
         </div>
       )}
 
-      {/* Modal for Full Image */}
+      {/* VIEW RECEIPT */}
       <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
         <Modal.Body className="text-center p-3">
           {modalImage && (

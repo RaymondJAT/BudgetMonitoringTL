@@ -21,7 +21,7 @@ const Verified = () => {
 
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
@@ -29,7 +29,9 @@ const Verified = () => {
 
   const downloadRef = useRef(null);
 
-  // Fetch VERIFIED & COMPLETED liquidations
+  /**
+   * Fetch VERIFIED & COMPLETED liquidation records
+   */
   const fetchVerifiedAndCompleted = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -64,13 +66,46 @@ const Verified = () => {
           : completedData.data || []),
       ];
 
-      const mappedData = apiData.map((item, index) => ({
+      const baseData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `liq-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Failed to fetch details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -78,23 +113,25 @@ const Verified = () => {
     }
   }, []);
 
-  // Initial Fetch
   useEffect(() => {
     fetchVerifiedAndCompleted();
   }, [fetchVerifiedAndCompleted]);
 
-  // Fetch Finance Dashboard Cards
+  /**
+   * Fetch Finance Dashboard Cards
+   */
   useEffect(() => {
     const fetchCards = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) return;
+
         const res = await fetch("/api5012/dashboard/get_finance_cards", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
-          const text = await res.text();
-          console.error("Finance cards API error:", text);
+          console.error("Finance cards API error:", await res.text());
           return;
         }
 
@@ -116,7 +153,9 @@ const Verified = () => {
     fetchCards();
   }, []);
 
-  // Search + Filter
+  /**
+   * Filter table data by search input
+   */
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -134,14 +173,18 @@ const Verified = () => {
     [selectedRows]
   );
 
-  // Handle row click navigation
+  /**
+   * Handle row click (go to Finance form view)
+   */
   const handleRowClick = (entry) => {
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
     });
   };
 
-  // Export data
+  /**
+   * Export selected or filtered data
+   */
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
@@ -151,6 +194,11 @@ const Verified = () => {
     });
     setSelectedRows(resetSelection);
   };
+
+  /**
+   * Retry handler for API fetch
+   */
+  const handleRetry = () => fetchVerifiedAndCompleted();
 
   return (
     <div className="pb-3">
@@ -163,38 +211,40 @@ const Verified = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onRefresh={fetchVerifiedAndCompleted}
+            onRefresh={handleRetry}
             selectedCount={selectedCount}
             handleExport={handleExport}
           />
 
-          {/* Loading */}
           {loading && (
             <Alert variant="info" className="text-center">
               Loading verified and completed liquidation records...
             </Alert>
           )}
 
-          {/* Error */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <Button size="sm" onClick={fetchVerifiedAndCompleted}>
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
                 </Button>
               </div>
             </Alert>
           )}
 
-          {/* Table */}
-          {!loading && !error && (
+          {!loading && !error && filteredData.length === 0 && (
+            <Alert variant="warning" className="text-center">
+              No verified or completed liquidation records found.
+            </Alert>
+          )}
+
+          {!loading && !error && filteredData.length > 0 && (
             <DataTable
               data={filteredData}
-              height="440px"
+              height="455px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
-              noDataMessage="No verified or completed liquidation records found."
               showCheckbox={true}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
@@ -203,7 +253,7 @@ const Verified = () => {
             />
           )}
 
-          {/* Hidden PDF export template */}
+          {/* Hidden PDF Renderer for Printing/Export */}
           <div className="d-none">
             <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
           </div>

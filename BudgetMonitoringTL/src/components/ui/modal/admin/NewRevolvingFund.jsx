@@ -4,6 +4,7 @@ import { Modal, Form, Row, Col } from "react-bootstrap";
 import Select from "react-select";
 import { customStyles } from "../../../../constants/customStyles";
 import AppButton from "../../buttons/AppButton";
+import Swal from "sweetalert2";
 
 const NewRevolvingFund = ({ show, onHide, onAdd }) => {
   const navigate = useNavigate();
@@ -128,7 +129,29 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
   };
 
   const handleConfirm = async () => {
-    if (!selectedBudget || balanceError) return;
+    if (!selectedBudget) {
+      Swal.fire({
+        icon: "warning",
+        title: "Budget Required",
+        text: "Please select a budget before proceeding.",
+        confirmButtonColor: "#800000",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (balanceError) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Amount",
+        text: balanceError,
+        confirmButtonColor: "#800000",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -150,15 +173,29 @@ const NewRevolvingFund = ({ show, onHide, onAdd }) => {
       });
 
       if (!res.ok) throw new Error(await res.text());
-
       const savedFund = await res.json();
-      console.log("Saved fund:", savedFund);
-      onAdd?.(savedFund.data);
 
+      // AUTO CLOSE POP OUT
+      Swal.fire({
+        icon: "success",
+        title: "Revolving Fund Created",
+        text: "The revolving fund has been successfully added.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      onAdd?.(savedFund.data);
       handleClose();
     } catch (error) {
       console.error("Create fund error:", error);
-      alert(error.message || "Failed to create fund");
+      // AUTO CLOSE ERROR POP OUT
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: error.message || "Failed to create revolving fund.",
+        timer: 2500,
+        showConfirmButton: false,
+      });
     } finally {
       setSubmitting(false);
     }

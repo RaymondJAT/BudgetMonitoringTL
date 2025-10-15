@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Alert } from "react-bootstrap";
+import { Container, Alert, Button } from "react-bootstrap";
 
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import { liquidationColumns } from "../../handlers/tableHeader";
@@ -21,47 +21,76 @@ const RejectLiquidation = () => {
 
   const [tableData, setTableData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedRowId, setSelectedRowId] = useState(null);
-  const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
+  const [cardsData, setCardsData] = useState(TEAMLEAD_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
   const [printData, setPrintData] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const downloadRef = useRef(null);
 
+  // 🔹 Fetch rejected liquidations (with details)
   const fetchRejectedLiquidations = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
+    try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      // Fetch only rejected liquidations
-      const response = await fetch(
+      const res = await fetch(
         "/api5012/liquidation/getcash_liquidation?status=rejected",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (!response.ok)
-        throw new Error("Failed to fetch rejected liquidations");
+      if (!res.ok) throw new Error("Failed to fetch rejected liquidations");
 
-      const result = await response.json();
+      const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const mappedData = apiData.map((item, index) => ({
+      // Map base data
+      const baseData = apiData.map((item, index) => ({
         ...item,
-        id: item.id || item._id || index,
+        id: item.id || item._id || `liq-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      // 🔹 Fetch each liquidation’s items + activities
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Failed to fetch details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,6 +102,7 @@ const RejectLiquidation = () => {
     fetchRejectedLiquidations();
   }, [fetchRejectedLiquidations]);
 
+  // 🔹 Fetch teamlead cards
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -82,8 +112,7 @@ const RejectLiquidation = () => {
         });
 
         if (!res.ok) {
-          const text = await res.text();
-          console.error("Teamleader cards API error:", text);
+          console.error("Teamleader cards API error:", await res.text());
           return;
         }
 
@@ -104,6 +133,7 @@ const RejectLiquidation = () => {
     fetchCards();
   }, []);
 
+  // 🔹 Filter by search
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -124,12 +154,8 @@ const RejectLiquidation = () => {
 
   const handleRowClick = (entry) => {
     setSelectedRowId(entry.id);
-
     navigate("/liquid_approval_form", {
-      state: {
-        ...entry,
-        role: "team-leader",
-      },
+      state: { ...entry, role: "team-leader" },
     });
   };
 
@@ -169,33 +195,38 @@ const RejectLiquidation = () => {
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={handleRetry}
-                >
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
-                </button>
+                </Button>
               </div>
             </Alert>
           )}
 
-          <DataTable
-            data={filteredData}
-            height="440px"
-            columns={liquidationColumns}
-            onRowClick={handleRowClick}
-            selectedRowId={selectedRowId}
-            noDataMessage="No rejected liquidation records found."
-            showCheckbox={true}
-            selectedRows={selectedRows}
-            onSelectionChange={setSelectedRows}
-            downloadRef={downloadRef}
-            setPrintData={setPrintData}
-          />
-        </div>
+          {!loading && !error && filteredData.length === 0 && (
+            <Alert variant="warning" className="text-center">
+              No rejected liquidation records found.
+            </Alert>
+          )}
 
-        <div className="d-none">
-          <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          {!loading && !error && filteredData.length > 0 && (
+            <DataTable
+              data={filteredData}
+              height="440px"
+              columns={liquidationColumns}
+              onRowClick={handleRowClick}
+              selectedRowId={selectedRowId}
+              noDataMessage="No rejected liquidation records found."
+              showCheckbox={true}
+              selectedRows={selectedRows}
+              onSelectionChange={setSelectedRows}
+              downloadRef={downloadRef}
+              setPrintData={setPrintData}
+            />
+          )}
+
+          <div className="d-none">
+            <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
+          </div>
         </div>
       </Container>
     </div>

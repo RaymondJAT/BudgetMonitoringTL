@@ -24,10 +24,77 @@ const FinanceLiquidForm = () => {
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
   const [showFundModal, setShowFundModal] = useState(false);
+  const [activities, setActivities] = useState([]);
 
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  // RECEIPTS
+  // LIQUIDATION ACTIVITIES
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token || !data?.id) return;
+
+        console.log("Fetching activities for liquidation ID:", data.id);
+
+        const res = await fetch(
+          `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${data.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Failed to fetch activities:", text);
+          throw new Error("Failed to fetch liquidation activities");
+        }
+
+        const result = await res.json();
+        console.log("Fetched activities:", result);
+        setActivities(result || []);
+      } catch (err) {
+        console.error("Error fetching liquidation activities:", err);
+      }
+    };
+
+    fetchActivities();
+  }, [data?.id]);
+
+  // LIQUIDATION ITEMS
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token || !data?.id) return;
+
+        console.log("Attempting fetch for liquidation ID:", data.id);
+
+        const res = await fetch(
+          `/api5012/liquidation_item/getliquidation_item_by_id?id=${data.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const text = await res.text();
+        console.log("Raw response text:", text);
+
+        const result = JSON.parse(text);
+        console.log("Parsed liquidation items:", result);
+
+        setTransactions(result || []);
+        setTotal(
+          (result || []).reduce(
+            (sum, item) => sum + parseFloat(item.amount || 0),
+            0
+          )
+        );
+      } catch (err) {
+        console.error("Error fetching liquidation items:", err);
+      }
+    };
+
+    fetchItems();
+  }, [data?.id]);
+
+  // RECEIPTS & REMARKS
   const receiptImages = useMemo(() => {
     const requesterReceipts = [
       ...(Array.isArray(data?.receipts)
@@ -35,8 +102,8 @@ const FinanceLiquidForm = () => {
         : data?.receipts
         ? [data.receipts]
         : []),
-      ...(Array.isArray(data?.liquidation_activities)
-        ? data.liquidation_activities.flatMap((act) => {
+      ...(Array.isArray(activities)
+        ? activities.flatMap((act) => {
             if (!act.receipts) return [];
             try {
               const parsed = JSON.parse(act.receipts);
@@ -51,16 +118,9 @@ const FinanceLiquidForm = () => {
     ].map(normalizeBase64Image);
 
     return Array.from(new Set(requesterReceipts));
-  }, [data]);
+  }, [data, activities]);
 
-  // TRANSACTIONS + TOTAL
-  useEffect(() => {
-    const items = data?.liquidation_items || [];
-    setTransactions(items);
-    setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
-  }, [data]);
-
-  // APPROVE
+  //  APPROVE
   const handleApprove = async (fundId) => {
     try {
       const token = localStorage.getItem("token");
@@ -125,26 +185,9 @@ const FinanceLiquidForm = () => {
     }
   };
 
-  // SELECT FUND
-  const handleSelectFund = (fundId) => {
-    confirmSwal({
-      title: "Are you sure?",
-      text: "Do you want to approve this liquidation using the selected fund?",
-      icon: "question",
-      confirmButtonText: "Yes, approve",
-      confirmButtonColor: "#008000",
-      cancelButtonColor: "#000000",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        handleApprove(fundId);
-        setShowFundModal(false);
-      }
-    });
-  };
-
   // REJECT
   const handleReject = async (remarks) => {
-    if (!remarks) return; // safeguard, since ActionButtons enforces required field
+    if (!remarks) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -187,45 +230,58 @@ const FinanceLiquidForm = () => {
 
   const renderInfoFields = () => (
     <Row>
-      <Col md={6}>
-        {liquidationLeftFields.map(({ label, key }, idx) => (
+      {[0, 1, 2].map((idx) => {
+        const leftField = liquidationLeftFields[idx];
+        const rightField = liquidationRightFields[idx];
+        const isAmountObtained = rightField?.key === "amount_obtained";
+        const referenceValue = isAmountObtained
+          ? data?.cr_reference_id ?? "N/A"
+          : null;
+
+        return (
           <Row key={idx} className="mb-2">
-            <Col xs={12} className="d-flex align-items-center">
-              <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">{data?.[key] ?? "N/A"}</p>
+            {/* Employee / Department / Date */}
+            <Col md={4} className="d-flex align-items-center">
+              <strong className="title">{leftField?.label}:</strong>
+              <p className="ms-2 mb-0">{data?.[leftField?.key] ?? "N/A"}</p>
+            </Col>
+
+            {/* Amount Obtained / Expended / Return */}
+            <Col md={4} className="d-flex align-items-center">
+              <strong className="title">
+                {rightField?.key === "reimburse_return"
+                  ? getReimburseReturnLabel()
+                  : rightField?.label}
+                :
+              </strong>
+              <p className="ms-2 mb-0">
+                {data?.[rightField?.key] != null &&
+                !isNaN(Number(data[rightField?.key]))
+                  ? `₱${Number(data[rightField?.key]).toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                    })}`
+                  : data?.[rightField?.key] ?? "N/A"}
+              </p>
+            </Col>
+
+            {/* Reference ID */}
+            <Col md={4} className="d-flex align-items-center">
+              {isAmountObtained && (
+                <>
+                  <strong className="title">Reference ID:</strong>
+                  <p className="ms-2 mb-0">{referenceValue}</p>
+                </>
+              )}
             </Col>
           </Row>
-        ))}
-      </Col>
-
-      <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, idx) => {
-          const dynamicLabel =
-            key === "reimburse_return" ? getReimburseReturnLabel() : label;
-
-          return (
-            <Row key={idx} className="mb-2">
-              <Col xs={12} className="d-flex align-items-center">
-                <strong className="title">{dynamicLabel}:</strong>
-                <p className="ms-2 mb-0">
-                  {data?.[key] != null && !isNaN(Number(data[key]))
-                    ? `₱${Number(data[key]).toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                      })}`
-                    : data?.[key] ?? "N/A"}
-                </p>
-              </Col>
-            </Row>
-          );
-        })}
-      </Col>
+        );
+      })}
     </Row>
   );
 
   const remarks =
     data?.remarks ||
-    (Array.isArray(data?.liquidation_activities) &&
-      data.liquidation_activities[0]?.remarks) ||
+    (Array.isArray(activities) && activities[0]?.remarks) ||
     "";
 
   const getReimburseReturnLabel = () => {
@@ -268,20 +324,38 @@ const FinanceLiquidForm = () => {
                 top: 0,
               }}
             >
-              <Reference items={data?.liquidation_items || []} />
+              <Reference items={transactions} />
             </div>
           </Col>
         </Row>
       </Container>
 
       <div className="d-none">
-        <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
+        <PrintableLiquidForm
+          data={{
+            ...data,
+            liquidation_items: transactions,
+            total_amount: total,
+          }}
+          contentRef={contentRef}
+        />
       </div>
 
       <PickRevolvingFund
         show={showFundModal}
         onClose={() => setShowFundModal(false)}
-        onSelect={handleSelectFund}
+        onSelect={(fundId) => {
+          confirmSwal({
+            title: "Are you sure?",
+            text: "Do you want to approve this liquidation using the selected fund?",
+            icon: "question",
+            confirmButtonText: "Yes, approve",
+            confirmButtonColor: "#008000",
+            cancelButtonColor: "#000000",
+          }).then((result) => {
+            if (result.isConfirmed) handleApprove(fundId);
+          });
+        }}
       />
     </>
   );

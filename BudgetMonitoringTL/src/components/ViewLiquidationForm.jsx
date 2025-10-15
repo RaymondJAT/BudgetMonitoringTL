@@ -22,6 +22,7 @@ const ViewLiquidationForm = () => {
   const [data, setData] = useState(state || null);
   const [transactions, setTransactions] = useState([]);
   const [total, setTotal] = useState(0);
+  const [activities, setActivities] = useState([]);
   const [apiReceipts, setApiReceipts] = useState([]);
   const [newReceipts, setNewReceipts] = useState([]);
   const [remarks, setRemarks] = useState("");
@@ -30,74 +31,96 @@ const ViewLiquidationForm = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
 
+  // Find rejected or latest remarks from activities
+  const activityRemark = useMemo(() => {
+    if (!activities?.length) return null;
+
+    // Prefer "REJECTED" remarks if present
+    const rejected = activities.find((act) => act.action === "REJECTED");
+    if (rejected?.remarks) return rejected.remarks;
+
+    // Otherwise use the latest non-empty remarks
+    const latestWithRemark = [...activities]
+      .reverse()
+      .find((act) => act.remarks && act.remarks.trim() !== "");
+    return latestWithRemark?.remarks || remarks || null;
+  }, [activities, remarks]);
+
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  const fetchReceipts = useCallback(async () => {
+  // FETCH ITEMS AND ACTIVITIES
+  const fetchLiquidationData = useCallback(async () => {
     if (!data?.id) return;
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `/api5012/liquidation/getcash_liquidation_id?id=${data.id}`,
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token found");
+
+      // FETCH
+      const itemsRes = await fetch(
+        `/api5012/liquidation_item/getliquidation_item_by_id?id=${data.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      const itemsText = await itemsRes.text();
+      const itemsData = itemsRes.ok ? JSON.parse(itemsText) : [];
+      setTransactions(itemsData || []);
+      setTotal(
+        (itemsData || []).reduce(
+          (sum, item) => sum + parseFloat(item.amount || 0),
+          0
+        )
+      );
 
-      if (!res.ok) throw new Error("Failed to fetch receipts");
+      // ACTIVITIES
+      const actRes = await fetch(
+        `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${data.id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const actData = actRes.ok ? await actRes.json() : [];
+      setActivities(actData || []);
 
-      const receiptData = await res.json();
+      // COMBINE RECEIPTS FROM BOTH ACTIVITIES AND DATA
+      const requesterReceipts = [
+        ...(Array.isArray(data?.receipts)
+          ? data.receipts
+          : data?.receipts
+          ? [data.receipts]
+          : []),
+        ...(Array.isArray(actData)
+          ? actData.flatMap((act) => {
+              if (!act.receipts) return [];
+              try {
+                const parsed = JSON.parse(act.receipts);
+                return Array.isArray(parsed)
+                  ? parsed.map((r) => normalizeBase64Image(r.image || r))
+                  : [normalizeBase64Image(act.receipts)];
+              } catch {
+                return [normalizeBase64Image(act.receipts)];
+              }
+            })
+          : []),
+      ].map(normalizeBase64Image);
 
-      const parsedReceipts = receiptData.flatMap((entry) => {
-        if (!entry.receipts) return [];
-        try {
-          const arr = JSON.parse(entry.receipts);
-          return Array.isArray(arr)
-            ? arr.map((r) => normalizeBase64Image(r.image || r))
-            : [normalizeBase64Image(entry.receipts)];
-        } catch {
-          return [normalizeBase64Image(entry.receipts)];
-        }
-      });
+      setApiReceipts(Array.from(new Set(requesterReceipts)));
 
-      setApiReceipts(parsedReceipts);
-
-      if (receiptData.length > 0) {
-        const liquidationData = receiptData[0];
-
-        if (liquidationData.remarks) {
-          setRemarks(liquidationData.remarks);
-        }
-
-        if (liquidationData.liquidation_items) {
-          setData(liquidationData);
-          setTransactions(liquidationData.liquidation_items);
-          setTotal(
-            liquidationData.liquidation_items.reduce((sum, item) => {
-              const val = parseFloat(item.amount);
-              return sum + (isNaN(val) ? 0 : val);
-            }, 0)
-          );
-        }
-      }
+      // SET REMARKS
+      const remarkText =
+        data?.remarks || (Array.isArray(actData) && actData[0]?.remarks) || "";
+      setRemarks(remarkText);
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Something went wrong");
+      console.error("Error fetching liquidation data:", err);
+      setError(err.message || "Failed to fetch liquidation data");
     } finally {
       setLoading(false);
     }
-  }, [data?.id]);
+  }, [data?.id, data?.receipts]);
 
   useEffect(() => {
-    fetchReceipts();
-  }, [fetchReceipts]);
-
-  // POPULATE TRANSACTIONS AND TOTAL
-  useEffect(() => {
-    if (!data) return;
-    const items = data.liquidation_items || [];
-    setTransactions(items);
-    setTotal(items.reduce((sum, item) => sum + (item.amount ?? 0), 0));
-  }, [data]);
+    fetchLiquidationData();
+  }, [fetchLiquidationData]);
 
   // HANDLE NEW UPLOAD RECEIPTS
   const handleReceiptsChange = async (files) => {
@@ -112,7 +135,6 @@ const ViewLiquidationForm = () => {
           })
       )
     );
-
     setNewReceipts((prev) => [...prev, ...base64List]);
   };
 
@@ -122,68 +144,78 @@ const ViewLiquidationForm = () => {
     [apiReceipts, newReceipts]
   );
 
-  // INFO FIELDS
+  const getReimburseReturnLabel = () => {
+    const obtained = parseFloat(data?.amount_obtained) || 0;
+    const expended = parseFloat(data?.amount_expended) || 0;
+    if (expended < obtained) return "Return";
+    if (expended > obtained) return "Reimburse";
+    return "Reimburse/Return";
+  };
+
   const renderInfoFields = () => (
     <Row>
-      <Col md={6}>
-        {liquidationLeftFields.map(({ label, key }, idx) => (
+      {[0, 1, 2].map((idx) => {
+        const leftField = liquidationLeftFields[idx];
+        const rightField = liquidationRightFields[idx];
+        const isAmountObtained = rightField?.key === "amount_obtained";
+        const referenceValue = isAmountObtained
+          ? data?.reference_id ?? "N/A"
+          : null;
+
+        return (
           <Row key={idx} className="mb-2">
-            <Col xs={12} className="d-flex align-items-center">
-              <strong className="title">{label}:</strong>
-              <p className="ms-2 mb-0">{data?.[key] ?? "N/A"}</p>
+            {/* Employee / Department / Date */}
+            <Col md={4} className="d-flex align-items-center">
+              <strong className="title">{leftField?.label}:</strong>
+              <p className="ms-2 mb-0">{data?.[leftField?.key] ?? "N/A"}</p>
+            </Col>
+
+            {/* Amount Obtained / Expended / Return */}
+            <Col md={4} className="d-flex align-items-center">
+              <strong className="title">
+                {rightField?.key === "reimburse_return"
+                  ? getReimburseReturnLabel()
+                  : rightField?.label}
+                :
+              </strong>
+              <p className="ms-2 mb-0">
+                {data?.[rightField?.key] != null &&
+                !isNaN(Number(data[rightField?.key]))
+                  ? `₱${Number(data[rightField?.key]).toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                    })}`
+                  : data?.[rightField?.key] ?? "N/A"}
+              </p>
+            </Col>
+
+            {/* Reference ID */}
+            <Col md={4} className="d-flex align-items-center">
+              {isAmountObtained && (
+                <>
+                  <strong className="title">Reference ID:</strong>
+                  <p className="ms-2 mb-0">{referenceValue}</p>
+                </>
+              )}
             </Col>
           </Row>
-        ))}
-      </Col>
-
-      <Col md={6}>
-        {liquidationRightFields.map(({ label, key }, idx) => {
-          const dynamicLabel =
-            key === "reimburse_return" ? getReimburseReturnLabel() : label;
-
-          return (
-            <Row key={idx} className="mb-2">
-              <Col xs={12} className="d-flex align-items-center">
-                <strong className="title">{dynamicLabel}:</strong>
-                <p className="ms-2 mb-0">
-                  {data?.[key] != null && !isNaN(Number(data[key]))
-                    ? `₱${Number(data[key]).toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                      })}`
-                    : data?.[key] ?? "N/A"}
-                </p>
-              </Col>
-            </Row>
-          );
-        })}
-      </Col>
+        );
+      })}
     </Row>
   );
 
-  if (loading) {
+  if (loading)
     return (
       <div className="d-flex justify-content-center align-items-center p-5">
         <Spinner animation="border" /> <span className="ms-2">Loading...</span>
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <Alert variant="danger" className="m-3">
         {error}
       </Alert>
     );
-  }
-
-  const getReimburseReturnLabel = () => {
-    const obtained = parseFloat(data?.amount_obtained) || 0;
-    const expended = parseFloat(data?.amount_expended) || 0;
-
-    if (expended < obtained) return "Return";
-    if (expended > obtained) return "Reimburse";
-    return "Reimburse/Return";
-  };
 
   return (
     <div className="pb-3">
@@ -198,6 +230,28 @@ const ViewLiquidationForm = () => {
           onEdit={() => setShowEditModal(true)}
         />
 
+        {/* REMARKS */}
+        {data?.status?.toLowerCase() === "rejected" && !!activityRemark && (
+          <Row className="mb-3">
+            <Col xs={12}>
+              <div
+                className="p-2 border rounded"
+                style={{ borderColor: "#e87272ff", background: "#fff5f5" }}
+              >
+                <strong
+                  className="text-danger me-2"
+                  style={{ fontSize: "0.85rem" }}
+                >
+                  Remarks:
+                </strong>
+                <span className="fw-bold" style={{ fontSize: "0.8rem" }}>
+                  {activityRemark}
+                </span>
+              </div>
+            </Col>
+          </Row>
+        )}
+
         <div className="custom-container border p-3">{renderInfoFields()}</div>
 
         <LiquidApprovalTable transactions={transactions} total={total} />
@@ -210,7 +264,16 @@ const ViewLiquidationForm = () => {
       </Container>
 
       <div className="d-none">
-        <PrintableLiquidForm data={{ ...data }} contentRef={contentRef} />
+        <PrintableLiquidForm
+          data={{
+            ...data,
+            liquidation_items: transactions,
+            total_amount: total,
+            receipts: receiptImages,
+            remarks: remarks,
+          }}
+          contentRef={contentRef}
+        />
       </div>
 
       <EditLiquidation
@@ -241,7 +304,7 @@ const ViewLiquidationForm = () => {
             );
           }
           setShowEditModal(false);
-          setTimeout(fetchReceipts, 1000);
+          setTimeout(fetchLiquidationData, 1000);
         }}
       />
     </div>

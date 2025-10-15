@@ -1,49 +1,64 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Alert } from "react-bootstrap";
+import Swal from "sweetalert2";
 import AppButton from "../../buttons/AppButton";
 import LiquidTable from "../../../layout/employee/liquidation-request/LiquidTable";
 import LiquidReceipt from "../../../layout/employee/liquidation-request/LiquidReceipt";
+import { saveDraft, getDraft, deleteDraft } from "../../../../utils/indexedDB";
 
 const EditLiquidation = ({ show, onHide, requestData, onSave }) => {
   const [tableRows, setTableRows] = useState([]);
-
   const [remarks, setRemarks] = useState("");
   const [receipts, setReceipts] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Load existing data into table and receipt sections
+  // unique draft key
+  const draftKey = requestData ? `edit_${requestData.id}` : "edit_draft";
+
+  // 🧠 LOAD DRAFT OR EXISTING DATA
   useEffect(() => {
-    if (requestData) {
+    async function loadData() {
+      if (!requestData) return;
+
+      const saved = await getDraft(draftKey);
+      if (saved) {
+        console.log("📦 Loaded edit draft:", saved);
+        setTableRows(saved.tableRows || []);
+        setRemarks(saved.remarks || "");
+        setReceipts(saved.receipts || []);
+        return;
+      }
+
       const rows =
         requestData?.liquidation_items?.length > 0
           ? requestData.liquidation_items.map((item) => ({
               id: item.id || 0,
-              date: item.date || "N/A",
+              date: item.date || "",
               rt: item.rt || "",
               store_name: item.store_name || "",
               particulars: item.particulars || "",
-              from: item.from || "",
-              to: item.to || "",
-              mode_of_transportation: item.mode_of_transportation || "",
+              from: item.started_from || "",
+              to: item.ended_to || "",
+              mode_of_transportation: item.li_mode_of_transportation || "",
               amount:
                 item.amount === null ||
                 item.amount === undefined ||
                 item.amount === ""
-                  ? "N/A"
+                  ? ""
                   : item.amount,
             }))
           : [
               {
-                date: "N/A",
+                date: "",
                 rt: "",
                 store_name: "",
                 particulars: "",
                 from: "",
                 to: "",
                 mode_of_transportation: "",
-                amount: "N/A",
+                amount: "",
               },
             ];
 
@@ -51,49 +66,62 @@ const EditLiquidation = ({ show, onHide, requestData, onSave }) => {
       setRemarks(requestData.remarks || "");
       setReceipts(requestData.receipts || []);
     }
-  }, [requestData]);
 
-  // ✅ Handle row edit (same logic as in LiqReqForm)
-  const handleRowChange = (index, field, value) => {
-    const updated = [...tableRows];
-    updated[index][field] = value;
-    setTableRows(updated);
-  };
+    loadData();
+  }, [requestData, draftKey]);
 
-  // ✅ Add new row (matches LiqReqForm behavior)
-  const handleAddRow = (newRow, insertIndex = null) => {
-    const defaultRow = {
-      date: "",
-      rt: "",
-      store_name: "",
-      particulars: "",
-      from: "",
-      to: "",
-      mode_of_transportation: "",
-      amount: "",
-    };
+  // 💾 AUTO-SAVE DRAFT
+  useEffect(() => {
+    if (!requestData) return;
 
-    setTableRows((prev) => {
-      const updated = [...prev];
-      if (insertIndex !== null && insertIndex >= 0) {
-        updated.splice(insertIndex, 0, newRow || defaultRow);
-      } else {
-        updated.push(newRow || defaultRow);
-      }
-      return updated;
-    });
-  };
+    const saveTimeout = setTimeout(() => {
+      const dataToSave = {
+        tableRows,
+        remarks,
+        receipts,
+        updatedAt: new Date(),
+      };
+      saveDraft(draftKey, dataToSave);
+      console.log("💾 Auto-saved edit draft:", draftKey);
+    }, 600);
 
-  // ✅ Remove a row
-  const handleRemoveRow = (index) => {
-    setTableRows((prev) => prev.filter((_, i) => i !== index));
-  };
+    return () => clearTimeout(saveTimeout);
+  }, [tableRows, remarks, receipts, draftKey, requestData]);
 
-  // ✅ Save edited liquidation
+  // 🧹 DELETE DRAFT AFTER SUCCESSFUL UPDATE
   const handleSave = async () => {
+    // ✅ Validation for missing date
+    const hasMissingDate = tableRows.some((row) => {
+      const hasOtherFieldsFilled =
+        row.rt?.trim() ||
+        row.store_name?.trim() ||
+        row.particulars?.trim() ||
+        row.from?.trim() ||
+        row.to?.trim() ||
+        row.mode_of_transportation?.trim() ||
+        (row.amount && parseFloat(row.amount) > 0);
+
+      return hasOtherFieldsFilled && (!row.date || row.date.trim() === "");
+    });
+
+    if (hasMissingDate) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Date",
+        text: "Please fill in the Date for all rows that have details before submitting.",
+        confirmButtonColor: "#800000",
+      });
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Authentication expired. Please log in again.");
+      Swal.fire({
+        icon: "error",
+        title: "Authentication Expired",
+        text: "Please log in again to continue.",
+        confirmButtonColor: "#800000",
+      });
       return;
     }
 
@@ -137,6 +165,8 @@ const EditLiquidation = ({ show, onHide, requestData, onSave }) => {
       }
 
       await res.json();
+      await deleteDraft(draftKey);
+      console.log("🧹 Deleted edit draft:", draftKey);
 
       onSave?.({
         id: requestData.id,
@@ -145,15 +175,34 @@ const EditLiquidation = ({ show, onHide, requestData, onSave }) => {
         receipts: payload.receipts,
       });
 
+      // ✅ Success Swal (auto close, no button)
+      Swal.fire({
+        icon: "success",
+        title: "Liquidation Updated",
+        text: "Your changes have been successfully saved.",
+        timer: 1500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+
+      onHide();
       navigate("/employee_liquidation");
     } catch (error) {
       console.error(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: error.message || "Something went wrong. Please try again.",
+        confirmButtonColor: "#800000",
+      });
+
       setError(error.message || "Something went wrong. Please try again.");
     }
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered size="xl">
+    <Modal show={show} onHide={onHide} centered size="fullscreen">
       <Modal.Header closeButton style={{ backgroundColor: "#EFEEEA" }}>
         <Modal.Title>EDIT LIQUIDATION</Modal.Title>
       </Modal.Header>
@@ -173,15 +222,36 @@ const EditLiquidation = ({ show, onHide, requestData, onSave }) => {
           </Alert>
         )}
 
-        {/* ✅ Liquidation table behaves same as in LiqReqForm */}
         <LiquidTable
           tableRows={tableRows}
-          onRowChange={handleRowChange}
-          onAddRow={handleAddRow}
-          onRemoveRow={handleRemoveRow}
+          onRowChange={(i, f, v) => {
+            const updated = [...tableRows];
+            updated[i][f] = v;
+            setTableRows(updated);
+          }}
+          onAddRow={(r, i) => {
+            const defaultRow = {
+              date: "",
+              rt: "",
+              store_name: "",
+              particulars: "",
+              from: "",
+              to: "",
+              mode_of_transportation: "",
+              amount: "",
+            };
+            setTableRows((prev) => {
+              const updated = [...prev];
+              if (i != null && i >= 0) updated.splice(i, 0, r || defaultRow);
+              else updated.push(r || defaultRow);
+              return updated;
+            });
+          }}
+          onRemoveRow={(i) =>
+            setTableRows((prev) => prev.filter((_, j) => j !== i))
+          }
         />
 
-        {/* ✅ Remarks + Receipts */}
         <LiquidReceipt
           remarksValue={remarks}
           onRemarksChange={(e) => setRemarks(e.target.value)}

@@ -26,9 +26,11 @@ const RejectedLiquidation = () => {
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
   const [printData, setPrintData] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
   const downloadRef = useRef(null);
 
+  // 🔹 Fetch rejected liquidations WITH enrichment
   const fetchRejectedLiquidations = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -37,12 +39,9 @@ const RejectedLiquidation = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      // Fetch only rejected liquidations
       const res = await fetch(
         "/api5012/liquidation/getapproved_liquidation?status=rejected",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (!res.ok) throw new Error("Failed to fetch rejected liquidations");
@@ -50,13 +49,43 @@ const RejectedLiquidation = () => {
       const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const mappedData = apiData.map((item, index) => ({
+      const baseData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `liq-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      // Fetch each liquidation’s detailed data (items + activities)
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Failed to fetch details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -64,12 +93,11 @@ const RejectedLiquidation = () => {
     }
   }, []);
 
-  // INITIAL FETCH
   useEffect(() => {
     fetchRejectedLiquidations();
   }, [fetchRejectedLiquidations]);
 
-  // TOTAL CARDS
+  // 🔹 Fetch finance cards
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -79,8 +107,7 @@ const RejectedLiquidation = () => {
         });
 
         if (!res.ok) {
-          const text = await res.text();
-          console.error("Finance cards API error:", text);
+          console.error("Finance cards API error:", await res.text());
           return;
         }
 
@@ -102,7 +129,7 @@ const RejectedLiquidation = () => {
     fetchCards();
   }, []);
 
-  // FILTER & SEARCH
+  // 🔹 Filter data by search
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -120,22 +147,26 @@ const RejectedLiquidation = () => {
     [selectedRows]
   );
 
-  // NAVIGATION TO FINANCE FORM
+  // 🔹 Handle row click navigation
   const handleRowClick = (entry) => {
+    setSelectedRowId(entry.id);
     navigate("/finance_liquid_form", {
       state: { ...entry, role: "finance" },
     });
   };
 
+  // 🔹 Export handler
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "liquidated-requests",
+      filename: "rejected-liquidations",
     });
     setSelectedRows(resetSelection);
   };
+
+  const handleRetry = () => fetchRejectedLiquidations();
 
   return (
     <div className="pb-3">
@@ -148,37 +179,41 @@ const RejectedLiquidation = () => {
           <ToolBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            onRefresh={fetchRejectedLiquidations}
+            onRefresh={handleRetry}
             selectedCount={selectedCount}
             handleExport={handleExport}
           />
 
-          {/* LOADING STATE */}
           {loading && (
             <Alert variant="info" className="text-center">
               Loading rejected liquidation records...
             </Alert>
           )}
 
-          {/* ERROR STATE */}
           {error && (
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <Button size="sm" onClick={fetchRejectedLiquidations}>
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
                 </Button>
               </div>
             </Alert>
           )}
 
-          {/* TABLE */}
-          {!loading && !error && (
+          {!loading && !error && filteredData.length === 0 && (
+            <Alert variant="warning" className="text-center">
+              No rejected liquidation records found.
+            </Alert>
+          )}
+
+          {!loading && !error && filteredData.length > 0 && (
             <DataTable
               data={filteredData}
               height="440px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
+              selectedRowId={selectedRowId}
               noDataMessage="No rejected liquidation records found."
               showCheckbox={true}
               selectedRows={selectedRows}

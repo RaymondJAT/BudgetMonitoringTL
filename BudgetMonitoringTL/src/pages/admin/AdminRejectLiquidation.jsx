@@ -17,8 +17,8 @@ const normalizeString = (value) =>
 const AdminRejectLiquidation = () => {
   const navigate = useNavigate();
 
-  const [searchValue, setSearchValue] = useState("");
   const [tableData, setTableData] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [printData, setPrintData] = useState(null);
@@ -27,7 +27,7 @@ const AdminRejectLiquidation = () => {
 
   const downloadRef = useRef(null);
 
-  // FETCH REJECTED LIQUIDATIONS
+  // 🔹 FETCH REJECTED LIQUIDATIONS (with details)
   const fetchRejectedLiquidations = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -36,6 +36,7 @@ const AdminRejectLiquidation = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
+      // Step 1: Fetch summary
       const res = await fetch(
         "/api5012/liquidation/getapproved_liquidation?status=rejected",
         { headers: { Authorization: `Bearer ${token}` } }
@@ -46,13 +47,43 @@ const AdminRejectLiquidation = () => {
       const result = await res.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const mappedData = apiData.map((item, index) => ({
+      const baseData = apiData.map((item, index) => ({
         ...item,
         id: item.id || item._id || `rejected-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      // Step 2: Fetch liquidation items & activities for each record
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Error fetching details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -64,12 +95,11 @@ const AdminRejectLiquidation = () => {
     fetchRejectedLiquidations();
   }, [fetchRejectedLiquidations]);
 
-  // SEARCH FILTER
+  // 🔹 FILTER + SEARCH
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
     const lowerSearch = normalizeString(searchValue);
-
     return tableData.filter((item) =>
       liquidationFinanceColumns.some((col) =>
         normalizeString(item[col.accessor]).includes(lowerSearch)
@@ -82,12 +112,13 @@ const AdminRejectLiquidation = () => {
     [selectedRows]
   );
 
-  // HANDLE ROW CLICK
+  // 🔹 ROW CLICK NAVIGATION
   const handleRowClick = (entry) => {
     setSelectedRowId(entry.id);
     navigate("/admin_liquid_form", { state: { ...entry, role: "admin" } });
   };
 
+  // 🔹 EXPORT FUNCTION
   const handleExport = () => {
     const resetSelection = handleExportData({
       filteredData,
@@ -98,14 +129,16 @@ const AdminRejectLiquidation = () => {
     setSelectedRows(resetSelection);
   };
 
+  const handleRetry = () => fetchRejectedLiquidations();
+
   return (
     <div className="pb-3">
       <Container fluid>
         <div className="custom-container shadow-sm rounded p-3 mt-3">
           <ToolBar
             searchValue={searchValue}
-            onSearchChange={setSearchValue} // pass value directly
-            onRefresh={fetchRejectedLiquidations}
+            onSearchChange={setSearchValue}
+            onRefresh={handleRetry}
             selectedCount={selectedCount}
             handleExport={handleExport}
             showFilter={false}
@@ -121,22 +154,28 @@ const AdminRejectLiquidation = () => {
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <Button size="sm" onClick={fetchRejectedLiquidations}>
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
                 </Button>
               </div>
             </Alert>
           )}
 
-          {!loading && !error && (
+          {!loading && !error && filteredData.length === 0 && (
+            <Alert variant="warning" className="text-center">
+              No rejected liquidation records found.
+            </Alert>
+          )}
+
+          {!loading && !error && filteredData.length > 0 && (
             <DataTable
               data={filteredData}
               height="550px"
               columns={liquidationFinanceColumns}
               onRowClick={handleRowClick}
+              selectedRowId={selectedRowId}
               noDataMessage="No rejected liquidation records found."
               showCheckbox={true}
-              selectedRowId={selectedRowId}
               selectedRows={selectedRows}
               onSelectionChange={setSelectedRows}
               downloadRef={downloadRef}
@@ -144,6 +183,7 @@ const AdminRejectLiquidation = () => {
             />
           )}
 
+          {/* Hidden printable component */}
           <div className="d-none">
             <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
           </div>

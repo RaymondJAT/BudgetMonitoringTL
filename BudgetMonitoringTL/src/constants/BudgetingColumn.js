@@ -12,7 +12,7 @@ const pesoFormatter = new Intl.NumberFormat("en-PH", {
 
 // REVOLVING FUND
 export const revolvingFundColumns = [
-  // { label: "ID", accessor: "id" },
+  { label: "ID", accessor: "id" },
   { label: "Budget Name", accessor: "name" },
   { label: "Start Date", accessor: "start_date" },
   { label: "End Date", accessor: "end_date" },
@@ -20,57 +20,145 @@ export const revolvingFundColumns = [
   {
     label: "Beginning",
     accessor: "beginning",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Added",
     accessor: "added",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Total Fund",
     accessor: "total_fund",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Issued",
     accessor: "issued",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Returned",
     accessor: "returned",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Outstanding",
     accessor: "outstanding",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Amount Expended",
     accessor: "amount_expended",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Ended",
     accessor: "ending",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Liquidated",
     accessor: "liquidated",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Unliquidated",
     accessor: "unliquidated",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
   {
     label: "Balance",
     accessor: "balance",
-    Cell: ({ value }) => pesoFormatter.format(value || 0),
+    Cell: ({ value }) => {
+      const pesoFormatter = new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return pesoFormatter.format(value || 0);
+    },
   },
 
   { label: "Status", accessor: "status" },

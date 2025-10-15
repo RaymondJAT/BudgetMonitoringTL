@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
+import Swal from "sweetalert2";
 
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
@@ -70,6 +71,39 @@ const App = () => {
       sessionStorage.setItem("sessionActive", "true");
     }
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let logoutTimer;
+
+    const resetTimer = () => {
+      clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => {
+        Swal.fire({
+          title: "Session Expired",
+          text: "You have been logged out due to inactivity.",
+          icon: "warning",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        setTimeout(() => {
+          logout();
+        }, 2000);
+      }, 30 * 60 * 1000);
+    };
+
+    const events = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    events.forEach((event) => window.addEventListener(event, resetTimer));
+
+    resetTimer();
+
+    return () => {
+      clearTimeout(logoutTimer);
+      events.forEach((event) => window.removeEventListener(event, resetTimer));
+    };
+  }, [isAuthenticated]);
 
   return (
     <Router>

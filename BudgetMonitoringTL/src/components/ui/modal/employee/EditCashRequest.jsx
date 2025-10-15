@@ -1,14 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import AppButton from "../../buttons/AppButton";
-import EditRequestForm from "../../../layout/employee/cash-request/EditRequestForm"; // 👈 use the new simplified form
+import EditRequestForm from "../../../layout/employee/cash-request/EditRequestForm";
 import { numberToWords } from "../../../../utils/numberToWords";
 
 const EditCashRequest = ({ show, onHide, requestData = {}, onSubmit }) => {
   const [formOutput, setFormOutput] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const [amount, setAmount] = useState("");
   const [amountInWords, setAmountInWords] = useState("Zero Pesos Only");
   const navigate = useNavigate();
@@ -39,7 +39,6 @@ const EditCashRequest = ({ show, onHide, requestData = {}, onSubmit }) => {
 
   const handleCloseModal = () => {
     if (!submitting) {
-      setError("");
       onHide();
     }
   };
@@ -66,29 +65,75 @@ const EditCashRequest = ({ show, onHide, requestData = {}, onSubmit }) => {
   };
 
   const handleSave = async () => {
-    const cashRequestId = formOutput.cash_request_id || formOutput.id;
+    const {
+      description,
+      team_lead,
+      amount,
+      cash_request_id,
+      id,
+      request_date,
+    } = formOutput;
+    const cashRequestId = cash_request_id || id;
+
+    // 🚨 Validation (with Swal)
+    if (!description?.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Field",
+        text: "Particulars is required.",
+        confirmButtonColor: "#800000",
+      });
+      return;
+    }
+    if (!team_lead?.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Field",
+        text: "Team Lead is required.",
+        confirmButtonColor: "#800000",
+      });
+      return;
+    }
+    if (!amount || parseFloat(amount) <= 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid Amount",
+        text: "Amount is required and must be greater than zero.",
+        confirmButtonColor: "#800000",
+      });
+      return;
+    }
     if (!cashRequestId) {
-      setError("Missing cash request ID.");
+      Swal.fire({
+        icon: "error",
+        title: "Missing Data",
+        text: "Missing cash request ID.",
+        confirmButtonColor: "#800000",
+      });
       return;
     }
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Authentication expired. Please log in again.");
+      Swal.fire({
+        icon: "error",
+        title: "Authentication Expired",
+        text: "Please log in again.",
+        confirmButtonColor: "#800000",
+      });
       return;
     }
 
     try {
       setSubmitting(true);
-      setError("");
 
       const payload = {
         cash_request_id: cashRequestId,
-        description: formOutput.description,
-        team_lead: formOutput.team_lead,
-        amount: formOutput.amount,
+        description,
+        team_lead,
+        amount,
         updated_by: localStorage.getItem("employee_name") || "admin",
-        request_date: formOutput.request_date,
+        request_date,
       };
 
       const res = await fetch(
@@ -111,12 +156,25 @@ const EditCashRequest = ({ show, onHide, requestData = {}, onSubmit }) => {
       const result = await res.json();
       if (onSubmit) onSubmit(result.data || payload);
 
-      // ✅ Redirect after saving
-      navigate("/employee_request");
-      handleCloseModal();
+      Swal.fire({
+        icon: "success",
+        title: "Changes Saved",
+        text: "The cash request has been updated successfully.",
+        confirmButtonColor: "#800000",
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => {
+        navigate("/employee_request");
+        handleCloseModal();
+      });
     } catch (error) {
       console.error("Error updating cash request:", error);
-      setError(error.message || "Something went wrong. Please try again.");
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: error.message || "Something went wrong. Please try again.",
+        confirmButtonColor: "#800000",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -143,17 +201,6 @@ const EditCashRequest = ({ show, onHide, requestData = {}, onSubmit }) => {
         className="cashreq-scroll"
         style={{ backgroundColor: "#800000" }}
       >
-        {error && (
-          <Alert
-            variant="danger"
-            className="mb-3"
-            onClose={() => setError("")}
-            dismissible
-          >
-            {error}
-          </Alert>
-        )}
-
         <EditRequestForm
           formData={formOutput}
           onChange={handleFormChange}

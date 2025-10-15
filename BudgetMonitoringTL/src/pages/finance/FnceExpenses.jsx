@@ -15,9 +15,9 @@ import DataTable from "../../components/layout/DataTable";
 
 const FnceExpenses = () => {
   const [cardsData, setCardsData] = useState(FINANCE_STATUS_LIST);
-  const [outstandingBalance, setOutstandingBalance] = useState([]);
+  // const [outstandingBalance, setOutstandingBalance] = useState([]);
   const [requestStatus, setRequestStatus] = useState([]);
-  const [cashFlow, setCashFlow] = useState([]);
+  // const [cashFlow, setCashFlow] = useState([]);
 
   const [revolvingFundData, setRevolvingFundData] = useState([]);
   const [loadingRevolving, setLoadingRevolving] = useState(false);
@@ -80,29 +80,29 @@ const FnceExpenses = () => {
 
         const data = await res.json();
 
-        setOutstandingBalance(
-          (data.outstanding_balance || []).map((item) => ({
-            date: new Date(item.date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            outstanding_balance: parseFloat(item.outstanding_balance) || 0,
-            released_amount: parseFloat(item.released_amount) || 0,
-          }))
-        );
+        // setOutstandingBalance(
+        //   (data.outstanding_balance || []).map((item) => ({
+        //     date: new Date(item.date).toLocaleDateString("en-US", {
+        //       month: "short",
+        //       day: "numeric",
+        //     }),
+        //     outstanding_balance: parseFloat(item.outstanding_balance) || 0,
+        //     released_amount: parseFloat(item.released_amount) || 0,
+        //   }))
+        // );
 
         setRequestStatus(data.request_status?.[0] || {});
 
-        setCashFlow(
-          (data.cash_flow || []).map((item) => ({
-            date: new Date(item.date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            total_cash_request: parseFloat(item.total_cash_request) || 0,
-            total_liquidation: parseFloat(item.total_liquidation) || 0,
-          }))
-        );
+        // setCashFlow(
+        //   (data.cash_flow || []).map((item) => ({
+        //     date: new Date(item.date).toLocaleDateString("en-US", {
+        //       month: "short",
+        //       day: "numeric",
+        //     }),
+        //     total_cash_request: parseFloat(item.total_cash_request) || 0,
+        //     total_liquidation: parseFloat(item.total_liquidation) || 0,
+        //   }))
+        // );
       } catch (err) {
         console.error("Error fetching finance charts:", err);
       }
@@ -224,7 +224,7 @@ const FnceExpenses = () => {
           {/* Top row: Cash Flow Chart full width */}
           <div className="col-12">
             <div className="custom-container rounded p-3">
-              <CashFlowChart data={cashFlow} />
+              <CashFlowChart />
             </div>
           </div>
 
@@ -245,7 +245,7 @@ const FnceExpenses = () => {
 
           <div className="col-12">
             <div className="custom-container rounded p-3">
-              <OutstandingBalanceChart data={outstandingBalance} />
+              <OutstandingBalanceChart />
             </div>
           </div>
         </div>

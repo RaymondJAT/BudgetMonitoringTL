@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Alert } from "react-bootstrap";
+import { Container, Alert, Button } from "react-bootstrap";
 
 import { TEAMLEAD_STATUS_LIST } from "../../constants/totalList";
 import { liquidationColumns } from "../../handlers/tableHeader";
@@ -24,12 +24,13 @@ const Reviewed = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
-  const [cardsData, setCardsData] = useState([TEAMLEAD_STATUS_LIST]);
+  const [cardsData, setCardsData] = useState(TEAMLEAD_STATUS_LIST);
   const [selectedRows, setSelectedRows] = useState({});
   const [printData, setPrintData] = useState(null);
 
   const downloadRef = useRef(null);
 
+  // ✅ Fetch reviewed (approved/verified) liquidations + their items & activities
   const fetchReviewed = useCallback(async () => {
     try {
       setLoading(true);
@@ -51,7 +52,8 @@ const Reviewed = () => {
       const result = await response.json();
       const apiData = Array.isArray(result) ? result : result.data || [];
 
-      const approvedData = apiData.filter((item) => {
+      // Filter approved / verified only
+      const reviewedData = apiData.filter((item) => {
         const status = normalizeString(item.status);
         const leadStatus = normalizeString(item.team_lead_status);
 
@@ -63,13 +65,43 @@ const Reviewed = () => {
         );
       });
 
-      const mappedData = approvedData.map((item, index) => ({
+      const baseData = reviewedData.map((item, index) => ({
         ...item,
-        id: item.id || item._id || index,
+        id: item.id || item._id || `liq-${index}`,
         formType: "Liquidation",
       }));
 
-      setTableData(mappedData);
+      // 🔹 Fetch each liquidation’s items + activities
+      const enrichedData = await Promise.all(
+        baseData.map(async (entry) => {
+          try {
+            const [itemsRes, actsRes] = await Promise.all([
+              fetch(
+                `/api5012/liquidation_item/getliquidation_item_by_id?id=${entry.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+              fetch(
+                `/api5012/liquidation_activity/getliquidation_activity_by_id?id=${entry.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+            ]);
+
+            const items = await itemsRes.json();
+            const acts = await actsRes.json();
+
+            return {
+              ...entry,
+              liquidation_items: Array.isArray(items) ? items : [],
+              activities: Array.isArray(acts) ? acts : [],
+            };
+          } catch (err) {
+            console.error(`Failed to fetch details for ${entry.id}:`, err);
+            return entry;
+          }
+        })
+      );
+
+      setTableData(enrichedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -81,17 +113,19 @@ const Reviewed = () => {
     fetchReviewed();
   }, [fetchReviewed]);
 
+  // ✅ Fetch Team Leader dashboard cards
   useEffect(() => {
     const fetchCards = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) return;
+
         const res = await fetch("/api5012/dashboard/get_teamleader_cards", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
-          const text = await res.text();
-          console.error("Teamleader cards API error:", text);
+          console.error("Teamleader cards API error:", await res.text());
           return;
         }
 
@@ -112,6 +146,7 @@ const Reviewed = () => {
     fetchCards();
   }, []);
 
+  // ✅ Filter table data by search
   const filteredData = useMemo(() => {
     if (!searchValue) return tableData;
 
@@ -131,7 +166,7 @@ const Reviewed = () => {
     navigate("/liquid_approval_form", {
       state: {
         ...entry,
-        role: "reviewer",
+        role: "reviewer", // Detailed form will fetch items/receipts/activities
       },
     });
   };
@@ -146,7 +181,7 @@ const Reviewed = () => {
       filteredData,
       selectedRows,
       selectedCount,
-      filename: "reviewed-requests",
+      filename: "reviewed-liquidations",
     });
     setSelectedRows(resetSelection);
   };
@@ -177,12 +212,9 @@ const Reviewed = () => {
             <Alert variant="danger" className="text-center">
               Error: {error}
               <div className="mt-2">
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={handleRetry}
-                >
+                <Button size="sm" onClick={handleRetry}>
                   Try Again
-                </button>
+                </Button>
               </div>
             </Alert>
           )}
@@ -208,6 +240,7 @@ const Reviewed = () => {
             />
           )}
 
+          {/* 🔹 Hidden printable component for PDF export */}
           <div className="d-none">
             <LiquidationPdf contentRef={downloadRef} data={printData || {}} />
           </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal, Spinner, Alert } from "react-bootstrap";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import LiqReqForm from "../../../layout/employee/liquidation-request/LiqReqForm";
 import AppButton from "../../buttons/AppButton";
@@ -45,10 +45,14 @@ const LiqFormModal = ({ show, onHide, requestData = null, onSuccess }) => {
         onSuccess(result);
       }
 
-      // ✅ show success toast
-      toast.success("Liquidation successfully submitted!", {
-        position: "top-right",
-        autoClose: 3000,
+      // ✅ SUCCESS SWAL (auto-close, no confirm button)
+      Swal.fire({
+        icon: "success",
+        title: "Liquidation Submitted",
+        text: "Your liquidation form has been successfully submitted.",
+        timer: 1500,
+        showConfirmButton: false,
+        timerProgressBar: true,
       });
 
       onHide();
@@ -56,9 +60,13 @@ const LiqFormModal = ({ show, onHide, requestData = null, onSuccess }) => {
     } catch (err) {
       console.error("Error submitting liquidation:", err);
       setError(err.message);
-      toast.error("Failed to submit liquidation form", {
-        position: "top-right",
-        autoClose: 3000,
+
+      // ❌ ERROR SWAL
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: err.message || "Something went wrong. Please try again.",
+        confirmButtonColor: "#800000",
       });
     } finally {
       setSubmitting(false);
@@ -69,7 +77,7 @@ const LiqFormModal = ({ show, onHide, requestData = null, onSuccess }) => {
     <Modal
       show={show}
       onHide={handleCloseModal}
-      dialogClassName="modal-xl"
+      dialogClassName="modal-fullscreen"
       centered
       scrollable
     >
